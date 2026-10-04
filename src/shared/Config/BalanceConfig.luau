@@ -30,12 +30,12 @@ local BalanceConfig = {
 	Storage = {
 		StartCapacity = 1000,
 		-- Kapazitätsstufen über die Storage-App im Laptop (docs/09 §29–30). Jede Stufe setzt
-		-- die Gesamtkapazität auf Capacity. Vorschlag Q-019, noch nicht bestätigt.
+		-- die Gesamtkapazität auf Capacity. Werte von Felix bestätigt (D-022).
 		Upgrades = {
-			{ Capacity = 2500, Cost = 3000, RequiredLevel = 5 }, -- TODO_BALANCE (Q-019)
-			{ Capacity = 5000, Cost = 8000, RequiredLevel = 6 }, -- TODO_BALANCE (Q-019)
-			{ Capacity = 10000, Cost = 20000, RequiredLevel = 8 }, -- TODO_BALANCE (Q-019)
-			{ Capacity = 25000, Cost = 50000, RequiredLevel = 10 }, -- TODO_BALANCE (Q-019)
+			{ Capacity = 2500, Cost = 3000, RequiredLevel = 5 }, -- Felix (D-022)
+			{ Capacity = 5000, Cost = 8000, RequiredLevel = 6 }, -- Felix (D-022)
+			{ Capacity = 10000, Cost = 20000, RequiredLevel = 8 }, -- Felix (D-022)
+			{ Capacity = 25000, Cost = 50000, RequiredLevel = 10 }, -- Felix (D-022)
 		},
 	},
 
@@ -65,13 +65,13 @@ local BalanceConfig = {
 	Elevator = {
 		StartCapacity = 100, -- Felix (D-021) Erz pro Fahrt
 		CycleSeconds = 10, -- Felix (D-021) eine Fahrt alle n Sekunden
-		-- Kapazitätsstufen über die Elevator-App im Laptop (docs/09 §31). Vorschlag Q-019.
+		-- Kapazitätsstufen über die Elevator-App im Laptop (docs/09 §31). Bestätigt (D-022).
 		Upgrades = {
-			{ Capacity = 200, Cost = 2000, RequiredLevel = 3 }, -- TODO_BALANCE (Q-019)
-			{ Capacity = 350, Cost = 5000, RequiredLevel = 5 }, -- TODO_BALANCE (Q-019)
-			{ Capacity = 500, Cost = 10000, RequiredLevel = 7 }, -- TODO_BALANCE (Q-019)
-			{ Capacity = 750, Cost = 20000, RequiredLevel = 9 }, -- TODO_BALANCE (Q-019)
-			{ Capacity = 1000, Cost = 40000, RequiredLevel = 11 }, -- TODO_BALANCE (Q-019)
+			{ Capacity = 200, Cost = 2000, RequiredLevel = 3 }, -- Felix (D-022)
+			{ Capacity = 350, Cost = 5000, RequiredLevel = 5 }, -- Felix (D-022)
+			{ Capacity = 500, Cost = 10000, RequiredLevel = 7 }, -- Felix (D-022)
+			{ Capacity = 750, Cost = 20000, RequiredLevel = 9 }, -- Felix (D-022)
+			{ Capacity = 1000, Cost = 40000, RequiredLevel = 11 }, -- Felix (D-022)
 		},
 	},
 

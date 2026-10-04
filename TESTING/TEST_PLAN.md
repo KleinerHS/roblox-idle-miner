@@ -130,7 +130,7 @@ Werte sind Platzhalter aus Q-018. Voraussetzung: Lager gebaut.
 
 ## Phase 4c – Laptop-Apps & Upgrades
 
-Werte sind Vorschläge aus Q-019. Voraussetzung: Lager gebaut.
+Werte aus D-022. Voraussetzung: Lager gebaut.
 
 | # | Test | Schritte | Erwartet |
 |---|---|---|---|
