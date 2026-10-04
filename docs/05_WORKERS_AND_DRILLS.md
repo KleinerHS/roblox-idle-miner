@@ -167,7 +167,7 @@ wenn beide Mining-Slots mit Workern statt Drills belegt sind.
 
 # 10. Spieler und Mining-Slots
 
-> **Entscheidung D-005 (ersetzt die frühere Regel dieses Abschnitts):** Sind beide Mining-Slots einer Mine mit Worker oder Drill belegt, kann der Spieler in dieser Mine nicht manuell minen. Es gibt keinen dritten Spielerbereich. Ist mindestens ein Slot frei, minet der Spieler an diesem freien Slot.
+> **Entscheidung D-005:** Der Spieler minet an denselben zwei Mining-Slots wie Worker und Drills. Auch wenn beide Slots belegt sind, kann er dort weiter manuell minen; er wird nie blockiert. Es gibt keinen dritten Spielerbereich.
 
 Die zwei festen Mining-Slots sind die einzigen Abbaustellen einer Mine.
 

@@ -29,10 +29,10 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Affected systems:** Worker, Storage, Selling, Progression, Build Plan (Phase 3/4)
 **Spec updated:** `docs/06` §17a
 
-## D-005 – Kein manuelles Mining, wenn beide Slots belegt sind
+## D-005 – Spieler minet an denselben Slots wie Worker/Drills
 
 **Source Question:** Q-004
-**Decision:** Sind beide Mining-Slots einer Mine mit Worker/Drill belegt, kann der Spieler dort nicht manuell minen. Kein dritter Spielerbereich. Bei mindestens einem freien Slot minet der Spieler an diesem Slot.
+**Decision:** Der Spieler kann an derselben Stelle minen wie Worker oder Drills, auch wenn beide Mining-Slots belegt sind. Kein dritter Spielerbereich. (Korrigiert durch Felix am 2026-10-04; die erste Fassung „Spieler kann dann nicht minen“ ist ungültig.)
 **Affected systems:** Mining, Mine Shaft Layout, Worker, Drill
 **Spec updated:** `docs/05` §10 (ersetzt die alte Regel „Spieler darf nicht blockiert werden“)
 
@@ -41,6 +41,7 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Source Question:** Q-005
 **Decision:** Rare Drops kommen nicht in Vertical Slice A. Bei fast vollem Rucksack darf ein Rare Drop die Kapazität einmalig überschreiten, nichts geht verloren.
 **Affected systems:** Mining, Backpack, Rare Drops
+**Bestätigt:** Felix, 2026-10-04 („ja passt“)
 **Spec updated:** `docs/03` §7
 
 ## D-007 – Quellen für Mining Luck

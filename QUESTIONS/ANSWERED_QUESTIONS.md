@@ -119,7 +119,7 @@ Jeder der beiden Erzbereiche ist breit genug: Worker/Drill belegt einen festen P
 Alles. Wird beim Mine-Layout in Phase 2 berücksichtigt.
 
 ### Answer (Felix, 2026-10-04)
-Spieler kann **nicht** minen, wenn beide Slots belegt sind. Kein dritter Bereich.
+Erste Antwort: „Spieler kann nicht minen, wenn beide Slots belegt sind.“ Korrektur (Felix, 2026-10-04): „Dann kann der Spieler an der selben Stelle wie die Arbeiter oder Drills minen.“ Gültig ist die Korrektur. Kein dritter Bereich.
 
 **Decision:** D-005
 
@@ -141,7 +141,7 @@ Spieler kann **nicht** minen, wenn beide Slots belegt sind. Kein dritter Bereich
 2. Ein Rare Drop darf die Rucksackkapazität einmalig überschreiten (kein Verlust). Danach greift `BACKPACK FULL` normal.
 
 ### Answer (Felix, 2026-10-04)
-„5.a“: als Default A für beide Teile übernommen: Rare Drops erst nach Slice A; bei fast vollem Rucksack darf ein Rare Drop einmalig überlaufen.
+„5.a“: Default A für beide Teile: Rare Drops erst nach Slice A; bei fast vollem Rucksack darf ein Rare Drop einmalig überlaufen. Auslegung von Felix bestätigt („ja passt“).
 
 **Decision:** D-006
 
