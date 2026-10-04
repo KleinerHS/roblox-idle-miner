@@ -220,7 +220,7 @@ local function buildTimberLining(model: Model, o: CFrame, rng: Random)
 end
 
 -- Abbauplatz: schwerer Stützrahmen über der offenen Erzwand, Erzflöz in der Wand,
--- großer Erzhaufen davor (wie im Referenzbild), unsichtbare Abbauzone.
+-- freie Arbeitsfläche davor, unsichtbare Abbauzone.
 local function buildSlot(model: Model, o: CFrame, slotIndex: number, plotId: number, rng: Random)
 	local slot = LayoutConfig.MineShaft.Slots[slotIndex]
 	local wall = if slot.X > 0 then walls()[2] else walls()[3]
@@ -257,30 +257,11 @@ local function buildSlot(model: Model, o: CFrame, slotIndex: number, plotId: num
 		chunk:SetAttribute("Recolor", "Ore")
 	end
 
-	-- Erzhaufen auf dem Boden (Kegel aus Brocken)
-	local radius = 9
-	local peak = 6.5
-	for i = 1, 38 do
-		local r = radius * math.sqrt(rng:NextNumber(0, 1))
-		local a = rng:NextNumber(0, math.pi * 2)
-		local s = rng:NextNumber(1.8, 3.6)
-		local y = (1 - r / radius) * peak + s * 0.35
-		local cf = o * CFrame.new(slot.X + math.cos(a) * r, y, slot.Y + math.sin(a) * r * 1.15) * CFrame.Angles(rng:NextNumber(0, 3), rng:NextNumber(0, 3), rng:NextNumber(0, 3))
-		local chunk = part(vein, `Heap{i}`, Vector3.new(s, s * rng:NextNumber(0.7, 1), s * rng:NextNumber(0.8, 1)), cf, Color3.new(0, 0, 0), Enum.Material.Slate)
-		if i % 3 == 0 then
-			chunk.Shape = Enum.PartType.Ball
-		end
-		chunk:SetAttribute("Recolor", "Ore")
-	end
+	-- Vor der Erzwand bleibt der Boden frei: Arbeitsplatz für Spieler, Worker und Drills
+	-- (Rückmeldung Felix 2026-10-04, keine Erzhaufen mehr).
 
-	-- Kiste und Spitzhacke vorne am Haufen
-	local edge = o * CFrame.new(slot.X, 0, slot.Y - radius * 1.15 - 2)
-	part(folder, "Crate", Vector3.new(3, 3, 3), edge * CFrame.new(-3, 1.5, 0) * CFrame.Angles(0, 0.3, 0), CRATE, Enum.Material.WoodPlanks)
-	local handle = part(folder, "PickHandle", Vector3.new(0.3, 4.2, 0.3), edge * CFrame.new(1.5, 2, 1) * CFrame.Angles(0.35, 0, 0.2), WOOD_TONES[2], Enum.Material.Wood)
-	part(folder, "PickHead", Vector3.new(2.6, 0.35, 0.35), handle.CFrame * CFrame.new(0, 2, 0), IRON, Enum.Material.Metal)
-
-	-- Unsichtbare Abbauzone für Schritt 2c (deckt Haufen und Erzwand ab)
-	local zone = part(folder, `MiningSlot{slotIndex}`, Vector3.new(22, 12, 24), o * CFrame.new((slot.X + wall.center.X) / 2, 6, slot.Y), Color3.new(1, 1, 1), Enum.Material.SmoothPlastic)
+	-- Unsichtbare Abbauzone für Schritt 2c: freie Fläche direkt vor der Erzwand
+	local zone = part(folder, `MiningSlot{slotIndex}`, Vector3.new(16, 14, 12), wallCFrame(o, wall, t0, 7, 6), Color3.new(1, 1, 1), Enum.Material.SmoothPlastic)
 	zone.Transparency = 1
 	zone.CanCollide = false
 	zone:SetAttribute("SlotIndex", slotIndex)

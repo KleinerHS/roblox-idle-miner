@@ -9,7 +9,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | Setup | GitHub-Repo, Rojo-Projekt, Doku-Ordner | USER_APPROVED |
 | 0 | Dokumentations-Audit | USER_APPROVED (Freigabe „weiter“, 2026-10-04) |
 | 1 | Project Skeleton | USER_APPROVED (Felix „passt“, 2026-10-04; Zwei-Spieler-Test wird in Phase 2 nachgeholt) |
-| 2 | Vertical Slice A | TESTING_REQUIRED (2a USER_APPROVED, 2b TESTING_REQUIRED, 2c–2d NOT_STARTED) |
+| 2 | Vertical Slice A | TESTING_REQUIRED (2a USER_APPROVED, 2b USER_APPROVED, 2c–2d NOT_STARTED) |
 | 3 | Vertical Slice B (Equipment, Mine 02) | NOT_STARTED |
 | 4 | Storage + Worker (Worker erst nach Lager, D-004) | NOT_STARTED |
 | 5 | Drill | NOT_STARTED |
@@ -83,7 +83,7 @@ Selbsttest per Studio-MCP (2026-10-04, Place „10042026_2“, DataStore aktiv):
 - Reset per `ServerStorage.DevTools.ResetProgress` → Ausgangszustand (Cash 800, nur Büro-Button).
 - Test durch Felix 2026-10-04: Büro → Firma „Fullucks“ → Elevator ($800 → $600) → Rejoin, alles da, Spawn im Bett → USER_APPROVED.
 
-### 2b – Elevator & Mine Shaft 01 (Version 0.3.0)
+### 2b – Elevator & Mine Shaft 01 (Version 0.3.0) – USER_APPROVED
 
 | System | Dateien | Status |
 |---|---|---|
@@ -107,7 +107,8 @@ Rückmeldung Felix (2026-10-04) und Überarbeitung:
 - BUG-001: Käfig in der Mine nicht verlassbar → behoben (siehe `TESTING/BUGS.md`).
 - Elevator zu billig → neuer gemeinsamer Förderkorb für Oberfläche und Mine: I-Träger-Rahmen, Gitterstäbe, Schiebegitter-Tor, Förderturm mit Seilrad und Kreuzverband, Bedienpult mit Leuchttastern, Warnleuchte (leuchtet während der Fahrt), Innenlampe (`src/server/World/ElevatorCageBuilder.luau`). Oben auf Schachtrahmen mit Rampe, unten auf Podest mit Treppe und Geländer.
 - Holzbalken ohne Sinn → Türstockausbau an Rück- und Seitenwänden (Stempel, Kappe, Kopfbänder, Bretterverschalung, Laternen), an den Abbauplätzen schwerer Stützrahmen über der offenen Erzwand; dunkles, unterschiedlich getöntes Grubenholz. Fels dunkler.
-- Status 2b bleibt TESTING_REQUIRED bis zum erneuten Test durch Felix.
+- Zweite Rückmeldung Felix (2026-10-04): „Die zwei Haufen vor den Abbauplätzen müssen weg, damit Platz ist für die Miner, sonst alles gut.“ → Erzhaufen und Kiste/Spitzhacke davor entfernt, Fläche vor der Erzwand ist frei; Abbauzone liegt jetzt direkt vor der Erzwand (16 × 12).
+- Status 2b: USER_APPROVED (Freigabe „sonst alles gut“, Haufen-Änderung von mir per Studio-Test geprüft).
 
 ---
 
@@ -257,8 +258,8 @@ ASSETS/ASSET_REGISTRY.md  (ab Phase 2, `19` §19)
 | Datenspeicherung / Session Lock | 14 | 1 | TESTING_REQUIRED |
 | Tycoon-Baukette | 04 | 2 | USER_APPROVED |
 | Blechhütte + Firmenidentität | 04, 09 | 2 | USER_APPROVED |
-| Elevator + Mine-Auswahl | 04, 09, 12 | 2 | TESTING_REQUIRED |
-| Mine Shaft 01 | 00 §13, 03 | 2 | TESTING_REQUIRED |
+| Elevator + Mine-Auswahl | 04, 09, 12 | 2 | USER_APPROVED |
+| Mine Shaft 01 | 00 §13, 03 | 2 | USER_APPROVED |
 | Manuelles Mining | 03, 10 | 2 | NOT_STARTED |
 | Backpack | 10 | 2 | NOT_STARTED |
 | Verkauf am Tresen | 07 | 2 | NOT_STARTED |
