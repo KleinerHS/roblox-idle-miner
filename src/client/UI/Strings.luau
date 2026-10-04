@@ -40,6 +40,13 @@ local MESSAGES: { [string]: string } = {
 	ITEM_PURCHASED = "{Name} purchased and equipped!",
 	NOT_OWNED = "You don't own this item yet.",
 
+	-- Worker
+	SLOT_TAKEN = "This slot is already taken.",
+	STORAGE_REQUIRED = "Build the Storage first to hire workers.",
+	WORKER_HIRED = "{Name} hired!",
+	WORKERS_UNPAID = "Not enough money for wages – some workers paused.",
+	WORKERS_PAID = "All workers are paid and working again.",
+
 	-- Lager
 	STORAGE_FULL = "Storage is full!",
 	STORAGE_MOVED = "{Amount} ore moved.",
@@ -105,6 +112,24 @@ Strings.Storage = table.freeze({
 	Empty = "Storage is empty.",
 	Take = "TAKE",
 	Deposit = "DEPOSIT BACKPACK (%s)",
+})
+
+Strings.Laptop = table.freeze({
+	Apps = { "DASHBOARD", "EMPLOYEES", "STORAGE", "ELEVATOR", "PRODUCTION", "COMPANY" },
+	ComingSoon = "This app is coming soon.",
+	Employees = "EMPLOYEES",
+	NeedStorage = "Build the Storage first to hire workers.",
+	NoMines = "No mines unlocked.",
+	MiningSlot = "Mining Slot %d",
+	TransportSlot = "Transport Slot %d",
+	Empty = "Empty",
+	Hire = "HIRE %s",
+	Fire = "FIRE",
+	Wage = "%s / min",
+	Buffer = "Ore waiting at slots: %s",
+	Elevator = "Elevator: %s / %s",
+	Status = { Working = "Working", Waiting = "Waiting", Unpaid = "Unpaid" },
+	Close = "X",
 })
 
 Strings.Hud = table.freeze({

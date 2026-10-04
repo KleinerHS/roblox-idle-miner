@@ -96,6 +96,15 @@ local function buildOffice(plotCFrame: CFrame): Model
 	screen.Transparency = 0.1
 	laptop.PrimaryPart = base
 	CollectionService:AddTag(laptop, "Laptop")
+	local laptopPrompt = Instance.new("ProximityPrompt")
+	laptopPrompt.Name = "LaptopPrompt"
+	laptopPrompt.ActionText = "Use Laptop"
+	laptopPrompt.ObjectText = "Company Laptop"
+	laptopPrompt.HoldDuration = 0
+	laptopPrompt.MaxActivationDistance = 8
+	laptopPrompt.RequiresLineOfSight = false
+	laptopPrompt:SetAttribute("Laptop", true)
+	laptopPrompt.Parent = base
 
 	local chair = part(model, "Chair", Vector3.new(2.2, 0.4, 2.2), o * CFrame.new(7, 2, 5), METAL_DARK, Enum.Material.Fabric)
 	part(model, "ChairBack", Vector3.new(2.2, 2.4, 0.3), chair.CFrame * CFrame.new(0, 1.2, -1), METAL_DARK, Enum.Material.Fabric)

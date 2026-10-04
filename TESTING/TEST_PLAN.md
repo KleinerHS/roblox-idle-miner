@@ -111,3 +111,19 @@ Werte (Preise/Level der Bauschritte) sind Platzhalter aus Q-017. Testwerkzeuge (
 | 4a.6 | Lager voll | Mehr als 1.000 einlagern | Rest bleibt im Rucksack, „Storage is full!“, Silo-Balken rot |
 | 4a.7 | Speichern/Migration | Stop → Play | Gebäude und Lagerbestand bleiben; alter Spielstand (v1) wird automatisch auf v2 gebracht |
 | 4a.8 | Fremdes Lager (2 Spieler) | Spieler 2 drückt E am Terminal von Spieler 1 | „This is not your company.“ |
+## Phase 4b – Worker & Laptop
+
+Werte sind Platzhalter aus Q-018. Voraussetzung: Lager gebaut.
+
+| # | Test | Schritte | Erwartet |
+|---|---|---|---|
+| 4b.1 | Laptop | In der Hütte am Laptop **E** („Use Laptop“) | Kamera zoomt kurz, Laptop-Fenster mit Firmenname, App-Leiste, EMPLOYEES aktiv |
+| 4b.2 | Einstellen | MINE 01 → Mining Slot 1 → HIRE $2K | Geld −$2.000, Slot zeigt „Mining Worker #… · Working · $5 / min“ |
+| 4b.3 | Transport | Transport Slot 1 → HIRE $1.5K | Status Working; „Elevator: x / 100“ steigt |
+| 4b.4 | Produktion | Ein paar Minuten warten | Silo-Anzeige im Lager zählt hoch (ca. 30 Kohle/Min pro Mining-Worker) |
+| 4b.5 | Figuren | Elevator → Mine 01 | Mining-Worker mit Helm hackt an der Wand, Transport-Worker läuft mit Kiste zur Elevator-Treppe |
+| 4b.6 | Lohn | Eine Minute warten | Geld sinkt um den Lohn ($5 + $4) |
+| 4b.7 | Unbezahlt | Mit SetCash Geld auf 0 setzen, eine Minute warten | Meldung „Not enough money for wages…“, Status „Unpaid“, Produktion stoppt; Geld geben → nach der nächsten Minute wieder „Working“ |
+| 4b.8 | Lager voll | Lager füllen (oder warten) | Elevator-Anzeige bleibt voll, Worker zeigen „Waiting“, nichts verschwindet |
+| 4b.9 | Entlassen | FIRE | Slot wieder leer, kein Lohn mehr, Figur verschwindet |
+| 4b.10 | Speichern | Stop → Play | Worker, Puffer und Lagerbestand bleiben erhalten |

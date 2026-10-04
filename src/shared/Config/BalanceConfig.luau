@@ -31,6 +31,34 @@ local BalanceConfig = {
 		StartCapacity = 1000,
 	},
 
+	-- Worker (docs/05 §5–9). Werte: Platzhalter aus Q-018, TODO_BALANCE.
+	Workers = {
+		Mining = {
+			HireCost = 2000, -- TODO_BALANCE (Q-018)
+			WagePerMinute = 5, -- TODO_BALANCE (Q-018)
+			OrePerMinute = 30, -- TODO_BALANCE (Q-018)
+		},
+		Transport = {
+			HireCost = 1500, -- TODO_BALANCE (Q-018)
+			WagePerMinute = 4, -- TODO_BALANCE (Q-018)
+			-- Erz pro Gang und Dauer eines Hin-und-Rückwegs (ergibt ca. 150 Erz/Min)
+			CarryAmount = 50, -- TODO_BALANCE (Q-018)
+			TripSeconds = 20, -- TODO_BALANCE (Q-018)
+		},
+		-- Puffer je belegtem Mining-Slot (Erz wartet auf Abholung, docs/06 §20)
+		SlotBuffer = 200, -- TODO_BALANCE (Q-018)
+		-- Abstand der Lohnabrechnung (docs/05 §6: jede Minute)
+		PayrollSeconds = 60,
+		-- Rückerstattung beim Entlassen (Anteil der Einstellungskosten)
+		FireRefund = 0, -- TODO_BALANCE (Q-018)
+	},
+
+	-- Elevator-Materialtransport (docs/06 §9–11). Upgrades folgen mit der Elevator-App (4c).
+	Elevator = {
+		StartCapacity = 100, -- TODO_BALANCE (Q-018) Erz pro Fahrt
+		CycleSeconds = 10, -- TODO_BALANCE (Q-018) eine Fahrt alle n Sekunden
+	},
+
 	-- Geldpreis der Minen ab Mine 03 zusätzlich zum Level (D-017, D-019):
 	-- Preis(n) = BasePrice * Growth ^ (n - FirstPaidMine), auf ganze Dollar gerundet.
 	-- Mine 03 = $3.000, jede weitere Mine +50 %.

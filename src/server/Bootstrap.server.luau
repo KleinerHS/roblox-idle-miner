@@ -26,6 +26,9 @@ local SERVICE_ORDER = {
 	"SellingService",
 	"ShopService",
 	"StorageService",
+	"WorkerService",
+	"ProductionService",
+	"WorkerVisualService",
 	"CompanyService",
 	"DevService",
 }

@@ -1,5 +1,5 @@
 --!strict
--- Datenschema v2: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
+-- Datenschema v3: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
 -- Regeln:
 --  * Defaults gibt es nur hier.
 --  * Jede Strukturänderung erhöht CURRENT_VERSION und bekommt eine Migration
@@ -15,7 +15,7 @@ local Backpacks = require(Shared.Definitions.Backpacks)
 local Mines = require(Shared.Definitions.Mines)
 local Types = require(Shared.Types)
 
-local CURRENT_VERSION = 2
+local CURRENT_VERSION = 3
 
 local DataSchema = {
 	CurrentVersion = CURRENT_VERSION,
@@ -59,6 +59,17 @@ local TEMPLATE: Types.PlayerData = {
 		Items = {},
 	},
 
+	-- Worker (v3): angestellte Mitarbeiter je Arbeitsplatz (docs/05 §21)
+	Workers = {},
+	WorkerSeq = 0,
+
+	-- Produktionspuffer (v3): Erz an den Mining-Slots je Mine und im Elevator (docs/06 §20)
+	Production = {
+		MineBuffers = {},
+		ElevatorBuffer = {},
+		ElevatorCapacity = BalanceConfig.Elevator.StartCapacity,
+	},
+
 	Stats = {
 		FirstJoinTime = 0,
 		JoinCount = 0,
@@ -89,6 +100,18 @@ local MIGRATIONS: { [number]: (data: { [string]: any }) -> () } = {
 	[1] = function(data)
 		if typeof(data.Storage) ~= "table" then
 			data.Storage = { Capacity = BalanceConfig.Storage.StartCapacity, Items = {} }
+		end
+	end,
+	-- v2 → v3: Worker und Produktionspuffer ergänzt (Phase 4b)
+	[2] = function(data)
+		if typeof(data.Workers) ~= "table" then
+			data.Workers = {}
+		end
+		if typeof(data.WorkerSeq) ~= "number" then
+			data.WorkerSeq = 0
+		end
+		if typeof(data.Production) ~= "table" then
+			data.Production = { MineBuffers = {}, ElevatorBuffer = {}, ElevatorCapacity = BalanceConfig.Elevator.StartCapacity }
 		end
 	end,
 }

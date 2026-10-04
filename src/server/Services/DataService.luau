@@ -67,6 +67,10 @@ local function buildSnapshot(data: Types.PlayerData): Types.StateSnapshot
 		BackpackCapacity = if backpack then backpack.Capacity else 0,
 		StorageCapacity = data.Storage.Capacity,
 		StorageItems = table.clone(data.Storage.Items),
+		Workers = table.clone(data.Workers),
+		MineBuffers = table.clone(data.Production.MineBuffers),
+		ElevatorBuffer = table.clone(data.Production.ElevatorBuffer),
+		ElevatorCapacity = data.Production.ElevatorCapacity,
 		Buildings = table.clone(data.Buildings),
 		PrestigeCount = data.Prestige.Count,
 	}
@@ -244,5 +248,36 @@ function DataService.Mutate(player: Player, mutator: (data: Types.PlayerData) ->
 	queueSnapshot(player)
 	return true
 end
+
+-- Für häufige Hintergrund-Änderungen (Produktion jede Sekunde): ändert sofort, schickt den
+-- Snapshot aber gebündelt höchstens alle QUIET_SNAPSHOT_SECONDS (kein Remote-Spam).
+local QUIET_SNAPSHOT_SECONDS = 2
+local quietDirty: { [Player]: boolean } = {}
+
+function DataService.MutateQuiet(player: Player, mutator: (data: Types.PlayerData) -> ()): boolean
+	local profile = profiles[player]
+	if not profile or not profile:IsActive() then
+		return false
+	end
+	mutator(profile.Data)
+	quietDirty[player] = true
+	return true
+end
+
+task.spawn(function()
+	while true do
+		task.wait(QUIET_SNAPSHOT_SECONDS)
+		for player in quietDirty do
+			quietDirty[player] = nil
+			if profiles[player] then
+				queueSnapshot(player)
+			end
+		end
+	end
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+	quietDirty[player] = nil
+end)
 
 return DataService

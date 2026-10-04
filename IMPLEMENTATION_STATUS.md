@@ -11,7 +11,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 1 | Project Skeleton | USER_APPROVED (Felix „passt“, 2026-10-04; Zwei-Spieler-Test wird in Phase 2 nachgeholt) |
 | 2 | Vertical Slice A | USER_APPROVED (Felix, 2026-10-04) |
 | 3 | Vertical Slice B (Equipment, Mine 02) | USER_APPROVED (Felix, 2026-10-04) |
-| 4 | Storage + Worker (Worker erst nach Lager, D-004) | TESTING_REQUIRED (4a USER_APPROVED, 4b/4c NOT_STARTED) |
+| 4 | Storage + Worker (Worker erst nach Lager, D-004) | TESTING_REQUIRED (4a USER_APPROVED, 4b TESTING_REQUIRED, 4c NOT_STARTED) |
 | 5 | Drill | NOT_STARTED |
 | 6 | Garage & Vehicles | NOT_STARTED |
 | 7 | Conveyors | NOT_STARTED |
@@ -192,6 +192,27 @@ Selbsttest per Studio-MCP (2026-10-04):
 - Buttons in Reihenfolge: BUILD WALLS $1,500 → BUILD ROOF (bei Level 3: „Requires Mining Level 4“, kein Kauf) → nach Level 5: Roof → BUILD STORAGE $5,000 → alle Modelle stehen.
 - 600 Coal abgeladen → Silo „600 / 1,000“; 100 entnommen; ungültige Erz-ID/Menge abgelehnt; Fenster öffnet über den Terminal-Prompt.
 - 900 im Rucksack, Lager 500 frei → 500 abgeladen, 400 bleiben im Rucksack, danach `STORAGE_FULL`, Silo-Balken rot.
+- Freigabe Felix 2026-10-04 („geht alles, machen wir weiter“).
+
+### 4b – Worker & Laptop (Version 0.8.0)
+
+| System | Dateien | Status |
+|---|---|---|
+| Worker-Werte (Einstellung, Lohn, Rate, Puffer, Elevator) – Platzhalter Q-018 | `BalanceConfig.Workers`, `BalanceConfig.Elevator`, `Definitions/WorkerRoles.luau` | TESTING_REQUIRED |
+| Datenschema v3 (Workers, WorkerSeq, Production-Puffer) mit Migration v2 → v3 | `src/server/Data/DataSchema.luau` | TESTING_REQUIRED |
+| Einstellen/Entlassen am Laptop (nur mit Lager, nur am eigenen Laptop, Slot frei, Mine freigeschaltet, Geld), Lohn jede Minute, Unbezahlte pausieren | `src/server/Services/WorkerService.luau` | TESTING_REQUIRED |
+| Zentraler Produktionstakt: Mining → Slot-Puffer → Transport → Elevator-Puffer → Fahrt → Lager, Rückstau statt Vernichtung, Status je Worker | `src/server/Services/ProductionService.luau` | TESTING_REQUIRED |
+| Worker-Figuren in der Mine (nur Darstellung, Helm/Weste, Hacken bzw. Kiste tragen, keine Kollision mit Spielern) | `src/server/Services/WorkerVisualService.luau` | TESTING_REQUIRED |
+| Laptop mit Kamera-Zoom, App-Leiste, EMPLOYEES-App (Minen-Reiter, 4 Slots, HIRE/FIRE, Status, Lohn, Puffer/Elevator-Anzeige) | `src/client/Controllers/LaptopController.luau`, Laptop-Prompt in `BuildTemplates` | TESTING_REQUIRED |
+| Gebündelte Snapshots für Produktion (alle 2 s) | `DataService.MutateQuiet` | TESTING_REQUIRED |
+
+Selbsttest per Studio-MCP (2026-10-04):
+- Migration v2 → v3 beim Laden („geladen: v3“), alle Daten erhalten.
+- Einstellen: Mining Slot 1 (w1) und Transport Slot 1 (w2) ok; gleicher Slot → `SLOT_TAKEN`; Slot 3 / Rolle „Boss“ → `INVALID_ARGUMENT`; gesperrte Mine → `NOT_AVAILABLE`.
+- Laptop-Prompt öffnet den Laptop mit Firmenname, EMPLOYEES zeigt Worker mit Status „Working“ und Lohn.
+- Lohn: jede Minute $9 abgezogen ($5 + $4), keine Unbezahlten.
+- Produktion: Lager in 22 s von 445 auf 455 (≈ 30 Kohle/Min eines Mining-Workers).
+- In Mine 01: 2 Worker-Figuren sichtbar (Mining-Worker an der Wand, Transport-Worker mit Kiste).
 
 ---
 
@@ -348,7 +369,7 @@ ASSETS/ASSET_REGISTRY.md  (ab Phase 2, `19` §19)
 | Verkauf am Tresen | 07 | 2 | USER_APPROVED |
 | Cash, XP, Mining Level, HUD | 09, 11 | 2 | USER_APPROVED |
 | Equipment-Shop | 10 | 3 | USER_APPROVED |
-| Worker (Mining/Transport) + Laptop Employees | 05, 09 | 3 | NOT_STARTED |
+| Worker (Mining/Transport) + Laptop Employees | 05, 09 | 4 | TESTING_REQUIRED |
 | Storage + Laptop Storage | 06 | 4 | TESTING_REQUIRED (Lager ohne Laptop) |
 | Elevator-Kapazität + Laptop Elevator | 05, 06 | 4 | NOT_STARTED |
 | Machine-Shop + Drills | 05, 10 | 5 | NOT_STARTED |

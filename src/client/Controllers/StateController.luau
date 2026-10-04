@@ -20,12 +20,16 @@ local StateController = {
 
 local current: Types.StateSnapshot? = nil
 
+local lastLogLine = ""
+
 local function apply(snapshot: Types.StateSnapshot)
 	current = snapshot
-	Log.debug(
-		TAG,
-		`Cash {NumberFormat.cash(snapshot.Cash)} · Level {snapshot.MiningLevel} · XP {snapshot.MiningXP}/{snapshot.MiningXPRequired} · Rucksack {snapshot.EquippedBackpack} ({snapshot.BackpackCapacity})`
-	)
+	-- Nur loggen, wenn sich die Kernwerte ändern (Produktions-Snapshots kommen alle 2 s)
+	local line = `Cash {NumberFormat.cash(snapshot.Cash)} · Level {snapshot.MiningLevel} · XP {snapshot.MiningXP}/{snapshot.MiningXPRequired} · Rucksack {snapshot.EquippedBackpack} ({snapshot.BackpackCapacity})`
+	if line ~= lastLogLine then
+		lastLogLine = line
+		Log.debug(TAG, line)
+	end
 	StateController.Changed:Fire(snapshot)
 end
 
