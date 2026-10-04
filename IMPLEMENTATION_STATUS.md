@@ -7,8 +7,8 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | Phase | Inhalt | Status |
 |---|---|---|
 | Setup | GitHub-Repo, Rojo-Projekt, Doku-Ordner | USER_APPROVED |
-| 0 | Dokumentations-Audit | TESTING_REQUIRED (Review durch Felix) |
-| 1 | Project Skeleton | NOT_STARTED |
+| 0 | Dokumentations-Audit | USER_APPROVED (Freigabe „weiter“, 2026-10-04) |
+| 1 | Project Skeleton | TESTING_REQUIRED |
 | 2 | Vertical Slice A | NOT_STARTED |
 | 3 | Vertical Slice B (Equipment, Mine 02) | NOT_STARTED |
 | 4 | Storage + Worker (Worker erst nach Lager, D-004) | NOT_STARTED |
@@ -30,6 +30,30 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 - Spezifikation 00–20 und Visual References in `docs/`
 - `QUESTIONS/` und `TESTING/` angelegt
 - Test 2026-10-04 durch Felix in Studio (lokaler Place, Rokit 1.2.0, Rojo 7.4.4): Sync ok, Play-Output `[Server] … gestartet` und `[Client] … gestartet`, keine Fehler → USER_APPROVED
+
+## Phase 1 – Project Skeleton – Details
+
+Stand: 2026-10-04 · Version 0.1.0
+
+| System | Dateien | Status |
+|---|---|---|
+| Zentrale Configs | `src/shared/Config/` GameConfig, BalanceConfig (TODO_BALANCE), LayoutConfig (TODO_LAYOUT), UITheme | TESTING_REQUIRED |
+| Definitionen | `src/shared/Definitions/` Ores (50), Mines (100), Pickaxes, Backpacks, BuildSteps, CompanyIdentity | TESTING_REQUIRED |
+| Shared Utils | `src/shared/Util/` Result, Signal, NumberFormat, Log, Leveling · `src/shared/Types.luau` | TESTING_REQUIRED |
+| Remote Registry | `src/shared/Remotes.luau`, `src/server/Services/RemoteService.luau`, `src/server/Util/` RateLimiter, Validate | TESTING_REQUIRED |
+| Service Bootstrap | `src/server/Bootstrap.server.luau` (Init → Start, feste Reihenfolge) | TESTING_REQUIRED |
+| Controller Bootstrap | `src/client/Bootstrap.client.luau`, `src/client/Net.luau`, Controllers State/Plot | TESTING_REQUIRED |
+| Data Schema v1 + DataService | `src/server/Data/DataSchema.luau`, `src/server/Services/DataService.luau`, ProfileStore (`src/server/Packages`) | TESTING_REQUIRED (Speichern erst nach Veröffentlichung testbar) |
+| Plot Ownership | `src/server/Services/PlotService.luau`, `src/server/World/PlotBuilder.luau` (Platzhalter-Geometrie) | TESTING_REQUIRED |
+| StreamingEnabled | `default.project.json` (Workspace) | TESTING_REQUIRED |
+
+Selbsttest per Studio-MCP (2026-10-04, unveröffentlichter Place, DataStore im Testmodus):
+- Server startet 3 Services ohne Fehler, Client 2 Controller.
+- Join → Plot 1, Schild „Plot 1 / Name“, Spawn am Plot-Spawnpunkt, Plots 2–6 „Frei“.
+- Profil v1 geladen: Cash 800, Level 1, XP 0/100, Starter-Rucksack 100.
+- 50 Erze, 100 Minen (mine_045 = Ruby, mine_100 = Diamond), Leveling und Zahlenformat korrekt.
+- Exploit-Test: GetState mit Müll-Argumenten → keine Wirkung; 7× in Folge → ab dem 6. `RATE_LIMITED`; Client-Aufrufe auf ServerToClient-Remotes werden ignoriert.
+- Noch nicht getestet: echtes Speichern/Rejoin (braucht veröffentlichten Place mit API-Zugriff), zwei Spieler.
 
 ---
 
@@ -104,17 +128,11 @@ Details mit Defaults in `QUESTIONS/OPEN_QUESTIONS.md`:
 
 Beantwortet am 2026-10-04: Q-001 → D-002, Q-002 → D-003 (Startgeld $800, Elevator $200), Q-003 → D-004.
 
+Beantwortet am 2026-10-04: Q-004 bis Q-012 → D-005 bis D-013.
+
 Noch offen:
 
-- **Q-004** Platz für manuelles Mining neben belegten Slots
-- **Q-005** Rare Drops: Zeitpunkt und voller Rucksack
-- **Q-006** Quellen für Mining Luck
-- **Q-007** Position des Ladebereichs
-- **Q-008** Fahrzeugwechsel mit Ladung
-- **Q-009** Lager-Optik: Regale oder Silo
-- **Q-010** Smelter: Rezepte für Nicht-Metalle, Priorität
-- **Q-011** Prestige: normale Ausrüstung behalten oder zurücksetzen
-- **Q-012** Firmenidentität nachträglich ändern
+- **Q-013** Stehen gekaufte Fahrzeuge geparkt in der Halle? (Phase 6)
 
 ## Proposed Technical Decisions (Veto möglich)
 
@@ -181,8 +199,8 @@ ASSETS/ASSET_REGISTRY.md  (ab Phase 2, `19` §19)
 
 | System | Quelle | Phase | Status |
 |---|---|---|---|
-| Plot-Zuweisung / Ownership | 04, 15 | 1 | NOT_STARTED |
-| Datenspeicherung / Session Lock | 14 | 1 | NOT_STARTED |
+| Plot-Zuweisung / Ownership | 04, 15 | 1 | TESTING_REQUIRED |
+| Datenspeicherung / Session Lock | 14 | 1 | TESTING_REQUIRED |
 | Tycoon-Baukette | 04 | 2 | NOT_STARTED |
 | Blechhütte + Firmenidentität | 04, 09 | 2 | NOT_STARTED |
 | Elevator + Mine-Auswahl | 04, 09, 12 | 2 | NOT_STARTED |

@@ -493,7 +493,7 @@ Die Company-App zeigt:
 
 Änderungen an benutzerdefinierten Texten müssen Roblox-Textfilterregeln beachten.
 
-Ob Name/Logo/Farbe später kostenlos oder gegen Gebühr geändert werden können, wird noch festgelegt.
+> **Entscheidung D-013:** Name, Logo und Farbe können später in der Company-App geändert werden, gegen Robux. Die Ersteinrichtung bleibt kostenlos.
 
 ---
 

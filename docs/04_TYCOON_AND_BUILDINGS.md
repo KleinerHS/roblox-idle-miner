@@ -376,6 +376,8 @@ Es ist kein separates riesiges Lagergebäude außerhalb der Halle.
 
 Der Lagerbereich besteht aus einem klar abgegrenzten Teil der Halle.
 
+> **Entscheidung D-010:** Lager wie in `FACTORY_MASTERPLAN_TOPDOWN.png`: Regale mit Kisten und allen Verschönerungsdetails aus dem Bild, dazu ein Silo mit gut lesbarer Füllanzeige im Lagerbereich.
+
 Zentrales visuelles Element:
 
 **großes Silo / Lagerbehälter**
@@ -514,6 +516,8 @@ Kein freies chaotisches Förderbandbauen.
 # 25. Ladebereich
 
 Die Halle besitzt einen fest eingeplanten Lade-/Verladebereich.
+
+> **Entscheidung D-008:** Der Ladebereich liegt in der Halle. Ein kleiner Verladeturm befüllt das dort stehende Fahrzeug direkt.
 
 Dieser Bereich verbindet:
 

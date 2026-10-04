@@ -580,6 +580,8 @@ Der Spieler muss nicht bei jedem Produktionszyklus ein Rezept auswählen.
 
 Der Schmelzer wählt automatisch ein gültiges Rezept anhand des verfügbaren Inputs.
 
+> **Entscheidung D-011:** Nur Metalle bekommen Schmelz-Rezepte. Coal, Edelsteine und Kristalle werden nur roh verkauft. Bei mehreren verarbeitbaren Erzen wird das wertvollste zuerst verarbeitet, umstellbar im Laptop. In späteren Versionen kommen Legierungen (mehrere Erze → ein Produkt) dazu.
+
 Beispiel:
 
 ```text
@@ -739,6 +741,8 @@ Dadurch bleibt die frühe und aktive Spielweise sinnvoll.
 Der Ladebereich ist die Schnittstelle zwischen Fabrik und Fahrzeug.
 
 Er besitzt einen festen Platz innerhalb der Halle.
+
+> **Entscheidung D-008:** Fahrzeuge stehen zum Beladen in der Halle. Ein kleiner Verladeturm speist das Material direkt von oben in das Fahrzeug.
 
 Der Spieler fährt mit einem Fahrzeug in den vorgesehenen Bereich.
 

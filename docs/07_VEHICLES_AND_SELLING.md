@@ -806,7 +806,7 @@ VehicleCargo
 
 Je nach finaler Architektur kann Cargo an das aktive Fahrzeugmodell oder an die jeweilige Fahrzeug-ID gebunden werden.
 
-Das System muss vor Implementierung eindeutig festlegen, wie Fahrzeugwechsel mit vorhandener Ladung behandelt werden.
+> **Entscheidung D-009:** Cargo gehört zur jeweiligen Fahrzeug-ID und bleibt dort gespeichert. Ein Fahrzeugwechsel ist auch mit Ladung erlaubt; das alte Fahrzeug despawnt mit seiner Ladung, nichts geht verloren.
 
 ---
 
