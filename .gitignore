@@ -1,0 +1,19 @@
+# Roblox-Studio-Dateien (Quelle der Wahrheit ist src/ + default.project.json)
+*.rbxl
+*.rbxlx
+*.rbxl.lock
+*.rbxlx.lock
+*.rbxm
+*.rbxmx
+!assets/**/*.rbxm
+!assets/**/*.rbxmx
+
+# Build-Ausgaben
+/build/
+sourcemap.json
+
+# Editor / OS
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini
