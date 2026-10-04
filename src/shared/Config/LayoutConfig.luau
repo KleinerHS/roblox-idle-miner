@@ -52,11 +52,18 @@ local LayoutConfig = {
 	-- Rolltor in der Vorderwand (X-Mitte und Breite). Zufahrt und Straße fluchten damit.
 	DoorCenterX = 15,
 	DoorWidth = 60,
+	-- Höhe der Hallenwände (Oberkante über dem Hallenboden). TODO_LAYOUT
+	HallWallHeight = 34,
+	-- Höhe der Rolltor-Öffnung (Platz für spätere LKW). TODO_LAYOUT
+	DoorHeight = 20,
 
 	-- Tycoon-Kaufbuttons je BuildStep (lokal X/Z, vor dem jeweiligen Bereich). TODO_LAYOUT
 	BuildButtons = {
 		build_office = Vector2.new(87, 33),
 		build_elevator = Vector2.new(50, 37),
+		build_walls = Vector2.new(15, -40),
+		build_roof = Vector2.new(15, -40),
+		build_storage = Vector2.new(-8, 25),
 	} :: { [string]: Vector2 },
 	ButtonSize = Vector3.new(7, 0.4, 7),
 
@@ -97,6 +104,8 @@ local LayoutConfig = {
 		Offset = Vector2.new(-88, -6),
 		Size = Vector3.new(40, 16, 30),
 	},
+	-- Maximale Entfernung zum Lager-Terminal
+	StorageTerminalDistance = 14,
 	-- Maximale Entfernung zum Shop-Tresen
 	ShopCounterDistance = 14,
 

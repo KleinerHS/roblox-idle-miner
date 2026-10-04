@@ -4,6 +4,15 @@
 -- Menge je ID, z. B. { ore_coal = 12 }
 export type ItemCounts = { [string]: number }
 
+-- Angestellter Worker (docs/05 §21: fest an Mine + Slot gebunden)
+export type WorkerRole = "Mining" | "Transport"
+export type WorkerRecord = {
+	Id: string,
+	Role: WorkerRole,
+	MineId: string,
+	Slot: number,
+}
+
 -- Persistentes Spielerprofil. Struktur-Änderungen nur mit neuer DataVersion und
 -- Migration (src/server/Data/DataSchema.luau, docs/14 §3).
 export type PlayerData = {
@@ -44,6 +53,23 @@ export type PlayerData = {
 	-- Robux-Käufe, bleiben bei Prestige (docs/14 §21)
 	Entitlements: { [string]: boolean },
 
+	-- Firmenlager (ab DataVersion 2): Gesamtkapazität und Bestand je Material
+	Storage: {
+		Capacity: number,
+		Items: ItemCounts,
+	},
+
+	-- Worker (ab DataVersion 3)
+	Workers: { [string]: WorkerRecord },
+	WorkerSeq: number,
+
+	-- Produktionspuffer (ab DataVersion 3)
+	Production: {
+		MineBuffers: { [string]: number },
+		ElevatorBuffer: ItemCounts,
+		ElevatorCapacity: number,
+	},
+
 	Stats: {
 		FirstJoinTime: number,
 		JoinCount: number,
@@ -71,6 +97,12 @@ export type StateSnapshot = {
 	OwnedBackpacks: { [string]: boolean },
 	Backpack: ItemCounts,
 	BackpackCapacity: number,
+	StorageCapacity: number,
+	StorageItems: ItemCounts,
+	Workers: { [string]: WorkerRecord },
+	MineBuffers: { [string]: number },
+	ElevatorBuffer: ItemCounts,
+	ElevatorCapacity: number,
 	Buildings: { [string]: boolean },
 	PrestigeCount: number,
 }

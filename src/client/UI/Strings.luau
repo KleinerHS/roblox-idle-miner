@@ -39,6 +39,20 @@ local MESSAGES: { [string]: string } = {
 	-- Shop
 	ITEM_PURCHASED = "{Name} purchased and equipped!",
 	NOT_OWNED = "You don't own this item yet.",
+
+	-- Worker
+	SLOT_TAKEN = "This slot is already taken.",
+	STORAGE_REQUIRED = "Build the Storage first to hire workers.",
+	WORKER_HIRED = "{Name} hired!",
+	WORKERS_UNPAID = "Not enough money for wages – some workers paused.",
+	WORKERS_PAID = "All workers are paid and working again.",
+
+	-- Lager
+	STORAGE_FULL = "Storage is full!",
+	STORAGE_MOVED = "{Amount} ore moved.",
+
+	-- Upgrades
+	UPGRADE_PURCHASED = "{Name} upgraded to {Capacity}!",
 }
 
 -- Text zu einem Code; {Platzhalter} werden aus args ersetzt.
@@ -94,6 +108,69 @@ Strings.Shop = table.freeze({
 	Locked = "LOCKED",
 	RequiresLevel = "Requires Mining Level %d",
 	Close = "X",
+})
+
+Strings.Storage = table.freeze({
+	Title = "COMPANY STORAGE",
+	Empty = "Storage is empty.",
+	Take = "TAKE",
+	Deposit = "DEPOSIT BACKPACK (%s)",
+})
+
+Strings.Laptop = table.freeze({
+	Apps = { "DASHBOARD", "EMPLOYEES", "STORAGE", "ELEVATOR", "PRODUCTION", "COMPANY" },
+	ComingSoon = "This app is coming soon.",
+	Employees = "EMPLOYEES",
+	NeedStorage = "Build the Storage first to hire workers.",
+	NoMines = "No mines unlocked.",
+	MiningSlot = "Mining Slot %d",
+	TransportSlot = "Transport Slot %d",
+	Empty = "Empty",
+	Hire = "HIRE %s",
+	Fire = "FIRE",
+	Wage = "%s / min",
+	Buffer = "Ore waiting at slots: %s",
+	Elevator = "Elevator: %s / %s",
+	Status = { Working = "Working", Waiting = "Waiting", Unpaid = "Unpaid" },
+	Close = "X",
+
+	-- Dashboard
+	Dashboard = "DASHBOARD",
+	MiningLevel = "Mining Level",
+	Cash = "Cash",
+	StorageCard = "Storage",
+	EmployeesCard = "Employees",
+	ProductionCard = "Production",
+	ActiveCount = "%d Active",
+	WaitingCount = "%d Waiting",
+	UnpaidCount = "%d Unpaid",
+	NoEmployees = "No employees yet",
+	NotBuilt = "Not built yet",
+	ElevatorLoad = "Elevator %s / %s",
+	PerMinute = "%s ore / min",
+
+	-- Storage-App
+	StorageTitle = "STORAGE",
+	StorageEmpty = "Storage is empty.",
+	StorageNotBuilt = "Build the Storage in your hall first.",
+	-- Elevator-App
+	ElevatorTitle = "ELEVATOR",
+	ElevatorNotBuilt = "Build the Elevator first.",
+	Capacity = "Capacity",
+	PerTrip = "%s ore per trip",
+	TripEvery = "One trip every %d s · up to %s ore / min",
+	CurrentLoad = "Waiting in elevator: %s",
+	ElevatorStatus = { Idle = "Idle", Transporting = "Transporting", StorageFull = "Storage Full" },
+	-- Upgrade-Karte
+	Upgrade = "UPGRADE",
+	UpgradeLevel = "Upgrade %d / %d",
+	Current = "Current",
+	Next = "Next",
+	Cost = "Cost",
+	RequiresLevel = "Requires Mining Level %d",
+	UpgradeButton = "UPGRADE %s",
+	MaxLevel = "MAX LEVEL",
+	MaxLevelSub = "Fully upgraded.",
 })
 
 Strings.Hud = table.freeze({

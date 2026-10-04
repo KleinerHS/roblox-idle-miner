@@ -16,6 +16,7 @@ local BuildSteps = require(Shared.Definitions.BuildSteps)
 local CompanyIdentity = require(Shared.Definitions.CompanyIdentity)
 local Types = require(Shared.Types)
 local Result = require(Shared.Util.Result)
+local Signal = require(Shared.Util.Signal)
 local NumberFormat = require(Shared.Util.NumberFormat)
 local Log = require(Shared.Util.Log)
 
@@ -32,7 +33,10 @@ local TOUCH_COOLDOWN = 1
 local COLOR_BUTTON_READY = Color3.fromRGB(88, 196, 120)
 local COLOR_BUTTON_BLOCKED = Color3.fromRGB(226, 92, 92)
 
-local BuildingService = {}
+local BuildingService = {
+	-- (player, stepId, model) nachdem ein Gebäudemodell auf dem Plot erzeugt wurde
+	ModelBuilt = Signal.new() :: Signal.Signal<Player, string, Model>,
+}
 
 type PlotState = {
 	plot: Model,
@@ -243,6 +247,7 @@ local function render(player: Player)
 			if model then
 				model.Parent = getFolder(plot)
 				s.models[step.Id] = model
+				BuildingService.ModelBuilt:Fire(player, step.Id, model)
 			end
 		end
 	end

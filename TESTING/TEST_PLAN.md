@@ -96,3 +96,49 @@ Werte (Preise, Level, Stats) sind Platzhalter aus Q-015.
 | 3a.7 | Rucksack | Reinforced Backpack kaufen | Rucksackanzeige zeigt „… / 200“ |
 | 3a.8 | Mine 02 | Level 3 erreichen | „NEW MINE UNLOCKED – MINE 02 – COAL“; im Elevator ist Mine 02 mit GO wählbar |
 | 3a.9 | Speichern | Stop → Play | Gekaufte und ausgerüstete Items bleiben |
+## Phase 4a – Halle & Lager
+
+Werte (Preise/Level der Bauschritte) sind Platzhalter aus Q-017. Testwerkzeuge (Server-Befehlszeile, nur Studio):
+`game.ServerStorage.DevTools.SetLevel:Invoke(game.Players:GetPlayers()[1], 5)` und `SetCash` (siehe 3a).
+
+| # | Test | Schritte | Erwartet |
+|---|---|---|---|
+| 4a.1 | Wände | Nach dem Elevator: Button „BUILD WALLS“ vorne in der Halle (ab Level 3, $1.500) | Außenwände mit Sockel, Fensterband und großem offenem Rolltor vorne erscheinen |
+| 4a.2 | Dach | Button „BUILD ROOF“ (ab Level 4, $2.500) | Flachdach mit Oberlichtern und Hallenleuchten |
+| 4a.3 | Lager | Button „BUILD STORAGE“ vor dem Lagerbereich (ab Level 5, $5.000) | Regale mit Kisten, Silo mit Anzeige „STORAGE 0 / 1,000“, Terminal |
+| 4a.4 | Abladen | Kohle abbauen → Terminal **E** → DEPOSIT BACKPACK | Rucksack leer, Lager zeigt die Menge, Silo-Anzeige zählt hoch |
+| 4a.5 | Entnehmen | Im Lagerfenster bei Coal TAKE | So viel wie in den Rucksack passt wandert zurück |
+| 4a.6 | Lager voll | Mehr als 1.000 einlagern | Rest bleibt im Rucksack, „Storage is full!“, Silo-Balken rot |
+| 4a.7 | Speichern/Migration | Stop → Play | Gebäude und Lagerbestand bleiben; alter Spielstand (v1) wird automatisch auf v2 gebracht |
+| 4a.8 | Fremdes Lager (2 Spieler) | Spieler 2 drückt E am Terminal von Spieler 1 | „This is not your company.“ |
+## Phase 4b – Worker & Laptop
+
+Werte sind Platzhalter aus Q-018. Voraussetzung: Lager gebaut.
+
+| # | Test | Schritte | Erwartet |
+|---|---|---|---|
+| 4b.1 | Laptop | In der Hütte am Laptop **E** („Use Laptop“) | Kamera zoomt kurz, Laptop-Fenster mit Firmenname, App-Leiste, EMPLOYEES aktiv |
+| 4b.2 | Einstellen | MINE 01 → Mining Slot 1 → HIRE $2K | Geld −$2.000, Slot zeigt „Mining Worker #… · Working · $5 / min“ |
+| 4b.3 | Transport | Transport Slot 1 → HIRE $1.5K | Status Working; „Elevator: x / 100“ steigt |
+| 4b.4 | Produktion | Ein paar Minuten warten | Silo-Anzeige im Lager zählt hoch (ca. 30 Kohle/Min pro Mining-Worker) |
+| 4b.5 | Figuren | Elevator → Mine 01 | Mining-Worker mit Helm hackt an der Wand, Transport-Worker läuft mit Kiste zur Elevator-Treppe |
+| 4b.6 | Lohn | Eine Minute warten | Geld sinkt um den Lohn ($5 + $4) |
+| 4b.7 | Unbezahlt | Mit SetCash Geld auf 0 setzen, eine Minute warten | Meldung „Not enough money for wages…“, Status „Unpaid“, Produktion stoppt; Geld geben → nach der nächsten Minute wieder „Working“ |
+| 4b.8 | Lager voll | Lager füllen (oder warten) | Elevator-Anzeige bleibt voll, Worker zeigen „Waiting“, nichts verschwindet |
+| 4b.9 | Entlassen | FIRE | Slot wieder leer, kein Lohn mehr, Figur verschwindet |
+| 4b.10 | Speichern | Stop → Play | Worker, Puffer und Lagerbestand bleiben erhalten |
+
+## Phase 4c – Laptop-Apps & Upgrades
+
+Werte sind Vorschläge aus Q-019. Voraussetzung: Lager gebaut.
+
+| # | Test | Schritte | Erwartet |
+|---|---|---|---|
+| 4c.1 | Dashboard | Laptop öffnen | Startet auf DASHBOARD: Level/XP, Cash, Lager x / y mit Balken, Mitarbeiter (Active/Waiting/Unpaid), Produktion Erz/Min und Elevator-Füllstand |
+| 4c.2 | Storage-App | STORAGE | Belegung mit Balken, Liste der Erze mit Menge, Upgrade-Karte „Upgrade 0 / 4 · Current 1,000 → Next 2,500 · Cost $3K · Requires Mining Level 5“ |
+| 4c.3 | Lager-Upgrade | UPGRADE $3K (Level 5, genug Geld) | Geld −$3.000, Meldung „Storage upgraded to 2500!“, Silo-Anzeige im Lager zeigt / 2,500 |
+| 4c.4 | Sperren | Nächste Stufe ohne Level 6 bzw. ohne Geld drücken | „Requires Mining Level 6.“ bzw. „Not enough money. You need $8000.“, nichts gekauft |
+| 4c.5 | Elevator-App | ELEVATOR | Kapazität pro Fahrt, Takt 10 s, max. Erz/Min, Inhalt, Status, Upgrade-Karte |
+| 4c.6 | Elevator-Upgrade | UPGRADE $2K | Kapazität 200, EMPLOYEES zeigt „Elevator: x / 200“ |
+| 4c.7 | Max-Stufe | Mit DevTools Level/Geld hoch, alle Stufen kaufen | „MAX LEVEL · Fully upgraded.“ |
+| 4c.8 | Speichern | Stop → Play | Gekaufte Kapazitäten bleiben erhalten |

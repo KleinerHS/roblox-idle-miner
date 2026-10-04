@@ -1,5 +1,5 @@
 --!strict
--- Datenschema v1: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
+-- Datenschema v3: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
 -- Regeln:
 --  * Defaults gibt es nur hier.
 --  * Jede Strukturänderung erhöht CURRENT_VERSION und bekommt eine Migration
@@ -15,7 +15,7 @@ local Backpacks = require(Shared.Definitions.Backpacks)
 local Mines = require(Shared.Definitions.Mines)
 local Types = require(Shared.Types)
 
-local CURRENT_VERSION = 1
+local CURRENT_VERSION = 3
 
 local DataSchema = {
 	CurrentVersion = CURRENT_VERSION,
@@ -53,6 +53,23 @@ local TEMPLATE: Types.PlayerData = {
 	UnlockedMines = { [Mines.StartMineId] = true },
 	Entitlements = {},
 
+	-- Firmenlager (v2): ein gemeinsamer Bestand über alle Materialien (docs/06 §13–14)
+	Storage = {
+		Capacity = BalanceConfig.Storage.StartCapacity,
+		Items = {},
+	},
+
+	-- Worker (v3): angestellte Mitarbeiter je Arbeitsplatz (docs/05 §21)
+	Workers = {},
+	WorkerSeq = 0,
+
+	-- Produktionspuffer (v3): Erz an den Mining-Slots je Mine und im Elevator (docs/06 §20)
+	Production = {
+		MineBuffers = {},
+		ElevatorBuffer = {},
+		ElevatorCapacity = BalanceConfig.Elevator.StartCapacity,
+	},
+
 	Stats = {
 		FirstJoinTime = 0,
 		JoinCount = 0,
@@ -79,8 +96,24 @@ end
 
 -- MIGRATIONS[n] überführt ein Profil von Version n nach n + 1.
 local MIGRATIONS: { [number]: (data: { [string]: any }) -> () } = {
-	-- Beispiel für später:
-	-- [1] = function(data) data.Storage = { Capacity = 1000, Items = {} } end,
+	-- v1 → v2: Firmenlager ergänzt (Phase 4)
+	[1] = function(data)
+		if typeof(data.Storage) ~= "table" then
+			data.Storage = { Capacity = BalanceConfig.Storage.StartCapacity, Items = {} }
+		end
+	end,
+	-- v2 → v3: Worker und Produktionspuffer ergänzt (Phase 4b)
+	[2] = function(data)
+		if typeof(data.Workers) ~= "table" then
+			data.Workers = {}
+		end
+		if typeof(data.WorkerSeq) ~= "number" then
+			data.WorkerSeq = 0
+		end
+		if typeof(data.Production) ~= "table" then
+			data.Production = { MineBuffers = {}, ElevatorBuffer = {}, ElevatorCapacity = BalanceConfig.Elevator.StartCapacity }
+		end
+	end,
 }
 
 -- Bringt ein geladenes Profil auf CURRENT_VERSION. Gibt false zurück, wenn das Profil

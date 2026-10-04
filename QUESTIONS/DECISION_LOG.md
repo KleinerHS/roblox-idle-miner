@@ -129,3 +129,14 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Hinweis:** Mit +50 % pro Mine wächst der Preis bis Mine 100 auf ca. 4 × 10^20 $. Muss in der Balance-Phase gegen docs/03 §13 („keine absurden Zahlen“) geprüft werden.
 **Affected systems:** Equipment, Shop, Mines, Balance
 **Supersedes:** D-018 (Teil „Coming soon“)
+## D-020 – Bauschritte Wände, Dach, Lager
+
+**Source Question:** Q-017
+**Decision:** Reihenfolge Büro → Elevator → Wände ($1.500, Level 3) → Dach ($2.500, Level 4) → Lager ($5.000, Level 5, 1.000 Kapazität).
+**Affected systems:** Tycoon, Storage, Balance
+
+## D-021 – Worker- und Elevator-Werte
+
+**Source Question:** Q-018
+**Decision:** Mining-Worker: Einstellung $2.000, Lohn $5/Min, 30 Erz/Min. Transport-Worker: $1.500, $4/Min, 50 Erz pro Gang (20 s). Slot-Puffer 200 Erz. Elevator: 100 Erz pro Fahrt alle 10 s. Entlassen ohne Rückerstattung.
+**Affected systems:** Worker, Production, Elevator, Balance

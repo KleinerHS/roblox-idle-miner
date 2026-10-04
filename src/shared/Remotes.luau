@@ -55,6 +55,24 @@ local Remotes: { [string]: RemoteDefinition } = {
 	BuyItem = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
 	-- Ausrüsten eines besessenen Items: (category, itemId) -> Result
 	EquipItem = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 10, Window = 10 } },
+
+	-- Firmenlager: Server öffnet das Lagerfenster nach gültigem Prompt
+	OpenStorage = { Kind = "Event", Direction = "ServerToClient" },
+	-- Rucksack ins Lager abladen: () -> Result<{ Moved: number }>
+	StorageDeposit = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
+	-- Material aus dem Lager in den Rucksack: (oreId: string, amount: number) -> Result<{ Moved: number }>
+	StorageWithdraw = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 10, Window = 10 } },
+
+	-- Laptop: Server öffnet den Laptop nach gültigem Prompt (nur Besitzer)
+	OpenLaptop = { Kind = "Event", Direction = "ServerToClient" },
+	-- Worker einstellen: (mineId: string, role: "Mining" | "Transport", slot: number) -> Result
+	HireWorker = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
+	-- Worker entlassen: (workerId: string) -> Result
+	FireWorker = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
+	-- Laufzeitstatus der Worker: { [workerId]: "Working" | "Waiting" | "Unpaid" }
+	WorkerStatus = { Kind = "Event", Direction = "ServerToClient" },
+	-- Kapazitäts-Upgrade am Laptop: (kind: "storage" | "elevator") -> Result<{ Capacity: number }>
+	BuyUpgrade = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
 }
 
 return table.freeze(Remotes)
