@@ -11,7 +11,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 1 | Project Skeleton | USER_APPROVED (Felix „passt“, 2026-10-04; Zwei-Spieler-Test wird in Phase 2 nachgeholt) |
 | 2 | Vertical Slice A | USER_APPROVED (Felix, 2026-10-04) |
 | 3 | Vertical Slice B (Equipment, Mine 02) | USER_APPROVED (Felix, 2026-10-04) |
-| 4 | Storage + Worker (Worker erst nach Lager, D-004) | TESTING_REQUIRED (4a) |
+| 4 | Storage + Worker (Worker erst nach Lager, D-004) | TESTING_REQUIRED (4a USER_APPROVED, 4b/4c NOT_STARTED) |
 | 5 | Drill | NOT_STARTED |
 | 6 | Garage & Vehicles | NOT_STARTED |
 | 7 | Conveyors | NOT_STARTED |
@@ -175,7 +175,7 @@ Selbsttest per Studio-MCP (2026-10-04):
 
 Schritte: 4a Halle & Lager · 4b Worker (Mining/Transport, Lohn, Rückstau) · 4c Laptop-Apps (Dashboard, Employees, Storage, Elevator).
 
-### 4a – Halle & Lager (Version 0.7.0)
+### 4a – Halle & Lager (Version 0.7.0) – USER_APPROVED
 
 | System | Dateien | Status |
 |---|---|---|

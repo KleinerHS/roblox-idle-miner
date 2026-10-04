@@ -18,5 +18,5 @@ Nach Änderungen an Economy, Inventory, Save, Trading oder Prestige die betroffe
 - [ ] Phase 2d: Zwei Spieler, fremde Buttons/Elevator geschützt (Test 2d.8)
 - [ ] Phase 3a: Kauf nur mit Geld/Level und am Shop, kein Doppelkauf, Ausrüsten nur besessener Items (Test 3a.4–3a.7)
 - [ ] Phase 3a: Mine 02 ab Level 3, Items nach Rejoin erhalten (Test 3a.8, 3a.9)
-- [ ] Phase 4a: Bauschritte Wände/Dach/Lager in Reihenfolge, Kapazität 1.000, kein Materialverlust beim Ab-/Umladen (Test 4a.1–4a.6)
-- [ ] Phase 4a: Migration v1 → v2 ohne Datenverlust (Test 4a.7)
+- [x] Phase 4a: Bauschritte Wände/Dach/Lager in Reihenfolge, Kapazität 1.000, kein Materialverlust beim Ab-/Umladen (Test 4a.1–4a.6, Felix 2026-10-04)
+- [x] Phase 4a: Migration v1 → v2 ohne Datenverlust (Test 4a.7, 2026-10-04)
