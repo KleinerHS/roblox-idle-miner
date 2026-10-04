@@ -467,6 +467,8 @@ Nach der Auswahl:
 
 Es gibt keine Reihe fester Parkplätze für jedes gekaufte Fahrzeug.
 
+> **Entscheidung D-016:** In der Garage gibt es 2 Stellplätze. Bis zu 2 eigene Fahrzeuge können gleichzeitig in der Halle stehen, alle weiteren werden über den Ring aus- und eingeparkt.
+
 ---
 
 # 23. Schmelzer-Bereich

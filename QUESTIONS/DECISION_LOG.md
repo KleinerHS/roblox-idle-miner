@@ -98,3 +98,16 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Source Question:** – (Vorschläge aus dem Audit, von Felix mit „Weiter“ freigegeben)
 **Decision:** ProfileStore (loleris/MadStudioRoblox, Apache-2.0, Commit `45c9847`) für Session Lock/Autosave/Shutdown-Save unter `src/server/Packages`. Zentrale Remote-Registry. Eigene UI-Komponenten ohne Framework. `StreamingEnabled` aktiv. Plot-Geometrie vorerst als Platzhalter aus `LayoutConfig` (TODO_LAYOUT).
 **Affected systems:** Data, Remotes, UI, Map
+
+## D-015 – Spieloberfläche auf Englisch
+
+**Source Question:** Q-014
+**Decision:** Alle Spielertexte sind Englisch. Sie stehen zentral in `src/client/UI/Strings.luau`. Projektdokumente bleiben Deutsch.
+**Affected systems:** UI, Notifications, Schilder
+
+## D-016 – Bis zu 2 Fahrzeuge gleichzeitig in der Halle
+
+**Source Question:** Q-013
+**Decision:** Bis zu 2 eigene Fahrzeuge können gleichzeitig in der Halle stehen (2 Stellplätze in der Garage). Alle weiteren gekauften Fahrzeuge werden über den Spawn-Ring aus- und eingeparkt. Ladung bleibt je Fahrzeug erhalten (D-009).
+**Affected systems:** Garage, Vehicles, Factory Layout, Performance (max. 12 Fahrzeuge bei 6 Spielern)
+**Spec updated:** `docs/04` §22, `docs/07` §4

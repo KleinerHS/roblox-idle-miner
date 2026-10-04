@@ -301,3 +301,37 @@ A, aber gegen Robux.
 **Decision:** D-013
 
 ---
+
+## Q-013 – Stehen gekaufte Fahrzeuge geparkt in der Halle?
+
+**Status:** ANSWERED
+**Priority:** IMPORTANT_NON_BLOCKING
+**System:** Garage / Vehicles
+**Date:** 2026-10-04
+
+### Question
+Stehen alle gekauften Fahrzeuge dauerhaft geparkt in der Halle, oder gibt es nur das aktive Fahrzeug?
+
+### Answer (Felix, 2026-10-04)
+„Man kann bis zu 2 Autos gleichzeitig stehen haben, den Rest muss man ausparken können.“
+
+**Decision:** D-016
+
+---
+
+## Q-014 – Sprache der Spieloberfläche
+
+**Status:** ANSWERED
+**Priority:** POLISH
+**System:** UI
+**Date:** 2026-10-04
+
+### Question
+In welcher Sprache sollen die Texte im Spiel erscheinen?
+
+### Answer (Felix, 2026-10-04)
+Englisch.
+
+**Decision:** D-015
+
+---

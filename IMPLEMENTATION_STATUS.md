@@ -159,7 +159,7 @@ Beantwortet am 2026-10-04: Q-004 bis Q-012 → D-005 bis D-013.
 
 Noch offen:
 
-- **Q-013** Stehen gekaufte Fahrzeuge geparkt in der Halle? (Phase 6)
+Beantwortet am 2026-10-04: Q-013 → D-016, Q-014 → D-015. Keine offenen Fragen.
 
 ## Proposed Technical Decisions (Veto möglich)
 
