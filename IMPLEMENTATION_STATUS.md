@@ -9,7 +9,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | Setup | GitHub-Repo, Rojo-Projekt, Doku-Ordner | USER_APPROVED |
 | 0 | Dokumentations-Audit | USER_APPROVED (Freigabe „weiter“, 2026-10-04) |
 | 1 | Project Skeleton | USER_APPROVED (Felix „passt“, 2026-10-04; Zwei-Spieler-Test wird in Phase 2 nachgeholt) |
-| 2 | Vertical Slice A | TESTING_REQUIRED (2a fertig, 2b–2d NOT_STARTED) |
+| 2 | Vertical Slice A | TESTING_REQUIRED (2a USER_APPROVED, 2b TESTING_REQUIRED, 2c–2d NOT_STARTED) |
 | 3 | Vertical Slice B (Equipment, Mine 02) | NOT_STARTED |
 | 4 | Storage + Worker (Worker erst nach Lager, D-004) | NOT_STARTED |
 | 5 | Drill | NOT_STARTED |
@@ -60,7 +60,7 @@ Selbsttest per Studio-MCP (2026-10-04, unveröffentlichter Place, DataStore im T
 
 Phase 2 ist in Hauptschritte geteilt, nach jedem wird gestoppt: 2a Tycoon & Firma · 2b Elevator & Mine 01 · 2c Mining & Rucksack · 2d Verkauf, Cash/XP, Level-HUD, Save/Rejoin, Zwei-Spieler-Test.
 
-### 2a – Tycoon & Firmeneinrichtung (Version 0.2.0)
+### 2a – Tycoon & Firmeneinrichtung (Version 0.2.0) – USER_APPROVED
 
 | System | Dateien | Status |
 |---|---|---|
@@ -81,6 +81,26 @@ Selbsttest per Studio-MCP (2026-10-04, Place „10042026_2“, DataStore aktiv):
 - Danach Button „BUILD ELEVATOR / $200“ → Kauf → Cash 800 → 600, Elevator-Käfig erscheint, kein weiterer Button.
 - Rejoin: Büro, Elevator, Schild, Cash 600 wiederhergestellt, Spawn auf dem Bett.
 - Reset per `ServerStorage.DevTools.ResetProgress` → Ausgangszustand (Cash 800, nur Büro-Button).
+- Test durch Felix 2026-10-04: Büro → Firma „Fullucks“ → Elevator ($800 → $600) → Rejoin, alles da, Spawn im Bett → USER_APPROVED.
+
+### 2b – Elevator & Mine Shaft 01 (Version 0.3.0)
+
+| System | Dateien | Status |
+|---|---|---|
+| Elevator-Navigation (Prompt am Käfig, Besitz-, Nähe- und Level-Prüfung, Teleport) | `src/server/Services/ElevatorService.luau` | TESTING_REQUIRED |
+| Minenauswahl (Liste aller 100 Minen, GO / LOCKED, Oberfläche) | `src/client/Controllers/ElevatorController.luau` | TESTING_REQUIRED |
+| Übergang (Abblenden mit Shaft-Titel, leichtes Kamera-Ruckeln) | `src/client/Controllers/ElevatorController.luau` | TESTING_REQUIRED |
+| Shaft-Anzeige oben mittig in der Mine | `src/client/Controllers/ElevatorController.luau` | TESTING_REQUIRED |
+| Mine-Shaft-Raum je Plot (Podest mit Treppe, Käfig, 2 Erzadern mit Holzstützen, Lampen, Kisten, Fässer) – Platzhalter | `src/server/World/MineShaftBuilder.luau`, `LayoutConfig.MineShaft` | TESTING_REQUIRED |
+| Umkonfiguration je Mine (Erzfarbe, Felsfarbe ab Mine 30 dunkler, Schild) | `MineShaftBuilder.configure`, `Ores.Color`, `Mines.RockColor` | TESTING_REQUIRED |
+| Mine-Atmosphäre (lokal kein Oberflächen-Dunst) | `src/client/Controllers/ElevatorController.luau` | TESTING_REQUIRED |
+
+Selbsttest per Studio-MCP (2026-10-04):
+- Prompt „Use Elevator“ am eigenen Käfig öffnet „SELECT MINE“: Mine 01 GO, Mine 02–100 „LOCKED · Coming soon“ (Level-Anforderungen sind TODO_BALANCE).
+- Fahrt in Mine 01: Abblenden, Ankunft im Käfig, Anzeige „MINE SHAFT 01 · COAL“.
+- Abgelehnt: gesperrte Mine (`NOT_AVAILABLE`), unbekannte ID oder Zahl (`INVALID_ARGUMENT`), Ziel = aktueller Ort (`ALREADY_DONE`), Fahrtwunsch weit weg vom Käfig (`NOT_AVAILABLE`).
+- Rückfahrt zur Oberfläche: Anzeige verschwindet, Dunst wieder normal.
+- Tod in der Mine → Respawn im Bett, Ort = Oberfläche.
 
 ---
 
@@ -228,10 +248,10 @@ ASSETS/ASSET_REGISTRY.md  (ab Phase 2, `19` §19)
 |---|---|---|---|
 | Plot-Zuweisung / Ownership | 04, 15 | 1 | TESTING_REQUIRED |
 | Datenspeicherung / Session Lock | 14 | 1 | TESTING_REQUIRED |
-| Tycoon-Baukette | 04 | 2 | TESTING_REQUIRED |
-| Blechhütte + Firmenidentität | 04, 09 | 2 | TESTING_REQUIRED |
-| Elevator + Mine-Auswahl | 04, 09, 12 | 2 | NOT_STARTED |
-| Mine Shaft 01 | 00 §13, 03 | 2 | NOT_STARTED |
+| Tycoon-Baukette | 04 | 2 | USER_APPROVED |
+| Blechhütte + Firmenidentität | 04, 09 | 2 | USER_APPROVED |
+| Elevator + Mine-Auswahl | 04, 09, 12 | 2 | TESTING_REQUIRED |
+| Mine Shaft 01 | 00 §13, 03 | 2 | TESTING_REQUIRED |
 | Manuelles Mining | 03, 10 | 2 | NOT_STARTED |
 | Backpack | 10 | 2 | NOT_STARTED |
 | Verkauf am Tresen | 07 | 2 | NOT_STARTED |

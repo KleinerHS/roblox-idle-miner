@@ -41,6 +41,18 @@ function Strings.message(code: string, args: { [string]: any }?): string
 	return text
 end
 
+Strings.Elevator = table.freeze({
+	Title = "SELECT MINE",
+	Surface = "SURFACE",
+	SurfaceSub = "Back to your company",
+	Go = "GO",
+	Here = "YOU ARE HERE",
+	Locked = "LOCKED",
+	RequiresLevel = "Requires Mining Level %d",
+	ComingSoon = "Coming soon",
+	Close = "X",
+})
+
 Strings.CompanySetup = table.freeze({
 	Title = "Found your company",
 	Subtitle = "Choose a name, a logo and your company color.",

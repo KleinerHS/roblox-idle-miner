@@ -40,3 +40,17 @@ Ausgangszustand herstellen (nur in Studio): während Play in der **Server**-Befe
 | 2a.7 | Rejoin | Stop → Play | Hütte, Elevator, Schild wieder da, Spawn auf dem Bett in der Hütte, Dialog öffnet sich NICHT erneut |
 | 2a.8 | Dialog nach Abbruch | Reset → Büro kaufen → Stop, ohne Firma zu gründen → Play | Dialog öffnet sich wieder, Elevator-Button fehlt bis zur Gründung |
 | 2a.9 | Fremder Button (2 Spieler) | Spieler 2 läuft auf den Button von Spieler 1 | Toast „This is not your company.“, nichts wird gekauft |
+
+## Phase 2b – Elevator & Mine Shaft 01
+
+Voraussetzung: Büro, Firma und Elevator sind gebaut (2a).
+
+| # | Test | Schritte | Erwartet |
+|---|---|---|---|
+| 2b.1 | Elevator öffnen | In den Käfig gehen, Taste **E** („Use Elevator“) | Fenster „SELECT MINE“: Mine 01 mit grünem GO, Mine 02–100 „LOCKED / Coming soon“ |
+| 2b.2 | Fahrt nach unten | GO bei Mine 01 | Bild blendet ab mit „MINE SHAFT 01 / COAL“, kurzes Ruckeln, Ankunft im Käfig der Mine, oben mittig „MINE SHAFT 01 · COAL“ |
+| 2b.3 | Mine ansehen | Käfig nach vorne über die Treppe verlassen, umsehen | Ein Raum, eine Ebene; Käfig mittig auf Podest; links und rechts je eine schwarze Kohleader mit Holzstützen und Lampe; graue Felswände; keine Schienen/Loren/Förderbänder |
+| 2b.4 | Fenster schließen | E drücken, dann X oder Escape bzw. wegrennen | Fenster schließt sich |
+| 2b.5 | Zurück nach oben | Im Minenkäfig E → SURFACE → GO | Ankunft im Elevator auf deinem Plot, Anzeige oben verschwindet |
+| 2b.6 | Respawn in der Mine | In der Mine Reset (Esc → Reset Character) | Respawn im Bett der Hütte, keine Mine-Anzeige |
+| 2b.7 | Fremder Elevator (2 Spieler) | Spieler 2 drückt E am Käfig von Spieler 1 | Meldung „This is not your company.“, kein Fenster |

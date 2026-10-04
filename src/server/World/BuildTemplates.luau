@@ -157,7 +157,7 @@ local function buildElevator(plotCFrame: CFrame): Model
 	-- Gitterwände hinten und seitlich, vorne offen (Gittertor folgt in 2b)
 	local function grid(name: string, size: Vector3, cframe: CFrame)
 		local g = part(model, name, size, cframe, METAL_DARK, Enum.Material.DiamondPlate)
-		g.Transparency = 0.55
+		g.Transparency = 0.85
 	end
 	grid("Grid_Back", Vector3.new(S - 1.2, H - 2, 0.2), o * CFrame.new(0, 1 + H / 2, half))
 	grid("Grid_Left", Vector3.new(0.2, H - 2, S - 1.2), o * CFrame.new(half, 1 + H / 2, 0))
@@ -172,6 +172,26 @@ local function buildElevator(plotCFrame: CFrame): Model
 	local wheel = part(model, "Sheave", Vector3.new(0.8, 6, 6), o * CFrame.new(0, 5.6 + H, 0), METAL_DARK, Enum.Material.Metal)
 	wheel.Shape = Enum.PartType.Cylinder
 	part(model, "Cable", Vector3.new(0.2, H - 1, 0.2), o * CFrame.new(0, 1.5 + H / 2, 0), Color3.fromRGB(40, 40, 40), Enum.Material.Metal)
+
+	-- Ankunftspunkt im Käfig (Blick nach vorne) und Bedienung per ProximityPrompt
+	local arrival = part(model, "ArrivalPoint", Vector3.new(2, 1, 2), o * CFrame.new(0, 4.5, 2), STEEL, Enum.Material.SmoothPlastic)
+	arrival.Transparency = 1
+	arrival.CanCollide = false
+	arrival.CanQuery = false
+
+	local promptPart = part(model, "ElevatorPromptPart", Vector3.new(4, 4, 4), o * CFrame.new(0, 4, 0), STEEL, Enum.Material.SmoothPlastic)
+	promptPart.Transparency = 1
+	promptPart.CanCollide = false
+	promptPart.CanQuery = false
+	local prompt = Instance.new("ProximityPrompt")
+	prompt.Name = "ElevatorPrompt"
+	prompt.ActionText = "Use Elevator"
+	prompt.ObjectText = "Elevator"
+	prompt.HoldDuration = 0
+	prompt.MaxActivationDistance = 12
+	prompt.RequiresLineOfSight = false
+	prompt:SetAttribute("ElevatorKind", "Surface")
+	prompt.Parent = promptPart
 
 	CollectionService:AddTag(model, "Elevator")
 	return model

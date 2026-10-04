@@ -31,6 +31,15 @@ local Remotes: { [string]: RemoteDefinition } = {
 
 	-- Ersteinrichtung der Firma: (name: string, logoId: string, colorId: string) -> Result
 	SubmitCompanySetup = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 5, Window = 30 } },
+
+	-- Elevator: Server öffnet die Auswahl nach gültigem Prompt: { Location: string }
+	OpenElevatorMenu = { Kind = "Event", Direction = "ServerToClient" },
+	-- Fahrtwunsch: (destination: "surface" | mineId) -> Result
+	RequestTravel = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
+	-- Übergangsanimation starten: { Title: string, Subtitle: string }
+	ElevatorTransition = { Kind = "Event", Direction = "ServerToClient" },
+	-- Aktueller Ort des Spielers: { Location: "surface" | mineId }
+	LocationChanged = { Kind = "Event", Direction = "ServerToClient" },
 }
 
 return table.freeze(Remotes)

@@ -64,6 +64,25 @@ local LayoutConfig = {
 	-- Danach liegt der Spawn auf dem Bett in der Hütte (docs/04 §7). TODO_LAYOUT
 	SpawnOffset = Vector3.new(87, 4, 24),
 
+	-- Mine Shaft (00 §13, MINE_SHAFT_REFERENCE.png): ein Raum pro Plot, unter dem Plot.
+	-- Der Raum wird beim Elevator-Wechsel auf die gewählte Mine umkonfiguriert (D-014).
+	MineShaft = {
+		-- Höhe des Raumbodens unter der Plot-Bodenhöhe (oberhalb FallenPartsDestroyHeight -500)
+		DepthBelowPlot = 260,
+		-- Innenmaß X (Breite), Z (Tiefe), Höhe. TODO_LAYOUT
+		Size = Vector3.new(96, 22, 72),
+		-- Elevator-Podest in der Raummitte, leicht nach hinten versetzt (lokal X/Z)
+		ElevatorCenter = Vector2.new(0, 8),
+		-- Mining-Slots an gegenüberliegenden Wänden (Slot 1 = +X = links im Bild)
+		Slots = {
+			Vector2.new(36, 4),
+			Vector2.new(-36, 4),
+		},
+	},
+
+	-- Elevator: maximale Entfernung zum Käfig, um ihn zu benutzen
+	ElevatorUseDistance = 16,
+
 	-- Zaun
 	FenceHeight = 3,
 	FenceThickness = 1,
