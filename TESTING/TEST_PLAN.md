@@ -49,7 +49,8 @@ Voraussetzung: Büro, Firma und Elevator sind gebaut (2a).
 |---|---|---|---|
 | 2b.1 | Elevator öffnen | In den Käfig gehen, Taste **E** („Use Elevator“) | Fenster „SELECT MINE“: Mine 01 mit grünem GO, Mine 02–100 „LOCKED / Coming soon“ |
 | 2b.2 | Fahrt nach unten | GO bei Mine 01 | Bild blendet ab mit „MINE SHAFT 01 / COAL“, kurzes Ruckeln, Ankunft im Käfig der Mine, oben mittig „MINE SHAFT 01 · COAL“ |
-| 2b.3 | Mine ansehen | Käfig nach vorne über die Treppe verlassen, umsehen | Ein Raum, eine Ebene; Käfig mittig auf Podest; links und rechts je eine schwarze Kohleader mit Holzstützen und Lampe; graue Felswände; keine Schienen/Loren/Förderbänder |
+| 2b.3 | Mine ansehen | Käfig nach vorne durch das offene Tor über die Treppe verlassen, umsehen | Ein Raum, eine Ebene; Korb mittig hinten auf Podest; Abbauplatz 1 hinten links, Abbauplatz 2 rechts, jeweils Kohlehaufen vor offener Erzwand mit schwerem Holzrahmen; Wände mit Holzverbau und Laternen; dunkler Fels; keine Schienen/Loren/Förderbänder |
+| 2b.3a | Tor (BUG-001) | Fahrt starten, danach Ankunft beobachten | Tor schließt bei Abfahrt, Warnleuchte auf dem Dach leuchtet; Tor am Ziel ist offen, man kann sofort rauslaufen |
 | 2b.4 | Fenster schließen | E drücken, dann X oder Escape bzw. wegrennen | Fenster schließt sich |
 | 2b.5 | Zurück nach oben | Im Minenkäfig E → SURFACE → GO | Ankunft im Elevator auf deinem Plot, Anzeige oben verschwindet |
 | 2b.6 | Respawn in der Mine | In der Mine Reset (Esc → Reset Character) | Respawn im Bett der Hütte, keine Mine-Anzeige |

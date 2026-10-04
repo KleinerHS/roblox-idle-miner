@@ -60,8 +60,8 @@ function Mines.Label(mine: MineDefinition): string
 end
 
 -- Felsfarbe: bis ca. Mine 30 grau, danach zunehmend dunkler (docs/19 §5).
-local ROCK_LIGHT = Color3.fromRGB(100, 98, 95)
-local ROCK_DARK = Color3.fromRGB(52, 50, 50)
+local ROCK_LIGHT = Color3.fromRGB(74, 72, 70)
+local ROCK_DARK = Color3.fromRGB(38, 36, 36)
 function Mines.RockColor(mine: MineDefinition): Color3
 	if mine.Number <= 30 then
 		return ROCK_LIGHT

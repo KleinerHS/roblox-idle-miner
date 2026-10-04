@@ -102,6 +102,13 @@ Selbsttest per Studio-MCP (2026-10-04):
 - Rückfahrt zur Oberfläche: Anzeige verschwindet, Dunst wieder normal.
 - Tod in der Mine → Respawn im Bett, Ort = Oberfläche.
 
+Rückmeldung Felix (2026-10-04) und Überarbeitung:
+- Abbauplätze nicht wie im Referenzbild angeordnet → jetzt Platz 1 hinten links, Platz 2 rechts an der Wand, jeweils großer Erzhaufen vor einer offenen Erzwand; Korb mittig hinten (`LayoutConfig.MineShaft`).
+- BUG-001: Käfig in der Mine nicht verlassbar → behoben (siehe `TESTING/BUGS.md`).
+- Elevator zu billig → neuer gemeinsamer Förderkorb für Oberfläche und Mine: I-Träger-Rahmen, Gitterstäbe, Schiebegitter-Tor, Förderturm mit Seilrad und Kreuzverband, Bedienpult mit Leuchttastern, Warnleuchte (leuchtet während der Fahrt), Innenlampe (`src/server/World/ElevatorCageBuilder.luau`). Oben auf Schachtrahmen mit Rampe, unten auf Podest mit Treppe und Geländer.
+- Holzbalken ohne Sinn → Türstockausbau an Rück- und Seitenwänden (Stempel, Kappe, Kopfbänder, Bretterverschalung, Laternen), an den Abbauplätzen schwerer Stützrahmen über der offenen Erzwand; dunkles, unterschiedlich getöntes Grubenholz. Fels dunkler.
+- Status 2b bleibt TESTING_REQUIRED bis zum erneuten Test durch Felix.
+
 ---
 
 # Documentation Audit

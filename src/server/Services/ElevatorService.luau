@@ -25,6 +25,7 @@ local Log = require(Shared.Util.Log)
 
 local PlotBuilder = require(script.Parent.Parent.World.PlotBuilder)
 local MineShaftBuilder = require(script.Parent.Parent.World.MineShaftBuilder)
+local ElevatorCageBuilder = require(script.Parent.Parent.World.ElevatorCageBuilder)
 local DataService = require(script.Parent.DataService)
 local PlotService = require(script.Parent.PlotService)
 local BuildingService = require(script.Parent.BuildingService)
@@ -141,7 +142,14 @@ local function travel(player: Player, destination: unknown)
 		subtitle = ""
 	end
 
+	-- Abfahrt: Tor schließt, Warnleuchte an, Bildschirm blendet ab
+	local departure = currentElevatorPart(player)
+	local departureCage = departure and departure:FindFirstAncestor("Cage")
 	traveling[player] = true
+	if departureCage then
+		ElevatorCageBuilder.setGate(departureCage, false, true)
+		ElevatorCageBuilder.setBeacon(departureCage, true)
+	end
 	RemoteService.FireClient("ElevatorTransition", player, { Title = title, Subtitle = subtitle })
 	task.wait(TRANSITION_IN_SECONDS)
 
@@ -157,6 +165,10 @@ local function travel(player: Player, destination: unknown)
 	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
 	if not target or not character or not humanoid or humanoid.Health <= 0 or player.Parent ~= Players then
 		traveling[player] = nil
+		if departureCage then
+			ElevatorCageBuilder.setBeacon(departureCage, false)
+			ElevatorCageBuilder.setGate(departureCage, true, true)
+		end
 		return Result.err(Result.Codes.INTERNAL_ERROR)
 	end
 
@@ -166,6 +178,19 @@ local function travel(player: Player, destination: unknown)
 	character:PivotTo((target :: BasePart).CFrame)
 	setLocation(player, destination)
 	traveling[player] = nil
+
+	-- Ankunft: Tor des Zielkorbs ist offen; Abfahrtskorb wieder öffnen, Leuchte aus
+	local arrivalCage = (target :: BasePart):FindFirstAncestor("Cage")
+	if arrivalCage then
+		ElevatorCageBuilder.setGate(arrivalCage, true, true)
+	end
+	if departureCage then
+		local cage = departureCage
+		task.delay(0.5, function()
+			ElevatorCageBuilder.setBeacon(cage, false)
+			ElevatorCageBuilder.setGate(cage, true, true)
+		end)
+	end
 	Log.debug(TAG, `{player.Name} → {destination}`)
 	return Result.ok(destination)
 end

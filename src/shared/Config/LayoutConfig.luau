@@ -71,12 +71,13 @@ local LayoutConfig = {
 		DepthBelowPlot = 260,
 		-- Innenmaß X (Breite), Z (Tiefe), Höhe. TODO_LAYOUT
 		Size = Vector3.new(96, 22, 72),
-		-- Elevator-Podest in der Raummitte, leicht nach hinten versetzt (lokal X/Z)
-		ElevatorCenter = Vector2.new(0, 8),
-		-- Mining-Slots an gegenüberliegenden Wänden (Slot 1 = +X = links im Bild)
+		-- Elevator-Podest mittig, nach hinten versetzt wie im Referenzbild (lokal X/Z)
+		ElevatorCenter = Vector2.new(0, 14),
+		-- Mining-Slots wie im Referenzbild: Platz 1 hinten links (+X = links im Bild),
+		-- Platz 2 rechts an der Wand. Center = Mitte des Erzhaufens.
 		Slots = {
-			Vector2.new(36, 4),
-			Vector2.new(-36, 4),
+			Vector2.new(31, 19),
+			Vector2.new(-35, 0),
 		},
 	},
 
