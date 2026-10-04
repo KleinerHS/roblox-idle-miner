@@ -383,3 +383,15 @@ Wände $1.500 ab Level 3, Dach $2.500 ab Level 4, Lager $5.000 ab Level 5.
 **Decision:** D-020
 
 ---
+
+## Q-018 – Worker- und Elevator-Werte
+
+**Status:** ANSWERED
+**Date:** 2026-10-04
+
+### Answer (Felix, 2026-10-04)
+ok - vorgeschlagene Werte übernommen.
+
+**Decision:** D-021
+
+---
