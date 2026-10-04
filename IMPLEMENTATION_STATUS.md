@@ -12,7 +12,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 2 | Vertical Slice A | USER_APPROVED (Felix, 2026-10-04) |
 | 3 | Vertical Slice B (Equipment, Mine 02) | USER_APPROVED (Felix, 2026-10-04) |
 | 4 | Storage + Worker (Worker erst nach Lager, D-004) | USER_APPROVED (4a, 4b, 4c) |
-| 5 | Drill | NOT_STARTED |
+| 5 | Drill | TESTING_REQUIRED (5a TESTING_REQUIRED, 5b NOT_STARTED) |
 | 6 | Garage & Vehicles | NOT_STARTED |
 | 7 | Conveyors | NOT_STARTED |
 | 8 | Smelter | NOT_STARTED |
@@ -233,6 +233,29 @@ Selbsttest per Studio-MCP (2026-10-04):
 - STORAGE: Upgrade-Button in der App gedrückt → 2.500 → 5.000, Karte springt auf „Upgrade 2 / 4“.
 - Felix' Profil danach zurückgesetzt (Level 5, $6.473, Lager 1.000, Elevator 100). XP im Level ist dabei auf 0 gefallen (vorher 1.000 / 1.118).
 - Freigabe Felix 2026-10-04 („passt“).
+
+## Phase 5 – Drill – Details
+
+Schritte: 5a Machine-Shop & Drill-Kauf ins Inventar · 5b Platzieren in der Mine, Produktion, Animation, Entfernen, Laptop-Anzeige.
+
+### 5a – Machine-Shop & Drills (Version 0.10.0) – TESTING_REQUIRED
+
+| System | Dateien | Status |
+|---|---|---|
+| Drill-Definitionen MK1–MK3 (Level, Preis, Erz pro Zyklus, Zykluszeit, Output-Puffer) – Vorschlag Q-020, `TODO_BALANCE` | `src/shared/Definitions/Drills.luau` | TESTING_REQUIRED |
+| Datenschema v4: `Machines.Drills` (Instanz-ID je Exemplar, Typ, Mine/Slot wenn platziert) + `Machines.Seq`, Migration v3 → v4; Snapshot `Drills` | `DataSchema.luau`, `Types.luau`, `DataService.luau` | TESTING_REQUIRED |
+| Drill-Modell (Kufenrahmen, Motorgehäuse, Ausleger mit Hydraulik, Bohrkopf mit Zähnen, Auswurfschacht, Bedienpult, Statuslampe; Größe je Stufe) | `src/server/World/DrillModelBuilder.luau` | TESTING_REQUIRED |
+| Machine-Shop in der Mitte (hinten rechts zwischen den Straßen zu Plot 2 und 3): Trapezblech orange, Stahlstützen, offenes Rolltor, Plattform mit MK1/MK3, Werkzeugwand, Werkbank, Tresen mit Prompt | `src/server/World/MachineShopBuilder.luau`, `LayoutConfig.MachineShop` | TESTING_REQUIRED |
+| Drill-Kauf (Remote `BuyMachine`): am Tresen, Level, Geld; mehrfach kaufbar, landet unplatziert im Inventar | `ShopService.luau`, `Remotes.luau` | TESTING_REQUIRED |
+| Shop-Fenster für beide Shops, Machine-Shop mit Reiter DRILLS: Produktion/Min, Output-Puffer, Inventar Owned/Placed/Available, BUY/LOCKED | `ShopController.luau`, `Strings.luau` | TESTING_REQUIRED |
+| DevTool `ClearDrills(player)`; Edit-Vorschau zeigt den Machine-Shop | `DevService.luau`, `plugin/EditPreview.server.luau` | TESTING_REQUIRED |
+
+Selbsttest per Studio-MCP (2026-10-04):
+- Migration v3 → v4 beim Laden („geladen: v4“), alle Daten erhalten.
+- Machine-Shop steht (408 Teile), Front mit Schild „MACHINES“ und offenem Rolltor, Plattform mit Drill MK1 und MK3 (Screenshots geprüft).
+- Kauf: ungültige ID → `INVALID_ARGUMENT`; MK1 bei Level 5 → `LEVEL_TOO_LOW`; bei Level 6 zwei MK1 gekauft (d1, d2), dritter → `NOT_ENOUGH_MONEY`; MK2 → `LEVEL_TOO_LOW`; 60 Studs vom Tresen → `TOO_FAR`.
+- Shop-Fenster: „MACHINES“, Reiter DRILLS, MK1 „Owned 2 · Placed 0 · Available 2“, MK2/MK3 „LOCKED“. Equipment-Shop danach unverändert.
+- Gekaufte Drills nach Stop → Play erhalten. Felix' Profil danach zurückgesetzt (Level 5, $6.473, keine Drills).
 
 ## Werkzeuge
 

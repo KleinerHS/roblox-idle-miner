@@ -105,6 +105,18 @@ function DevService.Init()
 	end
 	setCapacities.Parent = folder
 
+	-- Alle gekauften Drills entfernen (Inventar und platzierte):
+	--   game.ServerStorage.DevTools.ClearDrills:Invoke(game.Players:GetPlayers()[1])
+	local clearDrills = Instance.new("BindableFunction")
+	clearDrills.Name = "ClearDrills"
+	clearDrills.OnInvoke = function(player: Player): string
+		local ok = DataService.Mutate(player, function(data)
+			table.clear(data.Machines.Drills)
+		end)
+		return if ok then "ok" else "Profil nicht geladen"
+	end
+	clearDrills.Parent = folder
+
 	folder.Parent = ServerStorage
 end
 

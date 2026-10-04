@@ -104,6 +104,12 @@ local LayoutConfig = {
 		Offset = Vector2.new(-88, -6),
 		Size = Vector3.new(40, 16, 30),
 	},
+	-- Machine-Shop in der Mitte (CENTRAL_AREA_REFERENCE.png: hinten, orange). Liegt zwischen
+	-- den Straßen zu Plot 2 und Plot 3; Rolltor zeigt zur Platzmitte. TODO_LAYOUT
+	MachineShop = {
+		Offset = Vector2.new(44, -80),
+		Size = Vector3.new(52, 18, 40),
+	},
 	-- Maximale Entfernung zum Lager-Terminal
 	StorageTerminalDistance = 14,
 	-- Maximale Entfernung zum Shop-Tresen

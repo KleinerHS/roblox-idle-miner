@@ -1,5 +1,7 @@
 --!strict
 -- Shops (docs/10 §21–23, §42–43, §71). Phase 3: Equipment-Shop mit Pickaxes und Backpacks.
+-- Phase 5: Machine-Shop mit Drills. Drills sind mehrfach kaufbar und bekommen je Exemplar
+-- eine Instanz-ID (docs/10 §38–39, §64); sie landen unplatziert im Inventar (docs/10 §30).
 -- Preis, Level und Stats kommen ausschließlich aus den Definitionen; der Client schickt nur
 -- Kategorie und Item-ID. Pickaxes/Backpacks werden einmal besessen und danach ausgerüstet
 -- (docs/10 §62). Gekauftes wird direkt ausgerüstet.
@@ -12,11 +14,13 @@ local Shared = ReplicatedStorage:WaitForChild("Shared")
 local LayoutConfig = require(Shared.Config.LayoutConfig)
 local Pickaxes = require(Shared.Definitions.Pickaxes)
 local Backpacks = require(Shared.Definitions.Backpacks)
+local Drills = require(Shared.Definitions.Drills)
 local Types = require(Shared.Types)
 local Result = require(Shared.Util.Result)
 local Log = require(Shared.Util.Log)
 
 local EquipmentShopBuilder = require(script.Parent.Parent.World.EquipmentShopBuilder)
+local MachineShopBuilder = require(script.Parent.Parent.World.MachineShopBuilder)
 local DataService = require(script.Parent.DataService)
 local MiningService = require(script.Parent.MiningService)
 local RemoteService = require(script.Parent.RemoteService)
@@ -155,6 +159,43 @@ local function equip(player: Player, categoryName: unknown, itemId: unknown)
 	return Result.ok(item.Id)
 end
 
+-- Drill kaufen (mehrfach möglich): (drillTypeId) -> Result<instanceId>
+local function buyMachine(player: Player, drillTypeId: unknown)
+	if typeof(drillTypeId) ~= "string" then
+		return Result.err(Result.Codes.INVALID_ARGUMENT)
+	end
+	local def = Drills.Get(drillTypeId)
+	if not def then
+		return Result.err(Result.Codes.INVALID_ARGUMENT)
+	end
+	local data = DataService.Get(player)
+	if not data then
+		return Result.err(Result.Codes.DATA_NOT_LOADED)
+	end
+	if not isNearShop(player, "machine") then
+		return Result.err(Result.Codes.TOO_FAR)
+	end
+	if data.MiningLevel < def.RequiredLevel then
+		return Result.err(Result.Codes.LEVEL_TOO_LOW)
+	end
+	if data.Cash < def.Price then
+		return Result.err(Result.Codes.NOT_ENOUGH_MONEY)
+	end
+
+	-- Prüfung und Änderung ohne Yield dazwischen → kein Doppelkauf durch Remote-Spam
+	local newId = ""
+	DataService.Mutate(player, function(d)
+		d.Cash -= def.Price
+		d.Machines.Seq += 1
+		newId = `d{d.Machines.Seq}`
+		d.Machines.Drills[newId] = { Id = newId, Type = def.Id }
+	end)
+	DataService.RequestSave(player)
+	Log.debug(TAG, `{player.Name} kauft {def.Id} ({newId}) für {def.Price}`)
+	RemoteService.FireClient("Notify", player, { Kind = "Success", Code = "DRILL_PURCHASED", Args = { Name = def.DisplayName } })
+	return Result.ok(newId)
+end
+
 function ShopService.Init()
 	local center = workspace:FindFirstChild("Center")
 	if not center then
@@ -164,9 +205,12 @@ function ShopService.Init()
 	end
 	local shop = EquipmentShopBuilder.build(center :: Instance)
 	counters.equipment = shop:FindFirstChild("CounterPromptPart") :: BasePart
+	local machineShop = MachineShopBuilder.build(center :: Instance)
+	counters.machine = machineShop:FindFirstChild("CounterPromptPart") :: BasePart
 
 	RemoteService.OnInvoke("BuyItem", buy)
 	RemoteService.OnInvoke("EquipItem", equip)
+	RemoteService.OnInvoke("BuyMachine", buyMachine)
 end
 
 function ShopService.Start()

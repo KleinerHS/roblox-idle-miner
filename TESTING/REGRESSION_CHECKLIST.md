@@ -24,3 +24,5 @@ Nach Änderungen an Economy, Inventory, Save, Trading oder Prestige die betroffe
 - [x] Phase 4b: Migration v2 → v3, Worker nach Rejoin erhalten (Test 4b.10, Felix 2026-10-04)
 - [x] Phase 4c: Upgrades nur mit Gebäude, am Laptop, Level und Geld; keine Stufe doppelt; Max-Stufe gesperrt (Test 4c.3–4c.7, Felix 2026-10-04)
 - [x] Phase 4c: Kapazitäten nach Rejoin erhalten, Produktion nutzt neue Elevator-Kapazität (Test 4c.6, 4c.8, Felix 2026-10-04)
+- [ ] Phase 5a: Drill-Kauf nur am Tresen mit Level/Geld, mehrfach, Inventar korrekt (Test 5a.3–5a.6)
+- [ ] Phase 5a: Migration v3 → v4, Drills nach Rejoin erhalten, Equipment-Shop unverändert (Test 5a.7, 5a.8)

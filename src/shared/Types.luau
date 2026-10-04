@@ -13,6 +13,15 @@ export type WorkerRecord = {
 	Slot: number,
 }
 
+-- Gekaufter Drill (docs/10 §38–39, §64): eigene Instanz-ID je Exemplar.
+-- MineId/Slot gesetzt = platziert, nil = im Inventar verfügbar.
+export type DrillRecord = {
+	Id: string,
+	Type: string,
+	MineId: string?,
+	Slot: number?,
+}
+
 -- Persistentes Spielerprofil. Struktur-Änderungen nur mit neuer DataVersion und
 -- Migration (src/server/Data/DataSchema.luau, docs/14 §3).
 export type PlayerData = {
@@ -70,6 +79,12 @@ export type PlayerData = {
 		ElevatorCapacity: number,
 	},
 
+	-- Maschinen (ab DataVersion 4): gekaufte Drills mit Instanz-ID
+	Machines: {
+		Drills: { [string]: DrillRecord },
+		Seq: number,
+	},
+
 	Stats: {
 		FirstJoinTime: number,
 		JoinCount: number,
@@ -100,6 +115,7 @@ export type StateSnapshot = {
 	StorageCapacity: number,
 	StorageItems: ItemCounts,
 	Workers: { [string]: WorkerRecord },
+	Drills: { [string]: DrillRecord },
 	MineBuffers: { [string]: number },
 	ElevatorBuffer: ItemCounts,
 	ElevatorCapacity: number,

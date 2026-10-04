@@ -38,6 +38,7 @@ local MESSAGES: { [string]: string } = {
 
 	-- Shop
 	ITEM_PURCHASED = "{Name} purchased and equipped!",
+	DRILL_PURCHASED = "{Name} purchased! Place it in a mine.",
 	NOT_OWNED = "You don't own this item yet.",
 
 	-- Worker
@@ -95,6 +96,13 @@ Strings.Sell = table.freeze({
 
 Strings.Shop = table.freeze({
 	EquipmentTitle = "EQUIPMENT",
+	MachineTitle = "MACHINES",
+	Drills = "DRILLS",
+	Production = "Production",
+	PerMinute = "%s ore / min",
+	Output = "Output buffer",
+	Inventory = "Inventory",
+	InventoryValue = "Owned %d · Placed %d · Available %d",
 	Pickaxes = "PICKAXES",
 	Backpacks = "BACKPACKS",
 	Power = "Mining Power",

@@ -142,3 +142,18 @@ Werte aus D-022. Voraussetzung: Lager gebaut.
 | 4c.6 | Elevator-Upgrade | UPGRADE $2K | Kapazität 200, EMPLOYEES zeigt „Elevator: x / 200“ |
 | 4c.7 | Max-Stufe | Mit DevTools Level/Geld hoch, alle Stufen kaufen | „MAX LEVEL · Fully upgraded.“ |
 | 4c.8 | Speichern | Stop → Play | Gekaufte Kapazitäten bleiben erhalten |
+
+## Phase 5a – Machine-Shop & Drills
+
+Werte sind Vorschläge aus Q-020. Für den Kauf: `SetLevel(…, 6)` und `SetCash(…, 20000)`.
+
+| # | Test | Schritte | Erwartet |
+|---|---|---|---|
+| 5a.1 | Gebäude | Zur Stadtmitte, hinten rechts | Oranger Machine-Shop mit Schild „MACHINES“, offenem Rolltor, Plattform mit zwei Drills, Werkzeugwand, Tresen |
+| 5a.2 | Shop öffnen | Am Tresen **E** („Shop“) | Fenster „MACHINES“, Reiter DRILLS, drei Karten mit Produktion, Output-Puffer und Inventar |
+| 5a.3 | Gesperrt | Unter Level 6 | MK1 zeigt „LOCKED · Requires Mining Level 6“ |
+| 5a.4 | Kaufen | Level 6, genug Geld → BUY $8K | Geld −$8.000, Meldung „Drill MK1 purchased! Place it in a mine.“, Inventar „Owned 1 · Placed 0 · Available 1“ |
+| 5a.5 | Mehrfach | Noch einmal kaufen | „Owned 2 … Available 2“ |
+| 5a.6 | Zu wenig Geld | Ohne genug Geld kaufen | „Not enough money. You need $8000.“, nichts gekauft |
+| 5a.7 | Speichern | Stop → Play | Drills bleiben im Inventar; alter Spielstand wird auf v4 gebracht |
+| 5a.8 | Equipment-Shop | Equipment-Shop öffnen | Unverändert (Reiter PICKAXES/BACKPACKS) |

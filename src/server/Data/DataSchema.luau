@@ -1,5 +1,5 @@
 --!strict
--- Datenschema v3: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
+-- Datenschema v4: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
 -- Regeln:
 --  * Defaults gibt es nur hier.
 --  * Jede Strukturänderung erhöht CURRENT_VERSION und bekommt eine Migration
@@ -15,7 +15,7 @@ local Backpacks = require(Shared.Definitions.Backpacks)
 local Mines = require(Shared.Definitions.Mines)
 local Types = require(Shared.Types)
 
-local CURRENT_VERSION = 3
+local CURRENT_VERSION = 4
 
 local DataSchema = {
 	CurrentVersion = CURRENT_VERSION,
@@ -70,6 +70,12 @@ local TEMPLATE: Types.PlayerData = {
 		ElevatorCapacity = BalanceConfig.Elevator.StartCapacity,
 	},
 
+	-- Maschinen (v4): gekaufte Drills mit Instanz-ID, platziert oder im Inventar (docs/10 §38)
+	Machines = {
+		Drills = {},
+		Seq = 0,
+	},
+
 	Stats = {
 		FirstJoinTime = 0,
 		JoinCount = 0,
@@ -112,6 +118,12 @@ local MIGRATIONS: { [number]: (data: { [string]: any }) -> () } = {
 		end
 		if typeof(data.Production) ~= "table" then
 			data.Production = { MineBuffers = {}, ElevatorBuffer = {}, ElevatorCapacity = BalanceConfig.Elevator.StartCapacity }
+		end
+	end,
+	-- v3 → v4: Maschinen-Inventar (Drills) ergänzt (Phase 5)
+	[3] = function(data)
+		if typeof(data.Machines) ~= "table" then
+			data.Machines = { Drills = {}, Seq = 0 }
 		end
 	end,
 }
