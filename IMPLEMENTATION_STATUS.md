@@ -6,7 +6,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 
 | Phase | Inhalt | Status |
 |---|---|---|
-| Setup | GitHub-Repo, Rojo-Projekt, Doku-Ordner | TESTING_REQUIRED |
+| Setup | GitHub-Repo, Rojo-Projekt, Doku-Ordner | USER_APPROVED |
 | 0 | Dokumentations-Audit | TESTING_REQUIRED (Review durch Felix) |
 | 1 | Project Skeleton | NOT_STARTED |
 | 2 | Vertical Slice A | NOT_STARTED |
@@ -29,6 +29,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 - Sync-Check: `Bootstrap.server.luau` und `Bootstrap.client.luau` geben Version aus `Shared/Version` aus
 - Spezifikation 00–20 und Visual References in `docs/`
 - `QUESTIONS/` und `TESTING/` angelegt
+- Test 2026-10-04 durch Felix in Studio (lokaler Place, Rokit 1.2.0, Rojo 7.4.4): Sync ok, Play-Output `[Server] … gestartet` und `[Client] … gestartet`, keine Fehler → USER_APPROVED
 
 ---
 
