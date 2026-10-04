@@ -284,7 +284,7 @@ Er beeinflusst ausschließlich das manuelle Rare-Drop-System.
 
 Mining Luck wird nicht automatisch durch jeden Backpack oder jede Pickaxe erhöht.
 
-Quellen für Mining Luck werden später separat festgelegt.
+> **Entscheidung D-007:** Mining Luck kommt aus eigenen Luck-Upgrades/-Items (normal mit Cash) und aus Robux-Boostern. Pickaxe und Backpack erhöhen Luck weiterhin nicht automatisch. Konkrete Items und Werte: TODO_BALANCE.
 
 ---
 

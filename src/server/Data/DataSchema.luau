@@ -1,0 +1,110 @@
+--!strict
+-- Datenschema v1: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
+-- Regeln:
+--  * Defaults gibt es nur hier.
+--  * Jede Strukturänderung erhöht CURRENT_VERSION und bekommt eine Migration
+--    in MIGRATIONS[alteVersion] (alteVersion → alteVersion + 1).
+--  * Migrationen ändern nur Struktur, nie Werte "nach Gefühl".
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local BalanceConfig = require(Shared.Config.BalanceConfig)
+local Pickaxes = require(Shared.Definitions.Pickaxes)
+local Backpacks = require(Shared.Definitions.Backpacks)
+local Mines = require(Shared.Definitions.Mines)
+local Types = require(Shared.Types)
+
+local CURRENT_VERSION = 1
+
+local DataSchema = {
+	CurrentVersion = CURRENT_VERSION,
+}
+
+-- Vorlage für neue Spieler. Wird auch genutzt, um fehlende Felder alter Profile zu
+-- ergänzen (Reconcile), deshalb keine zeitabhängigen Werte hier.
+local TEMPLATE: Types.PlayerData = {
+	DataVersion = CURRENT_VERSION,
+
+	Cash = BalanceConfig.StartCash,
+	MiningLevel = 1,
+	MiningXP = 0,
+
+	Prestige = {
+		Count = 0,
+	},
+
+	Company = {
+		Created = false,
+		Name = "",
+		LogoId = "",
+		ColorId = "",
+	},
+
+	Equipment = {
+		OwnedPickaxes = { [Pickaxes.StarterId] = true },
+		EquippedPickaxe = Pickaxes.StarterId,
+		OwnedBackpacks = { [Backpacks.StarterId] = true },
+		EquippedBackpack = Backpacks.StarterId,
+	},
+
+	Backpack = {},
+	Buildings = {},
+	UnlockedMines = { [Mines.StartMineId] = true },
+	Entitlements = {},
+
+	Stats = {
+		FirstJoinTime = 0,
+		JoinCount = 0,
+	},
+
+	LastValidTime = 0,
+}
+
+-- Tiefe Kopie (für neue Profile, damit die Vorlage nie verändert wird).
+local function deepCopy<T>(value: T): T
+	if typeof(value) ~= "table" then
+		return value
+	end
+	local copy = {}
+	for k, v in value :: any do
+		copy[k] = deepCopy(v)
+	end
+	return copy :: any
+end
+
+function DataSchema.getTemplate(): Types.PlayerData
+	return deepCopy(TEMPLATE)
+end
+
+-- MIGRATIONS[n] überführt ein Profil von Version n nach n + 1.
+local MIGRATIONS: { [number]: (data: { [string]: any }) -> () } = {
+	-- Beispiel für später:
+	-- [1] = function(data) data.Storage = { Capacity = 1000, Items = {} } end,
+}
+
+-- Bringt ein geladenes Profil auf CURRENT_VERSION. Gibt false zurück, wenn das Profil
+-- von einer neueren Spielversion stammt (dann darf dieser Server es nicht beschreiben).
+function DataSchema.migrate(data: { [string]: any }): (boolean, string?)
+	local version = data.DataVersion
+	if typeof(version) ~= "number" then
+		-- Profil ohne Version = frisch angelegt aus der Vorlage
+		data.DataVersion = CURRENT_VERSION
+		return true, nil
+	end
+	if version > CURRENT_VERSION then
+		return false, `Profil-Version {version} ist neuer als Server-Version {CURRENT_VERSION}`
+	end
+	while version < CURRENT_VERSION do
+		local step = MIGRATIONS[version]
+		if not step then
+			return false, `Keine Migration von Version {version}`
+		end
+		step(data)
+		version += 1
+		data.DataVersion = version
+	end
+	return true, nil
+end
+
+return table.freeze(DataSchema)

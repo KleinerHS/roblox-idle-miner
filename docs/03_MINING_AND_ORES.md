@@ -197,6 +197,8 @@ Der Spieler erhält dabei genau ein seltenes Erz.
 
 Es werden nicht beide Varianten gleichzeitig ausgelöst.
 
+> **Entscheidung D-006:** Rare Drops kommen nicht in Vertical Slice A, sondern direkt danach. Ist der Rucksack bei einem Rare Drop fast voll, darf der Drop die Kapazität einmalig überschreiten, nichts geht verloren. Danach greift `BACKPACK FULL` normal.
+
 ### Wichtig
 
 Rare Drops dürfen nicht dazu führen, dass Spieler durch einen einzigen Hit völlig aus der normalen Progression herauskatapultiert werden.

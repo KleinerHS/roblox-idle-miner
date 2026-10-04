@@ -876,9 +876,7 @@ Voraussichtlich zurückgesetzt:
 - normale Maschinenplatzierungen
 - normale Fahrzeugprogression
 
-Bei gekaufter Standardausrüstung muss vor der finalen Implementierung noch entschieden werden, ob sie komplett zurückgesetzt oder teilweise erhalten bleibt.
-
-Claude darf diese offene Frage nicht eigenmächtig entscheiden.
+> **Entscheidung D-012:** Gekaufte Pickaxes, Backpacks und Fahrzeuge bleiben bei Prestige erhalten. Drills (und andere Maschinen) werden zurückgesetzt.
 
 ---
 

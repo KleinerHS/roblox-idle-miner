@@ -18,7 +18,21 @@ TESTING/               Testplan, Regression-Checkliste, Bugs
 IMPLEMENTATION_STATUS.md  Status je System
 ```
 
-Die Unterordner (`Services`, `Controllers`, `Config` …) entstehen mit Phase 1 (Project Skeleton).
+Ab Phase 1:
+
+```text
+src/shared/Config        GameConfig, BalanceConfig (TODO_BALANCE), LayoutConfig (TODO_LAYOUT), UITheme
+src/shared/Definitions   Ores, Mines, Pickaxes, Backpacks, BuildSteps, CompanyIdentity
+src/shared/Util          Result, Signal, NumberFormat, Log, Leveling
+src/shared/Remotes.luau  zentrale Remote-Liste
+src/server/Services      RemoteService, DataService, PlotService (Reihenfolge in Bootstrap.server.luau)
+src/server/Data          DataSchema (Default-Profil, Migrationen)
+src/server/Packages      ProfileStore (Apache-2.0, Lizenz in licenses/)
+src/server/World         PlotBuilder (Platzhalter-Geometrie der 6 Plots)
+src/client/Controllers   StateController, PlotController (Reihenfolge in Bootstrap.client.luau)
+```
+
+Speichern funktioniert in Studio nur in einem veröffentlichten Place mit aktiviertem „Enable Studio Access to API Services“ (Game Settings → Security).
 
 ## Setup (Windows)
 

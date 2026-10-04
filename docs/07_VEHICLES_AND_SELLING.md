@@ -62,7 +62,7 @@ Nach Auswahl eines eigenen Fahrzeugs:
 2. ausgewähltes Fahrzeug erscheint am vorgesehenen Spawnpunkt
 3. Spieler wird direkt auf den Fahrersitz gesetzt
 
-Es gibt keine dauerhaft nebeneinander stehende Sammlung aller Fahrzeuge.
+> **Entscheidung D-016 (ersetzt die frühere Regel „keine Sammlung“):** Bis zu **2 Fahrzeuge** eines Spielers können gleichzeitig in der Halle stehen (geparkt bzw. ausgeparkt). Alle weiteren gekauften Fahrzeuge sind eingelagert und werden über den Spawn-Ring ausgeparkt; dabei muss eines der beiden stehenden Fahrzeuge eingeparkt werden. Ladung bleibt je Fahrzeug erhalten (D-009).
 
 ---
 
@@ -806,7 +806,7 @@ VehicleCargo
 
 Je nach finaler Architektur kann Cargo an das aktive Fahrzeugmodell oder an die jeweilige Fahrzeug-ID gebunden werden.
 
-Das System muss vor Implementierung eindeutig festlegen, wie Fahrzeugwechsel mit vorhandener Ladung behandelt werden.
+> **Entscheidung D-009:** Cargo gehört zur jeweiligen Fahrzeug-ID und bleibt dort gespeichert. Ein Fahrzeugwechsel ist auch mit Ladung erlaubt; das alte Fahrzeug despawnt mit seiner Ladung, nichts geht verloren.
 
 ---
 

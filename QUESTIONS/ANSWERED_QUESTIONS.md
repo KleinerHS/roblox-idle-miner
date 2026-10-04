@@ -98,3 +98,240 @@ Default bestätigt: Worker erst nach gebautem Lager („Worker können nicht fü
 **Decision:** D-004
 
 ---
+
+## Q-004 – Platz für manuelles Mining neben belegten Slots
+
+**Status:** ANSWERED
+**Priority:** IMPORTANT_NON_BLOCKING
+**System:** Mine Shaft / Mining
+**Date:** 2026-10-04
+
+### Question
+Wo minet der Spieler, wenn beide Mining-Slots mit Worker/Drill belegt sind?
+
+### Why this matters
+`05` §10 verlangt einen eigenen Bereich für den Spieler. `MINE_SHAFT_REFERENCE.png` zeigt nur die zwei Mining-Plätze. Das Minenlayout entsteht schon in Slice A.
+
+### Default bis zur Antwort
+Jeder der beiden Erzbereiche ist breit genug: Worker/Drill belegt einen festen Punkt am Rand, der Spieler kann an der restlichen Fläche desselben Erzbereichs minen. Kein dritter Bereich.
+
+### Safe work that can continue
+Alles. Wird beim Mine-Layout in Phase 2 berücksichtigt.
+
+### Answer (Felix, 2026-10-04)
+Erste Antwort: „Spieler kann nicht minen, wenn beide Slots belegt sind.“ Korrektur (Felix, 2026-10-04): „Dann kann der Spieler an der selben Stelle wie die Arbeiter oder Drills minen.“ Gültig ist die Korrektur. Kein dritter Bereich.
+
+**Decision:** D-005
+
+---
+
+## Q-005 – Rare Drops: Zeitpunkt und voller Rucksack
+
+**Status:** ANSWERED
+**Priority:** IMPORTANT_NON_BLOCKING
+**System:** Mining / Rare Drops
+**Date:** 2026-10-04
+
+### Question
+1. Sollen Rare Drops schon in Vertical Slice A enthalten sein?
+2. Was passiert bei einem Rare Drop, wenn der Rucksack fast voll ist (`10` §16 verlangt eine eindeutige Regel)?
+
+### Default bis zur Antwort
+1. Nicht in Slice A (`00` §32 und `16` Phase 2 nennen sie nicht). Der Mining-Code bekommt aber schon die Stelle, an der der Rare-Wurf später eingehängt wird.
+2. Ein Rare Drop darf die Rucksackkapazität einmalig überschreiten (kein Verlust). Danach greift `BACKPACK FULL` normal.
+
+### Answer (Felix, 2026-10-04)
+„5.a“: Default A für beide Teile: Rare Drops erst nach Slice A; bei fast vollem Rucksack darf ein Rare Drop einmalig überlaufen. Auslegung von Felix bestätigt („ja passt“).
+
+**Decision:** D-006
+
+---
+
+## Q-006 – Quellen für Mining Luck
+
+**Status:** ANSWERED
+**Priority:** POLISH
+**System:** Mining / Equipment
+**Date:** 2026-10-04
+
+### Question
+Woher bekommt der Spieler Mining Luck? `10` §17: nicht automatisch über Pickaxe/Backpack, Quellen „später separat“.
+
+### Default bis zur Antwort
+Fester Basiswert in der Config (`TODO_BALANCE`). Später möglich: Prestige-Bonus.
+
+### Answer (Felix, 2026-10-04)
+B und C: eigene Luck-Upgrades/-Items und Robux-Booster.
+
+**Decision:** D-007
+
+---
+
+## Q-007 – Position des Ladebereichs
+
+**Status:** ANSWERED
+**Priority:** IMPORTANT_NON_BLOCKING
+**System:** Factory Layout / Vehicles
+**Date:** 2026-10-04
+
+### Question
+Wo genau liegt der Ladebereich? `04` §25 verlangt einen festen Ladebereich, `FACTORY_MASTERPLAN_TOPDOWN.png` markiert keinen.
+
+### Default bis zur Antwort
+Fahrspur vor dem Lager (zwischen Lager und Garage-Fläche), erreichbar durch das große Rolltor.
+
+### Safe work that can continue
+Alles bis Phase 6. Die Fläche wird beim Hallen-Layout freigehalten.
+
+### Answer (Felix, 2026-10-04)
+Die Fahrzeuge stehen in der Halle und werden direkt über einen kleinen Turm beladen, der das Material in die Autos speist.
+
+**Decision:** D-008
+
+---
+
+## Q-008 – Fahrzeugwechsel mit Ladung
+
+**Status:** ANSWERED
+**Priority:** IMPORTANT_NON_BLOCKING
+**System:** Vehicles
+**Date:** 2026-10-04
+
+### Question
+`07` §48 verlangt eine Festlegung vor der Implementierung: Was passiert mit Cargo, wenn der Spieler ein anderes Fahrzeug ausparkt?
+
+### Default bis zur Antwort
+Cargo gehört zur jeweiligen Fahrzeug-ID und bleibt dort gespeichert. Wechsel ist erlaubt, das alte Fahrzeug despawnt mit seiner Ladung, nichts geht verloren.
+
+### Answer (Felix, 2026-10-04)
+A: Wechsel erlaubt, Ladung bleibt im alten Fahrzeug gespeichert.
+
+**Decision:** D-009
+
+---
+
+## Q-009 – Lager-Optik: Regale oder Silo
+
+**Status:** ANSWERED
+**Priority:** POLISH
+**System:** Storage Visuals
+**Date:** 2026-10-04
+
+### Question
+Text (`04` §18, `06` §16) verlangt ein großes Silo mit Füllanzeige in der Halle. `FACTORY_MASTERPLAN_TOPDOWN.png` zeigt im Lager Regale mit Kisten und zwei Silos außen an der rechten Wand.
+
+### Default bis zur Antwort
+Regalbereich laut Bild plus ein Silo mit gut lesbarer Füllanzeige innerhalb des Lagerbereichs.
+
+### Answer (Felix, 2026-10-04)
+A, „auch mit allen Verschönerungsdetails wie im Bild“.
+
+**Decision:** D-010
+
+---
+
+## Q-010 – Smelter: Rezepte für Nicht-Metalle, Priorität
+
+**Status:** ANSWERED
+**Priority:** IMPORTANT_NON_BLOCKING
+**System:** Smelter
+**Date:** 2026-10-04
+
+### Question
+1. Was passiert mit Erzen, die sich nicht sinnvoll schmelzen lassen (Coal, Edelsteine, Kristalle)? Kein Rezept, oder eigene Verarbeitung?
+2. Welche Reihenfolge gilt bei mehreren verarbeitbaren Erzen im Lager (`06` §31)?
+
+### Default bis zur Antwort
+Nur Metalle bekommen Rezepte. Priorität: wertvollstes Erz zuerst, umschaltbar im Laptop.
+
+### Answer (Felix, 2026-10-04)
+A (nur Metalle, wertvollstes zuerst). Zusatz: In späteren Versionen sollen Legierungen möglich sein.
+
+**Decision:** D-011
+
+---
+
+## Q-011 – Prestige: normale Ausrüstung behalten oder zurücksetzen
+
+**Status:** ANSWERED
+**Priority:** IMPORTANT_NON_BLOCKING
+**System:** Prestige / Inventory
+**Date:** 2026-10-04
+
+### Question
+Welche normal mit Cash gekauften Pickaxes, Backpacks, Drills und Fahrzeuge werden beim Prestige zurückgesetzt, welche bleiben?
+
+### Why this matters
+Die Reset-Logik muss wissen, welche Itemklassen permanent sind.
+
+### Current project information
+- Robux-Käufe und Prestige-Boni bleiben.
+- Normale Firmenprogression wird zurückgesetzt.
+- Ausrüstung ist ausdrücklich offen (`00` §27, `12` §54, `20`).
+
+### Safe work that can continue
+Item-Besitz bekommt ab Phase 1 ein Feld `PersistenceClass` (`Progression` / `Permanent` / `RobuxEntitlement`).
+
+### Do not decide automatically
+Wird erst bei Phase 11 benötigt. Nicht selbst entscheiden.
+
+### Answer (Felix, 2026-10-04)
+Pickaxe, Backpack und Fahrzeuge bleiben.
+
+**Decision:** D-012
+
+---
+
+## Q-012 – Firmenidentität nachträglich ändern
+
+**Status:** ANSWERED
+**Priority:** POLISH
+**System:** Company
+**Date:** 2026-10-04
+
+### Question
+Kann der Spieler Name, Logo und Farbe später im Laptop ändern, und wenn ja, kostenlos oder gegen Cash (`09` §25)?
+
+### Default bis zur Antwort
+In Slice A nur Ersteinrichtung. Änderung kommt später mit der Company-App.
+
+### Answer (Felix, 2026-10-04)
+A, aber gegen Robux.
+
+**Decision:** D-013
+
+---
+
+## Q-013 – Stehen gekaufte Fahrzeuge geparkt in der Halle?
+
+**Status:** ANSWERED
+**Priority:** IMPORTANT_NON_BLOCKING
+**System:** Garage / Vehicles
+**Date:** 2026-10-04
+
+### Question
+Stehen alle gekauften Fahrzeuge dauerhaft geparkt in der Halle, oder gibt es nur das aktive Fahrzeug?
+
+### Answer (Felix, 2026-10-04)
+„Man kann bis zu 2 Autos gleichzeitig stehen haben, den Rest muss man ausparken können.“
+
+**Decision:** D-016
+
+---
+
+## Q-014 – Sprache der Spieloberfläche
+
+**Status:** ANSWERED
+**Priority:** POLISH
+**System:** UI
+**Date:** 2026-10-04
+
+### Question
+In welcher Sprache sollen die Texte im Spiel erscheinen?
+
+### Answer (Felix, 2026-10-04)
+Englisch.
+
+**Decision:** D-015
+
+---
