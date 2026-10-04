@@ -7,16 +7,16 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | Phase | Inhalt | Status |
 |---|---|---|
 | Setup | GitHub-Repo, Rojo-Projekt, Doku-Ordner | TESTING_REQUIRED |
-| 0 | Dokumentations-Audit | NOT_STARTED |
+| 0 | Dokumentations-Audit | TESTING_REQUIRED (Review durch Felix) |
 | 1 | Project Skeleton | NOT_STARTED |
 | 2 | Vertical Slice A | NOT_STARTED |
-| 3 | Vertical Slice B | NOT_STARTED |
+| 3 | Vertical Slice B (Equipment, Mine 02, Worker) | NOT_STARTED |
 | 4 | Storage | NOT_STARTED |
 | 5 | Drill | NOT_STARTED |
 | 6 | Garage & Vehicles | NOT_STARTED |
 | 7 | Conveyors | NOT_STARTED |
 | 8 | Smelter | NOT_STARTED |
-| 9 | Multiplayer Hardening | NOT_STARTED |
+| 9 | Multiplayer Hardening / Trading | NOT_STARTED |
 | 10 | Offline Production | NOT_STARTED |
 | 11 | Prestige | NOT_STARTED |
 | 12 | Content Expansion | NOT_STARTED |
@@ -28,17 +28,176 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 - Rojo-Projekt `default.project.json` mit `src/shared`, `src/server`, `src/client`
 - Sync-Check: `Bootstrap.server.luau` und `Bootstrap.client.luau` geben Version aus `Shared/Version` aus
 - Spezifikation 00–20 und Visual References in `docs/`
-- `QUESTIONS/` und `TESTING/` angelegt (Vorlagen, noch leer)
+- `QUESTIONS/` und `TESTING/` angelegt
+
+---
 
 # Documentation Audit
 
-Wird in Phase 0 ausgefüllt (siehe `docs/00_READ_ME_FIRST.md`, Abschnitt 35).
+Stand: 2026-10-04
 
 ## Documents Read
+
+Alle 21 Dateien vollständig gelesen: `docs/00_READ_ME_FIRST.md` bis `docs/20_MASTER_INSTRUCTIONS_FOR_CLAUDE.md`.
+
+Hinweis: Mehrere Dokumente verweisen auf Dateinamen, die es nicht gibt (z. B. `08_PLAYER_EQUIPMENT.md`, `16_TECHNICAL_ARCHITECTURE.md`, `17_SECURITY_AND_ANTI_EXPLOIT.md`, `18_PERFORMANCE.md`, `VISUAL_REFERENCES/01_MAP_TOPDOWN.png`). Das sind Überbleibsel einer älteren Gliederung. Inhaltlich entsprechen sie `10`, `15`, `15`/`18`, `15`/`18` und den PNGs in `docs/references/`.
+
 ## Visual References Inspected
+
+| Datei | Inhalt | Wichtigste Erkenntnisse |
+|---|---|---|
+| `MAP_MASTERPLAN_TOPDOWN.png` | 4-Panel: Map, Plot-Grundriss, Stadtmitte, Mine Shaft | 6 Plots ringförmig um die Mitte, jeder mit eigener Straße; Seen/Teiche zwischen den Plots; Berge rundum. Mine-Panel ist eine **ältere Fassung mit Förderband** (verworfen laut `00` §13). |
+| `FACTORY_MASTERPLAN_TOPDOWN.png` | Hallen-Grundriss | Büro oben links (in der Halle), Elevator oben links-mittig, Lager oben mittig, Schmelze rechts, Garage unten mittig, großes Glas-Rolltor unten mittig zur Straße. Kein Ladebereich markiert. Regale statt Silo im Lager, zwei Silos außen rechts. |
+| `CENTRAL_AREA_REFERENCE.png` | Stadtmitte | Equipment (blau, links), Machine (orange, hinten), Vehicle (rot, rechts), Verkauf (grün, vorne direkt an der Straße mit Fahrzeug-Parkzone). Brunnenplatz in der Mitte, Wasserturm, Windrad, 2–3 Dekohäuser. |
+| `MINE_SHAFT_REFERENCE.png` | Mine Shaft | Ein Raum, eine Ebene. Elevator-Käfig mittig auf Podest mit Treppe. Zwei Erzhaufen an gegenüberliegenden Wänden („Mining Platz 1/2“). Holzverbau, Lampen, Kisten, Fässer. Keine Schienen, kein Förderband. |
+
 ## Confirmed Core Rules
+
+- 6 Plots pro Server, gleiche Größe, festes Layout, kein freies Bauen.
+- Blechhütte $0, bleibt dauerhaft als Büro **innerhalb** der Halle, enthält Laptop und Bett (Spawn).
+- Firmenname (Textfilter), Logo (Auswahl), Farbe (nur Akzent) bei der Ersteinrichtung.
+- Tycoon: immer nur der nächste Haupt-Kaufbutton, Bauteil erscheint sofort, Kette datengetrieben.
+- Reihenfolge: Büro → Elevator/frühe Infrastruktur → Lager → Garage → Schmelzer → weitere Automatisierung.
+- 100 Minen, 50 Erze, je 2 Minen pro Erz, Coal (01–02) bis Diamond (99–100). Coal = Coal überall.
+- Mine Shaft: ein kompakter Raum, Elevator mittig, 2 Mining-Slots, keine Schienen/Loren/Förderbänder.
+- Erzadern unendlich, Wand wird nie zerstört.
+- Pro Mining-Slot Worker ODER Drill. Plus 2 Transport-Slots, max. 4 Worker pro Mine.
+- Worker früh, HireCost + Gehalt pro Minute, unbezahlt → pausiert.
+- Drills nur an festen Slots, Inventar zuerst, keine Rare Drops.
+- Rare Drops nur manuell, entweder Mengenmultiplikator (1–10×) oder 1 Erz aus bis zu 4 Stufen höher, nie beides. Rare Ore schaltet nichts frei.
+- XP nur beim Verkauf, SellValue und MiningXP getrennt. Kein XP durch Trade.
+- Ein Lager, 1.000 Startkapazität über alle Materialien, Upgrade im Laptop.
+- Elevator hat begrenzte, upgradebare Materialkapazität. Elevator darf technisch teleportieren.
+- Erstes Fahrzeug 1.000 Kapazität, Spieler fährt immer selbst, kein Auto-Verkauf, keine Kollision zwischen Spielerfahrzeugen.
+- Conveyors ca. ab Level 35, nur feste Slots.
+- Schmelzer wählt Rezept automatisch, Output wertvoller als Input, Rohverkauf bleibt sinnvoll.
+- Drei getrennte Shops, kein Upgrade-Shop. Level schaltet frei, Geld kauft.
+- Mining Level unten mittig, Level 100 = Prestige, Architektur bis 1000+.
+- Offline max. 1 h, nur Material, respektiert alle Kapazitäten, Serverzeit maßgeblich.
+- Serverautorität für alles Wirtschaftliche; Session Lock, DataVersion, Migration, Autosave.
+- Keine Pets, keine Zusatzwährungen, keine Lootboxen, kein dynamischer Markt in V1.
+
 ## Contradictions Resolved by 00_READ_ME_FIRST
+
+| Widerspruch | Ältere Quelle | Auflösung (Quelle) |
+|---|---|---|
+| Welt als „kleine Bergbaustadt“ mit Dekohäusern | `01` §10–11, `08` | Kompakte Service-Mitte, keine Stadt, nur wenige Dekogebäude (`00` §6, §11) |
+| Shop-Name „Drill/Conveyor Shop“ | `01`, `08` | Heißt **Machine Shop** (`00` §11) |
+| Erzwert verdoppelt sich je Stufe | `01` §16, `03` §12 | Kein `2^n`, kontrolliertes Wachstum (`00` §22, `11` §3) |
+| Rare Drop „zusätzlich 1–10×“ | `03` §7 | Ergebnis ist **entweder** Menge 1–10× **oder** Rare Ore (`00` §21, `11` §18) |
+| Mine-Panel in `MAP_MASTERPLAN` mit Förderband | Bild | Verworfen, `MINE_SHAFT_REFERENCE.png` gilt (`00` §13) |
+| „Mining Platz 2 (z. B. Eisen)“ im Mine-Bild | Bild | Beschriftung ist nur Beispiel. Eine Mine = ein Erz (`03` §2, `00` §22) |
+| Garage im Bild mit 4 geparkten Fahrzeugen | Bild | Keine festen Parkplätze, nur das aktive Fahrzeug spawnt (`01` §29, `07` §4) |
+| Garagentor „leicht rechts“ | `04` §21, `19` §9 | Bild zeigt Tor unten mittig; räumliche Komposition folgt dem Bild (`00` §5) |
+| Vertical Slice inkl. Worker/Storage | `12` §75 | Erster Slice ist kleiner (`00` §32, `16` Phase 2) |
+| Laptop-Bereiche „Overview/Upgrades/Vehicles/Prestige“ | `01` §32 | Dashboard/Employees/Storage/Elevator/Production/Company (`09` §23, `20`) |
+| Dateiverweise auf nicht vorhandene Dokumente | `01` §57, `06`, `08`, `09`, `10` | Siehe Hinweis unter „Documents Read“ |
+
 ## Remaining Open Blocking Questions
+
+Keine. Phase 1 kann ohne Antworten starten.
+
 ## Remaining Open Non-Blocking Questions
+
+Details mit Defaults in `QUESTIONS/OPEN_QUESTIONS.md`:
+
+- **Q-001** Hallenhülle beim Start (betrifft Slice A)
+- **Q-002** Elevator-Kosten vor dem ersten Verdienst (betrifft Slice A)
+- **Q-003** Materialfluss Worker → Storage → Verkauf vor der Garage (vor Phase 3 nötig)
+- **Q-004** Platz für manuelles Mining neben belegten Slots
+- **Q-005** Rare Drops: Zeitpunkt und voller Rucksack
+- **Q-006** Quellen für Mining Luck
+- **Q-007** Position des Ladebereichs
+- **Q-008** Fahrzeugwechsel mit Ladung
+- **Q-009** Lager-Optik: Regale oder Silo
+- **Q-010** Smelter: Rezepte für Nicht-Metalle, Priorität
+- **Q-011** Prestige: normale Ausrüstung behalten oder zurücksetzen
+- **Q-012** Firmenidentität nachträglich ändern
+
+## Proposed Technical Decisions (Veto möglich)
+
+Diese Punkte sind reine Technik, keine Designregeln. Ich setze sie so um, außer Felix widerspricht:
+
+1. **Mine-Instanzierung:** Nicht 100 Minen × 6 Spieler im Workspace. Jeder Plot bekommt einen eigenen, unsichtbar getrennten Mine-Shaft-Bereich unter der Map. Beim Elevator-Wechsel wird dieser Raum auf die gewählte Mine umkonfiguriert (Erzart, Felsfarbe, Slots, Worker/Drills). Produktion aller Minen läuft rein serverseitig als Daten weiter, auch wenn niemand im Raum ist.
+2. **Speichern:** ProfileStore (loleris, MIT) für Session Lock, Autosave und Shutdown-Save. Wird als einzelne Datei ins Repo übernommen (`src/server/Packages`), keine zusätzliche Paketverwaltung nötig.
+3. **Kartenmaßstab:** Plot-, Hallen- und Straßenmaße werden in Phase 1 als zentrale Layout-Config aus den Masterplänen abgeleitet (Straßen breit genug für spätere LKW). Werte sind als `TODO_LAYOUT` markiert und änderbar.
+4. **UI:** Eigene schlanke Komponenten-Module in Luau (Button, Card, ProgressBar, Notification, Modal) ohne externes UI-Framework, zentrale `UITheme`-Config.
+5. **Remotes:** Eine zentrale Registry (`Shared/Remotes`) erzeugt alle RemoteEvents/Functions serverseitig; Server prüft Typen, Besitz und Rate-Limit pro Remote.
+6. **StreamingEnabled:** ab Phase 1 aktiv, damit Streaming-Probleme früh auffallen.
+
 ## Proposed First Build Phase
+
+**Phase 1 – Project Skeleton** (`16` §4), ohne Gameplay-Content:
+
+- Ordnerstruktur nach `15` §5
+- Service-Bootstrap (Server) und Controller-Bootstrap (Client) mit definierter Startreihenfolge
+- Zentrale Remote-Registry mit Validierungs-Helfern
+- Data Schema v1 + DataService (Laden, Speichern, Session Lock, DataVersion, Default-Profil)
+- Zentrale Configs und erste Definitionen mit `TODO_BALANCE`: alle 50 Erze mit stabilen IDs, Mine 01–100 abgeleitet, Starter Pickaxe, Starter Backpack, Baukette-Grundgerüst
+- Hilfsmodule: Result-Codes, Number-Formatting
+- Plot Ownership: 6 Plots, Zuweisung beim Join, Freigabe beim Leave, Besitzprüfung
+
+Testbar in Studio danach: Join mit 1–2 Testspielern → jeder bekommt einen Plot, Daten werden geladen/gespeichert, Rejoin behält einen Testwert, kein Fehler im Output.
+
 ## Planned Files / Systems
+
+```text
+src/shared/
+├── Config/         GameConfig, BalanceConfig (TODO_BALANCE), LayoutConfig (TODO_LAYOUT), UITheme
+├── Definitions/    Ores, Mines, Pickaxes, Backpacks, BuildSteps, Logos
+├── Types/          gemeinsame Luau-Typen (PlayerData, Results, Definitions)
+├── Util/           NumberFormat, Result, Signal
+└── Remotes         zentrale Remote-Namen und -Signaturen
+
+src/server/
+├── Bootstrap.server.luau
+├── Packages/       ProfileStore
+└── Services/
+    ├── DataService       (Phase 1)
+    ├── PlotService       (Phase 1)
+    ├── RemoteService     (Phase 1)
+    ├── EconomyService    (Phase 2)
+    ├── BuildingService   (Phase 2)
+    ├── CompanyService    (Phase 2: Name/Logo/Farbe, Textfilter)
+    ├── ElevatorService   (Phase 2)
+    ├── MiningService     (Phase 2)
+    ├── InventoryService  (Phase 2)
+    ├── SellingService    (Phase 2)
+    ├── WorkerService, ProductionService, StorageService (Phase 3–4)
+    └── VehicleService, TradingService, PrestigeService, OfflineService (später)
+
+src/client/
+├── Bootstrap.client.luau
+├── Controllers/    HUD, Mining, Elevator, Tycoon, Company, Selling, Notification
+└── UI/Components/  Button, Card, ProgressBar, Notification, Modal
+
+assets/             Platzhalter-Modelle (Plot, Hütte, Elevator, Mine Shaft, Stadt)
+ASSETS/ASSET_REGISTRY.md  (ab Phase 2, `19` §19)
+```
+
+## Feature-Matrix
+
+| System | Quelle | Phase | Status |
+|---|---|---|---|
+| Plot-Zuweisung / Ownership | 04, 15 | 1 | NOT_STARTED |
+| Datenspeicherung / Session Lock | 14 | 1 | NOT_STARTED |
+| Tycoon-Baukette | 04 | 2 | NOT_STARTED |
+| Blechhütte + Firmenidentität | 04, 09 | 2 | NOT_STARTED |
+| Elevator + Mine-Auswahl | 04, 09, 12 | 2 | NOT_STARTED |
+| Mine Shaft 01 | 00 §13, 03 | 2 | NOT_STARTED |
+| Manuelles Mining | 03, 10 | 2 | NOT_STARTED |
+| Backpack | 10 | 2 | NOT_STARTED |
+| Verkauf am Tresen | 07 | 2 | NOT_STARTED |
+| Cash, XP, Mining Level, HUD | 09, 11 | 2 | NOT_STARTED |
+| Equipment-Shop | 10 | 3 | NOT_STARTED |
+| Worker (Mining/Transport) + Laptop Employees | 05, 09 | 3 | NOT_STARTED |
+| Storage + Laptop Storage | 06 | 4 | NOT_STARTED |
+| Elevator-Kapazität + Laptop Elevator | 05, 06 | 4 | NOT_STARTED |
+| Machine-Shop + Drills | 05, 10 | 5 | NOT_STARTED |
+| Garage, Vehicle-Shop, Fahrzeuge, Laden, Verkauf aus Fahrzeug | 07 | 6 | NOT_STARTED |
+| Conveyors | 06, 10 | 7 | NOT_STARTED |
+| Smelter | 06 | 8 | NOT_STARTED |
+| Trading | 13 | 9 | NOT_STARTED |
+| Offline-Produktion | 14 | 10 | NOT_STARTED |
+| Prestige | 12 | 11 | NOT_STARTED |
+| Rare Drops / Mining Luck | 03, 11 | nach Slice A (Q-005) | NOT_STARTED |
