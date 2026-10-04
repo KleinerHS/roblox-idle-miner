@@ -10,7 +10,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 0 | Dokumentations-Audit | USER_APPROVED (Freigabe „weiter“, 2026-10-04) |
 | 1 | Project Skeleton | USER_APPROVED (Felix „passt“, 2026-10-04; Zwei-Spieler-Test wird in Phase 2 nachgeholt) |
 | 2 | Vertical Slice A | USER_APPROVED (Felix, 2026-10-04) |
-| 3 | Vertical Slice B (Equipment, Mine 02) | TESTING_REQUIRED (3a) |
+| 3 | Vertical Slice B (Equipment, Mine 02) | USER_APPROVED (Felix, 2026-10-04) |
 | 4 | Storage + Worker (Worker erst nach Lager, D-004) | NOT_STARTED |
 | 5 | Drill | NOT_STARTED |
 | 6 | Garage & Vehicles | NOT_STARTED |
@@ -152,7 +152,7 @@ Selbsttest per Studio-MCP (2026-10-04):
 
 Laut D-004 kommen Worker erst mit dem Lager (Phase 4). Phase 3 umfasst daher Equipment-Shop, bessere Ausrüstung und Mine 02.
 
-### 3a – Equipment-Shop & Mine 02 (Version 0.6.0)
+### 3a – Equipment-Shop & Mine 02 (Version 0.6.0) – USER_APPROVED
 
 | System | Dateien | Status |
 |---|---|---|
@@ -324,7 +324,7 @@ ASSETS/ASSET_REGISTRY.md  (ab Phase 2, `19` §19)
 | Backpack | 10 | 2 | USER_APPROVED |
 | Verkauf am Tresen | 07 | 2 | USER_APPROVED |
 | Cash, XP, Mining Level, HUD | 09, 11 | 2 | USER_APPROVED |
-| Equipment-Shop | 10 | 3 | TESTING_REQUIRED |
+| Equipment-Shop | 10 | 3 | USER_APPROVED |
 | Worker (Mining/Transport) + Laptop Employees | 05, 09 | 3 | NOT_STARTED |
 | Storage + Laptop Storage | 06 | 4 | NOT_STARTED |
 | Elevator-Kapazität + Laptop Elevator | 05, 06 | 4 | NOT_STARTED |
