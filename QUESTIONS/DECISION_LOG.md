@@ -140,3 +140,9 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Source Question:** Q-018
 **Decision:** Mining-Worker: Einstellung $2.000, Lohn $5/Min, 30 Erz/Min. Transport-Worker: $1.500, $4/Min, 50 Erz pro Gang (20 s). Slot-Puffer 200 Erz. Elevator: 100 Erz pro Fahrt alle 10 s. Entlassen ohne Rückerstattung.
 **Affected systems:** Worker, Production, Elevator, Balance
+
+## D-022 – Upgrade-Stufen Lager und Elevator
+
+**Source Question:** Q-019
+**Decision:** Lager 1.000 → 2.500 ($3.000, Lv 5) → 5.000 ($8.000, Lv 6) → 10.000 ($20.000, Lv 8) → 25.000 ($50.000, Lv 10). Elevator (Erz pro Fahrt, alle 10 s) 100 → 200 ($2.000, Lv 3) → 350 ($5.000, Lv 5) → 500 ($10.000, Lv 7) → 750 ($20.000, Lv 9) → 1.000 ($40.000, Lv 11). Kauf über die Laptop-Apps STORAGE/ELEVATOR. Weitere Stufen folgen mit den höheren Minen.
+**Affected systems:** Storage, Elevator, Laptop, Balance

@@ -11,7 +11,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 1 | Project Skeleton | USER_APPROVED (Felix „passt“, 2026-10-04; Zwei-Spieler-Test wird in Phase 2 nachgeholt) |
 | 2 | Vertical Slice A | USER_APPROVED (Felix, 2026-10-04) |
 | 3 | Vertical Slice B (Equipment, Mine 02) | USER_APPROVED (Felix, 2026-10-04) |
-| 4 | Storage + Worker (Worker erst nach Lager, D-004) | TESTING_REQUIRED (4a + 4b USER_APPROVED, 4c TESTING_REQUIRED) |
+| 4 | Storage + Worker (Worker erst nach Lager, D-004) | USER_APPROVED (4a, 4b, 4c) |
 | 5 | Drill | NOT_STARTED |
 | 6 | Garage & Vehicles | NOT_STARTED |
 | 7 | Conveyors | NOT_STARTED |
@@ -214,11 +214,11 @@ Selbsttest per Studio-MCP (2026-10-04):
 - Produktion: Lager in 22 s von 445 auf 455 (≈ 30 Kohle/Min eines Mining-Workers).
 - In Mine 01: 2 Worker-Figuren sichtbar (Mining-Worker an der Wand, Transport-Worker mit Kiste).
 
-### 4c – Laptop-Apps & Upgrades (Version 0.9.0) – TESTING_REQUIRED
+### 4c – Laptop-Apps & Upgrades (Version 0.9.0) – USER_APPROVED
 
 | System | Dateien | Status |
 |---|---|---|
-| Upgrade-Stufen Lager (4) und Elevator (5) – Vorschlag Q-019, `TODO_BALANCE` | `BalanceConfig.Storage.Upgrades`, `BalanceConfig.Elevator.Upgrades`, `Definitions/Upgrades.luau` | TESTING_REQUIRED |
+| Upgrade-Stufen Lager (4) und Elevator (5) – bestätigt (D-022) | `BalanceConfig.Storage.Upgrades`, `BalanceConfig.Elevator.Upgrades`, `Definitions/Upgrades.luau` | TESTING_REQUIRED |
 | Upgrade kaufen (Remote `BuyUpgrade`): Gebäude vorhanden, am eigenen Laptop, Level, Geld, nächste Stufe; Stufe aus gespeicherter Kapazität (kein neues Datenfeld, keine Migration) | `src/server/Services/UpgradeService.luau` | TESTING_REQUIRED |
 | Laptop DASHBOARD (Level/XP, Cash, Lager mit Balken, Mitarbeiter nach Status, Produktion Erz/Min + Elevator-Füllstand) | `LaptopController.luau` | TESTING_REQUIRED |
 | Laptop STORAGE (Belegung mit Balken, Bestand je Erz, Upgrade-Karte) | `LaptopController.luau` | TESTING_REQUIRED |
@@ -232,6 +232,7 @@ Selbsttest per Studio-MCP (2026-10-04):
 - DASHBOARD zeigt Level 12, $124.99K, Lager 529 / 2,500, 2 Mitarbeiter (1 Active · 1 Waiting), 30 ore / min, Elevator 3 / 1,000.
 - STORAGE: Upgrade-Button in der App gedrückt → 2.500 → 5.000, Karte springt auf „Upgrade 2 / 4“.
 - Felix' Profil danach zurückgesetzt (Level 5, $6.473, Lager 1.000, Elevator 100). XP im Level ist dabei auf 0 gefallen (vorher 1.000 / 1.118).
+- Freigabe Felix 2026-10-04 („passt“).
 
 ---
 
