@@ -39,6 +39,10 @@ local MESSAGES: { [string]: string } = {
 	-- Shop
 	ITEM_PURCHASED = "{Name} purchased and equipped!",
 	NOT_OWNED = "You don't own this item yet.",
+
+	-- Lager
+	STORAGE_FULL = "Storage is full!",
+	STORAGE_MOVED = "{Amount} ore moved.",
 }
 
 -- Text zu einem Code; {Platzhalter} werden aus args ersetzt.
@@ -94,6 +98,13 @@ Strings.Shop = table.freeze({
 	Locked = "LOCKED",
 	RequiresLevel = "Requires Mining Level %d",
 	Close = "X",
+})
+
+Strings.Storage = table.freeze({
+	Title = "COMPANY STORAGE",
+	Empty = "Storage is empty.",
+	Take = "TAKE",
+	Deposit = "DEPOSIT BACKPACK (%s)",
 })
 
 Strings.Hud = table.freeze({

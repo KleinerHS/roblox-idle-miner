@@ -26,6 +26,11 @@ local BalanceConfig = {
 		mine_002 = { RequiredLevel = 3 }, -- Felix (D-017)
 	} :: { [string]: { RequiredLevel: number } },
 
+	-- Firmenlager (docs/06 §14): Startkapazität 1.000 über alle Materialien (fest).
+	Storage = {
+		StartCapacity = 1000,
+	},
+
 	-- Geldpreis der Minen ab Mine 03 zusätzlich zum Level (D-017, D-019):
 	-- Preis(n) = BasePrice * Growth ^ (n - FirstPaidMine), auf ganze Dollar gerundet.
 	-- Mine 03 = $3.000, jede weitere Mine +50 %.

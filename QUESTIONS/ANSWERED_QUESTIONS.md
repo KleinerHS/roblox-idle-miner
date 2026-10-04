@@ -372,3 +372,14 @@ Die nächste Spitzhacke soll 1.000 kosten, sonst passt das. Der nächste Rucksac
 Steel Pickaxe 3 Erz/Schlag, Tempo 1,25, $3.000, ab Level 4. Cargo Pack 2.500 Kapazität, $3.500, ab Level 4. Minen ab 03 brauchen Level UND Geld, Mine 03 = $3.000, jede weitere Mine +50 %.
 
 **Decision:** D-019
+## Q-017 – Preise/Level für Wände, Dach und Lager
+
+**Status:** ANSWERED
+**Date:** 2026-10-04
+
+### Answer (Felix, 2026-10-04)
+Wände $1.500 ab Level 3, Dach $2.500 ab Level 4, Lager $5.000 ab Level 5.
+
+**Decision:** D-020
+
+---

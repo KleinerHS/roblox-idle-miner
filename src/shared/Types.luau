@@ -44,6 +44,12 @@ export type PlayerData = {
 	-- Robux-Käufe, bleiben bei Prestige (docs/14 §21)
 	Entitlements: { [string]: boolean },
 
+	-- Firmenlager (ab DataVersion 2): Gesamtkapazität und Bestand je Material
+	Storage: {
+		Capacity: number,
+		Items: ItemCounts,
+	},
+
 	Stats: {
 		FirstJoinTime: number,
 		JoinCount: number,
@@ -71,6 +77,8 @@ export type StateSnapshot = {
 	OwnedBackpacks: { [string]: boolean },
 	Backpack: ItemCounts,
 	BackpackCapacity: number,
+	StorageCapacity: number,
+	StorageItems: ItemCounts,
 	Buildings: { [string]: boolean },
 	PrestigeCount: number,
 }

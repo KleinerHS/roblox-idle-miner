@@ -96,3 +96,18 @@ Werte (Preise, Level, Stats) sind Platzhalter aus Q-015.
 | 3a.7 | Rucksack | Reinforced Backpack kaufen | Rucksackanzeige zeigt „… / 200“ |
 | 3a.8 | Mine 02 | Level 3 erreichen | „NEW MINE UNLOCKED – MINE 02 – COAL“; im Elevator ist Mine 02 mit GO wählbar |
 | 3a.9 | Speichern | Stop → Play | Gekaufte und ausgerüstete Items bleiben |
+## Phase 4a – Halle & Lager
+
+Werte (Preise/Level der Bauschritte) sind Platzhalter aus Q-017. Testwerkzeuge (Server-Befehlszeile, nur Studio):
+`game.ServerStorage.DevTools.SetLevel:Invoke(game.Players:GetPlayers()[1], 5)` und `SetCash` (siehe 3a).
+
+| # | Test | Schritte | Erwartet |
+|---|---|---|---|
+| 4a.1 | Wände | Nach dem Elevator: Button „BUILD WALLS“ vorne in der Halle (ab Level 3, $1.500) | Außenwände mit Sockel, Fensterband und großem offenem Rolltor vorne erscheinen |
+| 4a.2 | Dach | Button „BUILD ROOF“ (ab Level 4, $2.500) | Flachdach mit Oberlichtern und Hallenleuchten |
+| 4a.3 | Lager | Button „BUILD STORAGE“ vor dem Lagerbereich (ab Level 5, $5.000) | Regale mit Kisten, Silo mit Anzeige „STORAGE 0 / 1,000“, Terminal |
+| 4a.4 | Abladen | Kohle abbauen → Terminal **E** → DEPOSIT BACKPACK | Rucksack leer, Lager zeigt die Menge, Silo-Anzeige zählt hoch |
+| 4a.5 | Entnehmen | Im Lagerfenster bei Coal TAKE | So viel wie in den Rucksack passt wandert zurück |
+| 4a.6 | Lager voll | Mehr als 1.000 einlagern | Rest bleibt im Rucksack, „Storage is full!“, Silo-Balken rot |
+| 4a.7 | Speichern/Migration | Stop → Play | Gebäude und Lagerbestand bleiben; alter Spielstand (v1) wird automatisch auf v2 gebracht |
+| 4a.8 | Fremdes Lager (2 Spieler) | Spieler 2 drückt E am Terminal von Spieler 1 | „This is not your company.“ |

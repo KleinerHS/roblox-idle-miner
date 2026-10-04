@@ -11,7 +11,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 1 | Project Skeleton | USER_APPROVED (Felix „passt“, 2026-10-04; Zwei-Spieler-Test wird in Phase 2 nachgeholt) |
 | 2 | Vertical Slice A | USER_APPROVED (Felix, 2026-10-04) |
 | 3 | Vertical Slice B (Equipment, Mine 02) | USER_APPROVED (Felix, 2026-10-04) |
-| 4 | Storage + Worker (Worker erst nach Lager, D-004) | NOT_STARTED |
+| 4 | Storage + Worker (Worker erst nach Lager, D-004) | TESTING_REQUIRED (4a) |
 | 5 | Drill | NOT_STARTED |
 | 6 | Garage & Vehicles | NOT_STARTED |
 | 7 | Conveyors | NOT_STARTED |
@@ -169,6 +169,29 @@ Selbsttest per Studio-MCP (2026-10-04):
 - Abgelehnt: zu wenig Geld (`NOT_ENOUGH_MONEY`), Steel (`NOT_AVAILABLE`), falsche Kategorie/ID (`INVALID_ARGUMENT`), nicht besessenes Item ausrüsten (`NOT_OWNED`), doppelt (`ALREADY_DONE`).
 - Mit $2.500: Iron Pickaxe + Reinforced Backpack gekauft → $500, Tool = Iron, Rucksack „0 / 1,000“; Wechsel Starter ↔ Iron tauscht das Tool.
 - 300 Coal verkauft → Level 3 → „NEW MINE UNLOCKED · MINE 02 · COAL“; Fahrt in Mine 02 ok („MINE SHAFT 02 · COAL“), Mine 03 gesperrt.
+- Freigabe Felix 2026-10-04 („alles gut, nächster Schritt“).
+
+## Phase 4 – Storage + Worker – Details
+
+Schritte: 4a Halle & Lager · 4b Worker (Mining/Transport, Lohn, Rückstau) · 4c Laptop-Apps (Dashboard, Employees, Storage, Elevator).
+
+### 4a – Halle & Lager (Version 0.7.0)
+
+| System | Dateien | Status |
+|---|---|---|
+| Bauschritte Wände ($1.500, Lv 3), Dach ($2.500, Lv 4), Lager ($5.000, Lv 5) (D-002, D-020) | `Definitions/BuildSteps.luau`, `LayoutConfig.BuildButtons` | TESTING_REQUIRED |
+| Hallenwände mit Sockel, Fensterband, Stützen und offenem Rolltor; Flachdach mit Oberlichtern und Hallenleuchten – Platzhalter | `src/server/World/HallTemplates.luau` | TESTING_REQUIRED |
+| Lager: Regale mit Kisten, Silo mit Füllanzeige „STORAGE x / 1,000“ (grün/gelb/rot), Terminal (D-010) | `HallTemplates.buildStorage` | TESTING_REQUIRED |
+| Lager-Service: Rucksack abladen (bis Kapazität, Rest bleibt), Material entnehmen (bis Rucksack voll), nur Besitzer am Terminal; API `GetFree`/`Add` für Worker (4b) | `src/server/Services/StorageService.luau` | TESTING_REQUIRED |
+| Lagerfenster (Füllstand, Bestand, TAKE, DEPOSIT BACKPACK) | `src/client/Controllers/StorageController.luau` | TESTING_REQUIRED |
+| Datenschema v2 mit Migration v1 → v2 (Storage) | `src/server/Data/DataSchema.luau` | TESTING_REQUIRED |
+| Studio-Testwerkzeug Level setzen | `DevService` → `DevTools.SetLevel` | TESTING_REQUIRED |
+
+Selbsttest per Studio-MCP (2026-10-04):
+- Bestehender Spielstand v1 wurde beim Laden auf v2 migriert („geladen: v2“), alle Daten erhalten.
+- Buttons in Reihenfolge: BUILD WALLS $1,500 → BUILD ROOF (bei Level 3: „Requires Mining Level 4“, kein Kauf) → nach Level 5: Roof → BUILD STORAGE $5,000 → alle Modelle stehen.
+- 600 Coal abgeladen → Silo „600 / 1,000“; 100 entnommen; ungültige Erz-ID/Menge abgelehnt; Fenster öffnet über den Terminal-Prompt.
+- 900 im Rucksack, Lager 500 frei → 500 abgeladen, 400 bleiben im Rucksack, danach `STORAGE_FULL`, Silo-Balken rot.
 
 ---
 
@@ -326,7 +349,7 @@ ASSETS/ASSET_REGISTRY.md  (ab Phase 2, `19` §19)
 | Cash, XP, Mining Level, HUD | 09, 11 | 2 | USER_APPROVED |
 | Equipment-Shop | 10 | 3 | USER_APPROVED |
 | Worker (Mining/Transport) + Laptop Employees | 05, 09 | 3 | NOT_STARTED |
-| Storage + Laptop Storage | 06 | 4 | NOT_STARTED |
+| Storage + Laptop Storage | 06 | 4 | TESTING_REQUIRED (Lager ohne Laptop) |
 | Elevator-Kapazität + Laptop Elevator | 05, 06 | 4 | NOT_STARTED |
 | Machine-Shop + Drills | 05, 10 | 5 | NOT_STARTED |
 | Garage, Vehicle-Shop, Fahrzeuge, Laden, Verkauf aus Fahrzeug | 07 | 6 | NOT_STARTED |

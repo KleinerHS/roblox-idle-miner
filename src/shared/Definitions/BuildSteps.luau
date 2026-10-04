@@ -31,6 +31,32 @@ local list: { BuildStepDefinition } = {
 		Requires = "build_office",
 		RequiresCompanySetup = true,
 	},
+	-- Außenwände und Dach als frühe eigene Schritte (D-002), danach das Lager (docs/00 §9).
+	-- Preise/Level von Felix festgelegt (D-020).
+	{
+		Id = "build_walls",
+		DisplayName = "Walls",
+		Price = 1500, -- Felix (D-020)
+		RequiredLevel = 3, -- Felix (D-020)
+		Requires = "build_elevator",
+		RequiresCompanySetup = true,
+	},
+	{
+		Id = "build_roof",
+		DisplayName = "Roof",
+		Price = 2500, -- Felix (D-020)
+		RequiredLevel = 4, -- Felix (D-020)
+		Requires = "build_walls",
+		RequiresCompanySetup = true,
+	},
+	{
+		Id = "build_storage",
+		DisplayName = "Storage",
+		Price = 5000, -- Felix (D-020)
+		RequiredLevel = 5, -- Felix (D-020)
+		Requires = "build_roof",
+		RequiresCompanySetup = true,
+	},
 }
 
 local byId: { [string]: BuildStepDefinition } = {}

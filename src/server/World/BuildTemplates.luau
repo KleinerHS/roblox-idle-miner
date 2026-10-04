@@ -14,6 +14,7 @@ local Shared = ReplicatedStorage:WaitForChild("Shared")
 local LayoutConfig = require(Shared.Config.LayoutConfig)
 
 local ElevatorCageBuilder = require(script.Parent.ElevatorCageBuilder)
+local HallTemplates = require(script.Parent.HallTemplates)
 
 local BuildTemplates = {}
 
@@ -158,6 +159,9 @@ end
 local BUILDERS: { [string]: (plotCFrame: CFrame) -> Model } = {
 	build_office = buildOffice,
 	build_elevator = buildElevator,
+	build_walls = HallTemplates.buildWalls,
+	build_roof = HallTemplates.buildRoof,
+	build_storage = HallTemplates.buildStorage,
 }
 
 -- Baut das Modell eines BuildSteps. nil, wenn für den Schritt (noch) kein Modell existiert.

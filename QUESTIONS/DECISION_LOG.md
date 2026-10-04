@@ -129,3 +129,8 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Hinweis:** Mit +50 % pro Mine wächst der Preis bis Mine 100 auf ca. 4 × 10^20 $. Muss in der Balance-Phase gegen docs/03 §13 („keine absurden Zahlen“) geprüft werden.
 **Affected systems:** Equipment, Shop, Mines, Balance
 **Supersedes:** D-018 (Teil „Coming soon“)
+## D-020 – Bauschritte Wände, Dach, Lager
+
+**Source Question:** Q-017
+**Decision:** Reihenfolge Büro → Elevator → Wände ($1.500, Level 3) → Dach ($2.500, Level 4) → Lager ($5.000, Level 5, 1.000 Kapazität).
+**Affected systems:** Tycoon, Storage, Balance

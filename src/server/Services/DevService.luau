@@ -79,6 +79,19 @@ function DevService.Init()
 	end
 	setCash.Parent = folder
 
+	-- Mining Level setzen (XP im Level = 0):
+	--   game.ServerStorage.DevTools.SetLevel:Invoke(game.Players:GetPlayers()[1], 5)
+	local setLevel = Instance.new("BindableFunction")
+	setLevel.Name = "SetLevel"
+	setLevel.OnInvoke = function(player: Player, level: number): string
+		local ok = DataService.Mutate(player, function(data)
+			data.MiningLevel = math.max(1, math.floor(level))
+			data.MiningXP = 0
+		end)
+		return if ok then "ok" else "Profil nicht geladen"
+	end
+	setLevel.Parent = folder
+
 	folder.Parent = ServerStorage
 end
 

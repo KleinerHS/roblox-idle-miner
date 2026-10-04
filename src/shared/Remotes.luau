@@ -55,6 +55,13 @@ local Remotes: { [string]: RemoteDefinition } = {
 	BuyItem = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
 	-- Ausrüsten eines besessenen Items: (category, itemId) -> Result
 	EquipItem = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 10, Window = 10 } },
+
+	-- Firmenlager: Server öffnet das Lagerfenster nach gültigem Prompt
+	OpenStorage = { Kind = "Event", Direction = "ServerToClient" },
+	-- Rucksack ins Lager abladen: () -> Result<{ Moved: number }>
+	StorageDeposit = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
+	-- Material aus dem Lager in den Rucksack: (oreId: string, amount: number) -> Result<{ Moved: number }>
+	StorageWithdraw = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 10, Window = 10 } },
 }
 
 return table.freeze(Remotes)

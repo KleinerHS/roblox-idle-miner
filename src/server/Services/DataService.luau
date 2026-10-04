@@ -65,6 +65,8 @@ local function buildSnapshot(data: Types.PlayerData): Types.StateSnapshot
 		OwnedBackpacks = table.clone(data.Equipment.OwnedBackpacks),
 		Backpack = table.clone(data.Backpack),
 		BackpackCapacity = if backpack then backpack.Capacity else 0,
+		StorageCapacity = data.Storage.Capacity,
+		StorageItems = table.clone(data.Storage.Items),
 		Buildings = table.clone(data.Buildings),
 		PrestigeCount = data.Prestige.Count,
 	}
