@@ -64,6 +64,36 @@ local LayoutConfig = {
 	-- Danach liegt der Spawn auf dem Bett in der Hütte (docs/04 §7). TODO_LAYOUT
 	SpawnOffset = Vector3.new(87, 4, 24),
 
+	-- Mine Shaft (00 §13, MINE_SHAFT_REFERENCE.png): ein Raum pro Plot, unter dem Plot.
+	-- Der Raum wird beim Elevator-Wechsel auf die gewählte Mine umkonfiguriert (D-014).
+	MineShaft = {
+		-- Höhe des Raumbodens unter der Plot-Bodenhöhe (oberhalb FallenPartsDestroyHeight -500)
+		DepthBelowPlot = 260,
+		-- Innenmaß X (Breite), Z (Tiefe), Höhe. TODO_LAYOUT
+		Size = Vector3.new(96, 22, 72),
+		-- Elevator-Podest mittig, nach hinten versetzt wie im Referenzbild (lokal X/Z)
+		ElevatorCenter = Vector2.new(0, 14),
+		-- Mining-Slots wie im Referenzbild: Platz 1 hinten links (+X = links im Bild),
+		-- Platz 2 rechts an der Wand. Center = Mitte des Erzhaufens.
+		Slots = {
+			Vector2.new(31, 19),
+			Vector2.new(-35, 0),
+		},
+	},
+
+	-- Verkaufsgebäude in der Mitte (CENTRAL_AREA_REFERENCE.png: vorne an der Straße).
+	-- Position relativ zu MapCenter (X/Z); Eingang zeigt nach +Z zur Straße Richtung Plot 5.
+	-- TODO_LAYOUT bis zum Bau der zentralen Service-Area.
+	SellingBuilding = {
+		Offset = Vector2.new(0, 82),
+		Size = Vector3.new(44, 16, 28),
+	},
+	-- Maximale Entfernung zum Verkaufstresen
+	SellCounterDistance = 14,
+
+	-- Elevator: maximale Entfernung zum Käfig, um ihn zu benutzen
+	ElevatorUseDistance = 16,
+
 	-- Zaun
 	FenceHeight = 3,
 	FenceThickness = 1,

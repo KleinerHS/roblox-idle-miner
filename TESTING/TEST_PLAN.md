@@ -40,3 +40,44 @@ Ausgangszustand herstellen (nur in Studio): während Play in der **Server**-Befe
 | 2a.7 | Rejoin | Stop → Play | Hütte, Elevator, Schild wieder da, Spawn auf dem Bett in der Hütte, Dialog öffnet sich NICHT erneut |
 | 2a.8 | Dialog nach Abbruch | Reset → Büro kaufen → Stop, ohne Firma zu gründen → Play | Dialog öffnet sich wieder, Elevator-Button fehlt bis zur Gründung |
 | 2a.9 | Fremder Button (2 Spieler) | Spieler 2 läuft auf den Button von Spieler 1 | Toast „This is not your company.“, nichts wird gekauft |
+
+## Phase 2b – Elevator & Mine Shaft 01
+
+Voraussetzung: Büro, Firma und Elevator sind gebaut (2a).
+
+| # | Test | Schritte | Erwartet |
+|---|---|---|---|
+| 2b.1 | Elevator öffnen | In den Käfig gehen, Taste **E** („Use Elevator“) | Fenster „SELECT MINE“: Mine 01 mit grünem GO, Mine 02–100 „LOCKED / Coming soon“ |
+| 2b.2 | Fahrt nach unten | GO bei Mine 01 | Bild blendet ab mit „MINE SHAFT 01 / COAL“, kurzes Ruckeln, Ankunft im Käfig der Mine, oben mittig „MINE SHAFT 01 · COAL“ |
+| 2b.3 | Mine ansehen | Käfig nach vorne durch das offene Tor über die Treppe verlassen, umsehen | Ein Raum, eine Ebene; Korb mittig hinten auf Podest; Abbauplatz 1 hinten links, Abbauplatz 2 rechts, jeweils offene Kohle-Erzwand mit schwerem Holzrahmen und freier Fläche davor; Wände mit Holzverbau und Laternen; dunkler Fels; keine Schienen/Loren/Förderbänder |
+| 2b.3a | Tor (BUG-001) | Fahrt starten, danach Ankunft beobachten | Tor schließt bei Abfahrt, Warnleuchte auf dem Dach leuchtet; Tor am Ziel ist offen, man kann sofort rauslaufen |
+| 2b.4 | Fenster schließen | E drücken, dann X oder Escape bzw. wegrennen | Fenster schließt sich |
+| 2b.5 | Zurück nach oben | Im Minenkäfig E → SURFACE → GO | Ankunft im Elevator auf deinem Plot, Anzeige oben verschwindet |
+| 2b.6 | Respawn in der Mine | In der Mine Reset (Esc → Reset Character) | Respawn im Bett der Hütte, keine Mine-Anzeige |
+| 2b.7 | Fremder Elevator (2 Spieler) | Spieler 2 drückt E am Käfig von Spieler 1 | Meldung „This is not your company.“, kein Fenster |
+## Phase 2c – Mining & Rucksack
+
+Voraussetzung: Elevator gebaut (2a). Testwerkzeug (Server-Befehlszeile, nur Studio):
+`game.ServerStorage.DevTools.FillBackpack:Invoke(game.Players:GetPlayers()[1], 95)`
+
+| # | Test | Schritte | Erwartet |
+|---|---|---|---|
+| 2c.1 | Spitzhacke | Play, Taste **1** | Spitzhacke in der Hand |
+| 2c.2 | Oberfläche | An der Oberfläche klicken | Meldung „You can only mine inside a mine.“, kein Erz |
+| 2c.3 | Mining | Mine 01 → zur Erzwand mit Holzrahmen gehen → klicken | Schlag-Animation, Brocken spritzen, „+1 Coal“ über der Wand, Rucksack unten rechts zählt hoch |
+| 2c.4 | Tempo | Schnell klicken | Höchstens ca. 1 Hit pro Sekunde zählt (Mining Speed der Starter-Spitzhacke) |
+| 2c.5 | Zu weit weg | In der Raummitte klicken | „Move closer to the ore.“ |
+| 2c.6 | Rucksack voll | Rucksack auf 95 füllen, 5× minen, weiter klicken | Bei 100/100 „BACKPACK FULL“ rot, Meldung „Backpack full! …“, kein weiteres Erz |
+| 2c.7 | Speichern | Etwas Kohle minen → Stop → Play | Rucksack hat noch die gleiche Menge |
+## Phase 2d – Verkauf, Cash & Mining Level (Abschluss Vertical Slice A)
+
+| # | Test | Schritte | Erwartet |
+|---|---|---|---|
+| 2d.1 | HUD | Play | Geld oben rechts, unten mittig „MINING LEVEL n“ mit XP-Balken (in Firmenfarbe) |
+| 2d.2 | Verkaufsgebäude | Vom Plot die Straße zur Mitte gehen | Grünes Gebäude „$ SELL“ vorne an der Mitte, Eingang zur Straße |
+| 2d.3 | Tresen | Hineingehen, am Tresen **E** („Sell Ore“) | Fenster „SELL ORE“ mit Rucksackinhalt, Gesamtwert und Mining XP |
+| 2d.4 | Verkaufen | SELL ALL | Fenster schließt, „SOLD +$… +… Mining XP“, Geld zählt hoch, XP-Balken wächst, Rucksack leer |
+| 2d.5 | Level-Up | Genug verkaufen (Level 1 → 2 braucht 100 XP) | „LEVEL UP! Mining Level 2“ |
+| 2d.6 | Leer | Mit leerem Rucksack SELL ALL | Button ausgegraut, Hinweis „Your backpack is empty…“ |
+| 2d.7 | Kompletter Loop + Speichern | Join → Mine 01 → Kohle abbauen → Oberfläche → verkaufen → Stop → Play | Geld, Level, XP sind gespeichert |
+| 2d.8 | Zwei Spieler | Test → Testsitzung beginnen → Server + 2 Clients | Plot 1 / Plot 2, eigene Schilder; Spieler 2 kann Büro-Button und Elevator von Spieler 1 nicht benutzen („This is not your company.“); Fenster schließen → Plot frei |

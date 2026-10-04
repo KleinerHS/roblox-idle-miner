@@ -24,6 +24,17 @@ local MESSAGES: { [string]: string } = {
 
 	-- Tycoon
 	BUILD_PURCHASED = "{Name} built!",
+
+	-- Mining
+	BACKPACK_FULL = "Backpack full! Sell your ore at the surface.",
+	TOO_FAR = "Move closer to the ore.",
+	NOT_IN_MINE = "You can only mine inside a mine.",
+	COOLDOWN = "",
+	NO_PICKAXE = "Equip your pickaxe first.",
+	MINED = "+{Amount} {Ore}",
+
+	-- Verkauf
+	NOTHING_TO_SELL = "Nothing to sell.",
 }
 
 -- Text zu einem Code; {Platzhalter} werden aus args ersetzt.
@@ -40,6 +51,36 @@ function Strings.message(code: string, args: { [string]: any }?): string
 	end
 	return text
 end
+
+Strings.Elevator = table.freeze({
+	Title = "SELECT MINE",
+	Surface = "SURFACE",
+	SurfaceSub = "Back to your company",
+	Go = "GO",
+	Here = "YOU ARE HERE",
+	Locked = "LOCKED",
+	RequiresLevel = "Requires Mining Level %d",
+	ComingSoon = "Coming soon",
+	Close = "X",
+})
+
+Strings.Sell = table.freeze({
+	Title = "SELL ORE",
+	Empty = "Your backpack is empty. Mine some ore first.",
+	NotSellable = "not sellable yet",
+	Total = "TOTAL",
+	SellAll = "SELL ALL",
+	Pending = "SELLING…",
+	Sold = "SOLD",
+	Close = "X",
+})
+
+Strings.Hud = table.freeze({
+	MiningLevel = "MINING LEVEL %d",
+	XP = "%s / %s XP",
+	LevelUp = "LEVEL UP!",
+	LevelUpSub = "Mining Level %d",
+})
 
 Strings.CompanySetup = table.freeze({
 	Title = "Found your company",

@@ -31,6 +31,23 @@ local Remotes: { [string]: RemoteDefinition } = {
 
 	-- Ersteinrichtung der Firma: (name: string, logoId: string, colorId: string) -> Result
 	SubmitCompanySetup = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 5, Window = 30 } },
+
+	-- Elevator: Server öffnet die Auswahl nach gültigem Prompt: { Location: string }
+	OpenElevatorMenu = { Kind = "Event", Direction = "ServerToClient" },
+	-- Fahrtwunsch: (destination: "surface" | mineId) -> Result
+	RequestTravel = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
+	-- Übergangsanimation starten: { Title: string, Subtitle: string }
+	ElevatorTransition = { Kind = "Event", Direction = "ServerToClient" },
+	-- Aktueller Ort des Spielers: { Location: "surface" | mineId }
+	LocationChanged = { Kind = "Event", Direction = "ServerToClient" },
+
+	-- Manuelles Mining: (slotIndex: number) -> Result<{ OreId, Amount, Total, Capacity }>
+	MineHit = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 12, Window = 5 } },
+
+	-- Verkauf am Tresen: Server öffnet das Verkaufsfenster nach gültigem Prompt
+	OpenSellMenu = { Kind = "Event", Direction = "ServerToClient" },
+	-- Alles Verkaufbare aus dem Rucksack verkaufen: () -> Result<{ Cash, XP, Level, LevelsGained }>
+	SellAll = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 5, Window = 10 } },
 }
 
 return table.freeze(Remotes)

@@ -16,6 +16,15 @@ local GameConfig = {
 		KeyPrefix = "Player_",
 	},
 
+	-- Servervalidierung beim manuellen Mining (docs/03 §4)
+	Mining = {
+		-- Maximaler Abstand des Spielers zur Abbauzone in Studs
+		ReachStuds = 7,
+		-- Anteil des Pickaxe-Cooldowns, der mindestens zwischen zwei Hits liegen muss
+		-- (Toleranz für Netzwerk-Schwankungen)
+		CooldownTolerance = 0.85,
+	},
+
 	Offline = {
 		-- Maximale Offline-Produktion in Sekunden (docs/14 §7, verbindlich).
 		MaxSeconds = 3600,

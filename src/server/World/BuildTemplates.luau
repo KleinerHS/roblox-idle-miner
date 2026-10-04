@@ -5,13 +5,15 @@
 --
 -- Vereinbarte Namen/Tags, auf die andere Systeme zugreifen:
 --   Office:   Part "SpawnAnchor" (Spawn auf dem Bett), Model "Laptop" (Tag "Laptop")
---   Elevator: Model mit Tag "Elevator", Part "CarFloor"
+--   Elevator: Model mit Tag "Elevator", Folder "Cage" (siehe ElevatorCageBuilder)
 
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local LayoutConfig = require(Shared.Config.LayoutConfig)
+
+local ElevatorCageBuilder = require(script.Parent.ElevatorCageBuilder)
 
 local BuildTemplates = {}
 
@@ -125,53 +127,29 @@ local function buildOffice(plotCFrame: CFrame): Model
 	return model
 end
 
--- Elevator-Gitterkäfig (docs/04 §16). Funktion (Mine-Auswahl, Fahrt) folgt in Schritt 2b.
+-- Elevator an der Oberfläche (docs/04 §16): Förderkorb (gleich wie in der Mine) über einem
+-- Schachtrahmen mit Warnmarkierung. Bedienung über ProximityPrompt im Korb.
 local function buildElevator(plotCFrame: CFrame): Model
 	local model = Instance.new("Model")
 	model.Name = "Elevator"
 	local o = zoneOrigin(plotCFrame, "Elevator")
 
-	local S, H = 20, 20 -- Kantenlänge Käfig, Höhe
-	local platform = part(model, "Platform", Vector3.new(S + 4, 1, S + 4), o * CFrame.new(0, 0.5, 0), METAL_DARK, Enum.Material.DiamondPlate)
-	model.PrimaryPart = platform
-
-	-- Warnstreifen am Plattformrand
-	local edge = (S + 4) / 2 - 0.6
-	part(model, "Warn_Front", Vector3.new(S + 4, 0.1, 1.2), o * CFrame.new(0, 1.05, -edge), WARNING_YELLOW, Enum.Material.SmoothPlastic)
-	part(model, "Warn_Back", Vector3.new(S + 4, 0.1, 1.2), o * CFrame.new(0, 1.05, edge), WARNING_YELLOW, Enum.Material.SmoothPlastic)
-	part(model, "Warn_Left", Vector3.new(1.2, 0.1, S + 4), o * CFrame.new(edge, 1.05, 0), WARNING_YELLOW, Enum.Material.SmoothPlastic)
-	part(model, "Warn_Right", Vector3.new(1.2, 0.1, S + 4), o * CFrame.new(-edge, 1.05, 0), WARNING_YELLOW, Enum.Material.SmoothPlastic)
-
-	part(model, "CarFloor", Vector3.new(S - 1, 0.4, S - 1), o * CFrame.new(0, 1.2, 0), STEEL, Enum.Material.DiamondPlate)
-
-	-- Eckpfosten und Rahmen
-	local half = S / 2
-	for i, c in { Vector2.new(half, half), Vector2.new(-half, half), Vector2.new(half, -half), Vector2.new(-half, -half) } do
-		part(model, `Post{i}`, Vector3.new(1.2, H, 1.2), o * CFrame.new(c.X, 1 + H / 2, c.Y), STEEL, Enum.Material.Metal)
+	-- Schachtrahmen: Betonsockel mit Stahlkante und Warnstreifen
+	local frame = part(model, "Platform", Vector3.new(24, 1, 24), o * CFrame.new(0, 0.5, 0), METAL_DARK, Enum.Material.Concrete)
+	model.PrimaryPart = frame
+	local edge = 11.4
+	for i, def in {
+		{ Vector3.new(24, 0.12, 1.2), Vector3.new(0, 1.06, -edge) },
+		{ Vector3.new(24, 0.12, 1.2), Vector3.new(0, 1.06, edge) },
+		{ Vector3.new(1.2, 0.12, 24), Vector3.new(edge, 1.06, 0) },
+		{ Vector3.new(1.2, 0.12, 24), Vector3.new(-edge, 1.06, 0) },
+	} do
+		part(model, `Warn{i}`, def[1], o * CFrame.new(def[2]), WARNING_YELLOW, Enum.Material.SmoothPlastic)
 	end
-	part(model, "Beam_Front", Vector3.new(S + 1.2, 1, 1), o * CFrame.new(0, 1 + H, -half), STEEL, Enum.Material.Metal)
-	part(model, "Beam_Back", Vector3.new(S + 1.2, 1, 1), o * CFrame.new(0, 1 + H, half), STEEL, Enum.Material.Metal)
-	part(model, "Beam_Left", Vector3.new(1, 1, S + 1.2), o * CFrame.new(half, 1 + H, 0), STEEL, Enum.Material.Metal)
-	part(model, "Beam_Right", Vector3.new(1, 1, S + 1.2), o * CFrame.new(-half, 1 + H, 0), STEEL, Enum.Material.Metal)
+	-- Rampe vorne, damit man bequem hineinläuft
+	part(model, "Ramp", Vector3.new(10, 0.5, 4), o * CFrame.new(0, 0.55, -13.5) * CFrame.Angles(math.rad(-12), 0, 0), METAL_DARK, Enum.Material.DiamondPlate)
 
-	-- Gitterwände hinten und seitlich, vorne offen (Gittertor folgt in 2b)
-	local function grid(name: string, size: Vector3, cframe: CFrame)
-		local g = part(model, name, size, cframe, METAL_DARK, Enum.Material.DiamondPlate)
-		g.Transparency = 0.55
-	end
-	grid("Grid_Back", Vector3.new(S - 1.2, H - 2, 0.2), o * CFrame.new(0, 1 + H / 2, half))
-	grid("Grid_Left", Vector3.new(0.2, H - 2, S - 1.2), o * CFrame.new(half, 1 + H / 2, 0))
-	grid("Grid_Right", Vector3.new(0.2, H - 2, S - 1.2), o * CFrame.new(-half, 1 + H / 2, 0))
-	for i = 1, 2 do
-		local y = 1 + i * (H / 3)
-		part(model, `Rail_Front{i}`, Vector3.new(S - 1.2, 0.3, 0.3), o * CFrame.new(0, y, -half), WARNING_YELLOW, Enum.Material.Metal)
-	end
-
-	-- Seilrad oben
-	part(model, "HeadBeam", Vector3.new(1.2, 1.2, S + 1.2), o * CFrame.new(0, 2.6 + H, 0), STEEL, Enum.Material.Metal)
-	local wheel = part(model, "Sheave", Vector3.new(0.8, 6, 6), o * CFrame.new(0, 5.6 + H, 0), METAL_DARK, Enum.Material.Metal)
-	wheel.Shape = Enum.PartType.Cylinder
-	part(model, "Cable", Vector3.new(0.2, H - 1, 0.2), o * CFrame.new(0, 1.5 + H / 2, 0), Color3.fromRGB(40, 40, 40), Enum.Material.Metal)
+	ElevatorCageBuilder.build(model, o * CFrame.new(0, 1.25, 0), "Surface", nil)
 
 	CollectionService:AddTag(model, "Elevator")
 	return model
