@@ -64,7 +64,7 @@ Er erhält:
 - Roblox-Charakter
 - Spitzhacke
 - kleinen Rucksack
-- Startgeld gemäß späterem Balancing
+- Startgeld: **$800** (Entscheidung D-003)
 - ein leeres Grundstück
 - große vorhandene Fabrikhalle
 - kleine Blechhütte

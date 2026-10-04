@@ -369,6 +369,15 @@ Iron Bar     200
 
 ---
 
+# 17a. Spieler und Lager (Entscheidung D-004)
+
+- Worker können erst eingestellt werden, wenn das Lager gebaut ist (keine Worker für eine leere Transportkette).
+- Der Spieler kann seinen Rucksack im Lager abladen.
+- Der Spieler kann Material aus dem Lager in seinen Rucksack nehmen und am Tresen verkaufen (Rucksackkapazität begrenzt die Menge).
+- Garage und erstes Fahrzeug werden so gebalanced, dass sie bald nach dem Lager kommen.
+
+---
+
 # 18. Produktionsstopp bei vollem Lager
 
 Wenn das Lager voll ist, darf kein Material einfach verschwinden.

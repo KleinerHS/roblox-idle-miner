@@ -62,6 +62,8 @@ Die Halle muss bereits bei der Planung genug Platz für das spätere Endgame bes
 
 Am Anfang ist sie größtenteils leer.
 
+> **Entscheidung D-002:** Beim Start ist nur die Bodenplatte mit Bodenmarkierungen des Endlayouts sichtbar. Außenwände und Dach sind frühe, eigene Bauschritte nach Büro und Elevator.
+
 Der Fortschritt entsteht dadurch, dass der Spieler innerhalb dieser bestehenden Grundstruktur nach und nach:
 
 - Gebäudeteile

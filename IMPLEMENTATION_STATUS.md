@@ -10,8 +10,8 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 0 | Dokumentations-Audit | TESTING_REQUIRED (Review durch Felix) |
 | 1 | Project Skeleton | NOT_STARTED |
 | 2 | Vertical Slice A | NOT_STARTED |
-| 3 | Vertical Slice B (Equipment, Mine 02, Worker) | NOT_STARTED |
-| 4 | Storage | NOT_STARTED |
+| 3 | Vertical Slice B (Equipment, Mine 02) | NOT_STARTED |
+| 4 | Storage + Worker (Worker erst nach Lager, D-004) | NOT_STARTED |
 | 5 | Drill | NOT_STARTED |
 | 6 | Garage & Vehicles | NOT_STARTED |
 | 7 | Conveyors | NOT_STARTED |
@@ -101,9 +101,10 @@ Keine. Phase 1 kann ohne Antworten starten.
 
 Details mit Defaults in `QUESTIONS/OPEN_QUESTIONS.md`:
 
-- **Q-001** Hallenhülle beim Start (betrifft Slice A)
-- **Q-002** Elevator-Kosten vor dem ersten Verdienst (betrifft Slice A)
-- **Q-003** Materialfluss Worker → Storage → Verkauf vor der Garage (vor Phase 3 nötig)
+Beantwortet am 2026-10-04: Q-001 → D-002, Q-002 → D-003 (Startgeld $800, Elevator $200), Q-003 → D-004.
+
+Noch offen:
+
 - **Q-004** Platz für manuelles Mining neben belegten Slots
 - **Q-005** Rare Drops: Zeitpunkt und voller Rucksack
 - **Q-006** Quellen für Mining Luck

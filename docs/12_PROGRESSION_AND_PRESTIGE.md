@@ -492,7 +492,7 @@ Die funktionale Firmenprogression soll aktuell grundsätzlich folgende Reihenfol
 
 ```text
 1. Blechhütte / Büro
-2. Elevator-Grundstruktur
+2. Elevator-Grundstruktur (**$200**, Startgeld $800 – Entscheidung D-003)
 3. frühe Firmen-/Transportbereiche
 4. Lager
 5. Garage
