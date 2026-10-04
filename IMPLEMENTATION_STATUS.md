@@ -9,7 +9,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | Setup | GitHub-Repo, Rojo-Projekt, Doku-Ordner | USER_APPROVED |
 | 0 | Dokumentations-Audit | USER_APPROVED (Freigabe „weiter“, 2026-10-04) |
 | 1 | Project Skeleton | USER_APPROVED (Felix „passt“, 2026-10-04; Zwei-Spieler-Test wird in Phase 2 nachgeholt) |
-| 2 | Vertical Slice A | TESTING_REQUIRED (2a USER_APPROVED, 2b USER_APPROVED, 2c USER_APPROVED, 2d TESTING_REQUIRED) |
+| 2 | Vertical Slice A | USER_APPROVED (Felix, 2026-10-04) |
 | 3 | Vertical Slice B (Equipment, Mine 02) | NOT_STARTED |
 | 4 | Storage + Worker (Worker erst nach Lager, D-004) | NOT_STARTED |
 | 5 | Drill | NOT_STARTED |
@@ -130,7 +130,7 @@ Selbsttest per Studio-MCP (2026-10-04):
 - Rucksack danach wieder auf 0 gesetzt.
 - Test durch Felix 2026-10-04: alles getestet, funktioniert → USER_APPROVED.
 
-### 2d – Verkauf, Cash & Mining Level (Version 0.5.0)
+### 2d – Verkauf, Cash & Mining Level (Version 0.5.0) – USER_APPROVED
 
 | System | Dateien | Status |
 |---|---|---|
@@ -146,6 +146,7 @@ Selbsttest per Studio-MCP (2026-10-04):
 - 99 Coal verkauft → +$99, +99 XP, HUD $600 → $699, „99 / 100 XP“; zweiter Verkauf `NOTHING_TO_SELL`.
 - 5 Coal verkauft → Level 2, 4 / 282 XP, „LEVEL UP!“-Meldung, XP-Balken in Firmenfarbe.
 - Noch offen: Zwei-Spieler-Test (1.6, 1.7, 2a.9, 2b.7) – kann nur Felix starten.
+- Freigabe Felix 2026-10-04 („passt“). Der Zwei-Spieler-Test wurde dabei nicht ausdrücklich bestätigt und bleibt in der Regression-Checkliste offen.
 
 ---
 
@@ -299,8 +300,8 @@ ASSETS/ASSET_REGISTRY.md  (ab Phase 2, `19` §19)
 | Mine Shaft 01 | 00 §13, 03 | 2 | USER_APPROVED |
 | Manuelles Mining | 03, 10 | 2 | USER_APPROVED |
 | Backpack | 10 | 2 | USER_APPROVED |
-| Verkauf am Tresen | 07 | 2 | TESTING_REQUIRED |
-| Cash, XP, Mining Level, HUD | 09, 11 | 2 | TESTING_REQUIRED |
+| Verkauf am Tresen | 07 | 2 | USER_APPROVED |
+| Cash, XP, Mining Level, HUD | 09, 11 | 2 | USER_APPROVED |
 | Equipment-Shop | 10 | 3 | NOT_STARTED |
 | Worker (Mining/Transport) + Laptop Employees | 05, 09 | 3 | NOT_STARTED |
 | Storage + Laptop Storage | 06 | 4 | NOT_STARTED |
