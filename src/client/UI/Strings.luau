@@ -24,6 +24,14 @@ local MESSAGES: { [string]: string } = {
 
 	-- Tycoon
 	BUILD_PURCHASED = "{Name} built!",
+
+	-- Mining
+	BACKPACK_FULL = "Backpack full! Sell your ore at the surface.",
+	TOO_FAR = "Move closer to the ore.",
+	NOT_IN_MINE = "You can only mine inside a mine.",
+	COOLDOWN = "",
+	NO_PICKAXE = "Equip your pickaxe first.",
+	MINED = "+{Amount} {Ore}",
 }
 
 -- Text zu einem Code; {Platzhalter} werden aus args ersetzt.

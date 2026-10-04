@@ -40,6 +40,9 @@ local Remotes: { [string]: RemoteDefinition } = {
 	ElevatorTransition = { Kind = "Event", Direction = "ServerToClient" },
 	-- Aktueller Ort des Spielers: { Location: "surface" | mineId }
 	LocationChanged = { Kind = "Event", Direction = "ServerToClient" },
+
+	-- Manuelles Mining: (slotIndex: number) -> Result<{ OreId, Amount, Total, Capacity }>
+	MineHit = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 12, Window = 5 } },
 }
 
 return table.freeze(Remotes)

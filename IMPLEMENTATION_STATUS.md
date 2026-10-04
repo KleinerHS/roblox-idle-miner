@@ -9,7 +9,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | Setup | GitHub-Repo, Rojo-Projekt, Doku-Ordner | USER_APPROVED |
 | 0 | Dokumentations-Audit | USER_APPROVED (Freigabe „weiter“, 2026-10-04) |
 | 1 | Project Skeleton | USER_APPROVED (Felix „passt“, 2026-10-04; Zwei-Spieler-Test wird in Phase 2 nachgeholt) |
-| 2 | Vertical Slice A | TESTING_REQUIRED (2a USER_APPROVED, 2b USER_APPROVED, 2c–2d NOT_STARTED) |
+| 2 | Vertical Slice A | TESTING_REQUIRED (2a USER_APPROVED, 2b USER_APPROVED, 2c TESTING_REQUIRED, 2d NOT_STARTED) |
 | 3 | Vertical Slice B (Equipment, Mine 02) | NOT_STARTED |
 | 4 | Storage + Worker (Worker erst nach Lager, D-004) | NOT_STARTED |
 | 5 | Drill | NOT_STARTED |
@@ -109,6 +109,25 @@ Rückmeldung Felix (2026-10-04) und Überarbeitung:
 - Holzbalken ohne Sinn → Türstockausbau an Rück- und Seitenwänden (Stempel, Kappe, Kopfbänder, Bretterverschalung, Laternen), an den Abbauplätzen schwerer Stützrahmen über der offenen Erzwand; dunkles, unterschiedlich getöntes Grubenholz. Fels dunkler.
 - Zweite Rückmeldung Felix (2026-10-04): „Die zwei Haufen vor den Abbauplätzen müssen weg, damit Platz ist für die Miner, sonst alles gut.“ → Erzhaufen und Kiste/Spitzhacke davor entfernt, Fläche vor der Erzwand ist frei; Abbauzone liegt jetzt direkt vor der Erzwand (16 × 12).
 - Status 2b: USER_APPROVED (Freigabe „sonst alles gut“, Haufen-Änderung von mir per Studio-Test geprüft).
+
+### 2c – Mining & Rucksack (Version 0.4.0)
+
+| System | Dateien | Status |
+|---|---|---|
+| Starter-Spitzhacke als Tool (Platzhalter aus Parts, keine Scripts im Tool) | `src/server/World/ToolBuilder.luau`, Vergabe in `MiningService` | TESTING_REQUIRED |
+| Servervalidiertes Mining: Ort = Mine, Spitzhacke in der Hand, eigener Slot, Abstand ≤ 7, Cooldown nach Mining Speed, Rucksackkapazität; Menge = Mining Power; Erz = Erz der Mine | `src/server/Services/MiningService.luau`, `GameConfig.Mining` | TESTING_REQUIRED |
+| Rare-Drop-Einhängepunkt (`rollRareDrop`, liefert noch nichts, D-006) | `MiningService` | TESTING_REQUIRED |
+| Client: Klick → zur Erzwand drehen → Schlag-Animation → Hit-Anfrage → bei Bestätigung Brocken-Effekt, „+1 Coal“, leichtes Kamera-Ruckeln | `src/client/Controllers/MiningController.luau` | TESTING_REQUIRED |
+| Rucksackanzeige unten rechts (in der Mine oder mit Inhalt), „BACKPACK FULL“ rot | `src/client/Controllers/BackpackHudController.luau` | TESTING_REQUIRED |
+| Studio-Testwerkzeug Rucksack füllen | `DevService` → `ServerStorage.DevTools.FillBackpack` | TESTING_REQUIRED |
+
+Selbsttest per Studio-MCP (2026-10-04):
+- Spitzhacke liegt nach Join im Inventar (Hotbar 1).
+- An der Oberfläche: `NOT_IN_MINE`; ohne Spitzhacke in der Hand: `NO_PICKAXE`.
+- In Mine 01 vor der Erzwand: +1 Coal pro Hit, Rucksack zählt hoch (Anzeige z. B. „12 / 100“).
+- Zweiter Hit sofort danach: `COOLDOWN`; anderer Slot zu weit weg: `TOO_FAR`; Slot 7, Text, 1.5: `INVALID_ARGUMENT`.
+- Rucksack auf 99 gefüllt → ein Hit → 100/100 → nächster Hit `BACKPACK_FULL`, Anzeige „BACKPACK FULL“ rot.
+- Rucksack danach wieder auf 0 gesetzt.
 
 ---
 
@@ -260,8 +279,8 @@ ASSETS/ASSET_REGISTRY.md  (ab Phase 2, `19` §19)
 | Blechhütte + Firmenidentität | 04, 09 | 2 | USER_APPROVED |
 | Elevator + Mine-Auswahl | 04, 09, 12 | 2 | USER_APPROVED |
 | Mine Shaft 01 | 00 §13, 03 | 2 | USER_APPROVED |
-| Manuelles Mining | 03, 10 | 2 | NOT_STARTED |
-| Backpack | 10 | 2 | NOT_STARTED |
+| Manuelles Mining | 03, 10 | 2 | TESTING_REQUIRED |
+| Backpack | 10 | 2 | TESTING_REQUIRED |
 | Verkauf am Tresen | 07 | 2 | NOT_STARTED |
 | Cash, XP, Mining Level, HUD | 09, 11 | 2 | NOT_STARTED |
 | Equipment-Shop | 10 | 3 | NOT_STARTED |

@@ -55,6 +55,18 @@ function DevService.Init()
 	end
 	reset.Parent = folder
 
+	-- Rucksack mit Kohle füllen (zum Testen von "Backpack full"):
+	--   game.ServerStorage.DevTools.FillBackpack:Invoke(game.Players:GetPlayers()[1], 95)
+	local fill = Instance.new("BindableFunction")
+	fill.Name = "FillBackpack"
+	fill.OnInvoke = function(player: Player, amount: number): string
+		local ok = DataService.Mutate(player, function(data)
+			data.Backpack.ore_coal = math.max(0, math.floor(amount))
+		end)
+		return if ok then "ok" else "Profil nicht geladen"
+	end
+	fill.Parent = folder
+
 	folder.Parent = ServerStorage
 end
 

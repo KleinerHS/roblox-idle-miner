@@ -55,3 +55,17 @@ Voraussetzung: Büro, Firma und Elevator sind gebaut (2a).
 | 2b.5 | Zurück nach oben | Im Minenkäfig E → SURFACE → GO | Ankunft im Elevator auf deinem Plot, Anzeige oben verschwindet |
 | 2b.6 | Respawn in der Mine | In der Mine Reset (Esc → Reset Character) | Respawn im Bett der Hütte, keine Mine-Anzeige |
 | 2b.7 | Fremder Elevator (2 Spieler) | Spieler 2 drückt E am Käfig von Spieler 1 | Meldung „This is not your company.“, kein Fenster |
+## Phase 2c – Mining & Rucksack
+
+Voraussetzung: Elevator gebaut (2a). Testwerkzeug (Server-Befehlszeile, nur Studio):
+`game.ServerStorage.DevTools.FillBackpack:Invoke(game.Players:GetPlayers()[1], 95)`
+
+| # | Test | Schritte | Erwartet |
+|---|---|---|---|
+| 2c.1 | Spitzhacke | Play, Taste **1** | Spitzhacke in der Hand |
+| 2c.2 | Oberfläche | An der Oberfläche klicken | Meldung „You can only mine inside a mine.“, kein Erz |
+| 2c.3 | Mining | Mine 01 → zur Erzwand mit Holzrahmen gehen → klicken | Schlag-Animation, Brocken spritzen, „+1 Coal“ über der Wand, Rucksack unten rechts zählt hoch |
+| 2c.4 | Tempo | Schnell klicken | Höchstens ca. 1 Hit pro Sekunde zählt (Mining Speed der Starter-Spitzhacke) |
+| 2c.5 | Zu weit weg | In der Raummitte klicken | „Move closer to the ore.“ |
+| 2c.6 | Rucksack voll | Rucksack auf 95 füllen, 5× minen, weiter klicken | Bei 100/100 „BACKPACK FULL“ rot, Meldung „Backpack full! …“, kein weiteres Erz |
+| 2c.7 | Speichern | Etwas Kohle minen → Stop → Play | Rucksack hat noch die gleiche Menge |
