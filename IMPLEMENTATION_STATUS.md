@@ -53,7 +53,8 @@ Selbsttest per Studio-MCP (2026-10-04, unveröffentlichter Place, DataStore im T
 - Profil v1 geladen: Cash 800, Level 1, XP 0/100, Starter-Rucksack 100.
 - 50 Erze, 100 Minen (mine_045 = Ruby, mine_100 = Diamond), Leveling und Zahlenformat korrekt.
 - Exploit-Test: GetState mit Müll-Argumenten → keine Wirkung; 7× in Folge → ab dem 6. `RATE_LIMITED`; Client-Aufrufe auf ServerToClient-Remotes werden ignoriert.
-- Noch nicht getestet: echtes Speichern/Rejoin (braucht veröffentlichten Place mit API-Zugriff), zwei Spieler.
+- Speichertest 2026-10-04 im veröffentlichten Place „10042026_2“ (placeId 74322463877243, API-Zugriff an): `DataStore verbunden`, 1. Play `Joins 1`, 2. Play `Joins 2` → Speichern und Laden funktionieren.
+- Noch nicht getestet: zwei Spieler (Test 1.6, 1.7).
 
 ---
 
