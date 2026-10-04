@@ -67,6 +67,8 @@ export type StateSnapshot = {
 	},
 	EquippedPickaxe: string,
 	EquippedBackpack: string,
+	OwnedPickaxes: { [string]: boolean },
+	OwnedBackpacks: { [string]: boolean },
 	Backpack: ItemCounts,
 	BackpackCapacity: number,
 	Buildings: { [string]: boolean },

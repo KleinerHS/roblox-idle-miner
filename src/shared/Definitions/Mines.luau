@@ -11,8 +11,17 @@ export type MineDefinition = {
 	OreId: string,
 	-- nil = noch nicht gebalanced (TODO_BALANCE), Mine bleibt gesperrt
 	RequiredLevel: number?,
-	UnlockCost: number?,
+	-- Geldpreis zusätzlich zum Level (ab Mine 03, D-017/D-019), 0 = kostenlos
+	UnlockCost: number,
 }
+
+local function unlockCost(number: number): number
+	local price = BalanceConfig.MinePrice
+	if number < price.FirstPaidMine then
+		return 0
+	end
+	return math.floor(price.BasePrice * price.Growth ^ (number - price.FirstPaidMine) + 0.5)
+end
 
 local list: { MineDefinition } = {}
 local byId: { [string]: MineDefinition } = {}
@@ -26,7 +35,7 @@ for _, ore in Ores.List do
 			Number = number,
 			OreId = ore.Id,
 			RequiredLevel = if unlock then unlock.RequiredLevel else nil,
-			UnlockCost = if unlock then unlock.UnlockCost else nil,
+			UnlockCost = unlockCost(number),
 		})
 		list[number] = mine
 		byId[id] = mine

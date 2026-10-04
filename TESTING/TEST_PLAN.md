@@ -81,3 +81,18 @@ Voraussetzung: Elevator gebaut (2a). Testwerkzeug (Server-Befehlszeile, nur Stud
 | 2d.6 | Leer | Mit leerem Rucksack SELL ALL | Button ausgegraut, Hinweis „Your backpack is empty…“ |
 | 2d.7 | Kompletter Loop + Speichern | Join → Mine 01 → Kohle abbauen → Oberfläche → verkaufen → Stop → Play | Geld, Level, XP sind gespeichert |
 | 2d.8 | Zwei Spieler | Test → Testsitzung beginnen → Server + 2 Clients | Plot 1 / Plot 2, eigene Schilder; Spieler 2 kann Büro-Button und Elevator von Spieler 1 nicht benutzen („This is not your company.“); Fenster schließen → Plot frei |
+## Phase 3a – Equipment-Shop & Mine 02
+
+Werte (Preise, Level, Stats) sind Platzhalter aus Q-015.
+
+| # | Test | Schritte | Erwartet |
+|---|---|---|---|
+| 3a.1 | Shop-Gebäude | Zur Mitte gehen | Blaues Gebäude „⛏ EQUIPMENT“ links der Mitte, Eingang zum Platz; innen Spitzhacken an der Wand, Rucksäcke auf dem Tisch |
+| 3a.2 | Shop öffnen | Am Tresen **E** („Shop“) | Fenster „EQUIPMENT“ mit Reitern PICKAXES / BACKPACKS |
+| 3a.3 | Status | Karten ansehen | Starter = EQUIPPED; nächste Stufe BUY $… oder LOCKED „Requires Mining Level n“; Stats mit Vergleich „alt → neu“ |
+| 3a.4 | Kaufen | Ab Level 2 mit genug Geld Iron Pickaxe kaufen | Geld sinkt, Meldung „… purchased and equipped!“, Karte EQUIPPED, neue Hacke in der Hand (hellerer Kopf) |
+| 3a.5 | Ausrüsten | Starter Pickaxe → EQUIP | Wechsel zurück, Tool in der Hand wechselt |
+| 3a.6 | Fehler | Zu wenig Geld / zu niedriges Level | Meldung „Not enough money…“ bzw. „Requires Mining Level …“, nichts passiert |
+| 3a.7 | Rucksack | Reinforced Backpack kaufen | Rucksackanzeige zeigt „… / 200“ |
+| 3a.8 | Mine 02 | Level 3 erreichen | „NEW MINE UNLOCKED – MINE 02 – COAL“; im Elevator ist Mine 02 mit GO wählbar |
+| 3a.9 | Speichern | Stop → Play | Gekaufte und ausgerüstete Items bleiben |

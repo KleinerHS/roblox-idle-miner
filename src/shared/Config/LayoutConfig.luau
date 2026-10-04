@@ -91,6 +91,15 @@ local LayoutConfig = {
 	-- Maximale Entfernung zum Verkaufstresen
 	SellCounterDistance = 14,
 
+	-- Equipment-Shop in der Mitte (CENTRAL_AREA_REFERENCE.png: links, blau).
+	-- Position relativ zu MapCenter; Eingang zeigt zur Platzmitte. TODO_LAYOUT
+	EquipmentShop = {
+		Offset = Vector2.new(-88, -6),
+		Size = Vector3.new(40, 16, 30),
+	},
+	-- Maximale Entfernung zum Shop-Tresen
+	ShopCounterDistance = 14,
+
 	-- Elevator: maximale Entfernung zum Käfig, um ihn zu benutzen
 	ElevatorUseDistance = 16,
 

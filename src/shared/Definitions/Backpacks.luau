@@ -12,6 +12,8 @@ export type BackpackDefinition = {
 	-- Gesamtkapazität über alle Erzarten
 	Capacity: number,
 	PersistenceClass: Pickaxes.PersistenceClass,
+	-- false = im Shop sichtbar, aber noch nicht kaufbar ("Coming soon", Werte offen)
+	Available: boolean?,
 }
 
 local list: { BackpackDefinition } = {
@@ -22,6 +24,23 @@ local list: { BackpackDefinition } = {
 		Price = 0,
 		Capacity = 100, -- TODO_BALANCE (Beispielwert aus docs/10 §45)
 		PersistenceClass = "Permanent", -- bleibt bei Prestige (D-012)
+	},
+	-- Stufen 2–3: Platzhalter aus Q-015 (Default bis zur Antwort), alle Zahlen TODO_BALANCE
+	{
+		Id = "backpack_reinforced",
+		DisplayName = "Reinforced Backpack",
+		RequiredLevel = 2, -- TODO_BALANCE
+		Price = 1000, -- Felix (D-017)
+		Capacity = 1000, -- Felix (D-017)
+		PersistenceClass = "Permanent",
+	},
+	{
+		Id = "backpack_cargo",
+		DisplayName = "Cargo Pack",
+		RequiredLevel = 4, -- Felix (D-019)
+		Price = 3500, -- Felix (D-019)
+		Capacity = 2500, -- Felix (D-019)
+		PersistenceClass = "Permanent",
 	},
 }
 

@@ -12,7 +12,6 @@ local ToolBuilder = {}
 ToolBuilder.PickaxeToolName = "Pickaxe"
 
 local WOOD = Color3.fromRGB(120, 84, 52)
-local IRON = Color3.fromRGB(70, 72, 76)
 local GRIP = Color3.fromRGB(40, 36, 32)
 
 local function weld(a: BasePart, b: BasePart)
@@ -57,7 +56,7 @@ function ToolBuilder.buildPickaxe(def: Pickaxes.PickaxeDefinition): Tool
 	local socket = Instance.new("Part")
 	socket.Name = "HeadSocket"
 	socket.Size = Vector3.new(0.6, 0.6, 0.6)
-	socket.Color = IRON
+	socket.Color = def.HeadColor
 	socket.Material = Enum.Material.Metal
 	socket.CanCollide = false
 	socket.Massless = true
@@ -68,7 +67,7 @@ function ToolBuilder.buildPickaxe(def: Pickaxes.PickaxeDefinition): Tool
 		local blade = Instance.new("Part")
 		blade.Name = if side > 0 then "BladeFront" else "BladeBack"
 		blade.Size = Vector3.new(0.3, 0.38, 1.7)
-		blade.Color = IRON
+		blade.Color = def.HeadColor
 		blade.Material = Enum.Material.Metal
 		blade.CanCollide = false
 		blade.Massless = true

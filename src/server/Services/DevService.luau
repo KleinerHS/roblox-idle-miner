@@ -67,6 +67,18 @@ function DevService.Init()
 	end
 	fill.Parent = folder
 
+	-- Geld setzen (zum Testen von Käufen):
+	--   game.ServerStorage.DevTools.SetCash:Invoke(game.Players:GetPlayers()[1], 5000)
+	local setCash = Instance.new("BindableFunction")
+	setCash.Name = "SetCash"
+	setCash.OnInvoke = function(player: Player, amount: number): string
+		local ok = DataService.Mutate(player, function(data)
+			data.Cash = math.max(0, math.floor(amount))
+		end)
+		return if ok then "ok" else "Profil nicht geladen"
+	end
+	setCash.Parent = folder
+
 	folder.Parent = ServerStorage
 end
 

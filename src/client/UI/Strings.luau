@@ -35,6 +35,10 @@ local MESSAGES: { [string]: string } = {
 
 	-- Verkauf
 	NOTHING_TO_SELL = "Nothing to sell.",
+
+	-- Shop
+	ITEM_PURCHASED = "{Name} purchased and equipped!",
+	NOT_OWNED = "You don't own this item yet.",
 }
 
 -- Text zu einem Code; {Platzhalter} werden aus args ersetzt.
@@ -75,11 +79,29 @@ Strings.Sell = table.freeze({
 	Close = "X",
 })
 
+Strings.Shop = table.freeze({
+	EquipmentTitle = "EQUIPMENT",
+	Pickaxes = "PICKAXES",
+	Backpacks = "BACKPACKS",
+	Power = "Mining Power",
+	Speed = "Mining Speed",
+	Capacity = "Capacity",
+	Buy = "BUY %s",
+	Equip = "EQUIP",
+	Equipped = "EQUIPPED",
+	Owned = "OWNED",
+	ComingSoon = "COMING SOON",
+	Locked = "LOCKED",
+	RequiresLevel = "Requires Mining Level %d",
+	Close = "X",
+})
+
 Strings.Hud = table.freeze({
 	MiningLevel = "MINING LEVEL %d",
 	XP = "%s / %s XP",
 	LevelUp = "LEVEL UP!",
 	LevelUpSub = "Mining Level %d",
+	MineUnlocked = "NEW MINE UNLOCKED",
 })
 
 Strings.CompanySetup = table.freeze({

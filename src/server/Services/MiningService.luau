@@ -147,6 +147,11 @@ local function hit(player: Player, slotIndex: unknown)
 	return Result.ok({ OreId = mine.OreId, Amount = amount, Total = total, Capacity = capacity })
 end
 
+-- Nach Wechsel der ausgerüsteten Spitzhacke (ShopService) das Tool tauschen.
+function MiningService.RefreshPickaxe(player: Player)
+	givePickaxe(player)
+end
+
 function MiningService.Init()
 	RemoteService.OnInvoke("MineHit", hit)
 end

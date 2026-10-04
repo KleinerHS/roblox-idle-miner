@@ -111,3 +111,21 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Decision:** Bis zu 2 eigene Fahrzeuge können gleichzeitig in der Halle stehen (2 Stellplätze in der Garage). Alle weiteren gekauften Fahrzeuge werden über den Spawn-Ring aus- und eingeparkt. Ladung bleibt je Fahrzeug erhalten (D-009).
 **Affected systems:** Garage, Vehicles, Factory Layout, Performance (max. 12 Fahrzeuge bei 6 Spielern)
 **Spec updated:** `docs/04` §22, `docs/07` §4
+## D-017 – Erste Ausrüstungsstufen, Minen kosten ab Mine 03 Geld
+
+**Source Question:** Q-015
+**Decision:** Iron Pickaxe kostet $1.000 (Level 2, Power 2, Speed 1,1 bleiben Platzhalter). Reinforced Backpack: Kapazität 1.000, Preis $1.000 (Level 2). Mine 02 wird ab Mining Level 3 ohne Geld freigeschaltet. Ab Mine 03 kosten Minen zusätzlich Geld: Mine 03 = $3.000, danach steigend (Werte offen, Q-016).
+**Affected systems:** Equipment, Shop, Mines, Elevator-Menü, Economy
+**Spec updated:** `docs/12` §22 (Minen ab 03 zusätzlich mit Geldpreis)
+## D-018 – Minen ab 03: Level UND Geld; dritte Ausrüstungsstufe später
+
+**Source Question:** Q-016
+**Decision:** Ab Mine 03 braucht eine Mine ein Mindest-Level und zusätzlich einen Geldpreis (Mine 03 = $3.000, D-017). Level-Anforderungen und Preise ab Mine 04 sind TODO_BALANCE. Steel Pickaxe und Cargo Pack sind im Shop sichtbar, aber „Coming soon“ (nicht kaufbar), bis ihre Werte festgelegt sind.
+**Affected systems:** Mines, Elevator-Menü, Shop, Balance
+## D-019 – Werte dritte Ausrüstungsstufe und Minenpreis-Formel
+
+**Source Question:** Q-016 (präzisierte Antwort)
+**Decision:** Steel Pickaxe: 3 Erz/Schlag, 1,25 Schläge/s, $3.000, ab Level 4. Cargo Pack: 2.500 Kapazität, $3.500, ab Level 4. Beide sind kaufbar (nicht mehr „Coming soon“). Minen ab 03 brauchen Level UND Geld; Mine 03 = $3.000, jede weitere Mine +50 % (`BalanceConfig.MinePrice`). Level-Anforderungen ab Mine 03 bleiben TODO_BALANCE.
+**Hinweis:** Mit +50 % pro Mine wächst der Preis bis Mine 100 auf ca. 4 × 10^20 $. Muss in der Balance-Phase gegen docs/03 §13 („keine absurden Zahlen“) geprüft werden.
+**Affected systems:** Equipment, Shop, Mines, Balance
+**Supersedes:** D-018 (Teil „Coming soon“)

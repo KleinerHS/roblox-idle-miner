@@ -352,6 +352,8 @@ Ein Mine Unlock bedeutet:
 
 Eine Mine muss nicht separat durch einen zweiten zufälligen Unlockmechanismus freigeschaltet werden.
 
+> **Entscheidung D-017:** Mine 01 und 02 werden nur über das Mining Level freigeschaltet (Mine 02 ab Level 3). Ab Mine 03 braucht eine Mine ein Mindest-Level UND kostet Geld: Mine 03 = $3.000, jede weitere Mine +50 % (D-019). Level-Anforderungen ab Mine 03: TODO_BALANCE.
+
 ---
 
 # 23. Elevator als Navigation
