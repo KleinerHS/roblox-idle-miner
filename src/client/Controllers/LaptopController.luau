@@ -1,7 +1,7 @@
 --!strict
 -- Firmen-Laptop (docs/09 §21–28): kurzer Kamera-Zoom auf den Laptop, dann eine saubere
--- Firmen-Oberfläche mit App-Leiste. Phase 4b: EMPLOYEES (Worker einstellen/entlassen,
--- Status, Lohn). DASHBOARD, STORAGE, ELEVATOR folgen in 4c, PRODUCTION/COMPANY später.
+-- Firmen-Oberfläche mit App-Leiste. DASHBOARD (Überblick), EMPLOYEES (Worker einstellen/
+-- entlassen), STORAGE und ELEVATOR (Bestand, Kapazität, Upgrades). PRODUCTION/COMPANY später.
 -- Kein Windows-Klon (docs/20). Einstellen/Entlassen prüft der Server.
 
 local Players = game:GetService("Players")
@@ -14,6 +14,8 @@ local UITheme = require(Shared.Config.UITheme)
 local Mines = require(Shared.Definitions.Mines)
 local Ores = require(Shared.Definitions.Ores)
 local WorkerRoles = require(Shared.Definitions.WorkerRoles)
+local Upgrades = require(Shared.Definitions.Upgrades)
+local BalanceConfig = require(Shared.Config.BalanceConfig)
 local CompanyIdentity = require(Shared.Definitions.CompanyIdentity)
 local Types = require(Shared.Types)
 local NumberFormat = require(Shared.Util.NumberFormat)
@@ -34,7 +36,7 @@ local gui: ScreenGui
 local content: Frame
 local headerName: TextLabel
 local navButtons: { [string]: TextButton } = {}
-local currentApp = "EMPLOYEES"
+local currentApp = "DASHBOARD"
 local selectedMine = "mine_001"
 local statuses: { [string]: string } = {}
 local busy = false
@@ -67,7 +69,8 @@ local function label(text: string, size: number, color: Color3, order: number, b
 	})
 end
 
-local function call(remote: string, ...: any)
+-- args: Platzhalter für die Fehlermeldung (z. B. Price/Level)
+local function call(remote: string, args: { [string]: any }?, ...: any)
 	if busy then
 		return
 	end
@@ -75,7 +78,7 @@ local function call(remote: string, ...: any)
 	local result = Net.invoke(remote, ...)
 	busy = false
 	if not result.success then
-		NotificationController.Show("Warning", result.code)
+		NotificationController.Show("Warning", result.code, args)
 	end
 end
 
@@ -125,7 +128,7 @@ local function slotCard(order: number, title: string, worker: Types.WorkerRecord
 		text, color, enabled = TEXT.Fire, UITheme.Colors.SurfaceRaised, true
 		local id = worker.Id
 		onClick = function()
-			call("FireWorker", id)
+			call("FireWorker", nil, id)
 		end
 	else
 		local affordable = snapshot.Cash >= roleDef.HireCost
@@ -134,7 +137,7 @@ local function slotCard(order: number, title: string, worker: Types.WorkerRecord
 		enabled = canHire
 		local mineId, role = selectedMine, roleDef.Id
 		onClick = function()
-			call("HireWorker", mineId, role, slot)
+			call("HireWorker", { Price = roleDef.HireCost }, mineId, role, slot)
 		end
 	end
 	local button: TextButton = Create("TextButton", {
@@ -221,6 +224,231 @@ local function renderEmployees(snapshot: Types.StateSnapshot)
 	end
 end
 
+-- Karte im Inhaltsbereich (oder in einem Grid)
+local function card(order: number, height: number, parent: Instance?): Frame
+	return Create("Frame", {
+		Size = UDim2.new(1, 0, 0, height),
+		BackgroundColor3 = UITheme.Colors.Surface,
+		LayoutOrder = order,
+		Parent = parent or content,
+	}, {
+		Create("UICorner", { CornerRadius = UITheme.CornerRadius }),
+		Create("UIPadding", {
+			PaddingLeft = UDim.new(0, 14),
+			PaddingRight = UDim.new(0, 14),
+			PaddingTop = UDim.new(0, 10),
+			PaddingBottom = UDim.new(0, 10),
+		}),
+	})
+end
+
+local function cardText(parent: Instance, text: string, y: number, size: number, color: Color3, bold: boolean?, xAlign: Enum.TextXAlignment?): TextLabel
+	return Create("TextLabel", {
+		Position = UDim2.fromOffset(0, y),
+		Size = UDim2.new(1, 0, 0, size + 4),
+		BackgroundTransparency = 1,
+		Font = if bold then UITheme.FontBold else UITheme.Font,
+		TextSize = size,
+		TextColor3 = color,
+		TextXAlignment = xAlign or Enum.TextXAlignment.Left,
+		TextTruncate = Enum.TextTruncate.AtEnd,
+		Text = text,
+		Parent = parent,
+	})
+end
+
+-- Füllbalken (0–1), z. B. Lagerauslastung
+local function bar(parent: Instance, y: number, fraction: number, snapshot: Types.StateSnapshot)
+	local f = math.clamp(fraction, 0, 1)
+	local back = Create("Frame", {
+		Position = UDim2.fromOffset(0, y),
+		Size = UDim2.new(1, 0, 0, 12),
+		BackgroundColor3 = UITheme.Colors.SurfaceRaised,
+		Parent = parent,
+	}, { Create("UICorner", { CornerRadius = UDim.new(1, 0) }) })
+	Create("Frame", {
+		Size = UDim2.fromScale(f, 1),
+		BackgroundColor3 = if f >= 1 then UITheme.Colors.Negative elseif f >= 0.85 then UITheme.Colors.Warning else accent(snapshot),
+		Parent = back,
+	}, { Create("UICorner", { CornerRadius = UDim.new(1, 0) }) })
+end
+
+local function sumItems(items: { [string]: number }): number
+	local total = 0
+	for _, amount in items do
+		total += amount
+	end
+	return total
+end
+
+-- Anzahl Worker je Laufzeitstatus
+local function workerCounts(snapshot: Types.StateSnapshot): (number, number, number, number)
+	local total, working, waiting, unpaidCount = 0, 0, 0, 0
+	for _, worker in snapshot.Workers do
+		total += 1
+		local status = statuses[worker.Id] or "Working"
+		if status == "Unpaid" then
+			unpaidCount += 1
+		elseif status == "Waiting" then
+			waiting += 1
+		else
+			working += 1
+		end
+	end
+	return total, working, waiting, unpaidCount
+end
+
+-- Upgrade-Karte für Lager oder Elevator (docs/09 §30–31). Server prüft alles erneut.
+local function upgradeCard(order: number, kind: Upgrades.UpgradeKind, capacity: number, snapshot: Types.StateSnapshot)
+	local tier = Upgrades.Next(kind, capacity)
+	local done, total = Upgrades.Progress(kind, capacity)
+	local box = card(order, 120)
+	cardText(box, string.format(TEXT.UpgradeLevel, done, total), 0, 14, UITheme.Colors.TextSecondary, true)
+	if not tier then
+		cardText(box, TEXT.MaxLevel, 26, 22, UITheme.Colors.Positive, true)
+		cardText(box, TEXT.MaxLevelSub, 56, 15, UITheme.Colors.TextSecondary)
+		return
+	end
+	cardText(box, `{TEXT.Current}: {NumberFormat.withSeparators(capacity)}   →   {TEXT.Next}: {NumberFormat.withSeparators(tier.Capacity)}`, 26, 18, UITheme.Colors.TextPrimary, true)
+	local levelOk = snapshot.MiningLevel >= tier.RequiredLevel
+	local affordable = snapshot.Cash >= tier.Cost
+	cardText(box, `{TEXT.Cost}: {NumberFormat.cash(tier.Cost)}`, 54, 15, if affordable then UITheme.Colors.TextPrimary else UITheme.Colors.Negative)
+	cardText(box, string.format(TEXT.RequiresLevel, tier.RequiredLevel), 76, 15, if levelOk then UITheme.Colors.TextSecondary else UITheme.Colors.Warning)
+	local ready = levelOk and affordable
+	local button: TextButton = Create("TextButton", {
+		AnchorPoint = Vector2.new(1, 1),
+		Position = UDim2.fromScale(1, 1),
+		Size = UDim2.fromOffset(170, 40),
+		BackgroundColor3 = if ready then accent(snapshot) else UITheme.Colors.SurfaceRaised,
+		Font = UITheme.FontBold,
+		TextSize = 15,
+		TextColor3 = if ready then Color3.fromRGB(20, 24, 28) else UITheme.Colors.TextPrimary,
+		Text = string.format(TEXT.UpgradeButton, NumberFormat.cash(tier.Cost)),
+		Parent = box,
+	}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
+	button.Activated:Connect(function()
+		call("BuyUpgrade", { Level = tier.RequiredLevel, Price = tier.Cost }, kind)
+	end)
+end
+
+-- DASHBOARD: schneller Firmenüberblick, keine Tabelle (docs/09 §24)
+local function renderDashboard(snapshot: Types.StateSnapshot)
+	label(TEXT.Dashboard, 24, UITheme.Colors.TextPrimary, 1, true)
+	local grid = Create("Frame", {
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		BackgroundTransparency = 1,
+		LayoutOrder = 2,
+		Parent = content,
+	}, {
+		Create("UIGridLayout", {
+			CellSize = UDim2.new(0.5, -5, 0, 96),
+			CellPadding = UDim2.fromOffset(10, 10),
+			SortOrder = Enum.SortOrder.LayoutOrder,
+		}),
+	})
+	local function tile(order: number, title: string, value: string, sub: string?, subColor: Color3?): Frame
+		local box = card(order, 96, grid)
+		cardText(box, title, 0, 14, UITheme.Colors.TextSecondary, true)
+		cardText(box, value, 22, 24, UITheme.Colors.TextPrimary, true)
+		if sub then
+			cardText(box, sub, 54, 14, subColor or UITheme.Colors.TextSecondary)
+		end
+		return box
+	end
+
+	tile(1, TEXT.MiningLevel, tostring(snapshot.MiningLevel), string.format(Strings.Hud.XP, NumberFormat.withSeparators(snapshot.MiningXP), NumberFormat.withSeparators(snapshot.MiningXPRequired)))
+	tile(2, TEXT.Cash, NumberFormat.cash(snapshot.Cash))
+
+	if snapshot.Buildings.build_storage then
+		local used = sumItems(snapshot.StorageItems)
+		local box = tile(3, TEXT.StorageCard, `{NumberFormat.withSeparators(used)} / {NumberFormat.withSeparators(snapshot.StorageCapacity)}`)
+		bar(box, 58, used / math.max(1, snapshot.StorageCapacity), snapshot)
+	else
+		tile(3, TEXT.StorageCard, "–", TEXT.NotBuilt)
+	end
+
+	local total, working, waiting, unpaidCount = workerCounts(snapshot)
+	if total == 0 then
+		tile(4, TEXT.EmployeesCard, "0", TEXT.NoEmployees)
+	else
+		local parts = { string.format(TEXT.ActiveCount, working) }
+		if waiting > 0 then
+			table.insert(parts, string.format(TEXT.WaitingCount, waiting))
+		end
+		if unpaidCount > 0 then
+			table.insert(parts, string.format(TEXT.UnpaidCount, unpaidCount))
+		end
+		tile(4, TEXT.EmployeesCard, tostring(total), table.concat(parts, " · "), if unpaidCount > 0 then UITheme.Colors.Negative elseif waiting > 0 then UITheme.Colors.Warning else UITheme.Colors.Positive)
+	end
+
+	-- Produktion: rechnerischer Abbau der bezahlten Mining-Worker und Elevator-Füllstand
+	local rate = 0
+	for _, worker in snapshot.Workers do
+		if worker.Role == "Mining" and statuses[worker.Id] ~= "Unpaid" then
+			rate += BalanceConfig.Workers.Mining.OrePerMinute
+		end
+	end
+	local load = sumItems(snapshot.ElevatorBuffer)
+	tile(5, TEXT.ProductionCard, string.format(TEXT.PerMinute, NumberFormat.withSeparators(rate)), string.format(TEXT.ElevatorLoad, NumberFormat.withSeparators(load), NumberFormat.withSeparators(snapshot.ElevatorCapacity)))
+end
+
+-- STORAGE: Bestand, Kapazität, Upgrade (docs/09 §29–30)
+local function renderStorage(snapshot: Types.StateSnapshot)
+	label(TEXT.StorageTitle, 24, UITheme.Colors.TextPrimary, 1, true)
+	if not snapshot.Buildings.build_storage then
+		label(TEXT.StorageNotBuilt, 16, UITheme.Colors.Warning, 2)
+		return
+	end
+	local used = sumItems(snapshot.StorageItems)
+	local head = card(2, 64)
+	cardText(head, `{NumberFormat.withSeparators(used)} / {NumberFormat.withSeparators(snapshot.StorageCapacity)}`, 0, 22, UITheme.Colors.TextPrimary, true)
+	bar(head, 32, used / math.max(1, snapshot.StorageCapacity), snapshot)
+
+	local ids = {}
+	for id, amount in snapshot.StorageItems do
+		if amount > 0 then
+			table.insert(ids, id)
+		end
+	end
+	table.sort(ids, function(a, b)
+		local oa, ob = Ores.Get(a), Ores.Get(b)
+		return (if oa then oa.Tier else 999) < (if ob then ob.Tier else 999)
+	end)
+	if #ids == 0 then
+		label(TEXT.StorageEmpty, 15, UITheme.Colors.TextSecondary, 3)
+	end
+	for i, id in ids do
+		local ore = Ores.Get(id)
+		local row = card(2 + i, 40)
+		cardText(row, if ore then ore.DisplayName else id, 0, 16, UITheme.Colors.TextPrimary)
+		cardText(row, NumberFormat.withSeparators(snapshot.StorageItems[id]), 0, 16, UITheme.Colors.TextPrimary, true, Enum.TextXAlignment.Right)
+	end
+	upgradeCard(100, "storage", snapshot.StorageCapacity, snapshot)
+end
+
+-- ELEVATOR: Kapazität, Takt, Status, Upgrade (docs/09 §31)
+local function renderElevator(snapshot: Types.StateSnapshot)
+	label(TEXT.ElevatorTitle, 24, UITheme.Colors.TextPrimary, 1, true)
+	if not snapshot.Buildings.build_elevator then
+		label(TEXT.ElevatorNotBuilt, 16, UITheme.Colors.Warning, 2)
+		return
+	end
+	local load = sumItems(snapshot.ElevatorBuffer)
+	local storageFull = snapshot.Buildings.build_storage == true and sumItems(snapshot.StorageItems) >= snapshot.StorageCapacity
+	local status = if load > 0 and storageFull then "StorageFull" elseif load > 0 then "Transporting" else "Idle"
+	local statusColor = if status == "StorageFull" then UITheme.Colors.Negative elseif status == "Transporting" then UITheme.Colors.Positive else UITheme.Colors.TextSecondary
+
+	local cycle = BalanceConfig.Elevator.CycleSeconds
+	local head = card(2, 118)
+	cardText(head, TEXT.Capacity, 0, 14, UITheme.Colors.TextSecondary, true)
+	cardText(head, TEXT.ElevatorStatus[status], 0, 14, statusColor, true, Enum.TextXAlignment.Right)
+	cardText(head, string.format(TEXT.PerTrip, NumberFormat.withSeparators(snapshot.ElevatorCapacity)), 22, 22, UITheme.Colors.TextPrimary, true)
+	cardText(head, string.format(TEXT.TripEvery, cycle, NumberFormat.withSeparators(math.floor(snapshot.ElevatorCapacity * 60 / cycle))), 54, 15, UITheme.Colors.TextSecondary)
+	cardText(head, string.format(TEXT.CurrentLoad, NumberFormat.withSeparators(load)), 76, 15, UITheme.Colors.TextSecondary)
+	upgradeCard(3, "elevator", snapshot.ElevatorCapacity, snapshot)
+end
+
 function LaptopController.Render()
 	if not gui or not gui.Enabled then
 		return
@@ -239,6 +467,12 @@ function LaptopController.Render()
 	end
 	if currentApp == "EMPLOYEES" then
 		renderEmployees(snapshot)
+	elseif currentApp == "DASHBOARD" then
+		renderDashboard(snapshot)
+	elseif currentApp == "STORAGE" then
+		renderStorage(snapshot)
+	elseif currentApp == "ELEVATOR" then
+		renderElevator(snapshot)
 	else
 		label(currentApp, 24, UITheme.Colors.TextPrimary, 1, true)
 		label(TEXT.ComingSoon, 16, UITheme.Colors.TextSecondary, 2)

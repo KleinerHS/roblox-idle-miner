@@ -71,6 +71,8 @@ local Remotes: { [string]: RemoteDefinition } = {
 	FireWorker = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
 	-- Laufzeitstatus der Worker: { [workerId]: "Working" | "Waiting" | "Unpaid" }
 	WorkerStatus = { Kind = "Event", Direction = "ServerToClient" },
+	-- Kapazitäts-Upgrade am Laptop: (kind: "storage" | "elevator") -> Result<{ Capacity: number }>
+	BuyUpgrade = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
 }
 
 return table.freeze(Remotes)

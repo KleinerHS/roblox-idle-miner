@@ -29,6 +29,14 @@ local BalanceConfig = {
 	-- Firmenlager (docs/06 §14): Startkapazität 1.000 über alle Materialien (fest).
 	Storage = {
 		StartCapacity = 1000,
+		-- Kapazitätsstufen über die Storage-App im Laptop (docs/09 §29–30). Jede Stufe setzt
+		-- die Gesamtkapazität auf Capacity. Vorschlag Q-019, noch nicht bestätigt.
+		Upgrades = {
+			{ Capacity = 2500, Cost = 3000, RequiredLevel = 5 }, -- TODO_BALANCE (Q-019)
+			{ Capacity = 5000, Cost = 8000, RequiredLevel = 6 }, -- TODO_BALANCE (Q-019)
+			{ Capacity = 10000, Cost = 20000, RequiredLevel = 8 }, -- TODO_BALANCE (Q-019)
+			{ Capacity = 25000, Cost = 50000, RequiredLevel = 10 }, -- TODO_BALANCE (Q-019)
+		},
 	},
 
 	-- Worker (docs/05 §5–9). Werte von Felix bestätigt (D-021).
@@ -53,10 +61,18 @@ local BalanceConfig = {
 		FireRefund = 0, -- Felix (D-021)
 	},
 
-	-- Elevator-Materialtransport (docs/06 §9–11). Upgrades folgen mit der Elevator-App (4c).
+	-- Elevator-Materialtransport (docs/06 §9–11).
 	Elevator = {
 		StartCapacity = 100, -- Felix (D-021) Erz pro Fahrt
 		CycleSeconds = 10, -- Felix (D-021) eine Fahrt alle n Sekunden
+		-- Kapazitätsstufen über die Elevator-App im Laptop (docs/09 §31). Vorschlag Q-019.
+		Upgrades = {
+			{ Capacity = 200, Cost = 2000, RequiredLevel = 3 }, -- TODO_BALANCE (Q-019)
+			{ Capacity = 350, Cost = 5000, RequiredLevel = 5 }, -- TODO_BALANCE (Q-019)
+			{ Capacity = 500, Cost = 10000, RequiredLevel = 7 }, -- TODO_BALANCE (Q-019)
+			{ Capacity = 750, Cost = 20000, RequiredLevel = 9 }, -- TODO_BALANCE (Q-019)
+			{ Capacity = 1000, Cost = 40000, RequiredLevel = 11 }, -- TODO_BALANCE (Q-019)
+		},
 	},
 
 	-- Geldpreis der Minen ab Mine 03 zusätzlich zum Level (D-017, D-019):

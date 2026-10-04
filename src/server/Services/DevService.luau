@@ -92,6 +92,19 @@ function DevService.Init()
 	end
 	setLevel.Parent = folder
 
+	-- Lager- und Elevator-Kapazität setzen (zum Testen der Upgrades):
+	--   game.ServerStorage.DevTools.SetCapacities:Invoke(game.Players:GetPlayers()[1], 1000, 100)
+	local setCapacities = Instance.new("BindableFunction")
+	setCapacities.Name = "SetCapacities"
+	setCapacities.OnInvoke = function(player: Player, storage: number, elevator: number): string
+		local ok = DataService.Mutate(player, function(data)
+			data.Storage.Capacity = math.max(1, math.floor(storage))
+			data.Production.ElevatorCapacity = math.max(1, math.floor(elevator))
+		end)
+		return if ok then "ok" else "Profil nicht geladen"
+	end
+	setCapacities.Parent = folder
+
 	folder.Parent = ServerStorage
 end
 

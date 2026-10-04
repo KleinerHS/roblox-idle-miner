@@ -127,3 +127,18 @@ Werte sind Platzhalter aus Q-018. Voraussetzung: Lager gebaut.
 | 4b.8 | Lager voll | Lager füllen (oder warten) | Elevator-Anzeige bleibt voll, Worker zeigen „Waiting“, nichts verschwindet |
 | 4b.9 | Entlassen | FIRE | Slot wieder leer, kein Lohn mehr, Figur verschwindet |
 | 4b.10 | Speichern | Stop → Play | Worker, Puffer und Lagerbestand bleiben erhalten |
+
+## Phase 4c – Laptop-Apps & Upgrades
+
+Werte sind Vorschläge aus Q-019. Voraussetzung: Lager gebaut.
+
+| # | Test | Schritte | Erwartet |
+|---|---|---|---|
+| 4c.1 | Dashboard | Laptop öffnen | Startet auf DASHBOARD: Level/XP, Cash, Lager x / y mit Balken, Mitarbeiter (Active/Waiting/Unpaid), Produktion Erz/Min und Elevator-Füllstand |
+| 4c.2 | Storage-App | STORAGE | Belegung mit Balken, Liste der Erze mit Menge, Upgrade-Karte „Upgrade 0 / 4 · Current 1,000 → Next 2,500 · Cost $3K · Requires Mining Level 5“ |
+| 4c.3 | Lager-Upgrade | UPGRADE $3K (Level 5, genug Geld) | Geld −$3.000, Meldung „Storage upgraded to 2500!“, Silo-Anzeige im Lager zeigt / 2,500 |
+| 4c.4 | Sperren | Nächste Stufe ohne Level 6 bzw. ohne Geld drücken | „Requires Mining Level 6.“ bzw. „Not enough money. You need $8000.“, nichts gekauft |
+| 4c.5 | Elevator-App | ELEVATOR | Kapazität pro Fahrt, Takt 10 s, max. Erz/Min, Inhalt, Status, Upgrade-Karte |
+| 4c.6 | Elevator-Upgrade | UPGRADE $2K | Kapazität 200, EMPLOYEES zeigt „Elevator: x / 200“ |
+| 4c.7 | Max-Stufe | Mit DevTools Level/Geld hoch, alle Stufen kaufen | „MAX LEVEL · Fully upgraded.“ |
+| 4c.8 | Speichern | Stop → Play | Gekaufte Kapazitäten bleiben erhalten |
