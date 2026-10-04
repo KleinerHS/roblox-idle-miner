@@ -146,3 +146,9 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Source Question:** Q-019
 **Decision:** Lager 1.000 → 2.500 ($3.000, Lv 5) → 5.000 ($8.000, Lv 6) → 10.000 ($20.000, Lv 8) → 25.000 ($50.000, Lv 10). Elevator (Erz pro Fahrt, alle 10 s) 100 → 200 ($2.000, Lv 3) → 350 ($5.000, Lv 5) → 500 ($10.000, Lv 7) → 750 ($20.000, Lv 9) → 1.000 ($40.000, Lv 11). Kauf über die Laptop-Apps STORAGE/ELEVATOR. Weitere Stufen folgen mit den höheren Minen.
 **Affected systems:** Storage, Elevator, Laptop, Balance
+
+## D-023 – Edit-Vorschau der Welt per Studio-Plugin
+
+**Source:** Frage von Felix (2026-10-04), warum die Welt ohne Serverstart nicht sichtbar ist; Option a) gewählt.
+**Decision:** Die Welt bleibt codegebaut (keine gespeicherten Modelle in der Place-Datei). Ein lokales Studio-Plugin („Idle Miner Preview“) baut sie auf Knopfdruck im Bearbeitungsmodus mit denselben World-Buildern auf und entfernt sie wieder. Die Vorschau wird nie gespeichert und nie ins Spiel kopiert.
+**Affected systems:** Werkzeuge (kein Spielsystem)

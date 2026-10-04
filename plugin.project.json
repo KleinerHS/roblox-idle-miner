@@ -1,0 +1,6 @@
+{
+  "name": "IdleMinerPreview",
+  "tree": {
+    "$path": "plugin/EditPreview.server.luau"
+  }
+}

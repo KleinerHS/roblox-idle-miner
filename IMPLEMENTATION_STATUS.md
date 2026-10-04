@@ -234,6 +234,14 @@ Selbsttest per Studio-MCP (2026-10-04):
 - Felix' Profil danach zurückgesetzt (Level 5, $6.473, Lager 1.000, Elevator 100). XP im Level ist dabei auf 0 gefallen (vorher 1.000 / 1.118).
 - Freigabe Felix 2026-10-04 („passt“).
 
+## Werkzeuge
+
+| Werkzeug | Dateien | Status |
+|---|---|---|
+| Studio-Plugin „Idle Miner Preview“: Toolbar-Knopf baut die Welt im Bearbeitungsmodus auf/ab (dieselben World-Builder wie der Server, frische Module bei jedem Aufbau, `Workspace.EditPreview` mit Archivable = false) – D-023 | `plugin/EditPreview.server.luau`, `plugin.project.json` | TESTING_REQUIRED |
+
+Selbsttest per Studio-MCP (2026-10-04): Aufbau im Edit-Modus mit 3.465 Teilen (6 Plots, Plot 1 voll ausgebaut, Stadtmitte, 6 Minenräume); `ReplicatedStorage.Shared` danach unverändert; beim Play nicht mitkopiert (Server-Workspace: nur Plots, MineShafts, Center); Plugin nach `%LOCALAPPDATA%\Roblox\Plugins\IdleMinerPreview.rbxm` gebaut. Der Knopf selbst ist erst nach einem Studio-Neustart sichtbar und noch ungetestet.
+
 ---
 
 # Documentation Audit
