@@ -159,7 +159,7 @@ Laut D-004 kommen Worker erst mit dem Lager (Phase 4). Phase 3 umfasst daher Equ
 | Equipment-Shop-Gebäude links der Mitte (blau, „⛏ EQUIPMENT“, Spitzhacken an der Wand, Rucksäcke auf dem Tisch, Tresen) – Platzhalter | `src/server/World/EquipmentShopBuilder.luau`, `LayoutConfig.EquipmentShop` | TESTING_REQUIRED |
 | Kaufen/Ausrüsten serverseitig (Kategorie + ID vom Client, Preis/Level aus Definitionen, Nähe zum Tresen, kein Doppelkauf, nur besessene Items ausrüsten, Kauf rüstet direkt aus) | `src/server/Services/ShopService.luau` | TESTING_REQUIRED |
 | Shop-Fenster mit Reitern, Stats-Vergleich alt → neu, Status EQUIPPED/EQUIP/BUY/LOCKED/COMING SOON | `src/client/Controllers/ShopController.luau` | TESTING_REQUIRED |
-| Ausrüstung: Iron Pickaxe ($1.000, Lv 2), Reinforced Backpack (1.000 Kapazität, $1.000, Lv 2); Steel Pickaxe/Cargo Pack „Coming soon“ (D-017, D-018) | `Definitions/Pickaxes.luau`, `Definitions/Backpacks.luau` | TESTING_REQUIRED |
+| Ausrüstung: Iron Pickaxe ($1.000, Lv 2), Reinforced Backpack (1.000 Kapazität, $1.000, Lv 2); Steel Pickaxe (3 Erz/Schlag, 1,25/s, $3.000, Lv 4), Cargo Pack (2.500, $3.500, Lv 4) (D-017, D-019); Minenpreis-Formel ab Mine 03 ($3.000, +50 % je Mine) | `Definitions/Pickaxes.luau`, `Definitions/Backpacks.luau` | TESTING_REQUIRED |
 | Hackenkopf-Farbe je Stufe, Tool wechselt beim Ausrüsten | `ToolBuilder`, `MiningService.RefreshPickaxe` | TESTING_REQUIRED |
 | Mine 02 ab Level 3, „NEW MINE UNLOCKED“ nach Level-Up | `BalanceConfig.MineUnlocks`, `HudController` | TESTING_REQUIRED |
 | Studio-Testwerkzeug Geld setzen | `DevService` → `ServerStorage.DevTools.SetCash` | TESTING_REQUIRED |

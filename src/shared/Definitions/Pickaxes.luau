@@ -45,12 +45,11 @@ local list: { PickaxeDefinition } = {
 	},
 	{
 		Id = "pickaxe_steel",
-		Available = false, -- Werte offen (Q-016)
 		DisplayName = "Steel Pickaxe",
-		RequiredLevel = 4, -- TODO_BALANCE
-		Price = 900, -- TODO_BALANCE
-		MiningPower = 3, -- TODO_BALANCE
-		MiningSpeed = 1.25, -- TODO_BALANCE
+		RequiredLevel = 4, -- Felix (D-019)
+		Price = 3000, -- Felix (D-019)
+		MiningPower = 3, -- Felix (D-019)
+		MiningSpeed = 1.25, -- Felix (D-019)
 		PersistenceClass = "Permanent",
 		HeadColor = Color3.fromRGB(186, 192, 202),
 	},

@@ -368,3 +368,7 @@ Die nächste Spitzhacke soll 1.000 kosten, sonst passt das. Der nächste Rucksac
 **Decision:** D-018
 
 ---
+### Präzisierte Antwort (Felix, 2026-10-04)
+Steel Pickaxe 3 Erz/Schlag, Tempo 1,25, $3.000, ab Level 4. Cargo Pack 2.500 Kapazität, $3.500, ab Level 4. Minen ab 03 brauchen Level UND Geld, Mine 03 = $3.000, jede weitere Mine +50 %.
+
+**Decision:** D-019

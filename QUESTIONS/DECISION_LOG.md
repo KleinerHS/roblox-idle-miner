@@ -122,3 +122,10 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Source Question:** Q-016
 **Decision:** Ab Mine 03 braucht eine Mine ein Mindest-Level und zusätzlich einen Geldpreis (Mine 03 = $3.000, D-017). Level-Anforderungen und Preise ab Mine 04 sind TODO_BALANCE. Steel Pickaxe und Cargo Pack sind im Shop sichtbar, aber „Coming soon“ (nicht kaufbar), bis ihre Werte festgelegt sind.
 **Affected systems:** Mines, Elevator-Menü, Shop, Balance
+## D-019 – Werte dritte Ausrüstungsstufe und Minenpreis-Formel
+
+**Source Question:** Q-016 (präzisierte Antwort)
+**Decision:** Steel Pickaxe: 3 Erz/Schlag, 1,25 Schläge/s, $3.000, ab Level 4. Cargo Pack: 2.500 Kapazität, $3.500, ab Level 4. Beide sind kaufbar (nicht mehr „Coming soon“). Minen ab 03 brauchen Level UND Geld; Mine 03 = $3.000, jede weitere Mine +50 % (`BalanceConfig.MinePrice`). Level-Anforderungen ab Mine 03 bleiben TODO_BALANCE.
+**Hinweis:** Mit +50 % pro Mine wächst der Preis bis Mine 100 auf ca. 4 × 10^20 $. Muss in der Balance-Phase gegen docs/03 §13 („keine absurden Zahlen“) geprüft werden.
+**Affected systems:** Equipment, Shop, Mines, Balance
+**Supersedes:** D-018 (Teil „Coming soon“)

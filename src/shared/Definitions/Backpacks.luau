@@ -36,11 +36,10 @@ local list: { BackpackDefinition } = {
 	},
 	{
 		Id = "backpack_cargo",
-		Available = false, -- Werte offen (Q-016)
 		DisplayName = "Cargo Pack",
-		RequiredLevel = 4, -- TODO_BALANCE
-		Price = 1200, -- TODO_BALANCE
-		Capacity = 400, -- TODO_BALANCE
+		RequiredLevel = 4, -- Felix (D-019)
+		Price = 3500, -- Felix (D-019)
+		Capacity = 2500, -- Felix (D-019)
 		PersistenceClass = "Permanent",
 	},
 }
