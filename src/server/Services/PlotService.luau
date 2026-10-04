@@ -56,7 +56,7 @@ local function assign(player: Player)
 			plotByPlayer[player] = plotId
 			local plot = plots[plotId]
 			plot:SetAttribute("OwnerUserId", player.UserId)
-			PlotBuilder.setSignText(plot, `Plot {plotId}\n{player.DisplayName}`)
+			PlotBuilder.setSign(plot, "", `Plot {plotId}\n{player.DisplayName}`, nil)
 			Log.debug(TAG, `{player.Name} → Plot {plotId}`)
 
 			RemoteService.FireClient("PlotAssigned", player, plotId)
@@ -84,7 +84,8 @@ local function release(player: Player)
 	ownerByPlot[plotId] = nil
 	local plot = plots[plotId]
 	plot:SetAttribute("OwnerUserId", 0)
-	PlotBuilder.setSignText(plot, `Plot {plotId}\nFrei`)
+	PlotBuilder.setSign(plot, "", `Plot {plotId}\nFree`, nil)
+	PlotBuilder.setSpawn(plot, PlotBuilder.getDefaultSpawnCFrame(plotId))
 	Log.debug(TAG, `Plot {plotId} freigegeben ({player.Name})`)
 end
 

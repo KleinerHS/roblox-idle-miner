@@ -25,6 +25,12 @@ local Remotes: { [string]: RemoteDefinition } = {
 	-- Plot-Zuweisung: PlotId des eigenen Grundstücks.
 	PlotAssigned = { Kind = "Event", Direction = "ServerToClient" },
 	GetMyPlot = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 5, Window = 10 } },
+
+	-- Kurze Meldung an den Spieler: { Kind = "Info"|"Success"|"Warning"|"Special", Code, Args? }
+	Notify = { Kind = "Event", Direction = "ServerToClient" },
+
+	-- Ersteinrichtung der Firma: (name: string, logoId: string, colorId: string) -> Result
+	SubmitCompanySetup = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 5, Window = 30 } },
 }
 
 return table.freeze(Remotes)

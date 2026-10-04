@@ -33,6 +33,8 @@ local TAG = "DataService"
 local DataService = {
 	-- (player, data) nachdem das Profil geladen, migriert und aktiv ist
 	ProfileLoaded = Signal.new() :: Signal.Signal<Player, Types.PlayerData>,
+	-- (player) nach jeder Mutate-Änderung (gebündelt pro Frame)
+	Changed = Signal.new() :: Signal.Signal<Player>,
 }
 
 type Profile = {
@@ -82,6 +84,9 @@ local function queueSnapshot(player: Player)
 	task.defer(function()
 		snapshotQueued[player] = nil
 		sendSnapshot(player)
+		if profiles[player] then
+			DataService.Changed:Fire(player)
+		end
 	end)
 end
 
@@ -201,6 +206,28 @@ end
 function DataService.IsLoaded(player: Player): boolean
 	return profiles[player] ~= nil
 end
+
+-- Sofort speichern nach wichtigen Zustandswechseln (Kauf, Firmengründung, docs/14 §5).
+-- Gegen Save-Spam: höchstens alle SAVE_COOLDOWN Sekunden, sonst übernimmt der Autosave.
+local SAVE_COOLDOWN = 20
+local lastSave: { [Player]: number } = {}
+
+function DataService.RequestSave(player: Player)
+	local profile = profiles[player] :: any
+	if not profile or not profile:IsActive() then
+		return
+	end
+	local now = os.clock()
+	if lastSave[player] and now - lastSave[player] < SAVE_COOLDOWN then
+		return
+	end
+	lastSave[player] = now
+	profile:Save()
+end
+
+Players.PlayerRemoving:Connect(function(player)
+	lastSave[player] = nil
+end)
 
 -- Führt eine Änderung am Profil aus und sendet danach einen Snapshot an den Client.
 -- `mutator` darf nicht yielden, damit Prüfung und Änderung atomar bleiben.

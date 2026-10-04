@@ -11,12 +11,14 @@ export type BuildStepDefinition = {
 	RequiredLevel: number,
 	-- Vorheriger Schritt, nil = erster Schritt
 	Requires: string?,
+	-- Button erscheint erst nach der Firmeneinrichtung (docs/04 §6)
+	RequiresCompanySetup: boolean?,
 }
 
 local list: { BuildStepDefinition } = {
 	{
 		Id = "build_office",
-		DisplayName = "Büro (Blechhütte)",
+		DisplayName = "Office",
 		Price = 0, -- fest (docs/04 §6)
 		RequiredLevel = 1,
 		Requires = nil,
@@ -27,6 +29,7 @@ local list: { BuildStepDefinition } = {
 		Price = 200, -- fest (D-003)
 		RequiredLevel = 1,
 		Requires = "build_office",
+		RequiresCompanySetup = true,
 	},
 }
 

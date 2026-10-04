@@ -9,7 +9,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | Setup | GitHub-Repo, Rojo-Projekt, Doku-Ordner | USER_APPROVED |
 | 0 | Dokumentations-Audit | USER_APPROVED (Freigabe „weiter“, 2026-10-04) |
 | 1 | Project Skeleton | USER_APPROVED (Felix „passt“, 2026-10-04; Zwei-Spieler-Test wird in Phase 2 nachgeholt) |
-| 2 | Vertical Slice A | IN_PROGRESS |
+| 2 | Vertical Slice A | TESTING_REQUIRED (2a fertig, 2b–2d NOT_STARTED) |
 | 3 | Vertical Slice B (Equipment, Mine 02) | NOT_STARTED |
 | 4 | Storage + Worker (Worker erst nach Lager, D-004) | NOT_STARTED |
 | 5 | Drill | NOT_STARTED |
@@ -54,7 +54,33 @@ Selbsttest per Studio-MCP (2026-10-04, unveröffentlichter Place, DataStore im T
 - 50 Erze, 100 Minen (mine_045 = Ruby, mine_100 = Diamond), Leveling und Zahlenformat korrekt.
 - Exploit-Test: GetState mit Müll-Argumenten → keine Wirkung; 7× in Folge → ab dem 6. `RATE_LIMITED`; Client-Aufrufe auf ServerToClient-Remotes werden ignoriert.
 - Speichertest 2026-10-04 im veröffentlichten Place „10042026_2“ (placeId 74322463877243, API-Zugriff an): `DataStore verbunden`, 1. Play `Joins 1`, 2. Play `Joins 2` → Speichern und Laden funktionieren.
-- Noch nicht getestet: zwei Spieler (Test 1.6, 1.7).
+- Noch nicht getestet: zwei Spieler (Test 1.6, 1.7) → wird in Schritt 2d nachgeholt.
+
+## Phase 2 – Vertical Slice A – Details
+
+Phase 2 ist in Hauptschritte geteilt, nach jedem wird gestoppt: 2a Tycoon & Firma · 2b Elevator & Mine 01 · 2c Mining & Rucksack · 2d Verkauf, Cash/XP, Level-HUD, Save/Rejoin, Zwei-Spieler-Test.
+
+### 2a – Tycoon & Firmeneinrichtung (Version 0.2.0)
+
+| System | Dateien | Status |
+|---|---|---|
+| Tycoon-Baukette (nur nächster Button, Kauf per Betreten, serverseitige Prüfung) | `src/server/Services/BuildingService.luau`, `src/shared/Definitions/BuildSteps.luau` | TESTING_REQUIRED |
+| Blechhütte (Schreibtisch, Laptop, Stuhl, Bett = Spawn, Regal, Lampe) – Platzhalter | `src/server/World/BuildTemplates.luau` | TESTING_REQUIRED |
+| Elevator-Käfig – nur Modell, Funktion folgt in 2b | `src/server/World/BuildTemplates.luau` | TESTING_REQUIRED |
+| Firmeneinrichtung (Name mit Textfilter, Logo, Farbe) | `src/server/Services/CompanyService.luau`, `src/client/Controllers/CompanySetupController.luau` | TESTING_REQUIRED |
+| Firmenschild mit Logo, Name, Akzentfarbe | `src/server/World/PlotBuilder.luau` | TESTING_REQUIRED |
+| Bodenmarkierungen der Endhalle (D-002) | `src/server/World/PlotBuilder.luau`, `LayoutConfig.HallZones` | TESTING_REQUIRED |
+| Meldungen (Toasts, ohne Popup-Flut) | `src/client/Controllers/NotificationController.luau`, `src/client/UI/Strings.luau` | TESTING_REQUIRED |
+| UI-Grundbausteine | `src/client/UI/Create.luau`, `src/client/UI/Components/Button.luau` | TESTING_REQUIRED |
+| Studio-Reset des Testspielstands | `src/server/Services/DevService.luau` (nur in Studio aktiv) | TESTING_REQUIRED |
+
+Selbsttest per Studio-MCP (2026-10-04, Place „10042026_2“, DataStore aktiv):
+- Button „BUILD OFFICE / FREE“ → Betreten → Hütte erscheint, Button weg, Firmendialog öffnet sich.
+- Ungültige Eingaben abgelehnt: Name zu kurz und Steuerzeichen (`NAME_INVALID`), falsche Logo-ID oder Zahl statt Text (`INVALID_ARGUMENT`), Spam (`RATE_LIMITED`).
+- Gültiger Name „  Deep   Rock Mining “ → gespeichert als „Deep Rock Mining“, Schild zeigt ⛏ + Name + Akzentfarbe, Dialog schließt.
+- Danach Button „BUILD ELEVATOR / $200“ → Kauf → Cash 800 → 600, Elevator-Käfig erscheint, kein weiterer Button.
+- Rejoin: Büro, Elevator, Schild, Cash 600 wiederhergestellt, Spawn auf dem Bett.
+- Reset per `ServerStorage.DevTools.ResetProgress` → Ausgangszustand (Cash 800, nur Büro-Button).
 
 ---
 
@@ -202,8 +228,8 @@ ASSETS/ASSET_REGISTRY.md  (ab Phase 2, `19` §19)
 |---|---|---|---|
 | Plot-Zuweisung / Ownership | 04, 15 | 1 | TESTING_REQUIRED |
 | Datenspeicherung / Session Lock | 14 | 1 | TESTING_REQUIRED |
-| Tycoon-Baukette | 04 | 2 | NOT_STARTED |
-| Blechhütte + Firmenidentität | 04, 09 | 2 | NOT_STARTED |
+| Tycoon-Baukette | 04 | 2 | TESTING_REQUIRED |
+| Blechhütte + Firmenidentität | 04, 09 | 2 | TESTING_REQUIRED |
 | Elevator + Mine-Auswahl | 04, 09, 12 | 2 | NOT_STARTED |
 | Mine Shaft 01 | 00 §13, 03 | 2 | NOT_STARTED |
 | Manuelles Mining | 03, 10 | 2 | NOT_STARTED |

@@ -3,9 +3,9 @@
 -- FACTORY_MASTERPLAN_TOPDOWN.png. Alle Werte sind TODO_LAYOUT: vorläufig, werden beim
 -- Map-Bau in Studio final festgelegt. Nur hier ändern, nirgends sonst Koordinaten hardcoden.
 --
--- Plot-Koordinatensystem (lokal): -Z zeigt zur Map-Mitte (Vorderseite, Rolltor, Straße),
--- +Z ist die Rückwand der Halle. Aus Sicht des Grundrissbilds (Tor unten) ist
--- "links im Bild" = +X lokal.
+-- Plot-Koordinatensystem (lokal, relativ zur Plotmitte auf Bodenhöhe):
+--   -Z zeigt zur Map-Mitte (Vorderseite, Rolltor, Straße), +Z ist die Rückwand der Halle.
+--   Aus Sicht des Grundrissbilds (Tor unten) ist "links im Bild" = +X lokal.
 
 local LayoutConfig = {
 	-- Mittelpunkt der Map (zentrale Service-Mitte mit Shops und Verkauf).
@@ -36,10 +36,33 @@ local LayoutConfig = {
 	HallSize = Vector2.new(210, 140),
 	-- Versatz der Hallenmitte von der Plotmitte (lokal, X/Z). Vorne bleibt Platz für Zufahrt.
 	HallOffset = Vector2.new(0, 15),
+	-- Oberkante der Hallen-Bodenplatte (lokal Y)
+	HallFloorTop = 1.4,
 
-	-- Spawnpunkt bis zum Bau des Büros: Position des späteren Büros (oben links im
-	-- Grundriss = hinten, +X). Lokal relativ zur Plotmitte. TODO_LAYOUT
-	SpawnOffset = Vector3.new(80, 4, 55),
+	-- Funktionsbereiche der Endhalle als Bodenmarkierung (D-002), Mittelpunkt X/Z und Größe
+	-- X/Z, lokal zur Plotmitte. Nach FACTORY_MASTERPLAN_TOPDOWN.png. TODO_LAYOUT
+	HallZones = {
+		Office = { Center = Vector2.new(87, 63), Size = Vector2.new(36, 44) },
+		Elevator = { Center = Vector2.new(50, 60), Size = Vector2.new(30, 30) },
+		Storage = { Center = Vector2.new(-8, 55), Size = Vector2.new(66, 50) },
+		Smelter = { Center = Vector2.new(-75, 25), Size = Vector2.new(58, 116) },
+		Garage = { Center = Vector2.new(37, -24), Size = Vector2.new(100, 54) },
+	} :: { [string]: { Center: Vector2, Size: Vector2 } },
+
+	-- Rolltor in der Vorderwand (X-Mitte und Breite). Zufahrt und Straße fluchten damit.
+	DoorCenterX = 15,
+	DoorWidth = 60,
+
+	-- Tycoon-Kaufbuttons je BuildStep (lokal X/Z, vor dem jeweiligen Bereich). TODO_LAYOUT
+	BuildButtons = {
+		build_office = Vector2.new(87, 33),
+		build_elevator = Vector2.new(50, 37),
+	} :: { [string]: Vector2 },
+	ButtonSize = Vector3.new(7, 0.4, 7),
+
+	-- Spawnpunkt solange das Büro nicht gebaut ist: neben dem Büro-Kaufbutton.
+	-- Danach liegt der Spawn auf dem Bett in der Hütte (docs/04 §7). TODO_LAYOUT
+	SpawnOffset = Vector3.new(87, 4, 24),
 
 	-- Zaun
 	FenceHeight = 3,

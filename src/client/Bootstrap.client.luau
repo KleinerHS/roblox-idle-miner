@@ -19,6 +19,8 @@ type Controller = {
 local CONTROLLER_ORDER = {
 	"StateController",
 	"PlotController",
+	"NotificationController",
+	"CompanySetupController",
 }
 
 local loaded: { Controller } = {}

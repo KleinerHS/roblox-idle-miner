@@ -11,6 +11,7 @@ Aktuell blockiert **keine** Frage die laufende Phase.
 | ID | Thema | Priorität | Betrifft Phase |
 |---|---|---|---|
 | Q-013 | Stehen gekaufte Fahrzeuge geparkt in der Halle? | IMPORTANT_NON_BLOCKING | 6 |
+| Q-014 | Sprache der Spieloberfläche | POLISH | 2+ |
 
 ---
 
@@ -32,3 +33,21 @@ Nur das aktive Fahrzeug existiert in der Welt. Es wird am Spawn-Ring ausgeparkt 
 
 ### Safe work that can continue
 Alles bis Phase 6. Der Platz unter dem Verladeturm wird beim Hallenlayout freigehalten.
+
+---
+
+## Q-014 – Sprache der Spieloberfläche
+
+**Status:** OPEN
+**Priority:** POLISH
+**System:** UI
+**Date:** 2026-10-04
+
+### Question
+In welcher Sprache sollen die Texte im Spiel erscheinen (Buttons, Dialoge, Meldungen)?
+
+### Why this matters
+Die Spezifikation nutzt durchgehend englische UI-Beispiele („BUILD STORAGE“, „Not enough money.“, „BACKPACK FULL“). Roblox-Spieler sind überwiegend international.
+
+### Default bis zur Antwort
+Englisch. Alle Texte stehen zentral in `src/client/UI/Strings.luau`, eine Übersetzung oder Umstellung ist ohne Codeänderung an anderen Stellen möglich.

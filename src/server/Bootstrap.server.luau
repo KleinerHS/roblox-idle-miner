@@ -20,6 +20,9 @@ local SERVICE_ORDER = {
 	"RemoteService",
 	"DataService",
 	"PlotService",
+	"BuildingService",
+	"CompanyService",
+	"DevService",
 }
 
 local started = os.clock()
