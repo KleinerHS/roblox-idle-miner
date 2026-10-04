@@ -69,3 +69,15 @@ Voraussetzung: Elevator gebaut (2a). Testwerkzeug (Server-Befehlszeile, nur Stud
 | 2c.5 | Zu weit weg | In der Raummitte klicken | „Move closer to the ore.“ |
 | 2c.6 | Rucksack voll | Rucksack auf 95 füllen, 5× minen, weiter klicken | Bei 100/100 „BACKPACK FULL“ rot, Meldung „Backpack full! …“, kein weiteres Erz |
 | 2c.7 | Speichern | Etwas Kohle minen → Stop → Play | Rucksack hat noch die gleiche Menge |
+## Phase 2d – Verkauf, Cash & Mining Level (Abschluss Vertical Slice A)
+
+| # | Test | Schritte | Erwartet |
+|---|---|---|---|
+| 2d.1 | HUD | Play | Geld oben rechts, unten mittig „MINING LEVEL n“ mit XP-Balken (in Firmenfarbe) |
+| 2d.2 | Verkaufsgebäude | Vom Plot die Straße zur Mitte gehen | Grünes Gebäude „$ SELL“ vorne an der Mitte, Eingang zur Straße |
+| 2d.3 | Tresen | Hineingehen, am Tresen **E** („Sell Ore“) | Fenster „SELL ORE“ mit Rucksackinhalt, Gesamtwert und Mining XP |
+| 2d.4 | Verkaufen | SELL ALL | Fenster schließt, „SOLD +$… +… Mining XP“, Geld zählt hoch, XP-Balken wächst, Rucksack leer |
+| 2d.5 | Level-Up | Genug verkaufen (Level 1 → 2 braucht 100 XP) | „LEVEL UP! Mining Level 2“ |
+| 2d.6 | Leer | Mit leerem Rucksack SELL ALL | Button ausgegraut, Hinweis „Your backpack is empty…“ |
+| 2d.7 | Kompletter Loop + Speichern | Join → Mine 01 → Kohle abbauen → Oberfläche → verkaufen → Stop → Play | Geld, Level, XP sind gespeichert |
+| 2d.8 | Zwei Spieler | Test → Testsitzung beginnen → Server + 2 Clients | Plot 1 / Plot 2, eigene Schilder; Spieler 2 kann Büro-Button und Elevator von Spieler 1 nicht benutzen („This is not your company.“); Fenster schließen → Plot frei |

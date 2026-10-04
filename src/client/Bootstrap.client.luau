@@ -24,6 +24,8 @@ local CONTROLLER_ORDER = {
 	"ElevatorController",
 	"MiningController",
 	"BackpackHudController",
+	"HudController",
+	"SellController",
 }
 
 local loaded: { Controller } = {}

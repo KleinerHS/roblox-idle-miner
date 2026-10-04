@@ -81,6 +81,16 @@ local LayoutConfig = {
 		},
 	},
 
+	-- Verkaufsgebäude in der Mitte (CENTRAL_AREA_REFERENCE.png: vorne an der Straße).
+	-- Position relativ zu MapCenter (X/Z); Eingang zeigt nach +Z zur Straße Richtung Plot 5.
+	-- TODO_LAYOUT bis zum Bau der zentralen Service-Area.
+	SellingBuilding = {
+		Offset = Vector2.new(0, 82),
+		Size = Vector3.new(44, 16, 28),
+	},
+	-- Maximale Entfernung zum Verkaufstresen
+	SellCounterDistance = 14,
+
 	-- Elevator: maximale Entfernung zum Käfig, um ihn zu benutzen
 	ElevatorUseDistance = 16,
 

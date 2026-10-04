@@ -43,6 +43,11 @@ local Remotes: { [string]: RemoteDefinition } = {
 
 	-- Manuelles Mining: (slotIndex: number) -> Result<{ OreId, Amount, Total, Capacity }>
 	MineHit = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 12, Window = 5 } },
+
+	-- Verkauf am Tresen: Server öffnet das Verkaufsfenster nach gültigem Prompt
+	OpenSellMenu = { Kind = "Event", Direction = "ServerToClient" },
+	-- Alles Verkaufbare aus dem Rucksack verkaufen: () -> Result<{ Cash, XP, Level, LevelsGained }>
+	SellAll = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 5, Window = 10 } },
 }
 
 return table.freeze(Remotes)
