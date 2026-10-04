@@ -20,5 +20,5 @@ Nach Änderungen an Economy, Inventory, Save, Trading oder Prestige die betroffe
 - [ ] Phase 3a: Mine 02 ab Level 3, Items nach Rejoin erhalten (Test 3a.8, 3a.9)
 - [x] Phase 4a: Bauschritte Wände/Dach/Lager in Reihenfolge, Kapazität 1.000, kein Materialverlust beim Ab-/Umladen (Test 4a.1–4a.6, Felix 2026-10-04)
 - [x] Phase 4a: Migration v1 → v2 ohne Datenverlust (Test 4a.7, 2026-10-04)
-- [ ] Phase 4b: Einstellen/Entlassen nur gültig, Lohn jede Minute, Unpaid pausiert, Rückstau bei vollem Lager ohne Verlust (Test 4b.2–4b.9)
-- [ ] Phase 4b: Migration v2 → v3, Worker nach Rejoin erhalten (Test 4b.10)
+- [x] Phase 4b: Einstellen/Entlassen nur gültig, Lohn jede Minute, Unpaid pausiert, Rückstau bei vollem Lager ohne Verlust (Test 4b.2–4b.9, Felix 2026-10-04)
+- [x] Phase 4b: Migration v2 → v3, Worker nach Rejoin erhalten (Test 4b.10, Felix 2026-10-04)

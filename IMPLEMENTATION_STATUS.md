@@ -11,7 +11,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 1 | Project Skeleton | USER_APPROVED (Felix „passt“, 2026-10-04; Zwei-Spieler-Test wird in Phase 2 nachgeholt) |
 | 2 | Vertical Slice A | USER_APPROVED (Felix, 2026-10-04) |
 | 3 | Vertical Slice B (Equipment, Mine 02) | USER_APPROVED (Felix, 2026-10-04) |
-| 4 | Storage + Worker (Worker erst nach Lager, D-004) | TESTING_REQUIRED (4a USER_APPROVED, 4b TESTING_REQUIRED, 4c NOT_STARTED) |
+| 4 | Storage + Worker (Worker erst nach Lager, D-004) | TESTING_REQUIRED (4a + 4b USER_APPROVED, 4c NOT_STARTED) |
 | 5 | Drill | NOT_STARTED |
 | 6 | Garage & Vehicles | NOT_STARTED |
 | 7 | Conveyors | NOT_STARTED |
@@ -194,7 +194,7 @@ Selbsttest per Studio-MCP (2026-10-04):
 - 900 im Rucksack, Lager 500 frei → 500 abgeladen, 400 bleiben im Rucksack, danach `STORAGE_FULL`, Silo-Balken rot.
 - Freigabe Felix 2026-10-04 („geht alles, machen wir weiter“).
 
-### 4b – Worker & Laptop (Version 0.8.0)
+### 4b – Worker & Laptop (Version 0.8.0) – USER_APPROVED
 
 | System | Dateien | Status |
 |---|---|---|
@@ -369,7 +369,7 @@ ASSETS/ASSET_REGISTRY.md  (ab Phase 2, `19` §19)
 | Verkauf am Tresen | 07 | 2 | USER_APPROVED |
 | Cash, XP, Mining Level, HUD | 09, 11 | 2 | USER_APPROVED |
 | Equipment-Shop | 10 | 3 | USER_APPROVED |
-| Worker (Mining/Transport) + Laptop Employees | 05, 09 | 4 | TESTING_REQUIRED |
+| Worker (Mining/Transport) + Laptop Employees | 05, 09 | 4 | USER_APPROVED |
 | Storage + Laptop Storage | 06 | 4 | TESTING_REQUIRED (Lager ohne Laptop) |
 | Elevator-Kapazität + Laptop Elevator | 05, 06 | 4 | NOT_STARTED |
 | Machine-Shop + Drills | 05, 10 | 5 | NOT_STARTED |
