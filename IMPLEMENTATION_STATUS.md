@@ -10,7 +10,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 0 | Dokumentations-Audit | USER_APPROVED (Freigabe „weiter“, 2026-10-04) |
 | 1 | Project Skeleton | USER_APPROVED (Felix „passt“, 2026-10-04; Zwei-Spieler-Test wird in Phase 2 nachgeholt) |
 | 2 | Vertical Slice A | USER_APPROVED (Felix, 2026-10-04) |
-| 3 | Vertical Slice B (Equipment, Mine 02) | NOT_STARTED |
+| 3 | Vertical Slice B (Equipment, Mine 02) | TESTING_REQUIRED (3a) |
 | 4 | Storage + Worker (Worker erst nach Lager, D-004) | NOT_STARTED |
 | 5 | Drill | NOT_STARTED |
 | 6 | Garage & Vehicles | NOT_STARTED |
@@ -147,6 +147,28 @@ Selbsttest per Studio-MCP (2026-10-04):
 - 5 Coal verkauft → Level 2, 4 / 282 XP, „LEVEL UP!“-Meldung, XP-Balken in Firmenfarbe.
 - Noch offen: Zwei-Spieler-Test (1.6, 1.7, 2a.9, 2b.7) – kann nur Felix starten.
 - Freigabe Felix 2026-10-04 („passt“). Der Zwei-Spieler-Test wurde dabei nicht ausdrücklich bestätigt und bleibt in der Regression-Checkliste offen.
+
+## Phase 3 – Vertical Slice B – Details
+
+Laut D-004 kommen Worker erst mit dem Lager (Phase 4). Phase 3 umfasst daher Equipment-Shop, bessere Ausrüstung und Mine 02.
+
+### 3a – Equipment-Shop & Mine 02 (Version 0.6.0)
+
+| System | Dateien | Status |
+|---|---|---|
+| Equipment-Shop-Gebäude links der Mitte (blau, „⛏ EQUIPMENT“, Spitzhacken an der Wand, Rucksäcke auf dem Tisch, Tresen) – Platzhalter | `src/server/World/EquipmentShopBuilder.luau`, `LayoutConfig.EquipmentShop` | TESTING_REQUIRED |
+| Kaufen/Ausrüsten serverseitig (Kategorie + ID vom Client, Preis/Level aus Definitionen, Nähe zum Tresen, kein Doppelkauf, nur besessene Items ausrüsten, Kauf rüstet direkt aus) | `src/server/Services/ShopService.luau` | TESTING_REQUIRED |
+| Shop-Fenster mit Reitern, Stats-Vergleich alt → neu, Status EQUIPPED/EQUIP/BUY/LOCKED/COMING SOON | `src/client/Controllers/ShopController.luau` | TESTING_REQUIRED |
+| Ausrüstung: Iron Pickaxe ($1.000, Lv 2), Reinforced Backpack (1.000 Kapazität, $1.000, Lv 2); Steel Pickaxe/Cargo Pack „Coming soon“ (D-017, D-018) | `Definitions/Pickaxes.luau`, `Definitions/Backpacks.luau` | TESTING_REQUIRED |
+| Hackenkopf-Farbe je Stufe, Tool wechselt beim Ausrüsten | `ToolBuilder`, `MiningService.RefreshPickaxe` | TESTING_REQUIRED |
+| Mine 02 ab Level 3, „NEW MINE UNLOCKED“ nach Level-Up | `BalanceConfig.MineUnlocks`, `HudController` | TESTING_REQUIRED |
+| Studio-Testwerkzeug Geld setzen | `DevService` → `ServerStorage.DevTools.SetCash` | TESTING_REQUIRED |
+
+Selbsttest per Studio-MCP (2026-10-04):
+- Shop-Prompt öffnet „EQUIPMENT“: Starter = EQUIPPED, Iron = BUY $1K mit Vergleich „1 → 2“, Steel = COMING SOON.
+- Abgelehnt: zu wenig Geld (`NOT_ENOUGH_MONEY`), Steel (`NOT_AVAILABLE`), falsche Kategorie/ID (`INVALID_ARGUMENT`), nicht besessenes Item ausrüsten (`NOT_OWNED`), doppelt (`ALREADY_DONE`).
+- Mit $2.500: Iron Pickaxe + Reinforced Backpack gekauft → $500, Tool = Iron, Rucksack „0 / 1,000“; Wechsel Starter ↔ Iron tauscht das Tool.
+- 300 Coal verkauft → Level 3 → „NEW MINE UNLOCKED · MINE 02 · COAL“; Fahrt in Mine 02 ok („MINE SHAFT 02 · COAL“), Mine 03 gesperrt.
 
 ---
 
@@ -302,7 +324,7 @@ ASSETS/ASSET_REGISTRY.md  (ab Phase 2, `19` §19)
 | Backpack | 10 | 2 | USER_APPROVED |
 | Verkauf am Tresen | 07 | 2 | USER_APPROVED |
 | Cash, XP, Mining Level, HUD | 09, 11 | 2 | USER_APPROVED |
-| Equipment-Shop | 10 | 3 | NOT_STARTED |
+| Equipment-Shop | 10 | 3 | TESTING_REQUIRED |
 | Worker (Mining/Transport) + Laptop Employees | 05, 09 | 3 | NOT_STARTED |
 | Storage + Laptop Storage | 06 | 4 | NOT_STARTED |
 | Elevator-Kapazität + Laptop Elevator | 05, 06 | 4 | NOT_STARTED |

@@ -10,6 +10,8 @@ local TweenService = game:GetService("TweenService")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local UITheme = require(Shared.Config.UITheme)
 local CompanyIdentity = require(Shared.Definitions.CompanyIdentity)
+local Mines = require(Shared.Definitions.Mines)
+local Ores = require(Shared.Definitions.Ores)
 local Types = require(Shared.Types)
 local NumberFormat = require(Shared.Util.NumberFormat)
 
@@ -90,13 +92,21 @@ local function refresh(snapshot: Types.StateSnapshot)
 	}):Play()
 
 	if lastLevel and snapshot.MiningLevel > lastLevel then
-		local level, color = snapshot.MiningLevel, accentColor(snapshot)
+		local fromLevel, level, color = lastLevel :: number, snapshot.MiningLevel, accentColor(snapshot)
 		task.delay(0.4, function()
 			local waitFor = soldActiveUntil - os.clock()
 			if waitFor > 0 then
 				task.wait(waitFor)
 			end
 			showPopup(TEXT.LevelUp, string.format(TEXT.LevelUpSub, level), "", color)
+			-- Neu freigeschaltete Minen danach kurz anzeigen (docs/09 §36)
+			for _, mine in Mines.List do
+				if mine.RequiredLevel and mine.RequiredLevel > fromLevel and mine.RequiredLevel <= level then
+					task.wait(2.6)
+					local ore = Ores.Get(mine.OreId)
+					showPopup(TEXT.MineUnlocked, Mines.Label(mine), if ore then string.upper(ore.DisplayName) else "", UITheme.Colors.Positive)
+				end
+			end
 		end)
 	end
 	lastLevel = snapshot.MiningLevel

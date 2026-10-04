@@ -48,6 +48,13 @@ local Remotes: { [string]: RemoteDefinition } = {
 	OpenSellMenu = { Kind = "Event", Direction = "ServerToClient" },
 	-- Alles Verkaufbare aus dem Rucksack verkaufen: () -> Result<{ Cash, XP, Level, LevelsGained }>
 	SellAll = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 5, Window = 10 } },
+
+	-- Shops: Server öffnet den Shop nach gültigem Prompt: { ShopId: string }
+	OpenShop = { Kind = "Event", Direction = "ServerToClient" },
+	-- Kaufen: (category: "pickaxe" | "backpack", itemId: string) -> Result
+	BuyItem = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
+	-- Ausrüsten eines besessenen Items: (category, itemId) -> Result
+	EquipItem = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 10, Window = 10 } },
 }
 
 return table.freeze(Remotes)

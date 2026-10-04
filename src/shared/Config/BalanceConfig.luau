@@ -23,6 +23,7 @@ local BalanceConfig = {
 	-- sind noch nicht gebalanced und gesperrt.
 	MineUnlocks = {
 		mine_001 = { RequiredLevel = 1, UnlockCost = 0 },
+		mine_002 = { RequiredLevel = 3, UnlockCost = 0 }, -- TODO_BALANCE (Q-015 Default)
 	} :: { [string]: { RequiredLevel: number, UnlockCost: number } },
 }
 

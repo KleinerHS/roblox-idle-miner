@@ -16,3 +16,5 @@ Nach Änderungen an Economy, Inventory, Save, Trading oder Prestige die betroffe
 - [x] Phase 2d: Verkauf nur am Tresen, Geld/XP getrennt aus Definitionen, kein Doppelverkauf (Test 2d.3–2d.6, Freigabe Felix 2026-10-04)
 - [x] Phase 2d: Kompletter Loop Join → Mine → Verkauf → Rejoin (Test 2d.7, Freigabe Felix 2026-10-04)
 - [ ] Phase 2d: Zwei Spieler, fremde Buttons/Elevator geschützt (Test 2d.8)
+- [ ] Phase 3a: Kauf nur mit Geld/Level und am Shop, kein Doppelkauf, Ausrüsten nur besessener Items (Test 3a.4–3a.7)
+- [ ] Phase 3a: Mine 02 ab Level 3, Items nach Rejoin erhalten (Test 3a.8, 3a.9)

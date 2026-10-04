@@ -335,3 +335,36 @@ Englisch.
 **Decision:** D-015
 
 ---
+## Q-015 – Erste Ausrüstungsstufen und Freischaltung Mine 02
+
+**Status:** ANSWERED
+**Priority:** IMPORTANT_NON_BLOCKING
+**System:** Equipment / Mines / Balance
+**Date:** 2026-10-04
+
+### Question
+Platzhalterwerte für Iron/Steel Pickaxe, Reinforced Backpack/Cargo Pack und Freischaltung Mine 02 (Level 3).
+
+### Answer (Felix, 2026-10-04)
+Die nächste Spitzhacke soll 1.000 kosten, sonst passt das. Der nächste Rucksack hat schon 1.000 Kapazität und kostet auch 1.000. Mine 02 wie vorgeschlagen; ab Mine 3 kosten Minen Geld: 3.000, und dann weiter.
+
+**Decision:** D-017 (Folgefragen: Q-016)
+
+---
+## Q-016 – Dritte Ausrüstungsstufe und Minenpreise ab Mine 03
+
+**Status:** ANSWERED
+**Priority:** IMPORTANT_NON_BLOCKING
+**System:** Equipment / Mines / Balance
+**Date:** 2026-10-04
+
+### Question
+1. Werte für Steel Pickaxe und Cargo Pack? 2. Brauchen Minen ab 03 zusätzlich ein Level, wie steigen die Preise?
+
+### Answer (Felix, 2026-10-04)
+1. „ok“ – Steel Pickaxe und Cargo Pack bleiben vorerst „Coming soon“, Werte später.
+2. „Ja, man muss trotzdem ein bestimmtes Level für die Minen haben.“
+
+**Decision:** D-018
+
+---
