@@ -117,6 +117,36 @@ function DevService.Init()
 	end
 	clearDrills.Parent = folder
 
+	-- Alle Fahrzeuge entfernen (Fuhrpark und Ladung):
+	--   game.ServerStorage.DevTools.ClearVehicles:Invoke(game.Players:GetPlayers()[1])
+	local clearVehicles = Instance.new("BindableFunction")
+	clearVehicles.Name = "ClearVehicles"
+	clearVehicles.OnInvoke = function(player: Player): string
+		local ok = DataService.Mutate(player, function(data)
+			table.clear(data.Vehicles.Owned)
+		end)
+		for _, model in workspace:FindFirstChild("Vehicles") and workspace.Vehicles:GetChildren() or {} do
+			if model:GetAttribute("OwnerUserId") == player.UserId then
+				model:Destroy()
+			end
+		end
+		return if ok then "ok (Rejoin für saubere Garage)" else "Profil nicht geladen"
+	end
+	clearVehicles.Parent = folder
+
+	-- Bauschritt setzen/entfernen (z. B. Garage wieder abbauen):
+	--   game.ServerStorage.DevTools.SetBuilding:Invoke(game.Players:GetPlayers()[1], "build_garage", false)
+	local setBuilding = Instance.new("BindableFunction")
+	setBuilding.Name = "SetBuilding"
+	setBuilding.OnInvoke = function(player: Player, stepId: string, built: boolean): string
+		local ok = DataService.Mutate(player, function(data)
+			data.Buildings[stepId] = if built then true else nil
+		end)
+		BuildingService.Rebuild(player)
+		return if ok then "ok" else "Profil nicht geladen"
+	end
+	setBuilding.Parent = folder
+
 	folder.Parent = ServerStorage
 end
 

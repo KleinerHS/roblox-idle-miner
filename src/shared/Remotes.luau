@@ -46,7 +46,9 @@ local Remotes: { [string]: RemoteDefinition } = {
 
 	-- Verkauf am Tresen: Server öffnet das Verkaufsfenster nach gültigem Prompt
 	OpenSellMenu = { Kind = "Event", Direction = "ServerToClient" },
-	-- Alles Verkaufbare aus dem Rucksack verkaufen: () -> Result<{ Cash, XP, Level, LevelsGained }>
+	-- Alles Verkaufbare verkaufen: (vehicleId: string?) -> Result<{ Cash, XP, Level, LevelsGained }>
+	-- ohne vehicleId = Rucksack am Tresen, mit vehicleId = Fahrzeugladung in der Verkaufszone.
+	-- OpenSellMenu kann { VehicleId } mitgeben (Fahrzeugverkauf).
 	SellAll = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 5, Window = 10 } },
 
 	-- Shops: Server öffnet den Shop nach gültigem Prompt: { ShopId: string }
@@ -89,6 +91,12 @@ local Remotes: { [string]: RemoteDefinition } = {
 	StoreVehicle = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 5, Window = 10 } },
 	-- Fahrzeug zurück auf den Stellplatz: (vehicleId: string) -> Result<vehicleId>
 	ResetVehicle = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 3, Window = 10 } },
+	-- Beladen am Verladeturm (Phase 6c): Server öffnet das Ladefenster: { VehicleId }
+	OpenLoading = { Kind = "Event", Direction = "ServerToClient" },
+	-- Laden: (vehicleId, oreId: string?, amount: number?) -> Result<{ Moved }>  (nil = alles/maximal)
+	LoadVehicle = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 10, Window = 10 } },
+	-- Entladen ins Lager: (vehicleId, oreId: string?) -> Result<{ Moved }>
+	UnloadVehicle = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 10, Window = 10 } },
 	-- Kapazitäts-Upgrade am Laptop: (kind: "storage" | "elevator") -> Result<{ Capacity: number }>
 	BuyUpgrade = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
 }

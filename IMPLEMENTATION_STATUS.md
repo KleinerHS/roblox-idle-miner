@@ -12,8 +12,8 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 2 | Vertical Slice A | USER_APPROVED (Felix, 2026-10-04) |
 | 3 | Vertical Slice B (Equipment, Mine 02) | USER_APPROVED (Felix, 2026-10-04) |
 | 4 | Storage + Worker (Worker erst nach Lager, D-004) | USER_APPROVED (4a, 4b, 4c) |
-| 5 | Drill | TESTING_REQUIRED (5a, 5b TESTING_REQUIRED) |
-| 6 | Garage & Vehicles | NOT_STARTED |
+| 5 | Drill | TESTING_REQUIRED (5a, 5b; Test von Felix zurückgestellt, 2026-10-05) |
+| 6 | Garage & Vehicles | TESTING_REQUIRED (6a, 6b, 6c) |
 | 7 | Conveyors | NOT_STARTED |
 | 8 | Smelter | NOT_STARTED |
 | 9 | Multiplayer Hardening / Trading | NOT_STARTED |
@@ -283,6 +283,58 @@ Selbsttest per Studio-MCP (2026-10-05):
 - Slot-Fenster (über das Server-Event geöffnet): leerer Slot zeigt MK1/MK2 mit PLACE → PLACE platziert, Fenster zeigt danach Drill mit Status und REMOVE; Slot mit Worker zeigt den Hinweis.
 - Stop → Play: platzierter Drill und Inventar erhalten. Felix' Profil danach zurückgesetzt (Level 5, $6.473, keine Drills); der Slot-Puffer von Mine 01 ist durch den Test auf 409 gestiegen.
 - Nicht selbst prüfbar: Der Prompt selbst ließ sich im Hintergrund-Fenster nicht auslösen (wie zuvor beim Laptop), und Screenshots aus der Mine waren schwarz (Studio-Fenster im Hintergrund rendert nicht). Optik, Drehung und Prompt bitte in Studio ansehen.
+
+## Phase 6 – Garage & Vehicles – Details
+
+Felix hat am 2026-10-05 die Tests zurückgestellt („arbeite erst mal weiter“). Phase 6 wurde deshalb in einem Zug gebaut (6a–6c) und per Studio-MCP selbst getestet.
+
+### 6a – Garage, Fahrzeughaus, Kauf (Version 0.12.0) – TESTING_REQUIRED
+
+| System | Dateien | Status |
+|---|---|---|
+| Fahrzeug-Definitionen Utility Pickup / Utility Van / Box Truck (Kapazität, Top Speed, Beschleunigung, Preis, Level) – Vorschlag Q-021, `TODO_BALANCE` (Pickup-Kapazität 1.000 fest) | `src/shared/Definitions/Vehicles.luau` | TESTING_REQUIRED |
+| Bauschritt Garage nach dem Lager ($10.000, Level 7 – Q-021) | `BuildSteps.luau`, `LayoutConfig.BuildButtons/Garage` | TESTING_REQUIRED |
+| Garage: 2 Stellplätze mit Markierung und Nummer, Leuchtring „VEHICLES“, Verladeturm mit Auslegern und Schurren über beiden Stellplätzen, Werkstatt-Details, Akzente in Firmenfarbe | `src/server/World/GarageTemplate.luau`, `BuildingService` (CompanyAccent) | TESTING_REQUIRED |
+| Fahrzeugmodelle (Pickup mit Ladefläche, Kastenwagen, LKW mit Koffer; Lampen, Spiegel, Firmenstreifen und Firmenname an der Tür) | `src/server/World/VehicleModelBuilder.luau` | TESTING_REQUIRED |
+| Fahrzeughaus in der Mitte (rechts, rot): Glasfront, Drehteller mit Pickup und Box Truck, Tresen | `src/server/World/VehicleShopBuilder.luau`, `LayoutConfig.VehicleShop` | TESTING_REQUIRED |
+| Fahrzeugkauf (Remote `BuyVehicle`): je Typ einmal, nur mit Garage, Level, Geld; Shop-Reiter VEHICLES mit Kapazität/Top Speed/OWNED | `ShopService.luau`, `ShopController.luau` | TESTING_REQUIRED |
+| Datenschema v5: `Vehicles.Owned` (Instanz-ID, Typ, Ladung, Stellplatz) + `Vehicles.Seq`, Migration v4 → v5 | `DataSchema.luau`, `Types.luau`, `DataService.luau` | TESTING_REQUIRED |
+
+### 6b – Ausparken, Fahren, Rolltor (Version 0.12.0) – TESTING_REQUIRED
+
+| System | Dateien | Status |
+|---|---|---|
+| Leuchtring öffnet die Fahrzeugauswahl (nur Besitzer, nicht im Fahrzeug); DRIVE / PARK AWAY / RESET; max. 2 Fahrzeuge in der Halle (D-016), Spieler sitzt direkt am Steuer | `src/server/Services/VehicleService.luau`, `src/client/Controllers/GarageController.luau` | TESTING_REQUIRED |
+| Fahrphysik: schweres Chassis, Hinterradantrieb (Motor), Lenkung über Achsschenkel (Servo), Fahrer besitzt die Physik; kontrollierte Beschleunigung, Motorbremse, Lenkwinkel nimmt mit Tempo ab, Rückwärts langsamer | `VehicleModelBuilder.luau`, `src/client/Controllers/DrivingController.luau` | TESTING_REQUIRED |
+| Nur der Besitzer kann fahren; Fahrzeuge kollidieren nicht mit anderen Fahrzeugen, Spielern, Worker-Figuren | `VehicleService.luau` | TESTING_REQUIRED |
+| Fahranzeige (Tempo, Ladung, RESET VEHICLE) | `DrivingController.luau` | TESTING_REQUIRED |
+| Glas-Rolltor in der Hallentür, rollt sich bei Annäherung (Spieler oder gefahrenes Fahrzeug) hoch, schließt nach 3 s | `GarageTemplate.luau`, `VehicleService.luau` | TESTING_REQUIRED |
+| Fahrzeuge mit Stellplatz stehen nach Rejoin wieder in der Halle; beim Verlassen verschwinden sie, Ladung bleibt im Profil | `VehicleService.luau` | TESTING_REQUIRED |
+
+### 6c – Verladeturm und Verkauf aus dem Fahrzeug (Version 0.12.0) – TESTING_REQUIRED
+
+| System | Dateien | Status |
+|---|---|---|
+| Prompt „Load Vehicle“ an den Schurren; Ladefenster mit Kapazität, je Material Lager/Fahrzeug, LOAD 100 / LOAD ALL, LOAD EVERYTHING, UNLOAD ALL; Transfer atomar (Lager − n / Fahrzeug + n) | `src/server/Services/LoadingService.luau`, `src/client/Controllers/LoadingController.luau` | TESTING_REQUIRED |
+| Sichtbare Ladung auf der Ladefläche (kosmetisch) | `VehicleModelBuilder.setCargoVisual` | TESTING_REQUIRED |
+| Fahrzeugverkauf: Einfahren mit Ladung in die Verkaufszone öffnet „SELL CARGO“, SELL ALL verkauft die Ladung (Geld und XP getrennt aus den Erzwerten), Fahrzeug danach leer | `SellingService.luau`, `SellController.luau` | TESTING_REQUIRED |
+| DevTools `ClearVehicles(player)`, `SetBuilding(player, stepId, built)` | `DevService.luau` | TESTING_REQUIRED |
+
+Selbsttest per Studio-MCP (2026-10-05):
+- Migration v4 → v5 beim Laden („geladen: v5“).
+- Garage über den Bau-Button gekauft; Akzente (Turm-Band) in der Firmenfarbe; keine Überschneidung der Garage mit Wänden, Lager, Büro (Overlap-Prüfung).
+- Kauf: ungültige ID → `INVALID_ARGUMENT`; Pickup (v1) OK; zweites Mal → `ALREADY_DONE`; Box Truck (v2) und Van (v3) OK; Geldabzug korrekt.
+- Leuchtring öffnet „GARAGE · Bays in use 0 / 2“ mit allen Fahrzeugen; DRIVE setzt den Spieler ans Steuer.
+- Fahren: Pickup 3 s W → 38 Studs geradeaus, bleibt aufrecht, fährt durch das sich öffnende Rolltor; W+D → Rechtskurve (−15°), nach dem Loslassen Stillstand (Bremse). Box Truck: 74 Studs bis auf die Zufahrt, stabil.
+- PARK AWAY fern vom Ring → `TOO_FAR`; RESET → zurück auf Stellplatz 1, Spieler sitzt wieder am Steuer.
+- Zwei Fahrzeuge in der Halle, drittes DRIVE → `BAYS_FULL`; PARK AWAY → OK, zweites Mal → `ALREADY_DONE`.
+- Rejoin: Box Truck steht wieder auf Stellplatz 2.
+- Beladen: ohne Fahrzeug unter dem Turm → `NO_VEHICLE`; ungültiges Erz → `INVALID_ARGUMENT`; LOAD 100 → 100; LOAD EVERYTHING → 900; danach `NOTHING_TO_LOAD`; UNLOAD ALL → 1.000 zurück; Ladefläche zeigt Ladung.
+- Ladefenster (über Server-Event geöffnet) zeigt „LOAD VEHICLE · Box Truck · 1,000 / 6,000“ mit allen Knöpfen.
+- Fahrzeug in die Verkaufszone gesetzt → „SELL CARGO“ öffnet sich automatisch mit 1.000 Coal ($1K, +1.000 XP); SELL ALL → +$1.000, +1.000 XP, Fahrzeug leer; nochmal → `NOTHING_TO_SELL`; fremde ID → `NOT_OWNED`.
+- Tresen-Verkauf aus dem Rucksack unverändert (50 Coal → $50).
+- Keine Fehler in der Konsole. Felix' Profil danach zurückgesetzt (Level 5, $6.473, Garage entfernt, keine Fahrzeuge).
+- Nicht selbst prüfbar: Optik (Studio rendert im Hintergrund nicht), die Prompts selbst (Ring wurde per Betreten getestet, Turm-Prompt und Fahrgefühl bitte selbst ausprobieren).
 
 ## Werkzeuge
 

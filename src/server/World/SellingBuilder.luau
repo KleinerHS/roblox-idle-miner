@@ -6,7 +6,7 @@
 -- Vereinbarte Namen/Attribute:
 --   Model "SellingBuilding"
 --   Part  "CounterPromptPart" mit ProximityPrompt "SellPrompt" (Attribute SellCounter = true)
---   Part  "VehicleSellZone"   (Tag "SellZone", noch ohne Funktion)
+--   Part  "VehicleSellZone"   (Tag "SellZone"): Einfahren mit Ladung öffnet den Fahrzeugverkauf
 
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -140,7 +140,7 @@ function SellingBuilder.build(parent: Instance): Model
 		light.Parent = lamp
 	end
 
-	-- Vorplatz und Fahrzeug-Verkaufszone (Fahrzeugverkauf folgt in Phase 6)
+	-- Vorplatz und Fahrzeug-Verkaufszone (Phase 6c: Einfahren mit Ladung → Verkaufsfenster)
 	part(model, "Forecourt", Vector3.new(W + 8, 0.4, 8), o * CFrame.new(0, 0.2, -D / 2 - 4), CONCRETE, Enum.Material.Concrete)
 	local zone = part(model, "VehicleSellZone", Vector3.new(30, 0.2, 16), o * CFrame.new(0, 0.1, -D / 2 - 18), Color3.fromRGB(58, 60, 64), Enum.Material.Asphalt)
 	CollectionService:AddTag(zone, "SellZone")

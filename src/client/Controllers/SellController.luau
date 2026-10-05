@@ -2,6 +2,8 @@
 -- Verkaufsfenster am Tresen (docs/09 §47–49, docs/07 §31): zeigt den Rucksack mit
 -- geschätztem Wert und XP, "SELL ALL" verkauft. Die Schätzung ist nur Anzeige; Geld und
 -- XP berechnet der Server beim Verkauf.
+-- Phase 6c: Dasselbe Fenster verkauft die Ladung eines Fahrzeugs, wenn der Server es mit
+-- { VehicleId } öffnet (Einfahren in die Fahrzeug-Verkaufszone, docs/07 §25).
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -34,6 +36,9 @@ local totalLabel: TextLabel
 local sellButton: Button.Button
 local openedAt: Vector3? = nil
 local selling = false
+local titleLabel: TextLabel
+-- nil = Rucksack am Tresen, sonst Fahrzeug-ID
+local vehicleId: string? = nil
 
 local function rootPosition(): Vector3?
 	local character = player.Character
@@ -89,7 +94,12 @@ local function refresh()
 	local cash, xp, count = 0, 0, 0
 	if snapshot then
 		local entries = {}
-		for oreId, amount in snapshot.Backpack do
+		local source = snapshot.Backpack
+		if vehicleId then
+			local vehicle = snapshot.Vehicles[vehicleId]
+			source = if vehicle then vehicle.Cargo else {}
+		end
+		for oreId, amount in source do
 			local ore = Ores.Get(oreId)
 			if ore and amount > 0 then
 				table.insert(entries, { ore = ore, amount = amount })
@@ -116,7 +126,10 @@ local function refresh()
 	sellButton:SetEnabled(count > 0 and not selling)
 end
 
-local function open()
+local function open(payload: any)
+	vehicleId = if typeof(payload) == "table" and typeof(payload.VehicleId) == "string" then payload.VehicleId else nil
+	titleLabel.Text = if vehicleId then TEXT.VehicleTitle else TEXT.Title
+	emptyLabel.Text = if vehicleId then TEXT.VehicleEmpty else TEXT.Empty
 	refresh()
 	openedAt = rootPosition()
 	gui.Enabled = true
@@ -146,7 +159,7 @@ local function build()
 		Create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 10) }),
 	})
 	local header = Create("Frame", { Size = UDim2.new(1, 0, 0, 32), BackgroundTransparency = 1, LayoutOrder = 1, Parent = panel })
-	Create("TextLabel", {
+	titleLabel = Create("TextLabel", {
 		Size = UDim2.new(1, -40, 1, 0),
 		BackgroundTransparency = 1,
 		Font = UITheme.FontBold,
@@ -207,7 +220,7 @@ local function build()
 		selling = true
 		sellButton:SetEnabled(false)
 		sellButton:SetText(TEXT.Pending)
-		local result = Net.invoke("SellAll")
+		local result = if vehicleId then Net.invoke("SellAll", vehicleId) else Net.invoke("SellAll")
 		selling = false
 		sellButton:SetText(TEXT.SellAll)
 		if result.success then

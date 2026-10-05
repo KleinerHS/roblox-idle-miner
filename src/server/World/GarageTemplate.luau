@@ -7,8 +7,9 @@
 -- Vereinbarte Namen/Attribute:
 --   Part "BaySpawn1"/"BaySpawn2"   – Fahrzeug-Spawn (Bodenmitte, LookVector zum Rolltor)
 --   Part "GarageRing"              – Auslöser der Fahrzeugauswahl (Attribut GarageRing = true)
---   Part "LoadPoint1"/"LoadPoint2" – Ende der Ladeschurre über dem Stellplatz (Phase 6c)
---   Part "TowerPanel"              – Bedienpult am Verladeturm (Prompt in Phase 6c)
+--   Part "LoadPoint1"/"LoadPoint2" – Ende der Ladeschurre über dem Stellplatz, ProximityPrompt
+--                                    "LoadPrompt" (Attribute LoadingTower = true, Bay)
+--   Part "GarageDoor"              – Glas-Rolltor in der Hallen-Toröffnung (VehicleService)
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -176,11 +177,22 @@ local function tower(model: Model, o: CFrame)
 		lp.Transparency = 1
 		flat(lp)
 		lp:SetAttribute("Bay", i)
+		-- Beladen (Phase 6c): erreichbar vom Fahrersitz und zu Fuß
+		local prompt = Instance.new("ProximityPrompt")
+		prompt.Name = "LoadPrompt"
+		prompt.ActionText = "Load Vehicle"
+		prompt.ObjectText = `Loading Bay {i}`
+		prompt.HoldDuration = 0.2
+		prompt.MaxActivationDistance = 16
+		prompt.RequiresLineOfSight = false
+		prompt:SetAttribute("LoadingTower", true)
+		prompt:SetAttribute("Bay", i)
+		prompt.Parent = lp
 		-- Warnleuchte an der Schurre
 		local lamp = part(model, `ChuteLamp{i}`, Vector3.new(0.5, 0.5, 0.5), t * CFrame.new(x + 1.4, armY - 1.4, -armLen), YELLOW, Enum.Material.Neon)
 		lamp.Shape = Enum.PartType.Ball
 	end
-	-- Bedienpult am Fuß des Turms (Prompt kommt mit dem Beladen in Phase 6c)
+	-- Bedienpult am Fuß des Turms (Optik; bedient wird über die Prompts an den Schurren)
 	part(model, "TowerPanelPost", Vector3.new(0.6, 3.2, 0.6), t * CFrame.new(-4.5, 2.2, -3), STEEL_DARK)
 	local panel = part(model, "TowerPanel", Vector3.new(2.4, 1.8, 0.4), t * CFrame.new(-4.5, 4.4, -3) * CFrame.Angles(math.rad(-20), 0, 0), STEEL_LIGHT, Enum.Material.SmoothPlastic)
 	local screen = part(model, "TowerPanelScreen", Vector3.new(2, 1.3, 0.1), t * CFrame.new(-4.5, 4.45, -3.25) * CFrame.Angles(math.rad(-20), 0, 0), Color3.fromRGB(90, 170, 255), Enum.Material.Neon)

@@ -28,3 +28,7 @@ Nach Änderungen an Economy, Inventory, Save, Trading oder Prestige die betroffe
 - [ ] Phase 5a: Migration v3 → v4, Drills nach Rejoin erhalten, Equipment-Shop unverändert (Test 5a.7, 5a.8)
 - [ ] Phase 5b: Slot ist Worker ODER Drill, Platzieren nur in der eigenen Mine mit freiem Exemplar, Entfernen ohne Verlust (Test 5b.2–5b.3, 5b.8–5b.9)
 - [ ] Phase 5b: Drill-Produktion mit Rückstau, Transport holt am Drill ab, Rejoin stellt Drills wieder her (Test 5b.5–5b.7, 5b.11)
+- [ ] Phase 6: Garage nach Lager, Fahrzeugkauf nur mit Garage/Level/Geld, je Typ einmal (Test 6.1, 6.3, 6.4)
+- [ ] Phase 6: Max. 2 Fahrzeuge in der Halle, nur Besitzer fährt, Reset ohne Ladungsverlust (Test 6.5, 6.9–6.11)
+- [ ] Phase 6: Beladen/Entladen atomar bis Kapazität, Fahrzeugverkauf nur in der Zone, Ladung nach Rejoin erhalten (Test 6.7, 6.8, 6.12)
+- [ ] Phase 6: Tresen-Verkauf aus dem Rucksack unverändert (Test 2d.3)

@@ -22,3 +22,19 @@ Vorschlag (eingebaut als `TODO_BALANCE` in `Definitions/Drills.luau`):
 Zum Vergleich: Mining-Worker $2.000 + $5/Min Lohn, 30 Erz/Min. Drills haben keinen Lohn.
 
 Frage an Felix: Passen diese Werte, oder andere?
+
+## Q-021 – Garage und Fahrzeugwerte (Phase 6)
+
+Quelle: docs/07 §6–7, §14, §50 (Werte nicht festgelegt, außer Pickup-Kapazität 1.000).
+Vorschlag (eingebaut als `TODO_BALANCE`):
+
+| | Preis | ab Level | Kapazität | Top Speed |
+|---|---|---|---|---|
+| Garage (Bauschritt) | $10.000 | 7 | – | – |
+| Utility Pickup | $6.000 | 7 | 1.000 | 55 |
+| Utility Van | $20.000 | 10 | 2.500 | 52 |
+| Box Truck | $60.000 | 14 | 6.000 | 46 |
+
+Große Fahrzeuge sind langsamer und träger (docs/07 §14). Je Typ besitzt man ein Fahrzeug.
+
+Frage an Felix: Passen diese Werte, oder andere?

@@ -175,3 +175,22 @@ Voraussetzung: Lager gebaut, mindestens ein Drill gekauft (5a). Für MK2: `SetLe
 | 5b.9 | Entfernen | Slot-Fenster oder Laptop → REMOVE | Drill verschwindet, Meldung „… moved back to your inventory.“, Shop-Inventar „Placed 0“, Erz im Puffer bleibt |
 | 5b.10 | PRODUCTION-App | Laptop → PRODUCTION | Platzierte Drills mit Mine, Slot, Status; darunter „INVENTORY“ mit verfügbaren Drills |
 | 5b.11 | Speichern | Stop → Play, wieder in die Mine | Drill steht wieder am selben Slot und arbeitet |
+
+## Phase 6 – Garage & Fahrzeuge
+
+Werte sind Vorschläge aus Q-021. Für den Test: `SetLevel(…, 14)` und `SetCash(…, 200000)`.
+
+| # | Test | Schritte | Erwartet |
+|---|---|---|---|
+| 6.1 | Garage bauen | Nach dem Lager den Button „Garage“ ($10K, Level 7) kaufen | Zwei Stellplätze, Leuchtring „VEHICLES“, Verladeturm mit „LOADING“-Schild, Glas-Rolltor in der Hallentür, Akzente in Firmenfarbe |
+| 6.2 | Rolltor | Zum Tor gehen | Tor rollt hoch; weggehen → nach 3 s rollt es runter |
+| 6.3 | Fahrzeughaus | Stadtmitte rechts (rot), am Tresen **E** | Fenster „VEHICLES“: Pickup / Van / Box Truck mit Kapazität, Top Speed, Preis |
+| 6.4 | Kaufen | Utility Pickup kaufen | Meldung „… Get it at the glowing ring …“, Karte zeigt OWNED |
+| 6.5 | Ausparken | In der Garage auf den Leuchtring treten → DRIVE | Pickup steht auf Stellplatz 1, du sitzt am Steuer, Fahranzeige unten |
+| 6.6 | Fahren | W/S, A/D, Kurven, Bremsen | Kontrolliert, kein Überschlag, Tor öffnet beim Heranfahren |
+| 6.7 | Laden | Rückwärts unter die Schurre von Stellplatz 1, **E** „Load Vehicle“ | Ladefenster; LOAD ALL lädt aus dem Lager, Ladefläche zeigt Ladung |
+| 6.8 | Verkaufen | Zur Stadtmitte, in die markierte Zone vor dem Verkaufsgebäude fahren | „SELL CARGO“ öffnet sich; SELL ALL → Geld und XP, Fahrzeug leer |
+| 6.9 | Zweites Fahrzeug | Weiteres Fahrzeug kaufen, am Ring DRIVE | Steht auf Stellplatz 2; ein drittes ginge nur nach PARK AWAY eines anderen |
+| 6.10 | Reset | Fahrzeug festfahren → RESET VEHICLE | Steht wieder auf seinem Stellplatz, Ladung unverändert |
+| 6.11 | Fremdes Fahrzeug (2 Spieler) | Spieler 2 setzt sich in das Fahrzeug von Spieler 1 | Wird sofort herausgesetzt („This is not your company.“) |
+| 6.12 | Speichern | Mit Ladung Stop → Play | Fahrzeug steht wieder in der Halle, Ladung ist noch da |

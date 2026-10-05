@@ -45,6 +45,9 @@ local MESSAGES: { [string]: string } = {
 	NO_VEHICLE = "Drive your vehicle under the loading tower first.",
 	VEHICLE_FULL = "Your vehicle is full!",
 	VEHICLE_RESET = "Vehicle returned to its garage bay.",
+	NOTHING_TO_LOAD = "Nothing in storage to load.",
+	CARGO_LOADED = "{Amount} loaded into your vehicle.",
+	CARGO_UNLOADED = "{Amount} moved back to storage.",
 	DRILL_PLACED = "{Name} placed and drilling!",
 	DRILL_REMOVED = "{Name} moved back to your inventory.",
 	NOT_OWNED = "You don't own this item yet.",
@@ -93,6 +96,8 @@ Strings.Elevator = table.freeze({
 
 Strings.Sell = table.freeze({
 	Title = "SELL ORE",
+	VehicleTitle = "SELL CARGO",
+	VehicleEmpty = "Your vehicle is empty. Load it at the loading tower in your garage.",
 	Empty = "Your backpack is empty. Mine some ore first.",
 	NotSellable = "not sellable yet",
 	Total = "TOTAL",
@@ -227,6 +232,18 @@ Strings.Garage = table.freeze({
 	Drive = "DRIVE",
 	Store = "PARK AWAY",
 	Reset = "RESET",
+	Close = "X",
+})
+
+Strings.Loading = table.freeze({
+	Title = "LOAD VEHICLE",
+	Capacity = "%s / %s",
+	Empty = "Storage and vehicle are empty.",
+	Row = "Storage %s · Vehicle %s",
+	Load100 = "LOAD 100",
+	LoadAll = "LOAD ALL",
+	LoadEverything = "LOAD EVERYTHING",
+	UnloadAll = "UNLOAD ALL",
 	Close = "X",
 })
 
