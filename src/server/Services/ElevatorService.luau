@@ -127,7 +127,10 @@ local function travel(player: Player, destination: unknown)
 	if not isNearElevator(player) then
 		return Result.err(Result.Codes.NOT_AVAILABLE)
 	end
-	if mine and not Mines.IsAccessible(mine, data.MiningLevel) then
+	if mine and not Mines.IsAccessible(mine, data.MiningLevel, data.UnlockedMines) then
+		if mine.RequiredLevel and data.MiningLevel >= mine.RequiredLevel then
+			return Result.err(Result.Codes.NOT_OWNED)
+		end
 		return Result.err(if mine.RequiredLevel then Result.Codes.LEVEL_TOO_LOW else Result.Codes.NOT_AVAILABLE)
 	end
 
@@ -195,6 +198,48 @@ local function travel(player: Player, destination: unknown)
 	return Result.ok(destination)
 end
 
+-- Mine kaufen (ab Mine 03, D-017/D-019): im Elevator-Menü, Level und Geld, der Reihe nach
+local function buyMine(player: Player, mineId: unknown)
+	if typeof(mineId) ~= "string" then
+		return Result.err(Result.Codes.INVALID_ARGUMENT)
+	end
+	local mine = Mines.Get(mineId)
+	if not mine or mine.UnlockCost <= 0 then
+		return Result.err(Result.Codes.INVALID_ARGUMENT)
+	end
+	local data = DataService.Get(player)
+	if not data then
+		return Result.err(Result.Codes.DATA_NOT_LOADED)
+	end
+	if not isNearElevator(player) then
+		return Result.err(Result.Codes.TOO_FAR)
+	end
+	if data.UnlockedMines[mine.Id] then
+		return Result.err(Result.Codes.ALREADY_DONE)
+	end
+	if mine.RequiredLevel == nil then
+		return Result.err(Result.Codes.NOT_AVAILABLE)
+	end
+	if data.MiningLevel < mine.RequiredLevel then
+		return Result.err(Result.Codes.LEVEL_TOO_LOW)
+	end
+	if not Mines.IsPurchasable(mine, data.MiningLevel, data.UnlockedMines) then
+		return Result.err(Result.Codes.NOT_AVAILABLE)
+	end
+	if data.Cash < mine.UnlockCost then
+		return Result.err(Result.Codes.NOT_ENOUGH_MONEY)
+	end
+	-- Prüfung und Änderung ohne Yield dazwischen → kein Doppelkauf durch Spam
+	DataService.Mutate(player, function(d)
+		d.Cash -= mine.UnlockCost
+		d.UnlockedMines[mine.Id] = true
+	end)
+	DataService.RequestSave(player)
+	Log.debug(TAG, `{player.Name} kauft {mine.Id} für {mine.UnlockCost}`)
+	RemoteService.FireClient("Notify", player, { Kind = "Success", Code = "MINE_PURCHASED", Args = { Name = Mines.Label(mine) } })
+	return Result.ok(mine.Id)
+end
+
 function ElevatorService.Init()
 	local existing = workspace:FindFirstChild("MineShafts")
 	if existing then
@@ -213,6 +258,7 @@ function ElevatorService.Init()
 	folder.Parent = workspace
 
 	RemoteService.OnInvoke("RequestTravel", travel)
+	RemoteService.OnInvoke("BuyMine", buyMine)
 end
 
 function ElevatorService.Start()

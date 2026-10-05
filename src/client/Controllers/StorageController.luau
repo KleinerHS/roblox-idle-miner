@@ -10,7 +10,7 @@ local UserInputService = game:GetService("UserInputService")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local UITheme = require(Shared.Config.UITheme)
-local Ores = require(Shared.Definitions.Ores)
+local Materials = require(Shared.Definitions.Materials)
 local Types = require(Shared.Types)
 local NumberFormat = require(Shared.Util.NumberFormat)
 
@@ -87,7 +87,7 @@ local function render()
 
 	local entries = {}
 	for oreId, amount in snapshot.StorageItems do
-		local ore = Ores.Get(oreId)
+		local ore = Materials.Get(oreId)
 		if ore and amount > 0 then
 			table.insert(entries, { ore = ore, amount = amount })
 		end

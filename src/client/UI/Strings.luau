@@ -24,6 +24,7 @@ local MESSAGES: { [string]: string } = {
 
 	-- Tycoon
 	BUILD_PURCHASED = "{Name} built!",
+	MINE_PURCHASED = "{Name} unlocked! Take the elevator down.",
 
 	-- Mining
 	BACKPACK_FULL = "Backpack full! Sell your ore at the surface.",
@@ -46,6 +47,9 @@ local MESSAGES: { [string]: string } = {
 	VEHICLE_FULL = "Your vehicle is full!",
 	VEHICLE_RESET = "Vehicle returned to its garage bay.",
 	NOTHING_TO_LOAD = "Nothing in storage to load.",
+	SMELTER_FULL = "The smelter hopper is full.",
+	SMELTER_FED = "{Amount} ore fed into the smelter.",
+	SMELTER_COLLECTED = "{Amount} bars moved to storage.",
 	CARGO_LOADED = "{Amount} loaded into your vehicle.",
 	CARGO_UNLOADED = "{Amount} moved back to storage.",
 	DRILL_PLACED = "{Name} placed and drilling!",
@@ -91,6 +95,8 @@ Strings.Elevator = table.freeze({
 	Locked = "LOCKED",
 	RequiresLevel = "Requires Mining Level %d",
 	ComingSoon = "Coming soon",
+	Buy = "BUY %s",
+	BuyPrevious = "Buy the previous mine first",
 	Close = "X",
 })
 
@@ -201,6 +207,7 @@ Strings.Laptop = table.freeze({
 	DrillRate = "%s ore / min",
 	RemoveDrill = "REMOVE",
 	ProductionTitle = "PRODUCTION",
+	SmelterCard = "Smelter",
 	NoMachines = "No machines yet. Buy drills at the Machine Shop in town.",
 	InventoryTitle = "INVENTORY",
 	InventoryLine = "%s × %d available",
@@ -247,6 +254,24 @@ Strings.Loading = table.freeze({
 	Close = "X",
 })
 
+Strings.Smelter = table.freeze({
+	Title = "SMELTER",
+	Input = "Hopper %s / %s",
+	Output = "Bars %s / %s",
+	Status = { Running = "Running", WaitingForInput = "Waiting for input", OutputFull = "Output full – collect bars", Idle = "Idle" },
+	Recipe = "Smelting: %s → %s",
+	Feed = "FEED",
+	FeedAll = "FEED ALL",
+	Collect = "COLLECT BARS",
+	NoOre = "No smeltable ore in storage. Metals like Copper, Tin and Iron can be smelted.",
+	Priority = "Priority",
+	Auto = "AUTO (most valuable)",
+	Prefer = "PREFER",
+	Preferred = "PREFERRED",
+	StorageAmount = "In storage: %s",
+	Close = "X",
+})
+
 Strings.Driving = table.freeze({
 	Speed = "%d studs/s",
 	Cargo = "CARGO %s / %s",
@@ -260,6 +285,7 @@ Strings.Hud = table.freeze({
 	LevelUp = "LEVEL UP!",
 	LevelUpSub = "Mining Level %d",
 	MineUnlocked = "NEW MINE UNLOCKED",
+	MineAvailable = "NEW MINE FOR SALE",
 })
 
 Strings.CompanySetup = table.freeze({

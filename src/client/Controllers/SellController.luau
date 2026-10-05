@@ -12,7 +12,7 @@ local UserInputService = game:GetService("UserInputService")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local UITheme = require(Shared.Config.UITheme)
-local Ores = require(Shared.Definitions.Ores)
+local Materials = require(Shared.Definitions.Materials)
 local NumberFormat = require(Shared.Util.NumberFormat)
 
 local Net = require(script.Parent.Parent.Net)
@@ -100,7 +100,7 @@ local function refresh()
 			source = if vehicle then vehicle.Cargo else {}
 		end
 		for oreId, amount in source do
-			local ore = Ores.Get(oreId)
+			local ore = Materials.Get(oreId)
 			if ore and amount > 0 then
 				table.insert(entries, { ore = ore, amount = amount })
 			end

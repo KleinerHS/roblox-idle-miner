@@ -36,6 +36,8 @@ local Remotes: { [string]: RemoteDefinition } = {
 	OpenElevatorMenu = { Kind = "Event", Direction = "ServerToClient" },
 	-- Fahrtwunsch: (destination: "surface" | mineId) -> Result
 	RequestTravel = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
+	-- Mine kaufen (ab Mine 03): (mineId: string) -> Result<mineId>
+	BuyMine = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 5, Window = 10 } },
 	-- Übergangsanimation starten: { Title: string, Subtitle: string }
 	ElevatorTransition = { Kind = "Event", Direction = "ServerToClient" },
 	-- Aktueller Ort des Spielers: { Location: "surface" | mineId }
@@ -97,6 +99,14 @@ local Remotes: { [string]: RemoteDefinition } = {
 	LoadVehicle = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 10, Window = 10 } },
 	-- Entladen ins Lager: (vehicleId, oreId: string?) -> Result<{ Moved }>
 	UnloadVehicle = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 10, Window = 10 } },
+	-- Schmelzer (Phase 7a): Server öffnet das Schmelzer-Fenster am Terminal
+	OpenSmelter = { Kind = "Event", Direction = "ServerToClient" },
+	-- Erz aus dem Lager einfüllen: (oreId: string?, amount: number?) -> Result<{ Moved }>
+	SmelterFeed = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 10, Window = 10 } },
+	-- Barren ins Lager holen: () -> Result<{ Moved }>
+	SmelterCollect = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 10, Window = 10 } },
+	-- Bevorzugtes Erz ("" = automatisch): (oreId: string) -> Result
+	SmelterPriority = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
 	-- Kapazitäts-Upgrade am Laptop: (kind: "storage" | "elevator") -> Result<{ Capacity: number }>
 	BuyUpgrade = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
 }

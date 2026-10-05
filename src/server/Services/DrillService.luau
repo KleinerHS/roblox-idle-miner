@@ -88,7 +88,7 @@ local function place(player: Player, mineId: unknown, slot: unknown, typeId: unk
 	if ElevatorService.GetLocation(player) ~= mine.Id then
 		return Result.err(Result.Codes.NOT_IN_MINE)
 	end
-	if not Mines.IsAccessible(mine, data.MiningLevel) then
+	if not Mines.IsAccessible(mine, data.MiningLevel, data.UnlockedMines) then
 		return Result.err(Result.Codes.NOT_AVAILABLE)
 	end
 	if workerAt(data, mine.Id, slot :: number) or DrillService.DrillAt(data, mine.Id, slot :: number) then

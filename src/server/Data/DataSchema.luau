@@ -1,5 +1,5 @@
 --!strict
--- Datenschema v5: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
+-- Datenschema v6: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
 -- Regeln:
 --  * Defaults gibt es nur hier.
 --  * Jede Strukturänderung erhöht CURRENT_VERSION und bekommt eine Migration
@@ -15,7 +15,7 @@ local Backpacks = require(Shared.Definitions.Backpacks)
 local Mines = require(Shared.Definitions.Mines)
 local Types = require(Shared.Types)
 
-local CURRENT_VERSION = 5
+local CURRENT_VERSION = 6
 
 local DataSchema = {
 	CurrentVersion = CURRENT_VERSION,
@@ -82,6 +82,13 @@ local TEMPLATE: Types.PlayerData = {
 		Seq = 0,
 	},
 
+	-- Schmelzer (v6): Einfülltrichter, Barrenablage, Priorität ("" = wertvollstes zuerst, D-011)
+	Smelter = {
+		Input = {},
+		Output = {},
+		Priority = "",
+	},
+
 	Stats = {
 		FirstJoinTime = 0,
 		JoinCount = 0,
@@ -136,6 +143,12 @@ local MIGRATIONS: { [number]: (data: { [string]: any }) -> () } = {
 	[4] = function(data)
 		if typeof(data.Vehicles) ~= "table" then
 			data.Vehicles = { Owned = {}, Seq = 0 }
+		end
+	end,
+	-- v5 → v6: Schmelzer ergänzt (Phase 7)
+	[5] = function(data)
+		if typeof(data.Smelter) ~= "table" then
+			data.Smelter = { Input = {}, Output = {}, Priority = "" }
 		end
 	end,
 }

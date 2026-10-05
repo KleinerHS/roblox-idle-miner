@@ -58,9 +58,23 @@ function Mines.GetByNumber(number: number): MineDefinition?
 end
 
 -- Minen werden über das Mining Level freigeschaltet (docs/12 §22). Ohne gebalanctes
--- RequiredLevel bleibt eine Mine gesperrt.
-function Mines.IsAccessible(mine: MineDefinition, miningLevel: number): boolean
-	return mine.RequiredLevel ~= nil and miningLevel >= mine.RequiredLevel
+-- RequiredLevel bleibt eine Mine gesperrt. Ab Mine 03 braucht es zusätzlich den Kauf
+-- (D-017/D-019): unlocked = gekaufte Minen des Spielers (PlayerData.UnlockedMines).
+function Mines.IsAccessible(mine: MineDefinition, miningLevel: number, unlocked: { [string]: boolean }?): boolean
+	if mine.RequiredLevel == nil or miningLevel < mine.RequiredLevel then
+		return false
+	end
+	return mine.UnlockCost <= 0 or (unlocked ~= nil and unlocked[mine.Id] == true)
+end
+
+-- Kann die Mine jetzt gekauft werden? Level erreicht, noch nicht gekauft und die vorherige
+-- Mine ist bereits zugänglich (Minen werden der Reihe nach gekauft).
+function Mines.IsPurchasable(mine: MineDefinition, miningLevel: number, unlocked: { [string]: boolean }): boolean
+	if mine.UnlockCost <= 0 or unlocked[mine.Id] or mine.RequiredLevel == nil or miningLevel < mine.RequiredLevel then
+		return false
+	end
+	local previous = list[mine.Number - 1]
+	return previous == nil or Mines.IsAccessible(previous, miningLevel, unlocked)
 end
 
 -- "MINE 01" … "MINE 100"

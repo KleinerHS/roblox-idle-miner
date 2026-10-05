@@ -10,7 +10,7 @@ local UserInputService = game:GetService("UserInputService")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local UITheme = require(Shared.Config.UITheme)
-local Ores = require(Shared.Definitions.Ores)
+local Materials = require(Shared.Definitions.Materials)
 local Vehicles = require(Shared.Definitions.Vehicles)
 local Types = require(Shared.Types)
 local NumberFormat = require(Shared.Util.NumberFormat)
@@ -116,7 +116,7 @@ local function render()
 		end
 	end
 	table.sort(ids, function(a, b)
-		local oa, ob = Ores.Get(a), Ores.Get(b)
+		local oa, ob = Materials.Get(a), Materials.Get(b)
 		return (if oa then oa.Tier else 999) < (if ob then ob.Tier else 999)
 	end)
 	if #ids == 0 then
@@ -131,7 +131,7 @@ local function render()
 		})
 	end
 	for i, id in ids do
-		local ore = Ores.Get(id)
+		local ore = Materials.Get(id)
 		local frame = Create("Frame", {
 			Size = UDim2.new(1, -8, 0, 56),
 			BackgroundColor3 = UITheme.Colors.Surface,

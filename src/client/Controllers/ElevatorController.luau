@@ -14,6 +14,7 @@ local Shared = ReplicatedStorage:WaitForChild("Shared")
 local UITheme = require(Shared.Config.UITheme)
 local Mines = require(Shared.Definitions.Mines)
 local Ores = require(Shared.Definitions.Ores)
+local NumberFormat = require(Shared.Util.NumberFormat)
 
 local Net = require(script.Parent.Parent.Net)
 local Create = require(script.Parent.Parent.UI.Create)
@@ -37,7 +38,7 @@ local location = SURFACE
 
 local menuGui: ScreenGui
 local list: ScrollingFrame
-type Row = { frame: Frame, go: TextButton, status: TextLabel }
+type Row = { frame: Frame, go: TextButton, buy: TextButton, status: TextLabel }
 local rows: { [string]: Row } = {}
 local openedAt: Vector3? = nil
 local requesting = false
@@ -140,7 +141,34 @@ local function makeRow(id: string, order: number, color: Color3, title: string, 
 		end
 	end)
 
-	local row = { frame = frame, go = go, status = status }
+	-- Kaufen (ab Mine 03, D-017/D-019)
+	local buy: TextButton = Create("TextButton", {
+		Name = "Buy",
+		AnchorPoint = Vector2.new(1, 0.5),
+		Position = UDim2.new(1, -14, 0.5, 0),
+		Size = UDim2.fromOffset(110, 38),
+		BackgroundColor3 = UITheme.Colors.DefaultAccent,
+		Font = UITheme.FontBold,
+		TextSize = 15,
+		TextColor3 = Color3.fromRGB(20, 24, 28),
+		Text = "",
+		Visible = false,
+		Parent = frame,
+	}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
+	buy.Activated:Connect(function()
+		if requesting then
+			return
+		end
+		requesting = true
+		local result = Net.invoke("BuyMine", id)
+		requesting = false
+		if not result.success then
+			local mine = Mines.Get(id)
+			NotificationController.Show("Warning", result.code, { Level = mine and mine.RequiredLevel, Price = mine and mine.UnlockCost })
+		end
+	end)
+
+	local row = { frame = frame, go = go, buy = buy, status = status }
 	rows[id] = row
 	return row
 end
@@ -148,6 +176,7 @@ end
 local function refreshRows()
 	local snapshot = StateController.Get()
 	local level = if snapshot then snapshot.MiningLevel else 1
+	local unlocked = if snapshot then snapshot.UnlockedMines else {}
 
 	local surfaceRow = rows[SURFACE]
 	surfaceRow.frame.Visible = location ~= SURFACE
@@ -155,15 +184,24 @@ local function refreshRows()
 	for _, mine in Mines.List do
 		local row = rows[mine.Id]
 		local here = location == mine.Id
-		local accessible = Mines.IsAccessible(mine, level)
+		local accessible = Mines.IsAccessible(mine, level, unlocked)
+		local purchasable = Mines.IsPurchasable(mine, level, unlocked)
 		row.go.Visible = accessible and not here
-		row.status.Visible = not row.go.Visible
+		row.buy.Visible = purchasable and not here
+		if purchasable then
+			local affordable = snapshot ~= nil and snapshot.Cash >= mine.UnlockCost
+			row.buy.Text = string.format(TEXT.Buy, NumberFormat.cash(mine.UnlockCost))
+			row.buy.BackgroundColor3 = if affordable then UITheme.Colors.DefaultAccent else UITheme.Colors.SurfaceRaised
+			row.buy.TextColor3 = if affordable then Color3.fromRGB(20, 24, 28) else UITheme.Colors.TextPrimary
+		end
+		row.status.Visible = not row.go.Visible and not row.buy.Visible
 		if here then
 			row.status.Text = TEXT.Here
 			row.status.TextColor3 = UITheme.Colors.Positive
 		elseif not accessible then
-			row.status.Text = if mine.RequiredLevel
+			row.status.Text = if mine.RequiredLevel and level < mine.RequiredLevel
 				then `{TEXT.Locked}\n{string.format(TEXT.RequiresLevel, mine.RequiredLevel)}`
+				elseif mine.RequiredLevel then `{TEXT.Locked}\n{TEXT.BuyPrevious}`
 				else `{TEXT.Locked}\n{TEXT.ComingSoon}`
 			row.status.TextColor3 = UITheme.Colors.TextSecondary
 		end

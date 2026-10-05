@@ -34,6 +34,7 @@ local CONTROLLER_ORDER = {
 	"GarageController",
 	"DrivingController",
 	"LoadingController",
+	"SmelterController",
 }
 
 local loaded: { Controller } = {}

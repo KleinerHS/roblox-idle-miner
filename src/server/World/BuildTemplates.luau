@@ -16,6 +16,7 @@ local LayoutConfig = require(Shared.Config.LayoutConfig)
 local ElevatorCageBuilder = require(script.Parent.ElevatorCageBuilder)
 local HallTemplates = require(script.Parent.HallTemplates)
 local GarageTemplate = require(script.Parent.GarageTemplate)
+local SmelterTemplate = require(script.Parent.SmelterTemplate)
 
 local BuildTemplates = {}
 
@@ -173,6 +174,7 @@ local BUILDERS: { [string]: (plotCFrame: CFrame) -> Model } = {
 	build_roof = HallTemplates.buildRoof,
 	build_storage = HallTemplates.buildStorage,
 	build_garage = GarageTemplate.build,
+	build_smelter = SmelterTemplate.build,
 }
 
 -- Baut das Modell eines BuildSteps. nil, wenn für den Schritt (noch) kein Modell existiert.

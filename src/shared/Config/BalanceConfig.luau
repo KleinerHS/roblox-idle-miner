@@ -17,13 +17,39 @@ local BalanceConfig = {
 	-- Erze ohne Eintrag sind noch nicht gebalanced und nicht verkaufbar.
 	OreValues = {
 		ore_coal = { SellValue = 1, XPValue = 1 }, -- TODO_BALANCE (Beispielwerte aus docs/03 §16)
+		ore_copper = { SellValue = 2, XPValue = 2 }, -- TODO_BALANCE (Q-022)
+		ore_tin = { SellValue = 3, XPValue = 3 }, -- TODO_BALANCE (Q-022)
+		ore_iron = { SellValue = 5, XPValue = 4 }, -- TODO_BALANCE (Q-022)
 	} :: { [string]: { SellValue: number, XPValue: number } },
+
+	-- Barren aus dem Schmelzer (docs/06 §36: Wert(Output) > Wert(Input)). Barren ohne Eintrag
+	-- sind noch nicht gebalanced; ihr Rezept bleibt inaktiv. Vorschlag Q-022.
+	BarValues = {
+		bar_copper = { SellValue = 6, XPValue = 5 }, -- TODO_BALANCE (Q-022) aus 2 Copper (= $4)
+		bar_tin = { SellValue = 9, XPValue = 7 }, -- TODO_BALANCE (Q-022) aus 2 Tin (= $6)
+		bar_iron = { SellValue = 14, XPValue = 10 }, -- TODO_BALANCE (Q-022) aus 2 Iron (= $10)
+	} :: { [string]: { SellValue: number, XPValue: number } },
+
+	-- Schmelzer (docs/06 §28–35). Vorschlag Q-022.
+	Smelter = {
+		OrePerBar = 2, -- TODO_BALANCE (Q-022)
+		SecondsPerBar = 3, -- TODO_BALANCE (Q-022)
+		InputCapacity = 200, -- TODO_BALANCE (Q-022) Erz im Einfülltrichter
+		OutputCapacity = 100, -- TODO_BALANCE (Q-022) Barren in der Ablage
+	},
 
 	-- Freischaltung der Minen über das Level (docs/12 §22). Mine 001 ist immer frei.
 	-- Minen ohne Level-Eintrag sind noch nicht gebalanced und bleiben gesperrt.
 	MineUnlocks = {
 		mine_001 = { RequiredLevel = 1 },
 		mine_002 = { RequiredLevel = 3 }, -- Felix (D-017)
+		-- Ab Mine 03 zusätzlich Kauf (MinePrice). Level: Vorschlag Q-022
+		mine_003 = { RequiredLevel = 6 }, -- TODO_BALANCE (Q-022) Copper
+		mine_004 = { RequiredLevel = 8 }, -- TODO_BALANCE (Q-022) Copper
+		mine_005 = { RequiredLevel = 10 }, -- TODO_BALANCE (Q-022) Tin
+		mine_006 = { RequiredLevel = 12 }, -- TODO_BALANCE (Q-022) Tin
+		mine_007 = { RequiredLevel = 14 }, -- TODO_BALANCE (Q-022) Iron
+		mine_008 = { RequiredLevel = 16 }, -- TODO_BALANCE (Q-022) Iron
 	} :: { [string]: { RequiredLevel: number } },
 
 	-- Firmenlager (docs/06 §14): Startkapazität 1.000 über alle Materialien (fest).

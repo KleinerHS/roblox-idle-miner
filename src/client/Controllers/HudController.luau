@@ -104,7 +104,7 @@ local function refresh(snapshot: Types.StateSnapshot)
 				if mine.RequiredLevel and mine.RequiredLevel > fromLevel and mine.RequiredLevel <= level then
 					task.wait(2.6)
 					local ore = Ores.Get(mine.OreId)
-					showPopup(TEXT.MineUnlocked, Mines.Label(mine), if ore then string.upper(ore.DisplayName) else "", UITheme.Colors.Positive)
+					showPopup(if mine.UnlockCost > 0 then TEXT.MineAvailable else TEXT.MineUnlocked, Mines.Label(mine), if ore then string.upper(ore.DisplayName) else "", UITheme.Colors.Positive)
 				end
 			end
 		end)

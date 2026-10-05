@@ -13,9 +13,10 @@ local UserInputService = game:GetService("UserInputService")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local UITheme = require(Shared.Config.UITheme)
 local Mines = require(Shared.Definitions.Mines)
-local Ores = require(Shared.Definitions.Ores)
+local Materials = require(Shared.Definitions.Materials)
 local WorkerRoles = require(Shared.Definitions.WorkerRoles)
 local Drills = require(Shared.Definitions.Drills)
+local SmelterLogic = require(Shared.Util.SmelterLogic)
 local Upgrades = require(Shared.Definitions.Upgrades)
 local BalanceConfig = require(Shared.Config.BalanceConfig)
 local CompanyIdentity = require(Shared.Definitions.CompanyIdentity)
@@ -239,7 +240,7 @@ local function renderEmployees(snapshot: Types.StateSnapshot)
 	}, { Create("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, Padding = UDim.new(0, 8) }) })
 	local any = false
 	for _, mine in Mines.List do
-		if Mines.IsAccessible(mine, snapshot.MiningLevel) then
+		if Mines.IsAccessible(mine, snapshot.MiningLevel, snapshot.UnlockedMines) then
 			any = true
 			local active = mine.Id == selectedMine
 			local tab: TextButton = Create("TextButton", {
@@ -265,7 +266,7 @@ local function renderEmployees(snapshot: Types.StateSnapshot)
 	end
 
 	local mine = Mines.Get(selectedMine)
-	local ore = mine and Ores.Get(mine.OreId)
+	local ore = mine and Materials.Get(mine.OreId)
 	local buffer = snapshot.MineBuffers[selectedMine] or 0
 	local elevatorLoad = 0
 	for _, amount in snapshot.ElevatorBuffer do
@@ -497,14 +498,14 @@ local function renderStorage(snapshot: Types.StateSnapshot)
 		end
 	end
 	table.sort(ids, function(a, b)
-		local oa, ob = Ores.Get(a), Ores.Get(b)
+		local oa, ob = Materials.Get(a), Materials.Get(b)
 		return (if oa then oa.Tier else 999) < (if ob then ob.Tier else 999)
 	end)
 	if #ids == 0 then
 		label(TEXT.StorageEmpty, 15, UITheme.Colors.TextSecondary, 3)
 	end
 	for i, id in ids do
-		local ore = Ores.Get(id)
+		local ore = Materials.Get(id)
 		local row = card(2 + i, 40)
 		cardText(row, if ore then ore.DisplayName else id, 0, 16, UITheme.Colors.TextPrimary)
 		cardText(row, NumberFormat.withSeparators(snapshot.StorageItems[id]), 0, 16, UITheme.Colors.TextPrimary, true, Enum.TextXAlignment.Right)
@@ -537,6 +538,19 @@ end
 -- PRODUCTION: platzierte Drills mit Status, verfügbare Drills im Inventar (docs/09 §32–33)
 local function renderProduction(snapshot: Types.StateSnapshot)
 	label(TEXT.ProductionTitle, 24, UITheme.Colors.TextPrimary, 1, true)
+	-- Schmelzer (docs/09 §32, D-011): Status, Füllstände, Priorität
+	local hasSmelter = snapshot.Buildings.build_smelter == true
+	if hasSmelter then
+		local state = snapshot.Smelter
+		local status = SmelterLogic.Status(state)
+		local box = card(2, 78)
+		cardText(box, TEXT.SmelterCard, 0, 17, UITheme.Colors.TextPrimary, true)
+		cardText(box, Strings.Smelter.Status[status] or status, 0, 14, if status == "Running" then UITheme.Colors.Positive elseif status == "OutputFull" then UITheme.Colors.Negative else UITheme.Colors.Warning, true, Enum.TextXAlignment.Right)
+		local cfg = BalanceConfig.Smelter
+		cardText(box, `{string.format(Strings.Smelter.Input, NumberFormat.withSeparators(SmelterLogic.Sum(state.Input)), NumberFormat.withSeparators(cfg.InputCapacity))} · {string.format(Strings.Smelter.Output, NumberFormat.withSeparators(SmelterLogic.Sum(state.Output)), NumberFormat.withSeparators(cfg.OutputCapacity))}`, 24, 14, UITheme.Colors.TextSecondary)
+		local preferred = if state.Priority ~= "" then Materials.Get(state.Priority) else nil
+		cardText(box, `{Strings.Smelter.Priority}: {if preferred then preferred.DisplayName else Strings.Smelter.Auto}`, 44, 14, UITheme.Colors.TextSecondary)
+	end
 	local placed: { Types.DrillRecord } = {}
 	local available: { [string]: number } = {}
 	for _, drill in snapshot.Drills do
@@ -547,7 +561,9 @@ local function renderProduction(snapshot: Types.StateSnapshot)
 		end
 	end
 	if #placed == 0 and next(available) == nil then
-		label(TEXT.NoMachines, 16, UITheme.Colors.TextSecondary, 2)
+		if not hasSmelter then
+			label(TEXT.NoMachines, 16, UITheme.Colors.TextSecondary, 2)
+		end
 		return
 	end
 	table.sort(placed, function(a, b)

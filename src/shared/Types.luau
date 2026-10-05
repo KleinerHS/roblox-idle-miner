@@ -31,6 +31,13 @@ export type VehicleRecord = {
 	Bay: number?,
 }
 
+-- Schmelzer-Zustand (docs/06 §34–35, D-011)
+export type SmelterState = {
+	Input: ItemCounts,
+	Output: ItemCounts,
+	Priority: string,
+}
+
 -- Persistentes Spielerprofil. Struktur-Änderungen nur mit neuer DataVersion und
 -- Migration (src/server/Data/DataSchema.luau, docs/14 §3).
 export type PlayerData = {
@@ -100,6 +107,9 @@ export type PlayerData = {
 		Seq: number,
 	},
 
+	-- Schmelzer (ab DataVersion 6): Erz im Trichter, fertige Barren, bevorzugtes Erz ("" = auto)
+	Smelter: SmelterState,
+
 	Stats: {
 		FirstJoinTime: number,
 		JoinCount: number,
@@ -136,6 +146,8 @@ export type StateSnapshot = {
 	ElevatorBuffer: ItemCounts,
 	ElevatorCapacity: number,
 	Buildings: { [string]: boolean },
+	UnlockedMines: { [string]: boolean },
+	Smelter: SmelterState,
 	PrestigeCount: number,
 }
 

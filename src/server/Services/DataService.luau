@@ -74,6 +74,8 @@ local function buildSnapshot(data: Types.PlayerData): Types.StateSnapshot
 		ElevatorBuffer = table.clone(data.Production.ElevatorBuffer),
 		ElevatorCapacity = data.Production.ElevatorCapacity,
 		Buildings = table.clone(data.Buildings),
+		UnlockedMines = table.clone(data.UnlockedMines),
+		Smelter = { Input = table.clone(data.Smelter.Input), Output = table.clone(data.Smelter.Output), Priority = data.Smelter.Priority },
 		PrestigeCount = data.Prestige.Count,
 	}
 end

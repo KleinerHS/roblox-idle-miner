@@ -100,7 +100,7 @@ local function hire(player: Player, mineId: unknown, role: unknown, slot: unknow
 	if not WorkerService.IsNearLaptop(player) then
 		return Result.err(Result.Codes.TOO_FAR)
 	end
-	if not Mines.IsAccessible(mine, data.MiningLevel) then
+	if not Mines.IsAccessible(mine, data.MiningLevel, data.UnlockedMines) then
 		return Result.err(Result.Codes.NOT_AVAILABLE)
 	end
 	if slotTaken(data, mine.Id, roleDef.Id, slot) then

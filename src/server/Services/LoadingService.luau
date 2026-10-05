@@ -10,7 +10,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local LayoutConfig = require(Shared.Config.LayoutConfig)
-local Ores = require(Shared.Definitions.Ores)
+local Materials = require(Shared.Definitions.Materials)
 local Vehicles = require(Shared.Definitions.Vehicles)
 local Types = require(Shared.Types)
 local Result = require(Shared.Util.Result)
@@ -43,7 +43,7 @@ local function sortedIds(items: Types.ItemCounts): { string }
 		end
 	end
 	table.sort(ids, function(a, b)
-		local oa, ob = Ores.Get(a), Ores.Get(b)
+		local oa, ob = Materials.Get(a), Materials.Get(b)
 		return (if oa then oa.Tier else 999) < (if ob then ob.Tier else 999)
 	end)
 	return ids
@@ -101,7 +101,7 @@ end
 
 -- Laden: oreId nil = alles (nach Tier) bis zur Kapazität; amount nil = so viel wie möglich
 local function load(player: Player, vehicleId: unknown, oreId: unknown, amount: unknown)
-	if oreId ~= nil and (typeof(oreId) ~= "string" or not Ores.Get(oreId :: string)) then
+	if oreId ~= nil and (typeof(oreId) ~= "string" or not Materials.Get(oreId :: string)) then
 		return Result.err(Result.Codes.INVALID_ARGUMENT)
 	end
 	if amount ~= nil and (typeof(amount) ~= "number" or amount ~= amount or amount < 1 or amount % 1 ~= 0 or amount > 1e9) then
@@ -152,7 +152,7 @@ end
 
 -- Entladen: alles (oder ein Erz) zurück ins Lager, so weit Platz ist
 local function unload(player: Player, vehicleId: unknown, oreId: unknown)
-	if oreId ~= nil and (typeof(oreId) ~= "string" or not Ores.Get(oreId :: string)) then
+	if oreId ~= nil and (typeof(oreId) ~= "string" or not Materials.Get(oreId :: string)) then
 		return Result.err(Result.Codes.INVALID_ARGUMENT)
 	end
 	local data, record, code = check(player, vehicleId)

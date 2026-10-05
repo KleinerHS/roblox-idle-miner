@@ -66,6 +66,15 @@ local list: { BuildStepDefinition } = {
 		Requires = "build_storage",
 		RequiresCompanySetup = true,
 	},
+	-- Schmelzer nach der Garage (docs/06 §28, docs/00 §9). Vorschlag Q-022.
+	{
+		Id = "build_smelter",
+		DisplayName = "Smelter",
+		Price = 25000, -- TODO_BALANCE (Q-022)
+		RequiredLevel = 10, -- TODO_BALANCE (Q-022)
+		Requires = "build_garage",
+		RequiresCompanySetup = true,
+	},
 }
 
 local byId: { [string]: BuildStepDefinition } = {}

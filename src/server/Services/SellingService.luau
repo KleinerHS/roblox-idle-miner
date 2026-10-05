@@ -13,7 +13,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local LayoutConfig = require(Shared.Config.LayoutConfig)
-local Ores = require(Shared.Definitions.Ores)
+local Materials = require(Shared.Definitions.Materials)
 local Result = require(Shared.Util.Result)
 local Leveling = require(Shared.Util.Leveling)
 local Log = require(Shared.Util.Log)
@@ -82,7 +82,7 @@ local function sellAll(player: Player, vehicleId: unknown)
 	local cash, xp = 0, 0
 	local sold: { [string]: number } = {}
 	for oreId, amount in source do
-		local ore = Ores.Get(oreId)
+		local ore = Materials.Get(oreId)
 		if ore and ore.SellValue and ore.XPValue and amount > 0 then
 			cash += amount * ore.SellValue
 			xp += amount * ore.XPValue
