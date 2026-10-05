@@ -69,6 +69,7 @@ local function buildSnapshot(data: Types.PlayerData): Types.StateSnapshot
 		StorageItems = table.clone(data.Storage.Items),
 		Workers = table.clone(data.Workers),
 		Drills = table.clone(data.Machines.Drills),
+		Vehicles = table.clone(data.Vehicles.Owned),
 		MineBuffers = table.clone(data.Production.MineBuffers),
 		ElevatorBuffer = table.clone(data.Production.ElevatorBuffer),
 		ElevatorCapacity = data.Production.ElevatorCapacity,

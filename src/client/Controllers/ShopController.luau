@@ -14,6 +14,7 @@ local UITheme = require(Shared.Config.UITheme)
 local Pickaxes = require(Shared.Definitions.Pickaxes)
 local Backpacks = require(Shared.Definitions.Backpacks)
 local Drills = require(Shared.Definitions.Drills)
+local Vehicles = require(Shared.Definitions.Vehicles)
 local Types = require(Shared.Types)
 local NumberFormat = require(Shared.Util.NumberFormat)
 
@@ -41,6 +42,13 @@ local currentTab = "pickaxe"
 local SHOP_TABS: { [string]: { { string } } } = {
 	equipment = { { "pickaxe", TEXT.Pickaxes }, { "backpack", TEXT.Backpacks } },
 	machine = { { "drill", TEXT.Drills } },
+	vehicle = { { "vehicle", TEXT.Vehicles } },
+}
+
+local SHOP_TITLES: { [string]: string } = {
+	equipment = TEXT.EquipmentTitle,
+	machine = TEXT.MachineTitle,
+	vehicle = TEXT.VehicleTitle,
 }
 local openedAt: Vector3? = nil
 local busy = false
@@ -89,6 +97,20 @@ local function cardsFor(tab: string, snapshot: Types.StateSnapshot): { Card }
 				},
 			})
 		end
+	elseif tab == "vehicle" then
+		for _, def in Vehicles.List do
+			table.insert(cards, {
+				Id = def.Id,
+				Name = def.DisplayName,
+				Level = def.RequiredLevel,
+				Price = def.Price,
+				Available = true,
+				Stats = {
+					{ label = TEXT.Capacity, value = NumberFormat.withSeparators(def.Capacity) },
+					{ label = TEXT.VehicleSpeed, value = tostring(def.MaxSpeed) },
+				},
+			})
+		end
 	elseif tab == "drill" then
 		for _, def in Drills.List do
 			local owned, placed = drillCounts(snapshot, def.Id)
@@ -129,10 +151,10 @@ local function act(remote: string, itemId: string)
 		return
 	end
 	busy = true
-	local result = if remote == "BuyMachine" then Net.invoke(remote, itemId) else Net.invoke(remote, currentTab, itemId)
+	local result = if remote == "BuyMachine" or remote == "BuyVehicle" then Net.invoke(remote, itemId) else Net.invoke(remote, currentTab, itemId)
 	busy = false
 	if not result.success then
-		local def: any = if currentTab == "pickaxe" then Pickaxes.Get(itemId) elseif currentTab == "drill" then Drills.Get(itemId) else Backpacks.Get(itemId)
+		local def: any = if currentTab == "pickaxe" then Pickaxes.Get(itemId) elseif currentTab == "drill" then Drills.Get(itemId) elseif currentTab == "vehicle" then Vehicles.Get(itemId) else Backpacks.Get(itemId)
 		NotificationController.Show("Warning", result.code, { Level = def and def.RequiredLevel, Price = def and def.Price })
 	end
 end
@@ -153,6 +175,11 @@ local function render()
 		return
 	end
 	local owned: { [string]: boolean } = if currentTab == "pickaxe" then snapshot.OwnedPickaxes elseif currentTab == "backpack" then snapshot.OwnedBackpacks else {}
+	if currentTab == "vehicle" then
+		for _, vehicle in snapshot.Vehicles do
+			owned[vehicle.Type] = true
+		end
+	end
 	local equipped = if currentTab == "pickaxe" then snapshot.EquippedPickaxe elseif currentTab == "backpack" then snapshot.EquippedBackpack else ""
 
 	for index, card in cardsFor(currentTab, snapshot) do
@@ -209,6 +236,18 @@ local function render()
 				actionText = string.format(TEXT.Buy, NumberFormat.cash(card.Price))
 				actionColor = if affordable then UITheme.Colors.Positive else UITheme.Colors.SurfaceRaised
 				enabled, remote = true, "BuyMachine"
+			end
+		elseif currentTab == "vehicle" then
+			-- Fahrzeuge: einmal kaufen, danach in der Garage am Ring ausparken
+			if isOwned then
+				actionText, actionColor, enabled = TEXT.Owned, UITheme.Colors.Positive, false
+			elseif locked then
+				actionText, actionColor, enabled = `{TEXT.Locked}\n{string.format(TEXT.RequiresLevel, card.Level)}`, UITheme.Colors.SurfaceRaised, false
+			else
+				local affordable = snapshot.Cash >= card.Price
+				actionText = string.format(TEXT.Buy, NumberFormat.cash(card.Price))
+				actionColor = if affordable then UITheme.Colors.Positive else UITheme.Colors.SurfaceRaised
+				enabled, remote = true, "BuyVehicle"
 			end
 		elseif isEquipped then
 			actionText, actionColor, enabled = TEXT.Equipped, UITheme.Colors.Positive, false
@@ -279,7 +318,7 @@ local function open(payload: any)
 		currentTab = SHOP_TABS[currentShop][1][1]
 		buildTabs()
 	end
-	title.Text = if currentShop == "machine" then TEXT.MachineTitle else TEXT.EquipmentTitle
+	title.Text = SHOP_TITLES[currentShop] or TEXT.EquipmentTitle
 	render()
 	openedAt = rootPosition()
 	gui.Enabled = true

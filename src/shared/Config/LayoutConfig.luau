@@ -64,7 +64,24 @@ local LayoutConfig = {
 		build_walls = Vector2.new(15, -40),
 		build_roof = Vector2.new(15, -40),
 		build_storage = Vector2.new(-8, 25),
+		build_garage = Vector2.new(66, -12),
 	} :: { [string]: Vector2 },
+
+	-- Garage im vorderen Hallenbereich (docs/07 §3, D-008, D-016), lokal zur Plotmitte.
+	-- Fahrzeuge stehen mit der Front zum Rolltor (-Z). Der Verladeturm steht hinter und
+	-- zwischen den beiden Stellplätzen und speist von oben in die Ladefläche. TODO_LAYOUT
+	Garage = {
+		-- Mitte der Stellplätze (X/Z) und Größe einer Stellfläche (Breite X, Länge Z)
+		Bays = { Vector2.new(3, -32), Vector2.new(27, -32) },
+		BaySize = Vector2.new(15, 30),
+		-- Leuchtring zur Fahrzeugauswahl (docs/07 §4)
+		Ring = Vector2.new(66, -30),
+		RingRadius = 5,
+		-- Verladeturm (D-008) mit Auslegern zu beiden Stellplätzen
+		Tower = Vector2.new(15, -8),
+		-- Höchstabstand Ladefläche ↔ Ausleger-Ende zum Beladen (Phase 6c)
+		LoadDistance = 14,
+	},
 	ButtonSize = Vector3.new(7, 0.4, 7),
 
 	-- Spawnpunkt solange das Büro nicht gebaut ist: neben dem Büro-Kaufbutton.
@@ -109,6 +126,12 @@ local LayoutConfig = {
 	MachineShop = {
 		Offset = Vector2.new(44, -80),
 		Size = Vector3.new(52, 18, 40),
+	},
+	-- Fahrzeughaus in der Mitte (CENTRAL_AREA_REFERENCE.png: rechts, rot). Liegt zwischen den
+	-- Straßen zu Plot 3 und Plot 4; Glasfront zeigt zur Platzmitte. TODO_LAYOUT
+	VehicleShop = {
+		Offset = Vector2.new(92, -4),
+		Size = Vector3.new(56, 18, 42),
 	},
 	-- Maximale Entfernung zum Lager-Terminal
 	StorageTerminalDistance = 14,

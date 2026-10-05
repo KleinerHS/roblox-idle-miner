@@ -212,6 +212,16 @@ local function updateSign(state: PlotState, player: Player, data: Types.PlayerDa
 		local logo = CompanyIdentity.LogoById[data.Company.LogoId]
 		local color = CompanyIdentity.ColorById[data.Company.ColorId]
 		PlotBuilder.setSign(state.plot, if logo then logo.Glyph else "", data.Company.Name, if color then color.Color else nil)
+		-- Dezente Akzente in der Firmenfarbe an Gebäuden (Attribut CompanyAccent, docs/07 §3)
+		if color then
+			for _, model in state.models do
+				for _, d in model:GetDescendants() do
+					if d:IsA("BasePart") and d:GetAttribute("CompanyAccent") == true then
+						d.Color = color.Color
+					end
+				end
+			end
+		end
 	else
 		PlotBuilder.setSign(state.plot, "", `Plot {plotId}\n{player.DisplayName}`, nil)
 	end

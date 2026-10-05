@@ -57,6 +57,8 @@ local Remotes: { [string]: RemoteDefinition } = {
 	EquipItem = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 10, Window = 10 } },
 	-- Maschine kaufen (mehrfach möglich, landet im Inventar): (drillTypeId: string) -> Result<instanceId>
 	BuyMachine = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
+	-- Fahrzeug kaufen (je Typ einmal, landet eingelagert im Fuhrpark): (vehicleTypeId: string) -> Result<vehicleId>
+	BuyVehicle = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
 
 	-- Firmenlager: Server öffnet das Lagerfenster nach gültigem Prompt
 	OpenStorage = { Kind = "Event", Direction = "ServerToClient" },

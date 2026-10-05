@@ -1,5 +1,5 @@
 --!strict
--- Datenschema v4: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
+-- Datenschema v5: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
 -- Regeln:
 --  * Defaults gibt es nur hier.
 --  * Jede Strukturänderung erhöht CURRENT_VERSION und bekommt eine Migration
@@ -15,7 +15,7 @@ local Backpacks = require(Shared.Definitions.Backpacks)
 local Mines = require(Shared.Definitions.Mines)
 local Types = require(Shared.Types)
 
-local CURRENT_VERSION = 4
+local CURRENT_VERSION = 5
 
 local DataSchema = {
 	CurrentVersion = CURRENT_VERSION,
@@ -76,6 +76,12 @@ local TEMPLATE: Types.PlayerData = {
 		Seq = 0,
 	},
 
+	-- Fahrzeuge (v5): Fuhrpark, Ladung je Fahrzeug, Garagen-Stellplatz (D-009, D-016)
+	Vehicles = {
+		Owned = {},
+		Seq = 0,
+	},
+
 	Stats = {
 		FirstJoinTime = 0,
 		JoinCount = 0,
@@ -124,6 +130,12 @@ local MIGRATIONS: { [number]: (data: { [string]: any }) -> () } = {
 	[3] = function(data)
 		if typeof(data.Machines) ~= "table" then
 			data.Machines = { Drills = {}, Seq = 0 }
+		end
+	end,
+	-- v4 → v5: Fahrzeuge ergänzt (Phase 6)
+	[4] = function(data)
+		if typeof(data.Vehicles) ~= "table" then
+			data.Vehicles = { Owned = {}, Seq = 0 }
 		end
 	end,
 }

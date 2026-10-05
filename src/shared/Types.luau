@@ -22,6 +22,15 @@ export type DrillRecord = {
 	Slot: number?,
 }
 
+-- Gekauftes Fahrzeug (docs/07 §48, D-009, D-016): Ladung gehört zur Fahrzeug-ID.
+-- Bay gesetzt = steht auf diesem Garagen-Stellplatz (1/2), nil = eingelagert.
+export type VehicleRecord = {
+	Id: string,
+	Type: string,
+	Cargo: ItemCounts,
+	Bay: number?,
+}
+
 -- Persistentes Spielerprofil. Struktur-Änderungen nur mit neuer DataVersion und
 -- Migration (src/server/Data/DataSchema.luau, docs/14 §3).
 export type PlayerData = {
@@ -85,6 +94,12 @@ export type PlayerData = {
 		Seq: number,
 	},
 
+	-- Fahrzeuge (ab DataVersion 5): Fuhrpark mit Ladung je Fahrzeug
+	Vehicles: {
+		Owned: { [string]: VehicleRecord },
+		Seq: number,
+	},
+
 	Stats: {
 		FirstJoinTime: number,
 		JoinCount: number,
@@ -116,6 +131,7 @@ export type StateSnapshot = {
 	StorageItems: ItemCounts,
 	Workers: { [string]: WorkerRecord },
 	Drills: { [string]: DrillRecord },
+	Vehicles: { [string]: VehicleRecord },
 	MineBuffers: { [string]: number },
 	ElevatorBuffer: ItemCounts,
 	ElevatorCapacity: number,
