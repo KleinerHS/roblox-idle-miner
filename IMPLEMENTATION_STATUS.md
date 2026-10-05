@@ -341,7 +341,7 @@ Selbsttest per Studio-MCP (2026-10-05):
 | Änderung | Dateien | Status |
 |---|---|---|
 | Verladeturm neu: ca. 22 Studs hohes Gitter-Gerüst mit Silo, Zuführrohr „FROM STORAGE“, Ausleger mit ausfahrbaren Teleskop-Schurren, Lampe und Anzeige je Stellplatz (D-025) | `GarageTemplate.luau` | TESTING_REQUIRED |
-| Automatisches Beladen: Fahrzeug steht still unter der Schurre → direkt aus dem Lager, alles Verkaufbare, wertvollstes zuerst, 100/s (Q-023); manuelles Beladen samt Fenster entfernt (D-025) | `LoadingService.luau`, `LoadingController.luau` (gelöscht) | TESTING_REQUIRED |
+| Automatisches Beladen: Fahrzeug steht still unter der Schurre → direkt aus dem Lager, alles Verkaufbare, wertvollstes zuerst, 100/s (D-029); manuelles Beladen samt Fenster entfernt (D-025) | `LoadingService.luau`, `LoadingController.luau` (gelöscht) | TESTING_REQUIRED |
 | Fahrphysik über A-Chassis 1.7.2 (MPL-2.0): unsere Karosserie auf dem Kit, Federung, Automatik (schaltet im Stand selbst in D/R), Tacho und Motorsound von A-Chassis; Abstimmung je Fahrzeug (D-026). Kit liegt in der Place-Datei unter `ServerStorage.Vendor.AChassis` | `VehicleModelBuilder.buildAChassis`, `VehicleService`, `DrivingController` (nur noch Ladung/RESET), `licenses/A-Chassis-LICENSE.txt` | TESTING_REQUIRED |
 | Fahrzeughaus neu: 72 × 56 Glas-Showroom mit umlaufender Glasfassade, auskragendem Dach mit Lichtband, roter Attika, LED-Wand, drei Drehtellern (alle Fahrzeuge), Lounge, Pylon (D-027) | `VehicleShopBuilder.luau`, `LayoutConfig.VehicleShop` | TESTING_REQUIRED |
 
@@ -357,8 +357,8 @@ Selbsttest per Studio-MCP (2026-10-05):
 
 | System | Dateien | Status |
 |---|---|---|
-| Minenkauf ab Mine 03 im Elevator-Menü (Level + Geld, der Reihe nach), Popup „NEW MINE FOR SALE“; Level Mine 03–08 Vorschlag Q-022 | `Mines.luau`, `ElevatorService`, `ElevatorController`, `HudController`, `BalanceConfig.MineUnlocks` | IMPLEMENTED |
-| Rezepte (nur Metalle, D-011) und Barren mit Werten (Copper/Tin/Iron, Q-022); gemeinsames Materialverzeichnis für Erze und Barren | `Recipes.luau`, `Materials.luau`, `BalanceConfig.BarValues` | IMPLEMENTED |
+| Minenkauf ab Mine 03 im Elevator-Menü (Level + Geld, der Reihe nach), Popup „NEW MINE FOR SALE“; Level Mine 03–08 bestätigt (D-028) | `Mines.luau`, `ElevatorService`, `ElevatorController`, `HudController`, `BalanceConfig.MineUnlocks` | IMPLEMENTED |
+| Rezepte (nur Metalle, D-011) und Barren mit Werten (Copper/Tin/Iron, D-028); gemeinsames Materialverzeichnis für Erze und Barren | `Recipes.luau`, `Materials.luau`, `BalanceConfig.BarValues` | IMPLEMENTED |
 | Datenschema v6: `Smelter` (Input, Output, Priority), Migration v5 → v6 | `DataSchema.luau`, `Types.luau`, `DataService.luau` | IMPLEMENTED |
 | Schmelzer-Gebäude (Bauschritt nach der Garage): Hochofen mit Glut/Feuer/Funken/Rauch nur im Betrieb, Trichter, Barrenablage, Kamin, Terminal mit Anzeige, Förderband-Anschlüsse | `SmelterTemplate.luau` | IMPLEMENTED |
 | Verarbeitung (1-s-Takt), Rezeptwahl (Priorität, sonst wertvollster Barren), Befüllen/Abholen am Terminal, Laptop PRODUCTION zeigt den Schmelzer | `SmelterService.luau`, `SmelterLogic.luau`, `SmelterController.luau`, `LaptopController.luau` | IMPLEMENTED |

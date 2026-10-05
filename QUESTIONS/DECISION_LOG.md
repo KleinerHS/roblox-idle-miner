@@ -153,9 +153,9 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Decision:** Die Welt bleibt codegebaut (keine gespeicherten Modelle in der Place-Datei). Ein lokales Studio-Plugin („Idle Miner Preview“) baut sie auf Knopfdruck im Bearbeitungsmodus mit denselben World-Buildern auf und entfernt sie wieder. Die Vorschau wird nie gespeichert und nie ins Spiel kopiert.
 **Affected systems:** Werkzeuge (kein Spielsystem)
 
-## D-024 – Schmelzer vor Förderbändern, Minenkauf vorgezogen (Vorschlag)
+## D-024 – Schmelzer vor Förderbändern, Minenkauf vorgezogen
 
-**Source:** Claude, 2026-10-05 (Felix: „arbeite schon mal weiter“) – Veto möglich.
+**Source:** Vorschlag Claude, bestätigt von Felix 2026-10-05 („D-024 ok“).
 **Decision:** Förderbänder verbinden Lager und Schmelzer und hätten ohne Schmelzer keine Aufgabe; deshalb wird der Schmelzer (Phase 8) als 7a vor den Förderbändern (7b) gebaut. Der Minenkauf ab Mine 03 (eigentlich Phase 12) wird vorgezogen, weil Metalle erst ab Mine 03 vorkommen.
 **Affected systems:** Build-Plan, Smelter, Mines
 
@@ -176,3 +176,15 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Source:** Felix, 2026-10-05
 **Decision:** Showroom deutlich größer, moderne Glasfassaden.
 **Affected systems:** Vehicle Shop, Map
+
+## D-028 – Minen 03–08, Metalle, Barren, Schmelzer
+
+**Source Question:** Q-022
+**Decision:** Mine 03 Lv 6, 04 Lv 8, 05 Lv 10, 06 Lv 12, 07 Lv 14, 08 Lv 16 (Preise nach D-019). Copper 2/2, Tin 3/3, Iron 5/4 (Geld/XP). Barren aus 2 Erz in 3 s: Copper Bar 6/5, Tin Bar 9/7, Iron Bar 14/10. Schmelzer $25.000 ab Level 10, Trichter 200, Ablage 100.
+**Affected systems:** Mines, Ores, Smelter, Balance
+
+## D-029 – Ladegeschwindigkeit Verladeturm
+
+**Source Question:** Q-023
+**Decision:** 100 Einheiten pro Sekunde.
+**Affected systems:** Garage, Loading, Balance
