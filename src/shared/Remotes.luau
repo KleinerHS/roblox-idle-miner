@@ -93,12 +93,6 @@ local Remotes: { [string]: RemoteDefinition } = {
 	StoreVehicle = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 5, Window = 10 } },
 	-- Fahrzeug zurück auf den Stellplatz: (vehicleId: string) -> Result<vehicleId>
 	ResetVehicle = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 3, Window = 10 } },
-	-- Beladen am Verladeturm (Phase 6c): Server öffnet das Ladefenster: { VehicleId }
-	OpenLoading = { Kind = "Event", Direction = "ServerToClient" },
-	-- Laden: (vehicleId, oreId: string?, amount: number?) -> Result<{ Moved }>  (nil = alles/maximal)
-	LoadVehicle = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 10, Window = 10 } },
-	-- Entladen ins Lager: (vehicleId, oreId: string?) -> Result<{ Moved }>
-	UnloadVehicle = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 10, Window = 10 } },
 	-- Schmelzer (Phase 7a): Server öffnet das Schmelzer-Fenster am Terminal
 	OpenSmelter = { Kind = "Event", Direction = "ServerToClient" },
 	-- Erz aus dem Lager einfüllen: (oreId: string?, amount: number?) -> Result<{ Moved }>

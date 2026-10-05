@@ -357,6 +357,113 @@ function VehicleModelBuilder.build(def: Vehicles.VehicleDefinition, cf: CFrame, 
 	return model
 end
 
+-- Fahrbares Fahrzeug auf A-Chassis (D-026): unsere Karosserie (Ausstellungs-Bau) wird auf das
+-- A-Chassis-Kit gesetzt; Fahrphysik, Federung, Automatik, Anzeigen und Sounds liefert A-Chassis
+-- (MPL-2.0, licenses/A-Chassis-LICENSE.txt). Kit und Abstimmungen liegen in der Place-Datei unter
+-- ServerStorage.Vendor.AChassis (Kit + Tunes/<VehicleId>), da Rojo nur Code synchronisiert.
+--   * Räder des Kits werden samt Aufhängung an unsere Achspositionen geschoben und auf unseren
+--     Radius gebracht; die Felge hängt am Rad ("Parts" wird von A-Chassis mitverschweißt).
+--   * "DriveSeat" sitzt an unserer Fahrerposition, die Karosserie liegt in car.Body.
+--   * Die Abstimmung (Gewicht, Motor, Getriebe) kommt aus Tunes/<VehicleId>.
+function VehicleModelBuilder.buildAChassis(def: Vehicles.VehicleDefinition, cf: CFrame, vendor: Instance): Model?
+	local kit = vendor:FindFirstChild("Kit")
+	local tunes = vendor:FindFirstChild("Tunes")
+	local tuneTemplate = tunes and tunes:FindFirstChild(def.Id)
+	if not (kit and kit:IsA("Model") and tuneTemplate) then
+		return nil
+	end
+	local spec = SPECS[def.Style]
+	local car = kit:Clone()
+	car.Name = def.Id
+	car:SetAttribute("VehicleType", def.Id)
+	local seat = car:FindFirstChild("DriveSeat") :: VehicleSeat
+	local wheels = car:FindFirstChild("Wheels") :: Model
+	local body = car:FindFirstChild("Body") :: Model
+
+	-- Kit-Bezugsrahmen: Mitte der Radaufstandspunkte, Blickrichtung des Fahrersitzes
+	local sumPos, count, kitRadius = Vector3.zero, 0, 1.2
+	for _, w in wheels:GetChildren() do
+		if w:IsA("BasePart") then
+			sumPos += w.Position
+			count += 1
+			kitRadius = w.Size.Y / 2
+		end
+	end
+	local center = sumPos / math.max(1, count)
+	local ground = Vector3.new(center.X, center.Y - kitRadius, center.Z)
+	local look = Vector3.new(seat.CFrame.LookVector.X, 0, seat.CFrame.LookVector.Z).Unit
+	local kitFrame = CFrame.lookAt(ground, ground + look)
+	car:PivotTo(cf * kitFrame:Inverse() * car:GetPivot())
+
+	-- Räder samt Aufhängung an unsere Achsen schieben und auf unseren Radius bringen
+	local targets = {
+		FL = Vector3.new(-spec.track, spec.r, spec.front),
+		FR = Vector3.new(spec.track, spec.r, spec.front),
+		RL = Vector3.new(-spec.track, spec.r, spec.rear),
+		RR = Vector3.new(spec.track, spec.r, spec.rear),
+	}
+	for name, localPos in targets do
+		local wheel = wheels:FindFirstChild(name)
+		if wheel and wheel:IsA("BasePart") then
+			local delta = (cf * CFrame.new(localPos)).Position - wheel.Position
+			for _, d in wheel:GetDescendants() do
+				if d:IsA("BasePart") then
+					d.CFrame += delta
+				end
+			end
+			wheel.CFrame += delta
+			wheel.Size = Vector3.new(spec.w, spec.r * 2, spec.r * 2)
+			wheel.Color = TIRE
+			wheel.Material = Enum.Material.Rubber
+			wheel.Transparency = 0
+			local parts = wheel:FindFirstChild("Parts")
+			if parts then
+				local rim = Instance.new("Part")
+				rim.Name = "Rim"
+				rim.Shape = Enum.PartType.Cylinder
+				rim.Size = Vector3.new(spec.w + 0.06, spec.r * 1.15, spec.r * 1.15)
+				rim.CFrame = wheel.CFrame
+				rim.Color = RIM
+				rim.Material = Enum.Material.Metal
+				rim.CanCollide = false
+				rim.CanTouch = false
+				rim.Anchored = true
+				rim.Parent = parts
+			end
+		end
+	end
+
+	-- Unsere Karosserie (Ausstellungs-Bau) übernehmen: ohne eigenes Chassis, Sitz und Räder
+	local display = VehicleModelBuilder.build(def, cf, false)
+	local seatPart = display:FindFirstChild("DriverSeat")
+	local seatCF = if seatPart and seatPart:IsA("BasePart") then seatPart.CFrame else cf * CFrame.new(-1.5, spec.r + 1.5, -2)
+	for _, child in display:GetChildren() do
+		local n = child.Name
+		if n == "Chassis" or n == "DriverSeat" or n:sub(1, 5) == "Wheel" then
+			child:Destroy()
+		elseif child:IsA("BasePart") then
+			child.Parent = body
+		end
+	end
+	display:Destroy()
+	-- Fahrersitz an unsere Position (Blickrichtung = Fahrtrichtung)
+	seat.CFrame = seatCF
+	seat.Color = SEAT
+	seat.Transparency = 0
+	seat.HeadsUpDisplay = false
+
+	-- Abstimmung des Fahrzeugtyps einsetzen
+	local oldTune = car:FindFirstChild("A-Chassis Tune")
+	if oldTune then
+		oldTune:Destroy()
+	end
+	local tune = tuneTemplate:Clone()
+	tune.Name = "A-Chassis Tune"
+	tune.Parent = car
+	car.PrimaryPart = seat
+	return car
+end
+
 -- Firmenfarbe und Firmenname anwenden (docs/07 §36–37)
 function VehicleModelBuilder.applyCompany(model: Model, accent: Color3?, companyName: string)
 	for _, d in model:GetDescendants() do
@@ -370,7 +477,7 @@ end
 
 -- Sichtbare Ladung (rein kosmetisch, docs/07 §44): Füllhöhe nach Anteil
 function VehicleModelBuilder.setCargoVisual(model: Model, fraction: number)
-	local cargo = model:FindFirstChild("CargoFill")
+	local cargo = model:FindFirstChild("CargoFill", true)
 	if cargo and cargo:IsA("BasePart") then
 		cargo.Transparency = if fraction > 0 then 0 else 1
 	end

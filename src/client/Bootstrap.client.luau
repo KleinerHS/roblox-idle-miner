@@ -33,7 +33,6 @@ local CONTROLLER_ORDER = {
 	"DrillAnimController",
 	"GarageController",
 	"DrivingController",
-	"LoadingController",
 	"SmelterController",
 }
 

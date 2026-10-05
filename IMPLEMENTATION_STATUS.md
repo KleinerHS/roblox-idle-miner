@@ -14,7 +14,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 4 | Storage + Worker (Worker erst nach Lager, D-004) | USER_APPROVED (4a, 4b, 4c) |
 | 5 | Drill | TESTING_REQUIRED (5a, 5b; Test von Felix zurückgestellt, 2026-10-05) |
 | 6 | Garage & Vehicles | TESTING_REQUIRED (6a, 6b, 6c) |
-| 7 | Conveyors | NOT_STARTED |
+| 7 | Conveyors (7a Minenkauf & Schmelzer vorgezogen, D-024) | IMPLEMENTED (7a, ungetestet; 7b Förderbänder NOT_STARTED) |
 | 8 | Smelter | NOT_STARTED |
 | 9 | Multiplayer Hardening / Trading | NOT_STARTED |
 | 10 | Offline Production | NOT_STARTED |
@@ -335,6 +335,33 @@ Selbsttest per Studio-MCP (2026-10-05):
 - Tresen-Verkauf aus dem Rucksack unverändert (50 Coal → $50).
 - Keine Fehler in der Konsole. Felix' Profil danach zurückgesetzt (Level 5, $6.473, Garage entfernt, keine Fahrzeuge).
 - Nicht selbst prüfbar: Optik (Studio rendert im Hintergrund nicht), die Prompts selbst (Ring wurde per Betreten getestet, Turm-Prompt und Fahrgefühl bitte selbst ausprobieren).
+
+### Rückmeldung Felix zu Phase 6 (2026-10-05) – umgesetzt, TESTING_REQUIRED
+
+| Änderung | Dateien | Status |
+|---|---|---|
+| Verladeturm neu: ca. 22 Studs hohes Gitter-Gerüst mit Silo, Zuführrohr „FROM STORAGE“, Ausleger mit ausfahrbaren Teleskop-Schurren, Lampe und Anzeige je Stellplatz (D-025) | `GarageTemplate.luau` | TESTING_REQUIRED |
+| Automatisches Beladen: Fahrzeug steht still unter der Schurre → direkt aus dem Lager, alles Verkaufbare, wertvollstes zuerst, 100/s (Q-023); manuelles Beladen samt Fenster entfernt (D-025) | `LoadingService.luau`, `LoadingController.luau` (gelöscht) | TESTING_REQUIRED |
+| Fahrphysik über A-Chassis 1.7.2 (MPL-2.0): unsere Karosserie auf dem Kit, Federung, Automatik (schaltet im Stand selbst in D/R), Tacho und Motorsound von A-Chassis; Abstimmung je Fahrzeug (D-026). Kit liegt in der Place-Datei unter `ServerStorage.Vendor.AChassis` | `VehicleModelBuilder.buildAChassis`, `VehicleService`, `DrivingController` (nur noch Ladung/RESET), `licenses/A-Chassis-LICENSE.txt` | TESTING_REQUIRED |
+| Fahrzeughaus neu: 72 × 56 Glas-Showroom mit umlaufender Glasfassade, auskragendem Dach mit Lichtband, roter Attika, LED-Wand, drei Drehtellern (alle Fahrzeuge), Lounge, Pylon (D-027) | `VehicleShopBuilder.luau`, `LayoutConfig.VehicleShop` | TESTING_REQUIRED |
+
+Selbsttest per Studio-MCP (2026-10-05):
+- A-Chassis-Paket geprüft: keine nachgeladenen Fremd-Module (require mit Asset-ID), kein loadstring/getfenv/HTTP; Lizenz MPL-2.0. Plugins GForces/Tires/Controls/Ignition entfernt.
+- Pickup, Van, Box Truck initialisieren ohne Fehler, Räder auf dem Boden, aufrecht. Pickup: W 4 s → 161 Studs, schaltet selbst in Gang 2, 71 Studs/s.
+- Turm: geparkter Pickup wurde automatisch voll geladen (Anzeige „FULL · 1,000 / 1,000“, Lampe blau); nach Verkauf und Rückkehr wurde das Lager (429) komplett geladen, danach „STORAGE EMPTY“; Ladung auf der Ladefläche sichtbar.
+- Fahrzeughaus: keine Überschneidung mit den anderen Gebäuden der Stadtmitte.
+- Felix' Profil danach zurückgesetzt (Level 7, $83.658); die 429 Coal aus seinem Lager liegen jetzt im Pickup.
+- Gefunden und behoben: Ladefläche liegt bei A-Chassis im Untermodell „Body“ → Suche nach „CargoFill“ rekursiv.
+
+### 7a – Minenkauf & Schmelzer (Version 0.13.0, vorgezogen nach D-024) – IMPLEMENTED (ungetestet)
+
+| System | Dateien | Status |
+|---|---|---|
+| Minenkauf ab Mine 03 im Elevator-Menü (Level + Geld, der Reihe nach), Popup „NEW MINE FOR SALE“; Level Mine 03–08 Vorschlag Q-022 | `Mines.luau`, `ElevatorService`, `ElevatorController`, `HudController`, `BalanceConfig.MineUnlocks` | IMPLEMENTED |
+| Rezepte (nur Metalle, D-011) und Barren mit Werten (Copper/Tin/Iron, Q-022); gemeinsames Materialverzeichnis für Erze und Barren | `Recipes.luau`, `Materials.luau`, `BalanceConfig.BarValues` | IMPLEMENTED |
+| Datenschema v6: `Smelter` (Input, Output, Priority), Migration v5 → v6 | `DataSchema.luau`, `Types.luau`, `DataService.luau` | IMPLEMENTED |
+| Schmelzer-Gebäude (Bauschritt nach der Garage): Hochofen mit Glut/Feuer/Funken/Rauch nur im Betrieb, Trichter, Barrenablage, Kamin, Terminal mit Anzeige, Förderband-Anschlüsse | `SmelterTemplate.luau` | IMPLEMENTED |
+| Verarbeitung (1-s-Takt), Rezeptwahl (Priorität, sonst wertvollster Barren), Befüllen/Abholen am Terminal, Laptop PRODUCTION zeigt den Schmelzer | `SmelterService.luau`, `SmelterLogic.luau`, `SmelterController.luau`, `LaptopController.luau` | IMPLEMENTED |
 
 ## Werkzeuge
 

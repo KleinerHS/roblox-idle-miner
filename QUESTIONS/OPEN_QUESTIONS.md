@@ -38,3 +38,15 @@ Vorschlag (eingebaut als `TODO_BALANCE`):
 Große Fahrzeuge sind langsamer und träger (docs/07 §14). Je Typ besitzt man ein Fahrzeug.
 
 Frage an Felix: Passen diese Werte, oder andere?
+
+## Q-022 – Minen 03–08, Metalle, Barren, Schmelzer (Phase 7a)
+
+Vorschlag (eingebaut als `TODO_BALANCE`):
+- Minen-Level: Mine 03 Lv 6, 04 Lv 8, 05 Lv 10, 06 Lv 12, 07 Lv 14, 08 Lv 16 (Preise wie D-019: $3.000, je +50 %)
+- Erzwerte (Geld/XP): Copper 2/2, Tin 3/3, Iron 5/4
+- Barren (aus 2 Erz in 3 s): Copper Bar 6/5, Tin Bar 9/7, Iron Bar 14/10
+- Schmelzer: $25.000 ab Level 10, Trichter 200 Erz, Ablage 100 Barren
+
+## Q-023 – Ladegeschwindigkeit des Verladeturms
+
+Vorschlag: 100 Einheiten pro Sekunde (Pickup in 10 s voll, Box Truck in 60 s). `TODO_BALANCE`.

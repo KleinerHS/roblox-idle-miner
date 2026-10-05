@@ -1,0 +1,15 @@
+A-Chassis 1.7.2
+Quelle: Roblox Creator Store, Asset 13999609938 ("A-Chassis 1.7.2" von "A-Chassis Official")
+Autoren: pointclouded, LuaInt, detocoyote und Mitwirkende (siehe README im Tune-Modul)
+
+Laut README im Paket:
+"A-Chassis and its plugins, scripts, and assets, is free, open-source software under the MPL-2.0 License."
+
+Mozilla Public License, Version 2.0: https://mozilla.org/MPL/2.0/
+
+Verwendung im Projekt (D-026): Fahrphysik der Firmenfahrzeuge. Das Kit liegt in der Place-Datei
+unter ServerStorage.Vendor.AChassis (Kit + Tunes/<VehicleId>). Änderungen gegenüber dem Original:
+- Plugins entfernt: GForces, Tires, Controls Module, Ignition
+- Abstimmung je Fahrzeug angepasst (LoadDelay, Gewicht, Motor, Automatik, Hinterradantrieb,
+  kein Turbo, Federn unsichtbar)
+Die Quelltexte der A-Chassis-Scripts bleiben unverändert und unterliegen weiter der MPL-2.0.

@@ -1,30 +1,38 @@
 --!strict
--- Beladen am Verladeturm (docs/07 §9–12, D-008, D-009): Fahrzeug steht unter einer Schurre,
--- der Spieler wählt, welches Material aus dem Firmenlager ins Fahrzeug geht. Entladen zurück
--- ins Lager ist ebenfalls möglich. Jeder Transfer ist eine einzige Änderung im Profil
--- (Lager − n, Fahrzeug + n), ohne Yield dazwischen → keine Duplikation (docs/07 §11).
--- Die Ladung gehört zur Fahrzeug-ID und bleibt beim Einparken/Verlassen erhalten.
+-- Automatisches Beladen am Verladeturm (docs/07 §9–12, D-008, D-009, D-025).
+-- Steht ein eigenes Fahrzeug still unter einer Schurre, speist der Turm direkt aus dem
+-- Firmenlager in die Ladefläche: alles Verkaufbare, wertvollstes Material zuerst, bis das
+-- Fahrzeug voll ist. Keine Bedienung nötig (D-025: manuelles Beladen entfällt).
+-- Jeder Transfer ist eine einzige Profiländerung (Lager − n / Fahrzeug + n), ohne Yield
+-- dazwischen → keine Duplikation (docs/07 §11). Die Ladung gehört zur Fahrzeug-ID.
 
-local ProximityPromptService = game:GetService("ProximityPromptService")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
+local BalanceConfig = require(Shared.Config.BalanceConfig)
 local LayoutConfig = require(Shared.Config.LayoutConfig)
 local Materials = require(Shared.Definitions.Materials)
 local Vehicles = require(Shared.Definitions.Vehicles)
 local Types = require(Shared.Types)
-local Result = require(Shared.Util.Result)
-local Log = require(Shared.Util.Log)
+local NumberFormat = require(Shared.Util.NumberFormat)
 
+local GarageTemplate = require(script.Parent.Parent.World.GarageTemplate)
 local DataService = require(script.Parent.DataService)
-local PlotService = require(script.Parent.PlotService)
 local BuildingService = require(script.Parent.BuildingService)
 local VehicleService = require(script.Parent.VehicleService)
 local RemoteService = require(script.Parent.RemoteService)
 
-local TAG = "LoadingService"
+local TICK_SECONDS = 0.5
+-- Fahrzeug gilt als "steht", wenn es langsamer ist als das (studs/s)
+local STANDSTILL_SPEED = 2
 
 local LoadingService = {}
+
+type BayState = { state: string, vehicleId: string?, extended: boolean }
+-- [player][bay] = letzter Zustand (für Anzeige/Schurre/Meldung nur bei Änderung)
+local bayStates: { [Player]: { [number]: BayState } } = {}
 
 local function sum(items: Types.ItemCounts): number
 	local total = 0
@@ -34,201 +42,159 @@ local function sum(items: Types.ItemCounts): number
 	return total
 end
 
--- Erze in fester Reihenfolge (Tier)
-local function sortedIds(items: Types.ItemCounts): { string }
+-- Verkaufbare Materialien im Lager, wertvollstes zuerst (D-025)
+local function loadOrder(storage: Types.ItemCounts): { string }
 	local ids = {}
-	for id, amount in items do
-		if amount > 0 then
+	for id, amount in storage do
+		local material = Materials.Get(id)
+		if amount > 0 and material and material.SellValue then
 			table.insert(ids, id)
 		end
 	end
 	table.sort(ids, function(a, b)
-		local oa, ob = Materials.Get(a), Materials.Get(b)
-		return (if oa then oa.Tier else 999) < (if ob then ob.Tier else 999)
+		local ma, mb = Materials.Get(a), Materials.Get(b)
+		local va, vb = (ma and ma.SellValue or 0) :: number, (mb and mb.SellValue or 0) :: number
+		if va ~= vb then
+			return va > vb
+		end
+		return a < b
 	end)
 	return ids
 end
 
--- Ladefläche des Fahrzeugs (CargoFill) bzw. Chassis als Bezugspunkt
-local function bedPosition(model: Model): Vector3?
-	local bed = model:FindFirstChild("CargoFill")
-	if bed and bed:IsA("BasePart") then
-		return bed.Position
-	end
-	return if model.PrimaryPart then model.PrimaryPart.Position else nil
-end
-
--- Steht das Fahrzeug unter einer Schurre der eigenen Garage?
-local function isUnderTower(player: Player, model: Model): boolean
-	local garage = BuildingService.GetModel(player, "build_garage")
-	local bed = bedPosition(model)
-	if not (garage and bed) then
-		return false
-	end
-	for bay = 1, Vehicles.BayCount do
-		local point = garage:FindFirstChild(`LoadPoint{bay}`)
-		if point and point:IsA("BasePart") then
-			local flat = Vector3.new(point.Position.X - bed.X, 0, point.Position.Z - bed.Z)
-			if flat.Magnitude <= LayoutConfig.Garage.LoadDistance then
-				return true
+-- Eigenes Fahrzeug, das still unter der Schurre dieses Stellplatzes steht
+local function vehicleUnder(player: Player, data: Types.PlayerData, point: BasePart): (string?, Model?)
+	for id in data.Vehicles.Owned do
+		local model = VehicleService.GetModel(player, id)
+		local chassis = model and model.PrimaryPart
+		if model and chassis then
+			local bed = model:FindFirstChild("CargoFill", true)
+			local ref = if bed and bed:IsA("BasePart") then bed.Position else chassis.Position
+			local flat = Vector3.new(point.Position.X - ref.X, 0, point.Position.Z - ref.Z)
+			if flat.Magnitude <= LayoutConfig.Garage.LoadDistance and chassis.AssemblyLinearVelocity.Magnitude < STANDSTILL_SPEED then
+				return id, model
 			end
 		end
 	end
-	return false
+	return nil, nil
 end
 
-local function check(player: Player, vehicleId: unknown): (Types.PlayerData?, Types.VehicleRecord?, string?)
-	if typeof(vehicleId) ~= "string" then
-		return nil, nil, Result.Codes.INVALID_ARGUMENT
+local function setChute(garage: Model, bay: number, bottomY: number?)
+	for part, goal in GarageTemplate.chuteGoals(garage, bay, bottomY) do
+		TweenService:Create(part, TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), goal):Play()
 	end
-	local data = DataService.Get(player)
-	if not data then
-		return nil, nil, Result.Codes.DATA_NOT_LOADED
-	end
-	local record = data.Vehicles.Owned[vehicleId :: string]
-	if not record then
-		return nil, nil, Result.Codes.NOT_OWNED
-	end
-	if not data.Buildings.build_storage or not data.Buildings.build_garage then
-		return nil, nil, Result.Codes.GARAGE_REQUIRED
-	end
-	local model = VehicleService.GetModel(player, record.Id)
-	if not model or not isUnderTower(player, model) then
-		return nil, nil, Result.Codes.NO_VEHICLE
-	end
-	return data, record, nil
 end
 
--- Laden: oreId nil = alles (nach Tier) bis zur Kapazität; amount nil = so viel wie möglich
-local function load(player: Player, vehicleId: unknown, oreId: unknown, amount: unknown)
-	if oreId ~= nil and (typeof(oreId) ~= "string" or not Materials.Get(oreId :: string)) then
-		return Result.err(Result.Codes.INVALID_ARGUMENT)
+-- Ein Takt für einen Stellplatz; gibt den neuen Zustand zurück
+local function tickBay(player: Player, data: Types.PlayerData, garage: Model, bay: number): BayState
+	local point = garage:FindFirstChild(`LoadPoint{bay}`)
+	if not (point and point:IsA("BasePart")) then
+		return { state = "Idle", vehicleId = nil, extended = false }
 	end
-	if amount ~= nil and (typeof(amount) ~= "number" or amount ~= amount or amount < 1 or amount % 1 ~= 0 or amount > 1e9) then
-		return Result.err(Result.Codes.INVALID_ARGUMENT)
+	local vehicleId, model = vehicleUnder(player, data, point)
+	local record = vehicleId and data.Vehicles.Owned[vehicleId]
+	local def = record and Vehicles.Get(record.Type)
+	if not (vehicleId and model and record and def) then
+		return { state = "Idle", vehicleId = nil, extended = false }
 	end
-	local data, record, code = check(player, vehicleId)
-	if not data or not record then
-		return Result.err(code or Result.Codes.INTERNAL_ERROR)
-	end
-	local def = Vehicles.Get(record.Type)
-	local free = (if def then def.Capacity else 0) - sum(record.Cargo)
+	local free = def.Capacity - sum(record.Cargo)
 	if free <= 0 then
-		return Result.err(Result.Codes.VEHICLE_FULL)
+		return { state = "Full", vehicleId = vehicleId, extended = false }
 	end
-	local ids = if oreId then { oreId :: string } else sortedIds(data.Storage.Items)
+	local budget = math.min(free, math.floor(BalanceConfig.Loading.UnitsPerSecond * TICK_SECONDS))
 	local plan: { [string]: number } = {}
 	local total = 0
-	for _, id in ids do
-		local stock = data.Storage.Items[id] or 0
-		local take = math.min(stock, free - total, if amount then (amount :: number) - total else math.huge)
+	for _, id in loadOrder(data.Storage.Items) do
+		local take = math.min(data.Storage.Items[id], budget - total)
 		if take > 0 then
 			plan[id] = take
 			total += take
 		end
-		if total >= free then
+		if total >= budget then
 			break
 		end
 	end
 	if total <= 0 then
-		return Result.err(Result.Codes.NOTHING_TO_LOAD)
+		return { state = "NoStock", vehicleId = vehicleId, extended = false }
 	end
-	local id = record.Id
-	DataService.Mutate(player, function(d)
+	local id = vehicleId
+	DataService.MutateQuiet(player, function(d)
 		local cargo = d.Vehicles.Owned[id].Cargo
-		for ore, n in plan do
-			d.Storage.Items[ore] -= n
-			if d.Storage.Items[ore] <= 0 then
-				d.Storage.Items[ore] = nil
+		for material, n in plan do
+			d.Storage.Items[material] -= n
+			if d.Storage.Items[material] <= 0 then
+				d.Storage.Items[material] = nil
 			end
-			cargo[ore] = (cargo[ore] or 0) + n
+			cargo[material] = (cargo[material] or 0) + n
 		end
 	end)
-	DataService.RequestSave(player)
 	VehicleService.RefreshCargo(player, id)
-	Log.debug(TAG, `{player.Name} lädt {total} in {id}`)
-	return Result.ok({ Moved = total })
+	return { state = "Loading", vehicleId = vehicleId, extended = true }
 end
 
--- Entladen: alles (oder ein Erz) zurück ins Lager, so weit Platz ist
-local function unload(player: Player, vehicleId: unknown, oreId: unknown)
-	if oreId ~= nil and (typeof(oreId) ~= "string" or not Materials.Get(oreId :: string)) then
-		return Result.err(Result.Codes.INVALID_ARGUMENT)
+local function tickPlayer(player: Player)
+	local data = DataService.Get(player)
+	local garage = BuildingService.GetModel(player, "build_garage")
+	if not (data and garage and data.Buildings.build_storage) then
+		return
 	end
-	local data, record, code = check(player, vehicleId)
-	if not data or not record then
-		return Result.err(code or Result.Codes.INTERNAL_ERROR)
-	end
-	local free = data.Storage.Capacity - sum(data.Storage.Items)
-	if free <= 0 then
-		return Result.err(Result.Codes.STORAGE_FULL)
-	end
-	local ids = if oreId then { oreId :: string } else sortedIds(record.Cargo)
-	local plan: { [string]: number } = {}
-	local total = 0
-	for _, id in ids do
-		local take = math.min(record.Cargo[id] or 0, free - total)
-		if take > 0 then
-			plan[id] = take
-			total += take
+	local states = bayStates[player] or {}
+	bayStates[player] = states
+	for bay = 1, Vehicles.BayCount do
+		local new = tickBay(player, data, garage, bay)
+		local old = states[bay]
+		-- Anzeige
+		local record = new.vehicleId and data.Vehicles.Owned[new.vehicleId]
+		local def = record and Vehicles.Get(record.Type)
+		local title = if def then `BAY {bay} · {string.upper(def.DisplayName)}` else `BAY {bay}`
+		local value = "READY"
+		if record and def then
+			local fill = `{NumberFormat.withSeparators(sum(record.Cargo))} / {NumberFormat.withSeparators(def.Capacity)}`
+			value = if new.state == "Full" then `FULL · {fill}` elseif new.state == "NoStock" then "STORAGE EMPTY" else fill
 		end
-	end
-	if total <= 0 then
-		return Result.err(Result.Codes.NOTHING_TO_SELL)
-	end
-	local id = record.Id
-	DataService.Mutate(player, function(d)
-		local cargo = d.Vehicles.Owned[id].Cargo
-		for ore, n in plan do
-			cargo[ore] -= n
-			if cargo[ore] <= 0 then
-				cargo[ore] = nil
+		GarageTemplate.setBayState(garage, bay, new.state, title, value)
+		-- Schurre nur bei Zustandswechsel bewegen
+		if not old or old.extended ~= new.extended or old.vehicleId ~= new.vehicleId then
+			local bottomY: number? = nil
+			if new.extended and new.vehicleId then
+				local model = VehicleService.GetModel(player, new.vehicleId)
+				if model then
+					local cf, size = model:GetBoundingBox()
+					bottomY = cf.Position.Y + size.Y / 2
+				end
 			end
-			d.Storage.Items[ore] = (d.Storage.Items[ore] or 0) + n
+			setChute(garage, bay, bottomY)
 		end
-	end)
-	DataService.RequestSave(player)
-	VehicleService.RefreshCargo(player, id)
-	return Result.ok({ Moved = total })
+		-- Meldung, wenn ein Fahrzeug voll geworden ist
+		if new.state == "Full" and old and old.state == "Loading" and old.vehicleId == new.vehicleId then
+			RemoteService.FireClient("Notify", player, { Kind = "Success", Code = "VEHICLE_LOADED" })
+		end
+		states[bay] = new
+	end
 end
 
-function LoadingService.Init()
-	RemoteService.OnInvoke("LoadVehicle", load)
-	RemoteService.OnInvoke("UnloadVehicle", unload)
-end
+function LoadingService.Init() end
 
 function LoadingService.Start()
-	ProximityPromptService.PromptTriggered:Connect(function(prompt: ProximityPrompt, player: Player)
-		if prompt:GetAttribute("LoadingTower") ~= true then
-			return
-		end
-		if not PlotService.IsOwnerOf(player, prompt) then
-			RemoteService.FireClient("Notify", player, { Kind = "Warning", Code = Result.Codes.NOT_OWNER })
-			return
-		end
-		local data = DataService.Get(player)
-		if not data then
-			return
-		end
-		-- Eigenes Fahrzeug unter einer Schurre suchen (gefahrenes zuerst)
-		local drivenId = VehicleService.GetDriven(player)
-		local candidates: { string } = {}
-		if drivenId then
-			table.insert(candidates, drivenId)
-		end
-		for id in data.Vehicles.Owned do
-			if id ~= drivenId then
-				table.insert(candidates, id)
+	task.spawn(function()
+		while true do
+			task.wait(TICK_SECONDS)
+			for _, player in Players:GetPlayers() do
+				local ok, err = pcall(tickPlayer, player)
+				if not ok then
+					warn(`[Server][LoadingService] Tick-Fehler {player.Name}: {err}`)
+				end
 			end
 		end
-		for _, id in candidates do
-			local model = VehicleService.GetModel(player, id)
-			if model and isUnderTower(player, model) then
-				RemoteService.FireClient("OpenLoading", player, { VehicleId = id })
-				return
-			end
+	end)
+	Players.PlayerRemoving:Connect(function(player)
+		bayStates[player] = nil
+	end)
+	-- Neu gebaute Garage: Anzeige/Schurren neu aufbauen
+	BuildingService.ModelBuilt:Connect(function(player, stepId)
+		if stepId == "build_garage" then
+			bayStates[player] = nil
 		end
-		RemoteService.FireClient("Notify", player, { Kind = "Warning", Code = Result.Codes.NO_VEHICLE })
 	end)
 end
 

@@ -13,6 +13,7 @@
 local Players = game:GetService("Players")
 local PhysicsService = game:GetService("PhysicsService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerStorage = game:GetService("ServerStorage")
 local TweenService = game:GetService("TweenService")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
@@ -49,6 +50,12 @@ local VehicleService = {
 -- [player] = { [vehicleId] = Model }
 local spawned: { [Player]: { [string]: Model } } = {}
 local ringTouch: { [Player]: number } = {}
+
+-- Fahrersitz: A-Chassis heißt "DriveSeat", der eigene Fallback "DriverSeat"
+local function seatOf(model: Model): VehicleSeat?
+	local seat = model:FindFirstChild("DriveSeat") or model:FindFirstChild("DriverSeat")
+	return if seat and seat:IsA("VehicleSeat") then seat else nil
+end
 
 local function folder(): Folder
 	local f = workspace:FindFirstChild("Vehicles")
@@ -113,8 +120,8 @@ end
 
 -- Nur der Besitzer darf fahren (docs/07 §17)
 local function guardSeat(model: Model, owner: Player)
-	local seat = model:FindFirstChild("DriverSeat")
-	if not (seat and seat:IsA("VehicleSeat")) then
+	local seat = seatOf(model)
+	if not seat then
 		return
 	end
 	seat:GetPropertyChangedSignal("Occupant"):Connect(function()
@@ -144,8 +151,8 @@ local function despawn(player: Player, vehicleId: string)
 		return
 	end
 	list[vehicleId] = nil
-	local seat = model:FindFirstChild("DriverSeat")
-	if seat and seat:IsA("VehicleSeat") and seat.Occupant then
+	local seat = seatOf(model)
+	if seat and seat.Occupant then
 		seat.Occupant.Sit = false
 	end
 	model:Destroy()
@@ -173,7 +180,14 @@ local function spawnAtBay(player: Player, record: Types.VehicleRecord): Model?
 	end
 	despawn(player, record.Id)
 	local floorCF = bayPart.CFrame * CFrame.new(0, -bayPart.Size.Y / 2, 0)
-	local model = VehicleModelBuilder.build(def, floorCF + Vector3.new(0, 0.15, 0), true)
+	-- Fahrphysik von A-Chassis (D-026); ohne Kit im Place eigener Fallback
+	local vendor = ServerStorage:FindFirstChild("Vendor")
+	local kit = vendor and vendor:FindFirstChild("AChassis")
+	local model = if kit then VehicleModelBuilder.buildAChassis(def, floorCF + Vector3.new(0, 0.15, 0), kit) else nil
+	if not model then
+		warn("[Server][VehicleService] A-Chassis-Kit fehlt (ServerStorage.Vendor.AChassis) – eigener Fallback")
+		model = VehicleModelBuilder.build(def, floorCF + Vector3.new(0, 0.15, 0), true)
+	end
 	model.Name = `{player.Name}_{record.Id}`
 	model:SetAttribute("VehicleId", record.Id)
 	model:SetAttribute("OwnerUserId", player.UserId)
@@ -182,14 +196,22 @@ local function spawnAtBay(player: Player, record: Types.VehicleRecord): Model?
 	local color = CompanyIdentity.ColorById[data.Company.ColorId]
 	VehicleModelBuilder.applyCompany(model, if color then color.Color else nil, data.Company.Name)
 	setGroup(model)
+	-- A-Chassis legt beim Start weitere Teile an: auch diese in die Fahrzeug-Gruppe
+	model.DescendantAdded:Connect(function(d)
+		if d:IsA("BasePart") then
+			d.CollisionGroup = GROUP_VEHICLES
+		end
+	end)
 	guardSeat(model, player)
 	model.Parent = folder()
-	-- Physik gehört dem Fahrer (flüssiges Fahren); der Server prüft alle Wirtschaftsaktionen
-	local chassis = model.PrimaryPart
-	if chassis then
-		pcall(function()
-			chassis:SetNetworkOwner(player)
-		end)
+	-- Eigener Fallback: Physik gehört dem Fahrer. A-Chassis setzt den Besitzer selbst.
+	if not model:FindFirstChild("A-Chassis Tune") then
+		local chassis = model.PrimaryPart
+		if chassis then
+			pcall(function()
+				chassis:SetNetworkOwner(player)
+			end)
+		end
 	end
 	spawned[player] = spawned[player] or {}
 	spawned[player][record.Id] = model
@@ -198,10 +220,10 @@ local function spawnAtBay(player: Player, record: Types.VehicleRecord): Model?
 end
 
 local function seatPlayer(player: Player, model: Model)
-	local seat = model:FindFirstChild("DriverSeat")
+	local seat = seatOf(model)
 	local character = player.Character
 	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-	if seat and seat:IsA("VehicleSeat") and humanoid and humanoid.Health > 0 then
+	if seat and humanoid and humanoid.Health > 0 then
 		if humanoid.SeatPart then
 			humanoid.Sit = false
 			task.wait()
@@ -393,8 +415,8 @@ local function doorLoop()
 				for _, model in spawned[player] or {} do
 					-- nur gefahrene Fahrzeuge (geparkte im Stellplatz öffnen das Tor nicht)
 					local chassis = model.PrimaryPart
-					local seat = model:FindFirstChild("DriverSeat")
-					local driven = seat and seat:IsA("VehicleSeat") and seat.Occupant ~= nil
+					local seat = seatOf(model)
+					local driven = seat ~= nil and seat.Occupant ~= nil
 					if chassis and driven and within(chassis.Position, DOOR_VEHICLE_RANGE) then
 						near = true
 						break

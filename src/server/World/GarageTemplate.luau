@@ -7,8 +7,8 @@
 -- Vereinbarte Namen/Attribute:
 --   Part "BaySpawn1"/"BaySpawn2"   – Fahrzeug-Spawn (Bodenmitte, LookVector zum Rolltor)
 --   Part "GarageRing"              – Auslöser der Fahrzeugauswahl (Attribut GarageRing = true)
---   Part "LoadPoint1"/"LoadPoint2" – Ende der Ladeschurre über dem Stellplatz, ProximityPrompt
---                                    "LoadPrompt" (Attribute LoadingTower = true, Bay)
+--   Part "LoadPoint1"/"LoadPoint2" – Bezugspunkt der Ladeschurre über dem Stellplatz (Attribut Bay)
+--   Part "ChuteTube{n}"/"ChuteNozzle{n}", "ChuteLamp{n}", "BayDisplay{n}" – automatisches Beladen
 --   Part "GarageDoor"              – Glas-Rolltor in der Hallen-Toröffnung (VehicleService)
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -133,73 +133,108 @@ local function ring(model: Model, o: CFrame)
 	trigger:SetAttribute("GarageRing", true)
 end
 
--- Verladeturm (D-008): Stahlgerüst mit Trichter, Ausleger nach vorn und Querträger über
--- beiden Stellplätzen, Teleskop-Schurren, Bedienpult am Fuß.
+-- Verladeturm (D-008, D-025): hohes Stahlgitter-Gerüst mit Silo, Zuführrohr aus dem Lager,
+-- Ausleger über beiden Stellplätzen mit ausfahrbaren Teleskop-Schurren, Statuslampe und
+-- Anzeige je Stellplatz. Beladen läuft automatisch (LoadingService), ohne Bedienung.
+local TOWER_HEIGHT = 22
+local BOOM_Y = 18
+-- Unterkante der Schurrenhülse; das Teleskoprohr fährt von hier nach unten aus
+local CHUTE_TOP = 16.4
+local CHUTE_REST = 1.6
+
 local function tower(model: Model, o: CFrame)
 	local cfg = LayoutConfig.Garage
 	local t = o * CFrame.new(cfg.Tower.X, 0, cfg.Tower.Y)
-	local H = 13
-	part(model, "TowerFoundation", Vector3.new(7, 0.6, 7), t * CFrame.new(0, 0.3, 0), CONCRETE, Enum.Material.Concrete)
-	for _, x in { -2.5, 2.5 } do
-		for _, z in { -2.5, 2.5 } do
-			part(model, `TowerLeg{x}_{z}`, Vector3.new(0.7, H, 0.7), t * CFrame.new(x, 0.6 + H / 2, z), STEEL)
+	local H = TOWER_HEIGHT
+	part(model, "TowerFoundation", Vector3.new(11, 0.8, 11), t * CFrame.new(0, 0.4, 0), CONCRETE, Enum.Material.Concrete)
+	for i = 1, 12 do
+		local edge = part(model, `TowerFoundationEdge{i}`, Vector3.new(11 / 12, 0.82, 0.3), t * CFrame.new(-5.5 + 11 / 12 * (i - 0.5), 0.41, -5.45), if i % 2 == 0 then BLACK else YELLOW, Enum.Material.SmoothPlastic)
+		edge.CanCollide = false
+	end
+	-- Vier Eckstiele (I-Profil-Optik) mit Fußplatten
+	for _, x in { -4, 4 } do
+		for _, z in { -4, 4 } do
+			part(model, `TowerLeg{x}_{z}`, Vector3.new(1, H, 1), t * CFrame.new(x, 0.8 + H / 2, z), STEEL)
+			part(model, `TowerFoot{x}_{z}`, Vector3.new(1.8, 0.3, 1.8), t * CFrame.new(x, 0.95, z), STEEL_DARK)
 		end
 	end
-	-- Diagonalverbände
-	for i, y in { 3.5, 8 } do
-		for _, z in { -2.5, 2.5 } do
-			part(model, `TowerBrace{i}_{z}`, Vector3.new(0.3, 6.4, 0.3), t * CFrame.new(0, y, z) * CFrame.Angles(0, 0, math.rad(if i == 1 then 50 else -50)), STEEL_LIGHT)
+	-- Riegel auf allen vier Seiten und Kreuzverbände auf zwei Seiten
+	for level = 1, 4 do
+		local y = 0.8 + level * (H / 4)
+		part(model, `TowerGirderF{level}`, Vector3.new(9, 0.6, 0.6), t * CFrame.new(0, y, -4), STEEL)
+		part(model, `TowerGirderB{level}`, Vector3.new(9, 0.6, 0.6), t * CFrame.new(0, y, 4), STEEL)
+		part(model, `TowerGirderL{level}`, Vector3.new(0.6, 0.6, 9), t * CFrame.new(-4, y, 0), STEEL)
+		part(model, `TowerGirderR{level}`, Vector3.new(0.6, 0.6, 9), t * CFrame.new(4, y, 0), STEEL)
+		local mid = y - H / 8
+		local diagonal = math.sqrt(8 ^ 2 + (H / 4) ^ 2)
+		local angle = math.atan2(H / 4, 8)
+		for _, side in { -4, 4 } do
+			part(model, `TowerBraceA{level}_{side}`, Vector3.new(0.3, 0.3, diagonal), t * CFrame.new(side, mid, 0) * CFrame.Angles(angle, 0, 0), STEEL_LIGHT)
+			part(model, `TowerBraceB{level}_{side}`, Vector3.new(0.3, 0.3, diagonal), t * CFrame.new(side, mid, 0) * CFrame.Angles(-angle, 0, 0), STEEL_LIGHT)
 		end
 	end
-	-- Trichter oben (Firmenfarbe als Akzent)
-	local hopper = part(model, "TowerHopper", Vector3.new(6, 3, 6), t * CFrame.new(0, H + 2, 0), STEEL_LIGHT)
-	local band = part(model, "TowerHopperBand", Vector3.new(6.2, 0.8, 6.2), t * CFrame.new(0, H + 3.1, 0), ACCENT_DEFAULT, Enum.Material.SmoothPlastic)
+	-- Wartungsleiter
+	part(model, "TowerLadder", Vector3.new(1.6, H, 0.2), t * CFrame.new(0, 0.8 + H / 2, 4.6), STEEL_LIGHT, Enum.Material.DiamondPlate)
+	part(model, "TowerPlatform", Vector3.new(10, 0.4, 10), t * CFrame.new(0, 0.8 + H, 0), STEEL_LIGHT, Enum.Material.DiamondPlate)
+	part(model, "TowerRail", Vector3.new(10, 0.2, 0.2), t * CFrame.new(0, 0.8 + H + 1.2, -5), YELLOW, Enum.Material.SmoothPlastic)
+
+	-- Silo oben mit Firmenfarbband und Trichter nach unten
+	local siloBase = 0.8 + H + 0.2
+	local silo = part(model, "TowerSilo", Vector3.new(7, 8, 8), t * CFrame.new(0, siloBase + 3.5, 0) * CFrame.Angles(0, 0, math.rad(90)), STEEL_LIGHT)
+	silo.Shape = Enum.PartType.Cylinder
+	local band = part(model, "TowerHopperBand", Vector3.new(1.2, 8.2, 8.2), t * CFrame.new(0, siloBase + 5, 0) * CFrame.Angles(0, 0, math.rad(90)), ACCENT_DEFAULT, Enum.Material.SmoothPlastic)
+	band.Shape = Enum.PartType.Cylinder
 	accent(band)
-	part(model, "TowerHopperFunnel", Vector3.new(3.6, 1.6, 3.6), t * CFrame.new(0, H - 0.2, 0), STEEL)
-	hopper.CastShadow = true
-	-- Zuführrohr von hinten (aus Richtung Lager)
-	part(model, "TowerFeedPipe", Vector3.new(1.4, 1.4, 14), t * CFrame.new(0, H + 2, 9.5), STEEL_LIGHT)
+	local cap = part(model, "TowerSiloCap", Vector3.new(0.6, 8.4, 8.4), t * CFrame.new(0, siloBase + 7.2, 0) * CFrame.Angles(0, 0, math.rad(90)), STEEL_DARK)
+	cap.Shape = Enum.PartType.Cylinder
+	for i, d in { 6, 4.4, 2.8 } do
+		local cone = part(model, `TowerFunnel{i}`, Vector3.new(1, d, d), t * CFrame.new(0, H - (i - 1) * 1 + 0.3, 0) * CFrame.Angles(0, 0, math.rad(90)), STEEL)
+		cone.Shape = Enum.PartType.Cylinder
+	end
+	-- Zuführrohr vom Lager (hinten, +Z) über das Silo: Material kommt direkt aus dem Lager
+	local pipeLen = 30
+	local pipe = part(model, "TowerFeedPipe", Vector3.new(pipeLen, 1.6, 1.6), t * CFrame.new(0, siloBase + 5.6, 4 + pipeLen / 2) * CFrame.Angles(0, math.rad(90), 0), STEEL_LIGHT)
+	pipe.Shape = Enum.PartType.Cylinder
+	for i = 1, 5 do
+		part(model, `TowerFeedClamp{i}`, Vector3.new(2, 0.4, 0.4), t * CFrame.new(0, siloBase + 5.6, 4 + i * pipeLen / 6), STEEL_DARK)
+	end
+	local drop = part(model, "TowerFeedDrop", Vector3.new(siloBase + 5.6, 1.6, 1.6), t * CFrame.new(0, (siloBase + 5.6) / 2, 4 + pipeLen) * CFrame.Angles(0, 0, math.rad(90)), STEEL_LIGHT)
+	drop.Shape = Enum.PartType.Cylinder
+	local intake = part(model, "TowerIntake", Vector3.new(3, 3, 3), t * CFrame.new(0, 1.5, 4 + pipeLen), STEEL)
+	intake.CastShadow = true
+	local intakeSign = part(model, "TowerIntakeSign", Vector3.new(2.6, 0.9, 0.1), t * CFrame.new(0, 2, 4 + pipeLen + 1.55), STEEL_DARK, Enum.Material.SmoothPlastic)
+	local intakeGui = Instance.new("SurfaceGui")
+	intakeGui.Face = Enum.NormalId.Back
+	intakeGui.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
+	intakeGui.PixelsPerStud = 40
+	intakeGui.LightInfluence = 0
+	intakeGui.Parent = intakeSign
+	local intakeLabel = Instance.new("TextLabel")
+	intakeLabel.Size = UDim2.fromScale(1, 1)
+	intakeLabel.BackgroundTransparency = 1
+	intakeLabel.Font = Enum.Font.GothamBlack
+	intakeLabel.TextScaled = true
+	intakeLabel.TextColor3 = YELLOW
+	intakeLabel.Text = "FROM STORAGE"
+	intakeLabel.Parent = intakeGui
+
 	-- Ausleger nach vorn und Querträger über den Stellplätzen
 	local armZ = cfg.Bays[1].Y + cfg.BaySize.Y / 2 - 3 -- über dem Heck der Fahrzeuge
 	local armLen = cfg.Tower.Y - armZ
-	local armY = 11
-	part(model, "TowerArm", Vector3.new(1.4, 1.4, armLen), t * CFrame.new(0, armY, -armLen / 2), STEEL)
+	part(model, "TowerArm", Vector3.new(1.8, 1.8, armLen + 4), t * CFrame.new(0, BOOM_Y, -(armLen + 4) / 2 + 4), STEEL)
+	part(model, "TowerArmTie", Vector3.new(0.3, 0.3, armLen), t * CFrame.new(0, BOOM_Y + 3, -armLen / 2), STEEL_LIGHT)
 	local x1, x2 = cfg.Bays[1].X - cfg.Tower.X, cfg.Bays[2].X - cfg.Tower.X
-	part(model, "TowerCrossbeam", Vector3.new(math.abs(x2 - x1) + 2, 1.2, 1.2), t * CFrame.new((x1 + x2) / 2, armY, -armLen), STEEL)
-	local stripe = part(model, "TowerCrossbeamStripe", Vector3.new(math.abs(x2 - x1) + 2, 0.4, 0.1), t * CFrame.new((x1 + x2) / 2, armY, -armLen - 0.65), ACCENT_DEFAULT, Enum.Material.SmoothPlastic)
+	local span = math.abs(x2 - x1) + cfg.BaySize.X + 2 -- Stützen außerhalb der Stellplätze
+	part(model, "TowerCrossbeam", Vector3.new(span, 1.6, 1.6), t * CFrame.new((x1 + x2) / 2, BOOM_Y, -armLen), STEEL)
+	local stripe = part(model, "TowerCrossbeamStripe", Vector3.new(span, 0.5, 0.1), t * CFrame.new((x1 + x2) / 2, BOOM_Y, -armLen - 0.85), ACCENT_DEFAULT, Enum.Material.SmoothPlastic)
 	accent(stripe)
-	-- Schurren je Stellplatz
-	for i, x in { x1, x2 } do
-		part(model, `ChuteHead{i}`, Vector3.new(2.4, 1.6, 2.4), t * CFrame.new(x, armY - 1.4, -armLen), STEEL_LIGHT)
-		part(model, `ChuteTube{i}`, Vector3.new(1.4, 2.6, 1.4), t * CFrame.new(x, armY - 3.5, -armLen), STEEL)
-		part(model, `ChuteNozzle{i}`, Vector3.new(1.8, 0.8, 1.8), t * CFrame.new(x, armY - 5.2, -armLen), RUBBER, Enum.Material.Rubber)
-		local lp = part(model, `LoadPoint{i}`, Vector3.new(1, 1, 1), t * CFrame.new(x, armY - 5.8, -armLen), WHITE, Enum.Material.SmoothPlastic)
-		lp.Transparency = 1
-		flat(lp)
-		lp:SetAttribute("Bay", i)
-		-- Beladen (Phase 6c): erreichbar vom Fahrersitz und zu Fuß
-		local prompt = Instance.new("ProximityPrompt")
-		prompt.Name = "LoadPrompt"
-		prompt.ActionText = "Load Vehicle"
-		prompt.ObjectText = `Loading Bay {i}`
-		prompt.HoldDuration = 0.2
-		prompt.MaxActivationDistance = 16
-		prompt.RequiresLineOfSight = false
-		prompt:SetAttribute("LoadingTower", true)
-		prompt:SetAttribute("Bay", i)
-		prompt.Parent = lp
-		-- Warnleuchte an der Schurre
-		local lamp = part(model, `ChuteLamp{i}`, Vector3.new(0.5, 0.5, 0.5), t * CFrame.new(x + 1.4, armY - 1.4, -armLen), YELLOW, Enum.Material.Neon)
-		lamp.Shape = Enum.PartType.Ball
+	-- Stützen am Ende des Querträgers
+	for i, x in { (x1 + x2) / 2 - span / 2 + 0.6, (x1 + x2) / 2 + span / 2 - 0.6 } do
+		part(model, `TowerCrossbeamPost{i}`, Vector3.new(0.9, BOOM_Y, 0.9), t * CFrame.new(x, BOOM_Y / 2 + 0.4, -armLen), STEEL)
+		part(model, `TowerCrossbeamPostStripe{i}`, Vector3.new(0.95, 2, 0.95), t * CFrame.new(x, 1.4, -armLen), YELLOW, Enum.Material.SmoothPlastic)
 	end
-	-- Bedienpult am Fuß des Turms (Optik; bedient wird über die Prompts an den Schurren)
-	part(model, "TowerPanelPost", Vector3.new(0.6, 3.2, 0.6), t * CFrame.new(-4.5, 2.2, -3), STEEL_DARK)
-	local panel = part(model, "TowerPanel", Vector3.new(2.4, 1.8, 0.4), t * CFrame.new(-4.5, 4.4, -3) * CFrame.Angles(math.rad(-20), 0, 0), STEEL_LIGHT, Enum.Material.SmoothPlastic)
-	local screen = part(model, "TowerPanelScreen", Vector3.new(2, 1.3, 0.1), t * CFrame.new(-4.5, 4.45, -3.25) * CFrame.Angles(math.rad(-20), 0, 0), Color3.fromRGB(90, 170, 255), Enum.Material.Neon)
-	screen.Transparency = 0.15
-	panel.CastShadow = true
-	-- Schild "LOADING"
-	local sign = part(model, "TowerSign", Vector3.new(7, 1.6, 0.2), t * CFrame.new((x1 + x2) / 2, armY + 1.7, -armLen - 0.4), STEEL_DARK, Enum.Material.SmoothPlastic)
+	-- Schild "LOADING" über dem Querträger
+	local sign = part(model, "TowerSign", Vector3.new(10, 2, 0.2), t * CFrame.new((x1 + x2) / 2, BOOM_Y + 2, -armLen - 0.5), STEEL_DARK, Enum.Material.SmoothPlastic)
 	local gui = Instance.new("SurfaceGui")
 	gui.Face = Enum.NormalId.Front
 	gui.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
@@ -214,6 +249,109 @@ local function tower(model: Model, o: CFrame)
 	label.TextColor3 = YELLOW
 	label.Text = "LOADING"
 	label.Parent = gui
+
+	-- Je Stellplatz: Laufkatze, Schurrenhülse, Teleskoprohr, Düse, Lampe, Anzeige vorne
+	for i, x in { x1, x2 } do
+		part(model, `ChuteTrolley{i}`, Vector3.new(3.4, 1.6, 2.6), t * CFrame.new(x, BOOM_Y - 1.6, -armLen), STEEL_LIGHT)
+		part(model, `ChuteSleeve{i}`, Vector3.new(2, 1.2, 2), t * CFrame.new(x, CHUTE_TOP + 0.6, -armLen), STEEL)
+		local tube = part(model, `ChuteTube{i}`, Vector3.new(1.4, CHUTE_REST, 1.4), t * CFrame.new(x, CHUTE_TOP - CHUTE_REST / 2, -armLen), STEEL_LIGHT)
+		tube:SetAttribute("ChuteTop", (t * CFrame.new(x, CHUTE_TOP, -armLen)).Position.Y)
+		tube.CanCollide = false
+		local nozzle = part(model, `ChuteNozzle{i}`, Vector3.new(2, 0.8, 2), t * CFrame.new(x, CHUTE_TOP - CHUTE_REST - 0.4, -armLen), RUBBER, Enum.Material.Rubber)
+		nozzle.CanCollide = false
+		local lp = part(model, `LoadPoint{i}`, Vector3.new(1, 1, 1), t * CFrame.new(x, CHUTE_TOP - 6, -armLen), WHITE, Enum.Material.SmoothPlastic)
+		lp.Transparency = 1
+		flat(lp)
+		lp:SetAttribute("Bay", i)
+		local lamp = part(model, `ChuteLamp{i}`, Vector3.new(0.8, 0.8, 0.8), t * CFrame.new(x + 2, BOOM_Y - 1.6, -armLen - 1), STEEL_LIGHT, Enum.Material.Neon)
+		lamp.Shape = Enum.PartType.Ball
+		local lampLight = Instance.new("PointLight")
+		lampLight.Name = "Glow"
+		lampLight.Range = 8
+		lampLight.Enabled = false
+		lampLight.Parent = lamp
+		-- Anzeige vorne am Stellplatz, zum Fahrer gedreht (schaut zur Hallenrückseite)
+		local bayCenter = cfg.Bays[i]
+		local displayCF = o * CFrame.new(bayCenter.X, 14.5, bayCenter.Y - cfg.BaySize.Y / 2 - 1) * CFrame.Angles(0, math.rad(180), 0)
+		part(model, `BayDisplayPost{i}`, Vector3.new(0.5, 16, 0.5), o * CFrame.new(bayCenter.X + cfg.BaySize.X / 2 + 0.6, 8, bayCenter.Y - cfg.BaySize.Y / 2 - 1), STEEL_DARK)
+		part(model, `BayDisplayArm{i}`, Vector3.new(cfg.BaySize.X / 2 + 0.6, 0.4, 0.4), o * CFrame.new(bayCenter.X + cfg.BaySize.X / 4 + 0.3, 15.9, bayCenter.Y - cfg.BaySize.Y / 2 - 1), STEEL_DARK)
+		local display = part(model, `BayDisplay{i}`, Vector3.new(6, 2.4, 0.3), displayCF, Color3.fromRGB(24, 27, 33), Enum.Material.SmoothPlastic)
+		display.CanCollide = false
+		local dgui = Instance.new("SurfaceGui")
+		dgui.Name = "Display"
+		dgui.Face = Enum.NormalId.Front
+		dgui.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
+		dgui.PixelsPerStud = 50
+		dgui.LightInfluence = 0
+		dgui.Parent = display
+		for j, name in { "Title", "Value" } do
+			local l = Instance.new("TextLabel")
+			l.Name = name
+			l.Position = UDim2.fromScale(0.04, if j == 1 then 0.06 else 0.48)
+			l.Size = UDim2.fromScale(0.92, if j == 1 then 0.38 else 0.46)
+			l.BackgroundTransparency = 1
+			l.Font = Enum.Font.GothamBlack
+			l.TextScaled = true
+			l.TextColor3 = if j == 1 then Color3.fromRGB(165, 172, 184) else Color3.fromRGB(240, 242, 245)
+			l.Text = if j == 1 then `BAY {i}` else "READY"
+			l.Parent = dgui
+		end
+	end
+end
+
+-- Zustand eines Stellplatzes am Turm (LoadingService): Lampe, Anzeige, Schurrenlänge
+local BAY_COLORS: { [string]: Color3 } = {
+	Idle = Color3.fromRGB(150, 154, 160),
+	Loading = Color3.fromRGB(70, 210, 90),
+	Full = Color3.fromRGB(80, 160, 255),
+	NoStock = Color3.fromRGB(255, 160, 30),
+}
+
+function GarageTemplate.setBayState(model: Model, bay: number, state: string, title: string, value: string)
+	local color = BAY_COLORS[state] or BAY_COLORS.Idle
+	local lamp = model:FindFirstChild(`ChuteLamp{bay}`)
+	if lamp and lamp:IsA("BasePart") then
+		lamp.Color = color
+		local glow = lamp:FindFirstChild("Glow")
+		if glow and glow:IsA("PointLight") then
+			glow.Color = color
+			glow.Enabled = state ~= "Idle"
+		end
+	end
+	local display = model:FindFirstChild(`BayDisplay{bay}`)
+	local gui = display and display:FindFirstChild("Display")
+	if gui then
+		local t = gui:FindFirstChild("Title")
+		local v = gui:FindFirstChild("Value")
+		if t and t:IsA("TextLabel") then
+			t.Text = title
+		end
+		if v and v:IsA("TextLabel") then
+			v.Text = value
+			v.TextColor3 = if state == "Idle" then Color3.fromRGB(240, 242, 245) else color
+		end
+	end
+end
+
+-- Zielgrößen der Schurre: Länge des Teleskoprohrs bis zur Höhe bottomY (Weltkoordinate).
+-- nil = eingefahren. Gibt { [Part] = { Size, CFrame } } für einen Tween zurück.
+function GarageTemplate.chuteGoals(model: Model, bay: number, bottomY: number?): { [BasePart]: { [string]: any } }
+	local goals = {}
+	local tube = model:FindFirstChild(`ChuteTube{bay}`)
+	local nozzle = model:FindFirstChild(`ChuteNozzle{bay}`)
+	if not (tube and tube:IsA("BasePart") and nozzle and nozzle:IsA("BasePart")) then
+		return goals
+	end
+	local top = tube:GetAttribute("ChuteTop")
+	if typeof(top) ~= "number" then
+		return goals
+	end
+	local length = if bottomY then math.clamp(top - bottomY - 0.8, CHUTE_REST, 14) else CHUTE_REST
+	local x, z = tube.Position.X, tube.Position.Z
+	local rot = tube.CFrame - tube.Position
+	goals[tube] = { Size = Vector3.new(tube.Size.X, length, tube.Size.Z), CFrame = CFrame.new(x, top - length / 2, z) * rot }
+	goals[nozzle] = { CFrame = CFrame.new(x, top - length - 0.4, z) * rot }
+	return goals
 end
 
 -- Werkstatt-Details am rechten Rand der Garage

@@ -184,11 +184,11 @@ Werte sind Vorschläge aus Q-021. Für den Test: `SetLevel(…, 14)` und `SetCas
 |---|---|---|---|
 | 6.1 | Garage bauen | Nach dem Lager den Button „Garage“ ($10K, Level 7) kaufen | Zwei Stellplätze, Leuchtring „VEHICLES“, Verladeturm mit „LOADING“-Schild, Glas-Rolltor in der Hallentür, Akzente in Firmenfarbe |
 | 6.2 | Rolltor | Zum Tor gehen | Tor rollt hoch; weggehen → nach 3 s rollt es runter |
-| 6.3 | Fahrzeughaus | Stadtmitte rechts (rot), am Tresen **E** | Fenster „VEHICLES“: Pickup / Van / Box Truck mit Kapazität, Top Speed, Preis |
+| 6.3 | Fahrzeughaus (D-027) | Stadtmitte rechts: großer Glas-Showroom mit drei Fahrzeugen, am Tresen hinten rechts **E** | Fenster „VEHICLES“: Pickup / Van / Box Truck mit Kapazität, Top Speed, Preis |
 | 6.4 | Kaufen | Utility Pickup kaufen | Meldung „… Get it at the glowing ring …“, Karte zeigt OWNED |
 | 6.5 | Ausparken | In der Garage auf den Leuchtring treten → DRIVE | Pickup steht auf Stellplatz 1, du sitzt am Steuer, Fahranzeige unten |
-| 6.6 | Fahren | W/S, A/D, Kurven, Bremsen | Kontrolliert, kein Überschlag, Tor öffnet beim Heranfahren |
-| 6.7 | Laden | Rückwärts unter die Schurre von Stellplatz 1, **E** „Load Vehicle“ | Ladefenster; LOAD ALL lädt aus dem Lager, Ladefläche zeigt Ladung |
+| 6.6 | Fahren (A-Chassis, D-026) | W/S, A/D, Kurven, Bremsen | Federung, Automatik schaltet selbst, Tacho und Motorsound; kein Überschlag; Tor öffnet beim Heranfahren |
+| 6.7 | Laden (D-025) | Fahrzeug auf Stellplatz stehen lassen bzw. rückwärts darunter fahren und anhalten | Schurre fährt aus, Lampe grün, Anzeige zählt hoch; voll → „FULL“ (blau); leeres Lager → „STORAGE EMPTY“ (orange) |
 | 6.8 | Verkaufen | Zur Stadtmitte, in die markierte Zone vor dem Verkaufsgebäude fahren | „SELL CARGO“ öffnet sich; SELL ALL → Geld und XP, Fahrzeug leer |
 | 6.9 | Zweites Fahrzeug | Weiteres Fahrzeug kaufen, am Ring DRIVE | Steht auf Stellplatz 2; ein drittes ginge nur nach PARK AWAY eines anderen |
 | 6.10 | Reset | Fahrzeug festfahren → RESET VEHICLE | Steht wieder auf seinem Stellplatz, Ladung unverändert |

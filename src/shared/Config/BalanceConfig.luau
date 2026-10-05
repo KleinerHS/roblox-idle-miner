@@ -30,6 +30,11 @@ local BalanceConfig = {
 		bar_iron = { SellValue = 14, XPValue = 10 }, -- TODO_BALANCE (Q-022) aus 2 Iron (= $10)
 	} :: { [string]: { SellValue: number, XPValue: number } },
 
+	-- Verladeturm (D-025): Einheiten pro Sekunde vom Lager ins Fahrzeug. Vorschlag Q-023.
+	Loading = {
+		UnitsPerSecond = 100, -- TODO_BALANCE (Q-023)
+	},
+
 	-- Schmelzer (docs/06 §28–35). Vorschlag Q-022.
 	Smelter = {
 		OrePerBar = 2, -- TODO_BALANCE (Q-022)

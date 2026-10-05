@@ -131,8 +131,9 @@ local LayoutConfig = {
 	-- Fahrzeughaus in der Mitte (CENTRAL_AREA_REFERENCE.png: rechts, rot). Liegt zwischen den
 	-- Straßen zu Plot 3 und Plot 4; Glasfront zeigt zur Platzmitte. TODO_LAYOUT
 	VehicleShop = {
-		Offset = Vector2.new(92, -4),
-		Size = Vector3.new(56, 18, 42),
+		Offset = Vector2.new(94, -4),
+		-- Großer Glas-Showroom (D-027): Breite, Höhe, Tiefe
+		Size = Vector3.new(72, 22, 56),
 	},
 	-- Maximale Entfernung zum Lager-Terminal
 	StorageTerminalDistance = 14,

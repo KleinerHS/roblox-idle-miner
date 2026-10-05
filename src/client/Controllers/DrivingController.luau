@@ -5,6 +5,8 @@
 -- Lenkwinkel nimmt mit der Geschwindigkeit ab, Rückwärts langsamer.
 -- Kleine Fahranzeige: Geschwindigkeit, Ladung, RESET (zurück auf den Stellplatz).
 -- Die normale Roblox-Kamera bleibt (docs/07 §15).
+-- D-026: Fahrzeuge mit A-Chassis bringen Fahrphysik, Tacho und Sounds selbst mit; dann zeigt
+-- dieser Controller nur Ladung und RESET (eigene Physik nur noch als Fallback).
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -100,6 +102,23 @@ local function stop()
 	end
 end
 
+-- Nur Anzeige (A-Chassis fährt selbst): Ladung aktualisieren
+local function startHudOnly(model: Model)
+	stop()
+	currentModel = model
+	hud.Enabled = true
+	speedLabel.Text = ""
+	connection = RunService.Heartbeat:Connect(function()
+		if not model.Parent then
+			stop()
+			return
+		end
+		local cargo = model:GetAttribute("Cargo")
+		local capacity = model:GetAttribute("Capacity")
+		cargoLabel.Text = string.format(TEXT.Cargo, NumberFormat.withSeparators(if typeof(cargo) == "number" then cargo else 0), NumberFormat.withSeparators(if typeof(capacity) == "number" then capacity else 0))
+	end)
+end
+
 local function start(model: Model)
 	stop()
 	local rig = rigOf(model)
@@ -141,10 +160,18 @@ local function onCharacter(character: Model)
 		return
 	end
 	humanoid.Seated:Connect(function(active, seatPart)
-		if active and seatPart and seatPart:IsA("VehicleSeat") and seatPart.Name == "DriverSeat" then
+		if active and seatPart and seatPart:IsA("VehicleSeat") and (seatPart.Name == "DriverSeat" or seatPart.Name == "DriveSeat") then
 			local model = seatPart:FindFirstAncestorOfClass("Model")
+			-- A-Chassis-Teile liegen in Untermodellen: bis zum Fahrzeugmodell hochgehen
+			while model and model:GetAttribute("OwnerUserId") == nil and model.Parent and model.Parent:IsA("Model") do
+				model = model.Parent :: Model
+			end
 			if model and model:GetAttribute("OwnerUserId") == player.UserId then
-				start(model)
+				if model:FindFirstChild("A-Chassis Tune") then
+					startHudOnly(model)
+				else
+					start(model)
+				end
 				return
 			end
 		end
@@ -161,9 +188,9 @@ local function build()
 		Parent = player:WaitForChild("PlayerGui"),
 	})
 	local panel = Create("Frame", {
-		AnchorPoint = Vector2.new(0.5, 1),
-		Position = UDim2.new(0.5, 0, 1, -96),
-		Size = UDim2.fromOffset(380, 64),
+		AnchorPoint = Vector2.new(0, 1),
+		Position = UDim2.new(0, 16, 1, -140),
+		Size = UDim2.fromOffset(330, 64),
 		BackgroundColor3 = UITheme.Colors.Background,
 		BackgroundTransparency = 0.1,
 		Parent = hud,

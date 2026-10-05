@@ -152,3 +152,27 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Source:** Frage von Felix (2026-10-04), warum die Welt ohne Serverstart nicht sichtbar ist; Option a) gewählt.
 **Decision:** Die Welt bleibt codegebaut (keine gespeicherten Modelle in der Place-Datei). Ein lokales Studio-Plugin („Idle Miner Preview“) baut sie auf Knopfdruck im Bearbeitungsmodus mit denselben World-Buildern auf und entfernt sie wieder. Die Vorschau wird nie gespeichert und nie ins Spiel kopiert.
 **Affected systems:** Werkzeuge (kein Spielsystem)
+
+## D-024 – Schmelzer vor Förderbändern, Minenkauf vorgezogen (Vorschlag)
+
+**Source:** Claude, 2026-10-05 (Felix: „arbeite schon mal weiter“) – Veto möglich.
+**Decision:** Förderbänder verbinden Lager und Schmelzer und hätten ohne Schmelzer keine Aufgabe; deshalb wird der Schmelzer (Phase 8) als 7a vor den Förderbändern (7b) gebaut. Der Minenkauf ab Mine 03 (eigentlich Phase 12) wird vorgezogen, weil Metalle erst ab Mine 03 vorkommen.
+**Affected systems:** Build-Plan, Smelter, Mines
+
+## D-025 – Verladeturm belädt automatisch aus dem Lager
+
+**Source:** Felix, 2026-10-05
+**Decision:** Der Turm speist direkt aus dem Lager (kein Zwischenspeicher, keine Loader-Worker). Automatisch alles Verkaufbare, wertvollstes zuerst. Manuelles Beladen entfällt komplett. Turm größer und höher.
+**Affected systems:** Garage, Loading, Storage
+
+## D-026 – Fahrphysik mit A-Chassis, Modelle später
+
+**Source:** Felix, 2026-10-05 (Option C)
+**Decision:** Fahrphysik über A-Chassis 1.7.2 (Creator Store, MPL-2.0). Die Karosserien bleiben vorerst unsere eigenen; bessere Modelle evtl. später (Kauf). Keine Modelle mit echten Markennamen.
+**Affected systems:** Vehicles, Driving
+
+## D-027 – Fahrzeughaus größer, modern mit Glaswänden
+
+**Source:** Felix, 2026-10-05
+**Decision:** Showroom deutlich größer, moderne Glasfassaden.
+**Affected systems:** Vehicle Shop, Map
