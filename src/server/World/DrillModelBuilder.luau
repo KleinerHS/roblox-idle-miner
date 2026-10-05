@@ -153,10 +153,41 @@ function DrillModelBuilder.build(def: Drills.DrillDefinition, cf: CFrame): Model
 	end
 	bit.PrimaryPart = core
 	bit.WorldPivot = axis
+
+	-- Staub und kleine Steinpartikel an der Bohrspitze (nur im Betrieb, docs/05 §28).
+	-- Hängt am feststehenden Getriebe, damit die Partikel nicht mitdrehen.
+	local gearbox = model:FindFirstChild("Gearbox") :: BasePart
 	local dust = Instance.new("Attachment")
 	dust.Name = "DustPoint"
-	dust.Parent = core
+	dust.Parent = gearbox
 	dust.WorldPosition = at(0, 2.6, -8.9).Position
+	local smoke = Instance.new("ParticleEmitter")
+	smoke.Name = "Dust"
+	smoke.Texture = "rbxasset://textures/particles/smoke_main.dds"
+	smoke.Color = ColorSequence.new(Color3.fromRGB(150, 140, 125))
+	smoke.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.8 * s), NumberSequenceKeypoint.new(1, 3 * s) })
+	smoke.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.55), NumberSequenceKeypoint.new(1, 1) })
+	smoke.Lifetime = NumberRange.new(1.2, 2)
+	smoke.Rate = 10
+	smoke.Speed = NumberRange.new(1.5, 3)
+	smoke.SpreadAngle = Vector2.new(60, 60)
+	smoke.Acceleration = Vector3.new(0, 0.6, 0)
+	smoke.LightInfluence = 0.6
+	smoke.Enabled = false
+	smoke.Parent = dust
+	local chips = Instance.new("ParticleEmitter")
+	chips.Name = "Chips"
+	chips.Texture = "rbxasset://textures/particles/sparkles_main.dds"
+	chips.Color = ColorSequence.new(Color3.fromRGB(90, 80, 70))
+	chips.Size = NumberSequence.new(0.18 * s)
+	chips.Lifetime = NumberRange.new(0.5, 0.9)
+	chips.Rate = 18
+	chips.Speed = NumberRange.new(5, 9)
+	chips.SpreadAngle = Vector2.new(70, 70)
+	chips.Acceleration = Vector3.new(0, -30, 0)
+	chips.LightInfluence = 1
+	chips.Enabled = false
+	chips.Parent = dust
 
 	-- Auswurfschacht hinten (Output-Bereich, docs/10 §29)
 	part(model, "ChuteBack", v(2.4, 2, 0.2), at(0, 1.6, 5.15), STEEL)
@@ -198,6 +229,60 @@ function DrillModelBuilder.build(def: Drills.DrillDefinition, cf: CFrame): Model
 	label.Parent = sign
 
 	return model
+end
+
+-- Abstand Bohrspitze ↔ Modell-Ursprung und Auswurf ↔ Ursprung (lokal, in Studs)
+local TIP_Z = 8.9
+local OUTPUT_Z = 6.9
+-- Seitlicher Versatz in der Abbauzone: links bleibt Platz für den Spieler (D-005)
+local SLOT_SIDE_OFFSET = 3
+
+-- Position eines Drills in einer Abbauzone (MineShaftBuilder "MiningSlotN"):
+-- zone.LookVector zeigt in den Raum, die Erzwand liegt bei lokal +Z = zone.Size.Z / 2.
+-- Ergebnis: Bodenmitte des Drills, LookVector zur Wand, Bohrspitze knapp vor der Wand.
+function DrillModelBuilder.slotCFrame(zone: BasePart, floorY: number, def: Drills.DrillDefinition): CFrame
+	local s = 1 + (def.Tier - 1) * 0.25
+	local wallZ = zone.Size.Z / 2
+	local spot = zone.CFrame * CFrame.new(SLOT_SIDE_OFFSET, 0, wallZ - TIP_Z * s - 0.6)
+	local pos = Vector3.new(spot.Position.X, floorY, spot.Position.Z)
+	return CFrame.lookAt(pos, pos - zone.CFrame.LookVector)
+end
+
+-- Abholpunkt hinter dem Auswurfschacht (für Transport-Worker), Bodenhöhe
+function DrillModelBuilder.outputPoint(drillCF: CFrame, def: Drills.DrillDefinition): Vector3
+	local s = 1 + (def.Tier - 1) * 0.25
+	return (drillCF * CFrame.new(0, 0, OUTPUT_Z * s + 1.5)).Position
+end
+
+-- Statusanzeige (docs/05 §29): Grün = arbeitet, Orange = wartet, Rot = blockiert.
+-- Partikel nur im Betrieb. Die Bohrkopf-Drehung macht der Client (Attribut "Status").
+local STATUS_COLORS: { [string]: Color3 } = {
+	Running = Color3.fromRGB(70, 210, 90),
+	OutputFull = Color3.fromRGB(255, 160, 30),
+	Idle = Color3.fromRGB(255, 160, 30),
+	Blocked = Color3.fromRGB(225, 55, 45),
+}
+
+function DrillModelBuilder.setStatus(model: Model, status: string)
+	if model:GetAttribute("Status") == status then
+		return
+	end
+	model:SetAttribute("Status", status)
+	local color = STATUS_COLORS[status] or STATUS_IDLE
+	local lamp = model:FindFirstChild("StatusLight")
+	if lamp and lamp:IsA("BasePart") then
+		lamp.Color = color
+		local glow = lamp:FindFirstChild("Glow")
+		if glow and glow:IsA("PointLight") then
+			glow.Color = color
+		end
+	end
+	local running = status == "Running"
+	for _, d in model:GetDescendants() do
+		if d:IsA("ParticleEmitter") then
+			d.Enabled = running
+		end
+	end
 end
 
 return table.freeze(DrillModelBuilder)

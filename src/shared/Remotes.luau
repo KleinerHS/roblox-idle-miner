@@ -71,8 +71,14 @@ local Remotes: { [string]: RemoteDefinition } = {
 	HireWorker = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
 	-- Worker entlassen: (workerId: string) -> Result
 	FireWorker = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
-	-- Laufzeitstatus der Worker: { [workerId]: "Working" | "Waiting" | "Unpaid" }
+	-- Laufzeitstatus: { [workerId]: "Working" | "Waiting" | "Unpaid", [drillId]: "Running" | "OutputFull" }
 	WorkerStatus = { Kind = "Event", Direction = "ServerToClient" },
+	-- Drills (Phase 5b): Server öffnet das Slot-Fenster nach gültigem Prompt: { MineId, Slot }
+	OpenSlotMenu = { Kind = "Event", Direction = "ServerToClient" },
+	-- Drill platzieren: (mineId: string, slot: number, drillTypeId: string) -> Result<drillId>
+	PlaceDrill = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
+	-- Drill entfernen (in der Mine oder am Laptop): (drillId: string) -> Result<drillId>
+	RemoveDrill = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
 	-- Kapazitäts-Upgrade am Laptop: (kind: "storage" | "elevator") -> Result<{ Capacity: number }>
 	BuyUpgrade = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
 }

@@ -1,7 +1,8 @@
 --!strict
 -- Firmen-Laptop (docs/09 §21–28): kurzer Kamera-Zoom auf den Laptop, dann eine saubere
 -- Firmen-Oberfläche mit App-Leiste. DASHBOARD (Überblick), EMPLOYEES (Worker einstellen/
--- entlassen), STORAGE und ELEVATOR (Bestand, Kapazität, Upgrades). PRODUCTION/COMPANY später.
+-- entlassen, Drills an Mining-Slots), STORAGE und ELEVATOR (Bestand, Kapazität, Upgrades),
+-- PRODUCTION (Drills mit Status, Inventar). COMPANY später.
 -- Kein Windows-Klon (docs/20). Einstellen/Entlassen prüft der Server.
 
 local Players = game:GetService("Players")
@@ -14,6 +15,7 @@ local UITheme = require(Shared.Config.UITheme)
 local Mines = require(Shared.Definitions.Mines)
 local Ores = require(Shared.Definitions.Ores)
 local WorkerRoles = require(Shared.Definitions.WorkerRoles)
+local Drills = require(Shared.Definitions.Drills)
 local Upgrades = require(Shared.Definitions.Upgrades)
 local BalanceConfig = require(Shared.Config.BalanceConfig)
 local CompanyIdentity = require(Shared.Definitions.CompanyIdentity)
@@ -157,6 +159,70 @@ local function slotCard(order: number, title: string, worker: Types.WorkerRecord
 	end
 end
 
+-- Drill-Status als Text und Farbe (docs/05 §29: Grün arbeitet, Orange wartet)
+local function drillStatus(id: string): (string, Color3)
+	local status = statuses[id]
+	if status == "Running" then
+		return TEXT.DrillStatus.Running, UITheme.Colors.Positive
+	elseif status == "OutputFull" then
+		return TEXT.DrillStatus.OutputFull, UITheme.Colors.Warning
+	end
+	return TEXT.DrillStatus.Idle, UITheme.Colors.Warning
+end
+
+-- Karte für einen Mining-Slot mit Drill (Slot ist Worker ODER Drill, docs/05 §26)
+local function drillSlotCard(order: number, title: string, drill: Types.DrillRecord)
+	local def = Drills.Get(drill.Type)
+	local card = Create("Frame", {
+		Size = UDim2.new(1, 0, 0, 64),
+		BackgroundColor3 = UITheme.Colors.Surface,
+		LayoutOrder = order,
+		Parent = content,
+	}, {
+		Create("UICorner", { CornerRadius = UITheme.CornerRadius }),
+		Create("UIPadding", { PaddingLeft = UDim.new(0, 14), PaddingRight = UDim.new(0, 14) }),
+	})
+	Create("TextLabel", {
+		Position = UDim2.fromOffset(0, 10),
+		Size = UDim2.new(0.6, 0, 0, 22),
+		BackgroundTransparency = 1,
+		Font = UITheme.FontBold,
+		TextSize = 18,
+		TextColor3 = UITheme.Colors.TextPrimary,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		Text = title,
+		Parent = card,
+	})
+	local statusText, statusColor = drillStatus(drill.Id)
+	local rate = if def then string.format(TEXT.DrillRate, NumberFormat.withSeparators(Drills.OrePerMinute(def))) else ""
+	Create("TextLabel", {
+		Position = UDim2.fromOffset(0, 34),
+		Size = UDim2.new(0.66, 0, 0, 18),
+		BackgroundTransparency = 1,
+		Font = UITheme.Font,
+		TextSize = 14,
+		TextColor3 = statusColor,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		Text = `{if def then def.DisplayName else drill.Type} · {statusText} · {rate}`,
+		Parent = card,
+	})
+	local button: TextButton = Create("TextButton", {
+		AnchorPoint = Vector2.new(1, 0.5),
+		Position = UDim2.fromScale(1, 0.5),
+		Size = UDim2.fromOffset(130, 38),
+		BackgroundColor3 = UITheme.Colors.SurfaceRaised,
+		Font = UITheme.FontBold,
+		TextSize = 15,
+		TextColor3 = UITheme.Colors.TextPrimary,
+		Text = TEXT.RemoveDrill,
+		Parent = card,
+	}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
+	local id = drill.Id
+	button.Activated:Connect(function()
+		call("RemoveDrill", nil, id)
+	end)
+end
+
 local function renderEmployees(snapshot: Types.StateSnapshot)
 	label(TEXT.Employees, 24, UITheme.Colors.TextPrimary, 1, true)
 	local storageBuilt = snapshot.Buildings.build_storage == true
@@ -218,7 +284,19 @@ local function renderEmployees(snapshot: Types.StateSnapshot)
 				end
 			end
 			local title = string.format(if roleId == "Mining" then TEXT.MiningSlot else TEXT.TransportSlot, slot)
-			slotCard(order, title, worker, roleDef, slot, storageBuilt, snapshot)
+			local drill: Types.DrillRecord? = nil
+			if roleId == "Mining" then
+				for _, d in snapshot.Drills do
+					if d.MineId == selectedMine and d.Slot == slot then
+						drill = d
+					end
+				end
+			end
+			if drill then
+				drillSlotCard(order, title, drill)
+			else
+				slotCard(order, title, worker, roleDef, slot, storageBuilt, snapshot)
+			end
 			order += 1
 		end
 	end
@@ -382,11 +460,18 @@ local function renderDashboard(snapshot: Types.StateSnapshot)
 		tile(4, TEXT.EmployeesCard, tostring(total), table.concat(parts, " · "), if unpaidCount > 0 then UITheme.Colors.Negative elseif waiting > 0 then UITheme.Colors.Warning else UITheme.Colors.Positive)
 	end
 
-	-- Produktion: rechnerischer Abbau der bezahlten Mining-Worker und Elevator-Füllstand
+	-- Produktion: rechnerischer Abbau der bezahlten Mining-Worker und laufenden Drills,
+	-- dazu der Elevator-Füllstand
 	local rate = 0
 	for _, worker in snapshot.Workers do
 		if worker.Role == "Mining" and statuses[worker.Id] ~= "Unpaid" then
 			rate += BalanceConfig.Workers.Mining.OrePerMinute
+		end
+	end
+	for _, drill in snapshot.Drills do
+		local def = Drills.Get(drill.Type)
+		if def and drill.MineId and statuses[drill.Id] == "Running" then
+			rate += Drills.OrePerMinute(def)
 		end
 	end
 	local load = sumItems(snapshot.ElevatorBuffer)
@@ -449,6 +534,69 @@ local function renderElevator(snapshot: Types.StateSnapshot)
 	upgradeCard(3, "elevator", snapshot.ElevatorCapacity, snapshot)
 end
 
+-- PRODUCTION: platzierte Drills mit Status, verfügbare Drills im Inventar (docs/09 §32–33)
+local function renderProduction(snapshot: Types.StateSnapshot)
+	label(TEXT.ProductionTitle, 24, UITheme.Colors.TextPrimary, 1, true)
+	local placed: { Types.DrillRecord } = {}
+	local available: { [string]: number } = {}
+	for _, drill in snapshot.Drills do
+		if drill.MineId then
+			table.insert(placed, drill)
+		else
+			available[drill.Type] = (available[drill.Type] or 0) + 1
+		end
+	end
+	if #placed == 0 and next(available) == nil then
+		label(TEXT.NoMachines, 16, UITheme.Colors.TextSecondary, 2)
+		return
+	end
+	table.sort(placed, function(a, b)
+		local ma, mb = Mines.Get(a.MineId or ""), Mines.Get(b.MineId or "")
+		local na, nb = if ma then ma.Number else 0, if mb then mb.Number else 0
+		if na ~= nb then
+			return na < nb
+		end
+		return (a.Slot or 0) < (b.Slot or 0)
+	end)
+	for i, drill in placed do
+		local def = Drills.Get(drill.Type)
+		local mine = Mines.Get(drill.MineId or "")
+		local box = card(10 + i, 64)
+		cardText(box, `{if def then def.DisplayName else drill.Type} – {if mine then Mines.Label(mine) else ""} · {string.format(TEXT.MiningSlot, drill.Slot or 0)}`, 0, 17, UITheme.Colors.TextPrimary, true)
+		local statusText, statusColor = drillStatus(drill.Id)
+		local rate = if def then string.format(TEXT.DrillRate, NumberFormat.withSeparators(Drills.OrePerMinute(def))) else ""
+		cardText(box, `{statusText} · {rate}`, 24, 14, statusColor)
+		local button: TextButton = Create("TextButton", {
+			AnchorPoint = Vector2.new(1, 0.5),
+			Position = UDim2.fromScale(1, 0.5),
+			Size = UDim2.fromOffset(120, 36),
+			BackgroundColor3 = UITheme.Colors.SurfaceRaised,
+			Font = UITheme.FontBold,
+			TextSize = 14,
+			TextColor3 = UITheme.Colors.TextPrimary,
+			Text = TEXT.RemoveDrill,
+			Parent = box,
+		}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
+		local id = drill.Id
+		button.Activated:Connect(function()
+			call("RemoveDrill", nil, id)
+		end)
+	end
+	if next(available) ~= nil then
+		label(TEXT.InventoryTitle, 16, UITheme.Colors.TextSecondary, 100, true)
+		local order = 101
+		for _, def in Drills.List do
+			local count = available[def.Id]
+			if count then
+				local box = card(order, 52)
+				cardText(box, string.format(TEXT.InventoryLine, def.DisplayName, count), 0, 16, UITheme.Colors.TextPrimary, true)
+				cardText(box, TEXT.InventoryHint, 22, 13, UITheme.Colors.TextSecondary)
+				order += 1
+			end
+		end
+	end
+end
+
 function LaptopController.Render()
 	if not gui or not gui.Enabled then
 		return
@@ -473,6 +621,8 @@ function LaptopController.Render()
 		renderStorage(snapshot)
 	elseif currentApp == "ELEVATOR" then
 		renderElevator(snapshot)
+	elseif currentApp == "PRODUCTION" then
+		renderProduction(snapshot)
 	else
 		label(currentApp, 24, UITheme.Colors.TextPrimary, 1, true)
 		label(TEXT.ComingSoon, 16, UITheme.Colors.TextSecondary, 2)

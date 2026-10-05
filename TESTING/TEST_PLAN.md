@@ -157,3 +157,21 @@ Werte sind Vorschläge aus Q-020. Für den Kauf: `SetLevel(…, 6)` und `SetCash
 | 5a.6 | Zu wenig Geld | Ohne genug Geld kaufen | „Not enough money. You need $8000.“, nichts gekauft |
 | 5a.7 | Speichern | Stop → Play | Drills bleiben im Inventar; alter Spielstand wird auf v4 gebracht |
 | 5a.8 | Equipment-Shop | Equipment-Shop öffnen | Unverändert (Reiter PICKAXES/BACKPACKS) |
+
+## Phase 5b – Drills in der Mine
+
+Voraussetzung: Lager gebaut, mindestens ein Drill gekauft (5a). Für MK2: `SetLevel(…, 9)`.
+
+| # | Test | Schritte | Erwartet |
+|---|---|---|---|
+| 5b.1 | Slot-Prompt | Elevator → Mine 01, zum gelben Schild am Pfosten neben einem Mining-Slot, **E** halten („Manage Slot“) | Fenster „MINE 01 · MINING SLOT n“ |
+| 5b.2 | Worker-Slot | Prompt an einem Slot mit Mining-Worker | Hinweis „A Mining Worker works here …“, kein PLACE |
+| 5b.3 | Platzieren | Freier Slot → PLACE bei Drill MK1 | Meldung „Drill MK1 placed and drilling!“, Drill steht vor der Erzwand, Bohrspitze an der Wand, links bleibt Platz zum selbst Minen |
+| 5b.4 | Betrieb | Zuschauen | Statuslampe grün, Bohrkopf dreht, Motor vibriert leicht, Staub und Steinchen an der Spitze |
+| 5b.5 | Produktion | Laptop → EMPLOYEES | Mining Slot n zeigt „Drill MK1 · Running · 60 ore / min“; „Ore waiting at slots“ steigt |
+| 5b.6 | Transport | Transport-Worker einstellen | Er holt hinten am Auswurf des Drills ab und bringt zum Elevator |
+| 5b.7 | Output voll | Ohne Transport-Worker warten, bis der Puffer voll ist | Lampe orange, Bohrkopf steht, Status „Output Full“, nichts verschwindet |
+| 5b.8 | Sperren | Am Laptop HIRE auf dem Drill-Slot | Nicht möglich (Karte zeigt REMOVE statt HIRE) |
+| 5b.9 | Entfernen | Slot-Fenster oder Laptop → REMOVE | Drill verschwindet, Meldung „… moved back to your inventory.“, Shop-Inventar „Placed 0“, Erz im Puffer bleibt |
+| 5b.10 | PRODUCTION-App | Laptop → PRODUCTION | Platzierte Drills mit Mine, Slot, Status; darunter „INVENTORY“ mit verfügbaren Drills |
+| 5b.11 | Speichern | Stop → Play, wieder in die Mine | Drill steht wieder am selben Slot und arbeitet |

@@ -1,11 +1,15 @@
 --!strict
 -- Produktion (docs/06 §2, §9–21, docs/15 §11–12): ein zentraler Takt für alle Spieler,
 -- keine Schleife pro Worker. Kette je Mine:
---   Mining-Worker → Slot-Puffer → Transport-Worker → Elevator-Puffer → (Fahrt) → Lager
+--   Mining-Worker/Drill → Slot-Puffer → Transport-Worker → Elevator-Puffer → (Fahrt) → Lager
 -- Jeder Schritt läuft nur, wenn der nächste Platz hat (Rückstau statt Vernichtung, §18–19).
 -- Wirtschaft ist rein rechnerisch; die Figuren (WorkerVisualService) sind nur Darstellung.
 --
--- Status je Worker: "Working" | "Waiting" | "Unpaid" → Remote "WorkerStatus" bei Änderung.
+-- Status je Worker: "Working" | "Waiting" | "Unpaid", je Drill: "Running" | "OutputFull"
+-- → Remote "WorkerStatus" und Signal StatusChanged bei Änderung.
+-- Drills (Phase 5b, docs/05 §27–31): OrePerCycle alle CycleSeconds in den Slot-Puffer, kein
+-- Lohn. Der Puffer der Mine wächst um die OutputCapacity jedes platzierten Drills; ist er voll,
+-- steht der Drill (Zyklus wird angehalten, nichts geht verloren).
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -13,6 +17,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local BalanceConfig = require(Shared.Config.BalanceConfig)
 local Mines = require(Shared.Definitions.Mines)
+local Drills = require(Shared.Definitions.Drills)
 local Ores = require(Shared.Definitions.Ores)
 local Types = require(Shared.Types)
 local Signal = require(Shared.Util.Signal)
@@ -29,10 +34,12 @@ local ProductionService = {
 	Mined = Signal.new() :: Signal.Signal<Player, string>,
 	-- (player, mineId) wenn ein Transport-Worker Erz zum Elevator gebracht hat
 	Transported = Signal.new() :: Signal.Signal<Player, string>,
+	-- (player, status) wenn sich ein Worker-/Drill-Status geändert hat
+	StatusChanged = Signal.new() :: Signal.Signal<Player, { [string]: string }>,
 }
 
 -- Nachkommastellen der Raten (nur Laufzeit; ganze Einheiten stehen im Profil)
-type Accumulators = { mining: { [string]: number }, transport: { [string]: number }, elevator: number }
+type Accumulators = { mining: { [string]: number }, transport: { [string]: number }, drill: { [string]: number }, elevator: number }
 local accumulators: { [Player]: Accumulators } = {}
 local lastStatus: { [Player]: { [string]: string } } = {}
 
@@ -47,15 +54,33 @@ end
 local function getAcc(player: Player): Accumulators
 	local acc = accumulators[player]
 	if not acc then
-		acc = { mining = {}, transport = {}, elevator = 0 }
+		acc = { mining = {}, transport = {}, drill = {}, elevator = 0 }
 		accumulators[player] = acc
 	end
 	return acc
 end
 
+-- Hat der Spieler irgendetwas, das produziert oder transportiert?
+local function hasProducers(data: Types.PlayerData): boolean
+	if next(data.Workers) ~= nil then
+		return true
+	end
+	for _, drill in data.Machines.Drills do
+		if drill.MineId then
+			return true
+		end
+	end
+	return false
+end
+
 local function tickPlayer(player: Player)
 	local data = DataService.Get(player)
-	if not data or not data.Buildings.build_storage or next(data.Workers) == nil then
+	if not data or not data.Buildings.build_storage or not hasProducers(data) then
+		if data and next(lastStatus[player] or {}) ~= nil then
+			lastStatus[player] = {}
+			RemoteService.FireClient("WorkerStatus", player, {})
+			ProductionService.StatusChanged:Fire(player, {})
+		end
 		return
 	end
 	local cfg = BalanceConfig.Workers
@@ -63,14 +88,23 @@ local function tickPlayer(player: Player)
 	local status: { [string]: string } = {}
 
 	-- Worker je Mine gruppieren (nur bezahlte arbeiten)
-	type MineGroup = { mining: { Types.WorkerRecord }, transport: { Types.WorkerRecord } }
+	type MineGroup = { mining: { Types.WorkerRecord }, transport: { Types.WorkerRecord }, drills: { Types.DrillRecord } }
 	local mines: { [string]: MineGroup } = {}
-	for _, worker in data.Workers do
-		local group = mines[worker.MineId]
+	local function groupFor(mineId: string): MineGroup
+		local group = mines[mineId]
 		if not group then
-			group = { mining = {}, transport = {} }
-			mines[worker.MineId] = group
+			group = { mining = {}, transport = {}, drills = {} }
+			mines[mineId] = group
 		end
+		return group
+	end
+	for _, drill in data.Machines.Drills do
+		if drill.MineId then
+			table.insert(groupFor(drill.MineId).drills, drill)
+		end
+	end
+	for _, worker in data.Workers do
+		local group = groupFor(worker.MineId)
 		if not WorkerService.IsPaid(player, worker.Id) then
 			status[worker.Id] = "Unpaid"
 		elseif worker.Role == "Mining" then
@@ -92,9 +126,14 @@ local function tickPlayer(player: Player)
 				continue
 			end
 			local buffer = production.MineBuffers[mineId] or 0
-			-- Puffer: SlotBuffer je Mining-Slot mit Worker (mindestens einer, damit
-			-- Transport-Worker Restmengen noch abholen können)
-			local cap = cfg.SlotBuffer * math.max(1, #group.mining)
+			-- Puffer: SlotBuffer je Mining-Worker plus OutputCapacity je Drill (mindestens
+			-- SlotBuffer, damit Transport-Worker Restmengen noch abholen können)
+			local cap = cfg.SlotBuffer * #group.mining
+			for _, drill in group.drills do
+				local def = Drills.Get(drill.Type)
+				cap += if def then def.OutputCapacity else 0
+			end
+			cap = math.max(cap, cfg.SlotBuffer)
 
 			-- 1) Mining-Worker füllen den Slot-Puffer
 			if #group.mining > 0 then
@@ -110,6 +149,27 @@ local function tickPlayer(player: Player)
 				for _, worker in group.mining do
 					status[worker.Id] = if buffer >= cap then "Waiting" else "Working"
 				end
+			end
+
+			-- 1b) Drills: OrePerCycle alle CycleSeconds, Zyklus steht bei vollem Puffer
+			for _, drill in group.drills do
+				local def = Drills.Get(drill.Type)
+				if not def then
+					continue
+				end
+				if buffer >= cap then
+					status[drill.Id] = "OutputFull"
+					continue
+				end
+				local t = (acc.drill[drill.Id] or 0) + TICK_SECONDS
+				if t >= def.CycleSeconds then
+					local add = math.min(def.OrePerCycle, cap - buffer)
+					buffer += add
+					mined[mineId] = true
+					t -= def.CycleSeconds
+				end
+				acc.drill[drill.Id] = t
+				status[drill.Id] = if buffer >= cap then "OutputFull" else "Running"
 			end
 
 			-- 2) Transport-Worker bringen Erz vom Slot-Puffer zum Elevator
@@ -197,6 +257,7 @@ local function tickPlayer(player: Player)
 	if changed then
 		lastStatus[player] = status
 		RemoteService.FireClient("WorkerStatus", player, status)
+		ProductionService.StatusChanged:Fire(player, status)
 	end
 end
 

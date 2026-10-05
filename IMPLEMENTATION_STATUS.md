@@ -12,7 +12,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 2 | Vertical Slice A | USER_APPROVED (Felix, 2026-10-04) |
 | 3 | Vertical Slice B (Equipment, Mine 02) | USER_APPROVED (Felix, 2026-10-04) |
 | 4 | Storage + Worker (Worker erst nach Lager, D-004) | USER_APPROVED (4a, 4b, 4c) |
-| 5 | Drill | TESTING_REQUIRED (5a TESTING_REQUIRED, 5b NOT_STARTED) |
+| 5 | Drill | TESTING_REQUIRED (5a, 5b TESTING_REQUIRED) |
 | 6 | Garage & Vehicles | NOT_STARTED |
 | 7 | Conveyors | NOT_STARTED |
 | 8 | Smelter | NOT_STARTED |
@@ -256,6 +256,33 @@ Selbsttest per Studio-MCP (2026-10-04):
 - Kauf: ungültige ID → `INVALID_ARGUMENT`; MK1 bei Level 5 → `LEVEL_TOO_LOW`; bei Level 6 zwei MK1 gekauft (d1, d2), dritter → `NOT_ENOUGH_MONEY`; MK2 → `LEVEL_TOO_LOW`; 60 Studs vom Tresen → `TOO_FAR`.
 - Shop-Fenster: „MACHINES“, Reiter DRILLS, MK1 „Owned 2 · Placed 0 · Available 2“, MK2/MK3 „LOCKED“. Equipment-Shop danach unverändert.
 - Gekaufte Drills nach Stop → Play erhalten. Felix' Profil danach zurückgesetzt (Level 5, $6.473, keine Drills).
+
+### 5b – Drills in der Mine (Version 0.11.0) – TESTING_REQUIRED
+
+| System | Dateien | Status |
+|---|---|---|
+| Slot-Prompt „Manage Slot“ an jedem Mining-Slot (Pfosten mit Schild im Raum) | `MineShaftBuilder.luau` | TESTING_REQUIRED |
+| Drill platzieren/entfernen (Remotes `PlaceDrill`, `RemoveDrill`, Event `OpenSlotMenu`): nur eigene Mine, in der man steht, Lager gebaut, Slot frei (kein Worker/Drill), freies Exemplar; Entfernen in der Mine oder am Laptop; Puffer bleibt erhalten | `src/server/Services/DrillService.luau` | TESTING_REQUIRED |
+| Mining-Slot ist Worker ODER Drill: Einstellen auf Drill-Slot → `SLOT_TAKEN` | `WorkerService.luau` | TESTING_REQUIRED |
+| Produktion: Drill liefert OrePerCycle alle CycleSeconds in den Slot-Puffer, Puffer wächst um OutputCapacity, voll → „OutputFull“ (Zyklus steht, nichts geht verloren); Status per `WorkerStatus` + Signal `StatusChanged` | `ProductionService.luau` | TESTING_REQUIRED |
+| Drill-Modelle in der Mine (nur solange der Besitzer drin ist), Statuslampe Grün/Orange, Staub- und Steinpartikel nur im Betrieb, Kollision mit Spielern, nicht mit Worker-Figuren | `src/server/Services/DrillVisualService.luau`, `DrillModelBuilder.luau` | TESTING_REQUIRED |
+| Bohrkopf dreht, Motor vibriert (Client, nur bei „Running“ und in Sichtweite) | `src/client/Controllers/DrillAnimController.luau` | TESTING_REQUIRED |
+| Slot-Fenster: Worker-Hinweis / Drill mit Status und REMOVE / verfügbare Drills mit PLACE | `src/client/Controllers/DrillSlotController.luau` | TESTING_REQUIRED |
+| Transport-Worker holen am Auswurf des Drills ab | `WorkerVisualService.luau` | TESTING_REQUIRED |
+| Laptop: EMPLOYEES zeigt Drill im Mining-Slot (Status, Rate, REMOVE); neue App PRODUCTION (platzierte Drills mit Status, Inventar); Dashboard-Produktion inkl. laufender Drills | `LaptopController.luau`, `Strings.luau` | TESTING_REQUIRED |
+| Client-Status zentral im StateController (`GetStatus`, `StatusChanged`) | `StateController.luau` | TESTING_REQUIRED |
+
+Selbsttest per Studio-MCP (2026-10-05):
+- MK1 (d3) und MK2 (d4) gekauft, in Mine 01 gefahren.
+- Platzieren: Slot 1 mit Worker → `SLOT_TAKEN`; Slot 3 → `INVALID_ARGUMENT`; Mine 02 (nicht dort) → `NOT_IN_MINE`; MK3 nicht im Besitz → `NOT_OWNED`; MK2 auf Slot 2 → OK; nochmal → `SLOT_TAKEN`.
+- Drill-Modell steht im Slot (Bohrspitze 0,8 Studs vor der Wand, berührt nur das Erzflöz), Status „Running“, Partikel an; Slot-Pfosten überschneidet nichts.
+- Produktion: Puffer 202 → 228 in 12 s (MK2 + Worker), Lager war voll → Rückstau korrekt, nichts verloren.
+- Entfernen in der Mine: ungültige ID → `NOT_OWNED`, OK, zweites Mal → `ALREADY_DONE`; Modell weg, Puffer bleibt (264).
+- An der Oberfläche fern vom Laptop entfernen → `TOO_FAR`; am Laptop: Einstellen auf Drill-Slot → `SLOT_TAKEN`; REMOVE in EMPLOYEES → Drill im Inventar.
+- Laptop: DASHBOARD „90 ore / min“ (Worker 30 + MK1 60); PRODUCTION listet „Drill MK1 – MINE 01 · Mining Slot 2 · Running“ und „Drill MK2 × 1 available“; EMPLOYEES zeigt Slot 2 mit Drill.
+- Slot-Fenster (über das Server-Event geöffnet): leerer Slot zeigt MK1/MK2 mit PLACE → PLACE platziert, Fenster zeigt danach Drill mit Status und REMOVE; Slot mit Worker zeigt den Hinweis.
+- Stop → Play: platzierter Drill und Inventar erhalten. Felix' Profil danach zurückgesetzt (Level 5, $6.473, keine Drills); der Slot-Puffer von Mine 01 ist durch den Test auf 409 gestiegen.
+- Nicht selbst prüfbar: Der Prompt selbst ließ sich im Hintergrund-Fenster nicht auslösen (wie zuvor beim Laptop), und Screenshots aus der Mine waren schwarz (Studio-Fenster im Hintergrund rendert nicht). Optik, Drehung und Prompt bitte in Studio ansehen.
 
 ## Werkzeuge
 

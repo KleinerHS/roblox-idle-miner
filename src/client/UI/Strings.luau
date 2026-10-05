@@ -39,11 +39,13 @@ local MESSAGES: { [string]: string } = {
 	-- Shop
 	ITEM_PURCHASED = "{Name} purchased and equipped!",
 	DRILL_PURCHASED = "{Name} purchased! Place it in a mine.",
+	DRILL_PLACED = "{Name} placed and drilling!",
+	DRILL_REMOVED = "{Name} moved back to your inventory.",
 	NOT_OWNED = "You don't own this item yet.",
 
 	-- Worker
 	SLOT_TAKEN = "This slot is already taken.",
-	STORAGE_REQUIRED = "Build the Storage first to hire workers.",
+	STORAGE_REQUIRED = "Build the Storage first.",
 	WORKER_HIRED = "{Name} hired!",
 	WORKERS_UNPAID = "Not enough money for wages – some workers paused.",
 	WORKERS_PAID = "All workers are paid and working again.",
@@ -179,6 +181,30 @@ Strings.Laptop = table.freeze({
 	UpgradeButton = "UPGRADE %s",
 	MaxLevel = "MAX LEVEL",
 	MaxLevelSub = "Fully upgraded.",
+
+	-- Drills (Phase 5b)
+	DrillStatus = { Running = "Running", OutputFull = "Output Full", Idle = "Idle" },
+	DrillRate = "%s ore / min",
+	RemoveDrill = "REMOVE",
+	ProductionTitle = "PRODUCTION",
+	NoMachines = "No machines yet. Buy drills at the Machine Shop in town.",
+	InventoryTitle = "INVENTORY",
+	InventoryLine = "%s × %d available",
+	InventoryHint = "Place it at a mining slot inside a mine.",
+})
+
+Strings.DrillSlot = table.freeze({
+	Title = "%s · MINING SLOT %d",
+	WorkerHere = "A Mining Worker works here.",
+	WorkerHint = "Fire the worker on the laptop to place a drill here.",
+	EmptySlot = "This slot is free.",
+	NoDrills = "No drills in your inventory. Buy one at the Machine Shop in town.",
+	Available = "Available: %d",
+	PerMinute = "%s ore / min",
+	Place = "PLACE",
+	Remove = "REMOVE",
+	Status = { Running = "Running", OutputFull = "Output Full – needs transport", Idle = "Idle" },
+	Close = "X",
 })
 
 Strings.Hud = table.freeze({

@@ -16,9 +16,12 @@ local TAG = "StateController"
 
 local StateController = {
 	Changed = Signal.new() :: Signal.Signal<Types.StateSnapshot>,
+	StatusChanged = Signal.new() :: Signal.Signal<{ [string]: string }>,
 }
 
 local current: Types.StateSnapshot? = nil
+-- Laufzeitstatus von Workern und Drills (Remote "WorkerStatus", nur bei Änderung gesendet)
+local statuses: { [string]: string } = {}
 
 local lastLogLine = ""
 
@@ -37,6 +40,17 @@ function StateController.Init()
 	Net.on("StateSnapshot", function(snapshot: Types.StateSnapshot)
 		apply(snapshot)
 	end)
+	Net.on("WorkerStatus", function(payload: any)
+		if typeof(payload) == "table" then
+			statuses = payload
+			StateController.StatusChanged:Fire(statuses)
+		end
+	end)
+end
+
+-- Status eines Workers/Drills ("Working", "Running", "OutputFull" …) oder nil
+function StateController.GetStatus(id: string): string?
+	return statuses[id]
 end
 
 function StateController.Start()

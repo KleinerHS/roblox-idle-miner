@@ -267,6 +267,27 @@ local function buildSlot(model: Model, o: CFrame, slotIndex: number, plotId: num
 	zone:SetAttribute("SlotIndex", slotIndex)
 	zone:SetAttribute("PlotId", plotId)
 	CollectionService:AddTag(zone, "MiningSlot")
+
+	-- Slot verwalten (Drill platzieren/entfernen, docs/05 §25, docs/10 §31–32). Der Prompt
+	-- sitzt an einem kleinen Pfosten im Raum vor dem Slot, nicht an der Wand.
+	local post = part(folder, `SlotPost{slotIndex}`, Vector3.new(0.5, 3.2, 0.5), wallCFrame(o, wall, t0 - 9.5, 1.6, 11), IRON, Enum.Material.Metal)
+	local sign = part(folder, `SlotSign{slotIndex}`, Vector3.new(1.6, 1, 0.15), wallCFrame(o, wall, t0 - 9.5, 3.4, 11), Color3.fromRGB(240, 196, 40), Enum.Material.SmoothPlastic)
+	local promptPart = part(folder, `SlotPromptPart{slotIndex}`, Vector3.new(1, 1, 1), wallCFrame(o, wall, t0 - 9.5, 3, 11), Color3.new(1, 1, 1), Enum.Material.SmoothPlastic)
+	promptPart.Transparency = 1
+	promptPart.CanCollide = false
+	promptPart.CanQuery = false
+	local prompt = Instance.new("ProximityPrompt")
+	prompt.Name = "SlotPrompt"
+	prompt.ActionText = "Manage Slot"
+	prompt.ObjectText = `Mining Slot {slotIndex}`
+	prompt.HoldDuration = 0.3
+	prompt.MaxActivationDistance = 9
+	prompt.RequiresLineOfSight = false
+	prompt:SetAttribute("SlotIndex", slotIndex)
+	prompt:SetAttribute("PlotId", plotId)
+	prompt.Parent = promptPart
+	post.CanTouch = false
+	sign.CanTouch = false
 end
 
 local function buildElevator(model: Model, o: CFrame, plotId: number)

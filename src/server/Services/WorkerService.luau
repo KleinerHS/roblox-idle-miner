@@ -70,6 +70,14 @@ local function slotTaken(data: Types.PlayerData, mineId: string, role: string, s
 			return true
 		end
 	end
+	-- Mining-Slot ist Worker ODER Drill (docs/05 §26)
+	if role == "Mining" then
+		for _, drill in data.Machines.Drills do
+			if drill.MineId == mineId and drill.Slot == slot then
+				return true
+			end
+		end
+	end
 	return false
 end
 

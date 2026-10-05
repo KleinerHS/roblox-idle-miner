@@ -5,6 +5,7 @@
 --
 -- Mining-Worker: steht am eigenen Slot vor der Erzwand und hackt (wenn Status "Working").
 -- Transport-Worker: läuft mit Kiste zwischen Abholpunkt am Slot und Elevator-Treppe.
+-- Steht an dem Slot ein Drill, holt er am Auswurfschacht des Drills ab (docs/05 §32).
 -- Worker kollidieren nicht mit Spielern oder untereinander (Kollisionsgruppen, §18).
 
 local Players = game:GetService("Players")
@@ -14,8 +15,11 @@ local TweenService = game:GetService("TweenService")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Mines = require(Shared.Definitions.Mines)
+local Drills = require(Shared.Definitions.Drills)
 
+local DrillModelBuilder = require(script.Parent.Parent.World.DrillModelBuilder)
 local DataService = require(script.Parent.DataService)
+local DrillService = require(script.Parent.DrillService)
 local ElevatorService = require(script.Parent.ElevatorService)
 local WorkerService = require(script.Parent.WorkerService)
 local ProductionService = require(script.Parent.ProductionService)
@@ -221,6 +225,12 @@ local function show(player: Player)
 				else
 					local pickupCF = zone.CFrame * CFrame.new(2, 0, -6)
 					local pickup = Vector3.new(pickupCF.Position.X, floorY + 3, pickupCF.Position.Z)
+					local drill = DrillService.DrillAt(data, mine.Id, worker.Slot)
+					local def = drill and Drills.Get(drill.Type)
+					if def then
+						local output = DrillModelBuilder.outputPoint(DrillModelBuilder.slotCFrame(zone, floorY, def), def)
+						pickup = Vector3.new(output.X, floorY + 3, output.Z)
+					end
 					local front = podium.CFrame * CFrame.new(0, 0, -podium.Size.Z / 2 - 7)
 					local dropoff = Vector3.new(front.Position.X + (worker.Slot - 1.5) * 4, floorY + 3, front.Position.Z)
 					local rig = spawnWorker(room, CFrame.new(pickup), "Transport")
@@ -269,6 +279,11 @@ function WorkerVisualService.Start()
 		task.spawn(show, player)
 	end)
 	WorkerService.WorkersChanged:Connect(function(player)
+		if Mines.Get(ElevatorService.GetLocation(player)) then
+			task.spawn(show, player)
+		end
+	end)
+	DrillService.DrillsChanged:Connect(function(player)
 		if Mines.Get(ElevatorService.GetLocation(player)) then
 			task.spawn(show, player)
 		end
