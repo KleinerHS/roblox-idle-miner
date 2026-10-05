@@ -41,6 +41,10 @@ local MESSAGES: { [string]: string } = {
 	DRILL_PURCHASED = "{Name} purchased! Place it in a mine.",
 	VEHICLE_PURCHASED = "{Name} purchased! Get it at the glowing ring in your garage.",
 	GARAGE_REQUIRED = "Build the Garage first.",
+	BAYS_FULL = "Both garage bays are taken. Park one of your vehicles first.",
+	NO_VEHICLE = "Drive your vehicle under the loading tower first.",
+	VEHICLE_FULL = "Your vehicle is full!",
+	VEHICLE_RESET = "Vehicle returned to its garage bay.",
 	DRILL_PLACED = "{Name} placed and drilling!",
 	DRILL_REMOVED = "{Name} moved back to your inventory.",
 	NOT_OWNED = "You don't own this item yet.",
@@ -210,6 +214,27 @@ Strings.DrillSlot = table.freeze({
 	Remove = "REMOVE",
 	Status = { Running = "Running", OutputFull = "Output Full – needs transport", Idle = "Idle" },
 	Close = "X",
+})
+
+Strings.Garage = table.freeze({
+	Title = "GARAGE",
+	Bays = "Bays in use: %d / %d",
+	NoVehicles = "You don't own a vehicle yet. Buy one at the Vehicle shop in town.",
+	Capacity = "Capacity %s",
+	Cargo = "Cargo %s / %s",
+	InBay = "In bay %d",
+	Stored = "Parked away",
+	Drive = "DRIVE",
+	Store = "PARK AWAY",
+	Reset = "RESET",
+	Close = "X",
+})
+
+Strings.Driving = table.freeze({
+	Speed = "%d studs/s",
+	Cargo = "CARGO %s / %s",
+	Reset = "RESET VEHICLE",
+	Exit = "Press Space to get out",
 })
 
 Strings.Hud = table.freeze({

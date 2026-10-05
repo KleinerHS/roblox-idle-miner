@@ -227,6 +227,39 @@ local function props(model: Model, o: CFrame)
 	accent(line)
 end
 
+-- Glas-Rolltor in der Hallen-Toröffnung (docs/07 §3, §19). Geschlossen füllt es die Öffnung;
+-- zum Öffnen rollt es sich nach oben in den Rollkasten (VehicleService tweened Größe/Lage).
+local function door(model: Model, plotCFrame: CFrame)
+	local doorW, doorH = LayoutConfig.DoorWidth, LayoutConfig.DoorHeight
+	local z = LayoutConfig.HallOffset.Y - LayoutConfig.HallSize.Y / 2 - 0.9
+	local base = plotCFrame * CFrame.new(LayoutConfig.DoorCenterX, LayoutConfig.HallFloorTop, z)
+	local curtain = part(model, "GarageDoor", Vector3.new(doorW, doorH, 0.35), base * CFrame.new(0, doorH / 2, 0), Color3.fromRGB(170, 205, 225), Enum.Material.Glass)
+	curtain.Transparency = 0.45
+	curtain:SetAttribute("OpenHeight", 0.8)
+	-- Lamellen als Linien (eine Fläche, damit das Rollen nur ein Teil bewegt)
+	for _, face in { Enum.NormalId.Front, Enum.NormalId.Back } do
+		local gui = Instance.new("SurfaceGui")
+		gui.Face = face
+		gui.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
+		gui.PixelsPerStud = 10
+		gui.LightInfluence = 1
+		gui.Parent = curtain
+		local slats = math.floor(doorH / 2)
+		for i = 1, slats do
+			local line = Instance.new("Frame")
+			line.AnchorPoint = Vector2.new(0, 0.5)
+			line.Position = UDim2.fromScale(0, i / slats)
+			line.Size = UDim2.new(1, 0, 0, 3)
+			line.BackgroundColor3 = Color3.fromRGB(90, 96, 104)
+			line.BorderSizePixel = 0
+			line.Parent = gui
+		end
+	end
+	-- Sensor-Leuchte über dem Tor
+	local sensor = part(model, "DoorSensor", Vector3.new(1.2, 0.6, 0.6), base * CFrame.new(doorW / 2 - 2, doorH + 3, -0.8), Color3.fromRGB(90, 200, 120), Enum.Material.Neon)
+	sensor.CanCollide = false
+end
+
 function GarageTemplate.build(plotCFrame: CFrame): Model
 	local model = Instance.new("Model")
 	model.Name = "Garage"
@@ -237,6 +270,7 @@ function GarageTemplate.build(plotCFrame: CFrame): Model
 	ring(model, o)
 	tower(model, o)
 	props(model, o)
+	door(model, plotCFrame)
 	return model
 end
 

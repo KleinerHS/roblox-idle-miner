@@ -81,6 +81,14 @@ local Remotes: { [string]: RemoteDefinition } = {
 	PlaceDrill = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
 	-- Drill entfernen (in der Mine oder am Laptop): (drillId: string) -> Result<drillId>
 	RemoveDrill = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
+	-- Garage (Phase 6): Server öffnet die Fahrzeugauswahl nach Betreten des Leuchtrings
+	OpenGarage = { Kind = "Event", Direction = "ServerToClient" },
+	-- Ausparken/Einsteigen: (vehicleId: string) -> Result<vehicleId>
+	DriveVehicle = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 5, Window = 10 } },
+	-- Einparken (Stellplatz frei, Ladung bleibt): (vehicleId: string) -> Result<vehicleId>
+	StoreVehicle = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 5, Window = 10 } },
+	-- Fahrzeug zurück auf den Stellplatz: (vehicleId: string) -> Result<vehicleId>
+	ResetVehicle = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 3, Window = 10 } },
 	-- Kapazitäts-Upgrade am Laptop: (kind: "storage" | "elevator") -> Result<{ Capacity: number }>
 	BuyUpgrade = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
 }
