@@ -147,6 +147,31 @@ function DevService.Init()
 	end
 	setBuilding.Parent = folder
 
+	-- Material ins Lager legen (ohne Kapazitätsprüfung, nur zum Testen):
+	--   game.ServerStorage.DevTools.AddStorage:Invoke(game.Players:GetPlayers()[1], "ore_copper", 200)
+	local addStorage = Instance.new("BindableFunction")
+	addStorage.Name = "AddStorage"
+	addStorage.OnInvoke = function(player: Player, materialId: string, amount: number): string
+		local ok = DataService.Mutate(player, function(data)
+			local n = (data.Storage.Items[materialId] or 0) + math.floor(amount)
+			data.Storage.Items[materialId] = if n > 0 then n else nil
+		end)
+		return if ok then "ok" else "Profil nicht geladen"
+	end
+	addStorage.Parent = folder
+
+	-- Gekaufte Mine setzen/entfernen (ab Mine 03):
+	--   game.ServerStorage.DevTools.SetMineUnlocked:Invoke(game.Players:GetPlayers()[1], "mine_003", false)
+	local setMine = Instance.new("BindableFunction")
+	setMine.Name = "SetMineUnlocked"
+	setMine.OnInvoke = function(player: Player, mineId: string, unlocked: boolean): string
+		local ok = DataService.Mutate(player, function(data)
+			data.UnlockedMines[mineId] = if unlocked then true else nil
+		end)
+		return if ok then "ok" else "Profil nicht geladen"
+	end
+	setMine.Parent = folder
+
 	folder.Parent = ServerStorage
 end
 

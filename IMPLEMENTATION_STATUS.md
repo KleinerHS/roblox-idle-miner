@@ -14,7 +14,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 4 | Storage + Worker (Worker erst nach Lager, D-004) | USER_APPROVED (4a, 4b, 4c) |
 | 5 | Drill | TESTING_REQUIRED (5a, 5b; Test von Felix zurückgestellt, 2026-10-05) |
 | 6 | Garage & Vehicles | TESTING_REQUIRED (6a, 6b, 6c) |
-| 7 | Conveyors (7a Minenkauf & Schmelzer vorgezogen, D-024) | IMPLEMENTED (7a, ungetestet; 7b Förderbänder NOT_STARTED) |
+| 7 | Conveyors (7a Minenkauf & Schmelzer vorgezogen, D-024) | TESTING_REQUIRED (7a selbst getestet; 7b Förderbänder NOT_STARTED) |
 | 8 | Smelter | NOT_STARTED |
 | 9 | Multiplayer Hardening / Trading | NOT_STARTED |
 | 10 | Offline Production | NOT_STARTED |
@@ -353,7 +353,7 @@ Selbsttest per Studio-MCP (2026-10-05):
 - Felix' Profil danach zurückgesetzt (Level 7, $83.658); die 429 Coal aus seinem Lager liegen jetzt im Pickup.
 - Gefunden und behoben: Ladefläche liegt bei A-Chassis im Untermodell „Body“ → Suche nach „CargoFill“ rekursiv.
 
-### 7a – Minenkauf & Schmelzer (Version 0.13.0, vorgezogen nach D-024) – IMPLEMENTED (ungetestet)
+### 7a – Minenkauf & Schmelzer (Version 0.13.0, vorgezogen nach D-024) – TESTING_REQUIRED
 
 | System | Dateien | Status |
 |---|---|---|
@@ -362,6 +362,16 @@ Selbsttest per Studio-MCP (2026-10-05):
 | Datenschema v6: `Smelter` (Input, Output, Priority), Migration v5 → v6 | `DataSchema.luau`, `Types.luau`, `DataService.luau` | IMPLEMENTED |
 | Schmelzer-Gebäude (Bauschritt nach der Garage): Hochofen mit Glut/Feuer/Funken/Rauch nur im Betrieb, Trichter, Barrenablage, Kamin, Terminal mit Anzeige, Förderband-Anschlüsse | `SmelterTemplate.luau` | IMPLEMENTED |
 | Verarbeitung (1-s-Takt), Rezeptwahl (Priorität, sonst wertvollster Barren), Befüllen/Abholen am Terminal, Laptop PRODUCTION zeigt den Schmelzer | `SmelterService.luau`, `SmelterLogic.luau`, `SmelterController.luau`, `LaptopController.luau` | IMPLEMENTED |
+| DevTools `AddStorage(player, id, n)`, `SetMineUnlocked(player, mineId, bool)` | `DevService.luau` | IMPLEMENTED |
+
+Selbsttest per Studio-MCP (2026-10-06):
+- Minenkauf: Fahrt in Mine 03 ohne Kauf → `NOT_OWNED`; Mine 04 vor Mine 03 → `NOT_AVAILABLE`; Mine 02 (kostenlos) → `INVALID_ARGUMENT`; Mine 03 → OK ($3.000), zweites Mal → `ALREADY_DONE`; Mine 04 → OK ($4.500); Mine 05 bei Level 8 → `LEVEL_TOO_LOW`. Fahrt in Mine 03: Schild „MINE 03 · COPPER“.
+- Elevator-Menü: Mine 04 „GO“, Mine 05/06 „LOCKED · Requires Mining Level 10/12“.
+- Schmelzer über den Bau-Button gebaut (Level 10), Anzeige „IDLE“.
+- Einfüllen: Coal → `INVALID_ARGUMENT`; 50 Copper → OK; nach 10 s Trichter 48 → 42, 4 Barren, Anzeige „RUNNING · IN 42 / 200 · OUT 4 / 100“; COLLECT → 4 Copper Bars im Lager.
+- Fenster „SMELTER“: Status, „Smelting: Copper → Copper Bar“, Trichter/Ablage, AUTO-Priorität, FEED/FEED ALL/PREFER, COLLECT BARS.
+- Gefunden (offene Frage an Felix): Der Verladeturm (D-025) zieht schmelzbares Erz sofort in ein geparktes Fahrzeug, so dass der Schmelzer leer ausgeht.
+- Felix' Profil zurückgesetzt (Level 7, $83.613, Minen 03/04 und Schmelzer entfernt, Barren entfernt). Durch den Test liegen 250 Copper im Pickup; im (abgebauten) Schmelzer stehen noch 28 Copper und 7 Barren in den Daten.
 
 ## Werkzeuge
 
