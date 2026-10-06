@@ -194,3 +194,19 @@ Werte sind Vorschläge aus Q-021. Für den Test: `SetLevel(…, 14)` und `SetCas
 | 6.10 | Reset | Fahrzeug festfahren → RESET VEHICLE | Steht wieder auf seinem Stellplatz, Ladung unverändert |
 | 6.11 | Fremdes Fahrzeug (2 Spieler) | Spieler 2 setzt sich in das Fahrzeug von Spieler 1 | Wird sofort herausgesetzt („This is not your company.“) |
 | 6.12 | Speichern | Mit Ladung Stop → Play | Fahrzeug steht wieder in der Halle, Ladung ist noch da |
+
+## Phase 7 – Minenkauf, Schmelzer, Förderbänder
+
+Für den Test: `SetLevel(…, 35)`, `SetCash(…, 1000000)`, `AddStorage(…, "ore_copper", 200)`.
+
+| # | Test | Schritte | Erwartet |
+|---|---|---|---|
+| 7.1 | Minenkauf | Elevator-Menü, bei Mine 03 „BUY $3K“ | Mine 03 freigeschaltet, Fahrt möglich, Schild „MINE 03 · COPPER“; Mine 04 erst danach kaufbar |
+| 7.2 | Schmelzer bauen | Nach der Garage den Button „Smelter“ | Hochofen mit Trichter, Barrenablage, Kamin, Terminal mit Anzeige „IDLE“ |
+| 7.3 | Einfüllen | Terminal **E** → FEED ALL | Trichter füllt sich, Ofen glüht, Funken/Rauch, Anzeige „RUNNING“ |
+| 7.4 | Abholen | COLLECT BARS | Copper Bars im Lager, verkaufbar |
+| 7.5 | Förderband kaufen | Machine-Shop → CONVEYORS → MK1 | „Owned 1“, Meldung zum Einsetzen |
+| 7.6 | Einsetzen | Am gelben Pfosten „Storage → Smelter“ **E** → INSTALL | Band erscheint statt der Vorschau, Erz wandert sichtbar zum Trichter |
+| 7.7 | Rückweg | Zweites Band an „Smelter → Storage“ | Barren laufen automatisch ins Lager |
+| 7.8 | Entfernen | Pfosten → REMOVE | Band zurück im Inventar, Vorschau wieder da |
+| 7.9 | Speichern | Stop → Play | Bänder und Schmelzer-Inhalt bleiben |

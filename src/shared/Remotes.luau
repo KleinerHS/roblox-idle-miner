@@ -59,7 +59,7 @@ local Remotes: { [string]: RemoteDefinition } = {
 	BuyItem = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
 	-- Ausrüsten eines besessenen Items: (category, itemId) -> Result
 	EquipItem = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 10, Window = 10 } },
-	-- Maschine kaufen (mehrfach möglich, landet im Inventar): (drillTypeId: string) -> Result<instanceId>
+	-- Maschine kaufen (Drill oder Förderband, mehrfach möglich, landet im Inventar): (typeId: string) -> Result<instanceId>
 	BuyMachine = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
 	-- Fahrzeug kaufen (je Typ einmal, landet eingelagert im Fuhrpark): (vehicleTypeId: string) -> Result<vehicleId>
 	BuyVehicle = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
@@ -101,6 +101,12 @@ local Remotes: { [string]: RemoteDefinition } = {
 	SmelterCollect = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 10, Window = 10 } },
 	-- Bevorzugtes Erz ("" = automatisch): (oreId: string) -> Result
 	SmelterPriority = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
+	-- Förderbänder (Phase 7b): Server öffnet das Platz-Fenster: { Slot }
+	OpenConveyorSlot = { Kind = "Event", Direction = "ServerToClient" },
+	-- Einsetzen: (slot: string, conveyorTypeId: string) -> Result<conveyorId>
+	PlaceConveyor = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
+	-- Entfernen (zurück ins Inventar): (conveyorId: string) -> Result<conveyorId>
+	RemoveConveyor = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
 	-- Kapazitäts-Upgrade am Laptop: (kind: "storage" | "elevator") -> Result<{ Capacity: number }>
 	BuyUpgrade = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
 }

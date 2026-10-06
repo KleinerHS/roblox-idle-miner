@@ -38,3 +38,13 @@ Vorschlag (eingebaut als `TODO_BALANCE`):
 Große Fahrzeuge sind langsamer und träger (docs/07 §14). Je Typ besitzt man ein Fahrzeug.
 
 Frage an Felix: Passen diese Werte, oder andere?
+
+## Q-024 – Förderband-Werte (Phase 7b)
+
+Quelle: docs/00 §18 (erster Conveyor ~Level 35), docs/10 §35. Vorschlag (eingebaut als `TODO_BALANCE`):
+
+| Band | Preis | ab Level | Durchsatz |
+|---|---|---|---|
+| Conveyor MK1 | $50.000 | 35 | 120 / min |
+| Conveyor MK2 | $150.000 | 45 | 300 / min |
+| Conveyor MK3 | $500.000 | 60 | 800 / min |

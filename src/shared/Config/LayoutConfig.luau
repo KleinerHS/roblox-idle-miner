@@ -68,6 +68,15 @@ local LayoutConfig = {
 		build_smelter = Vector2.new(-60, -20),
 	} :: { [string]: Vector2 },
 
+	-- Feste Förderband-Strecken (docs/06 §23, D-024), lokal zur Plotmitte: X, Höhe über dem
+	-- Hallenboden, Z. Erster Punkt = Förderband-Platz ("PLACE CONVEYOR HERE"). TODO_LAYOUT
+	ConveyorPaths = {
+		-- Lager-Ausgang vorne am Lager → entlang der Halle → schräg hinauf in den Schmelzer-Trichter
+		StorageToSmelter = { Vector3.new(-30, 1.2, 27), Vector3.new(-30, 1.2, 1.5), Vector3.new(-56, 1.2, 1.5), Vector3.new(-70, 12.2, 4.6) },
+		-- Barren-Ablage → abwärts → zum Lager-Eingang an der linken Lagerseite
+		SmelterToStorage = { Vector3.new(-71, 3.6, 31), Vector3.new(-65, 1.2, 34), Vector3.new(-44, 1.2, 34) },
+	} :: { [string]: { Vector3 } },
+
 	-- Garage im vorderen Hallenbereich (docs/07 §3, D-008, D-016), lokal zur Plotmitte.
 	-- Fahrzeuge stehen mit der Front zum Rolltor (-Z). Der Verladeturm steht hinter und
 	-- zwischen den beiden Stellplätzen und speist von oben in die Ladefläche. TODO_LAYOUT

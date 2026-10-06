@@ -22,6 +22,13 @@ export type DrillRecord = {
 	Slot: number?,
 }
 
+-- Gekauftes Förderband (docs/10 §38–39): Slot gesetzt = eingesetzt, nil = im Inventar
+export type ConveyorRecord = {
+	Id: string,
+	Type: string,
+	Slot: string?,
+}
+
 -- Gekauftes Fahrzeug (docs/07 §48, D-009, D-016): Ladung gehört zur Fahrzeug-ID.
 -- Bay gesetzt = steht auf diesem Garagen-Stellplatz (1/2), nil = eingelagert.
 export type VehicleRecord = {
@@ -98,6 +105,8 @@ export type PlayerData = {
 	-- Maschinen (ab DataVersion 4): gekaufte Drills mit Instanz-ID
 	Machines: {
 		Drills: { [string]: DrillRecord },
+		-- ab DataVersion 7
+		Conveyors: { [string]: ConveyorRecord },
 		Seq: number,
 	},
 
@@ -141,6 +150,7 @@ export type StateSnapshot = {
 	StorageItems: ItemCounts,
 	Workers: { [string]: WorkerRecord },
 	Drills: { [string]: DrillRecord },
+	Conveyors: { [string]: ConveyorRecord },
 	Vehicles: { [string]: VehicleRecord },
 	MineBuffers: { [string]: number },
 	ElevatorBuffer: ItemCounts,

@@ -14,6 +14,7 @@ local UITheme = require(Shared.Config.UITheme)
 local Pickaxes = require(Shared.Definitions.Pickaxes)
 local Backpacks = require(Shared.Definitions.Backpacks)
 local Drills = require(Shared.Definitions.Drills)
+local Conveyors = require(Shared.Definitions.Conveyors)
 local Vehicles = require(Shared.Definitions.Vehicles)
 local Types = require(Shared.Types)
 local NumberFormat = require(Shared.Util.NumberFormat)
@@ -41,7 +42,7 @@ local currentTab = "pickaxe"
 -- Reiter je Shop
 local SHOP_TABS: { [string]: { { string } } } = {
 	equipment = { { "pickaxe", TEXT.Pickaxes }, { "backpack", TEXT.Backpacks } },
-	machine = { { "drill", TEXT.Drills } },
+	machine = { { "drill", TEXT.Drills }, { "conveyor", TEXT.Conveyors } },
 	vehicle = { { "vehicle", TEXT.Vehicles } },
 }
 
@@ -111,6 +112,30 @@ local function cardsFor(tab: string, snapshot: Types.StateSnapshot): { Card }
 				},
 			})
 		end
+	elseif tab == "conveyor" then
+		for _, def in Conveyors.List do
+			local owned, placed = 0, 0
+			for _, c in snapshot.Conveyors do
+				if c.Type == def.Id then
+					owned += 1
+					if c.Slot then
+						placed += 1
+					end
+				end
+			end
+			table.insert(cards, {
+				Id = def.Id,
+				Name = def.DisplayName,
+				Level = def.RequiredLevel,
+				Price = def.Price,
+				Available = true,
+				Multi = true,
+				Stats = {
+					{ label = TEXT.Throughput, value = string.format(TEXT.PerMinute, NumberFormat.withSeparators(def.Throughput)) },
+					{ label = TEXT.Inventory, value = string.format(TEXT.InventoryValue, owned, placed, owned - placed) },
+				},
+			})
+		end
 	elseif tab == "drill" then
 		for _, def in Drills.List do
 			local owned, placed = drillCounts(snapshot, def.Id)
@@ -154,7 +179,7 @@ local function act(remote: string, itemId: string)
 	local result = if remote == "BuyMachine" or remote == "BuyVehicle" then Net.invoke(remote, itemId) else Net.invoke(remote, currentTab, itemId)
 	busy = false
 	if not result.success then
-		local def: any = if currentTab == "pickaxe" then Pickaxes.Get(itemId) elseif currentTab == "drill" then Drills.Get(itemId) elseif currentTab == "vehicle" then Vehicles.Get(itemId) else Backpacks.Get(itemId)
+		local def: any = if currentTab == "pickaxe" then Pickaxes.Get(itemId) elseif currentTab == "drill" then Drills.Get(itemId) elseif currentTab == "conveyor" then Conveyors.Get(itemId) elseif currentTab == "vehicle" then Vehicles.Get(itemId) else Backpacks.Get(itemId)
 		NotificationController.Show("Warning", result.code, { Level = def and def.RequiredLevel, Price = def and def.Price })
 	end
 end

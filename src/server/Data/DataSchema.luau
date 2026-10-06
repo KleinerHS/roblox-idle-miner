@@ -1,5 +1,5 @@
 --!strict
--- Datenschema v6: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
+-- Datenschema v7: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
 -- Regeln:
 --  * Defaults gibt es nur hier.
 --  * Jede Strukturänderung erhöht CURRENT_VERSION und bekommt eine Migration
@@ -15,7 +15,7 @@ local Backpacks = require(Shared.Definitions.Backpacks)
 local Mines = require(Shared.Definitions.Mines)
 local Types = require(Shared.Types)
 
-local CURRENT_VERSION = 6
+local CURRENT_VERSION = 7
 
 local DataSchema = {
 	CurrentVersion = CURRENT_VERSION,
@@ -73,6 +73,8 @@ local TEMPLATE: Types.PlayerData = {
 	-- Maschinen (v4): gekaufte Drills mit Instanz-ID, platziert oder im Inventar (docs/10 §38)
 	Machines = {
 		Drills = {},
+		-- Förderbänder (v7) mit Instanz-ID, eingesetzt an einem festen Platz oder im Inventar
+		Conveyors = {},
 		Seq = 0,
 	},
 
@@ -149,6 +151,12 @@ local MIGRATIONS: { [number]: (data: { [string]: any }) -> () } = {
 	[5] = function(data)
 		if typeof(data.Smelter) ~= "table" then
 			data.Smelter = { Input = {}, Output = {}, Priority = "" }
+		end
+	end,
+	-- v6 → v7: Förderbänder ergänzt (Phase 7b)
+	[6] = function(data)
+		if typeof(data.Machines) == "table" and typeof(data.Machines.Conveyors) ~= "table" then
+			data.Machines.Conveyors = {}
 		end
 	end,
 }

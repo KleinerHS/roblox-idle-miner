@@ -14,7 +14,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 4 | Storage + Worker (Worker erst nach Lager, D-004) | USER_APPROVED (4a, 4b, 4c) |
 | 5 | Drill | TESTING_REQUIRED (5a, 5b; Test von Felix zurückgestellt, 2026-10-05) |
 | 6 | Garage & Vehicles | TESTING_REQUIRED (6a, 6b, 6c) |
-| 7 | Conveyors (7a Minenkauf & Schmelzer vorgezogen, D-024) | TESTING_REQUIRED (7a selbst getestet; 7b Förderbänder NOT_STARTED) |
+| 7 | Conveyors (7a Minenkauf & Schmelzer vorgezogen, D-024) | TESTING_REQUIRED (7a und 7b selbst getestet) |
 | 8 | Smelter | NOT_STARTED |
 | 9 | Multiplayer Hardening / Trading | NOT_STARTED |
 | 10 | Offline Production | NOT_STARTED |
@@ -372,6 +372,28 @@ Selbsttest per Studio-MCP (2026-10-06):
 - Fenster „SMELTER“: Status, „Smelting: Copper → Copper Bar“, Trichter/Ablage, AUTO-Priorität, FEED/FEED ALL/PREFER, COLLECT BARS.
 - Gefunden: Der Verladeturm (D-025) zog schmelzbares Erz sofort in ein geparktes Fahrzeug → gelöst mit D-030 (nur mit Fahrer laden, schmelzbares Erz bleibt beim Schmelzer). Getestet: im Fahrzeug 107 Coal geladen, 100 Copper blieben im Lager; ausgestiegen → kein Laden, Anzeige „GET IN TO LOAD“.
 - Felix' Profil zurückgesetzt (Level 7, $83.613, Minen 03/04 und Schmelzer entfernt, Barren entfernt). Durch den Test liegen 250 Copper im Pickup; im (abgebauten) Schmelzer stehen noch 28 Copper und 7 Barren in den Daten.
+
+### 7b – Förderbänder (Version 0.15.0) – TESTING_REQUIRED
+
+| System | Dateien | Status |
+|---|---|---|
+| Förderband-Definitionen MK1–MK3 (Durchsatz, Preis, Level) – Vorschlag Q-024 | `src/shared/Definitions/Conveyors.luau` | TESTING_REQUIRED |
+| Datenschema v7: `Machines.Conveyors` (Instanz-ID, Typ, Platz), Migration v6 → v7; Snapshot `Conveyors` | `DataSchema.luau`, `Types.luau`, `DataService.luau` | TESTING_REQUIRED |
+| Feste Strecken Lager → Schmelzer-Trichter und Barren-Ablage → Lager | `LayoutConfig.ConveyorPaths` | TESTING_REQUIRED |
+| Band-Modell (Gurt, Seitenwangen in Stufenfarbe, Umlenkrollen, Stützen), Vorschau „PLACE CONVEYOR HERE“ für freie Plätze | `src/server/World/ConveyorBuilder.luau` | TESTING_REQUIRED |
+| Einsetzen/Entfernen am Pfosten (Prompt), Transport im 1-s-Takt (Erz: bevorzugtes zuerst, sonst wertvollstes; nur bis Trichter voll; Barren nur bis Lager voll), Band läuft sichtbar nur bei Bewegung | `src/server/Services/ConveyorService.luau` | TESTING_REQUIRED |
+| Machine-Shop Reiter CONVEYORS (mehrfach kaufbar, Inventar) | `ShopService.luau`, `ShopController.luau` | TESTING_REQUIRED |
+| Platz-Fenster (INSTALL/REMOVE), wandernde Materialhaufen in Materialfarbe | `src/client/Controllers/ConveyorController.luau` | TESTING_REQUIRED |
+| DevTool `ClearSmelter(player)` (Förderbänder + Schmelzer-Inhalt) | `DevService.luau` | TESTING_REQUIRED |
+
+Selbsttest per Studio-MCP (2026-10-06):
+- Migration v6 → v7 ohne Fehler; mit Schmelzer erscheinen beide Vorschau-Strecken mit Pfosten.
+- Kauf: 2 × MK1 (c5, c6); MK2 bei Level 35 → `LEVEL_TOO_LOW`.
+- Einsetzen: zu weit vom Pfosten → `TOO_FAR`; falscher Platz → `INVALID_ARGUMENT`; MK3 nicht im Besitz → `NOT_OWNED`; MK1 → OK; zweites Mal → `SLOT_TAKEN`.
+- Betrieb: Lager-Kupfer 197 → 167 in 16 s (≈ 2/s), Trichter füllt sich, Schmelzer läuft, Barren im Lager 2 → 26; Band A „Running“ mit 23 sichtbaren Haufen.
+- Platz-Fenster zeigt „Conveyor MK1 · 120 / min · REMOVE“; REMOVE → Band im Inventar, Vorschau wieder da.
+- Überschneidungen nur gewollt (Band mündet in den Trichter, startet an der Ablage); Pfosten von Band 2 vom Anschluss-Pad weggesetzt.
+- Felix' Profil danach zurückgesetzt (Level 7, $84.363, keine Bänder, kein Schmelzer, Test-Kupfer/Barren entfernt).
 
 ## Werkzeuge
 

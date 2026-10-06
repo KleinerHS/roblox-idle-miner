@@ -17,6 +17,7 @@ local LayoutConfig = require(Shared.Config.LayoutConfig)
 local Pickaxes = require(Shared.Definitions.Pickaxes)
 local Backpacks = require(Shared.Definitions.Backpacks)
 local Drills = require(Shared.Definitions.Drills)
+local Conveyors = require(Shared.Definitions.Conveyors)
 local Vehicles = require(Shared.Definitions.Vehicles)
 local Types = require(Shared.Types)
 local Result = require(Shared.Util.Result)
@@ -164,11 +165,14 @@ local function equip(player: Player, categoryName: unknown, itemId: unknown)
 end
 
 -- Drill kaufen (mehrfach möglich): (drillTypeId) -> Result<instanceId>
-local function buyMachine(player: Player, drillTypeId: unknown)
-	if typeof(drillTypeId) ~= "string" then
+-- Maschine kaufen: Drill (Phase 5) oder Förderband (Phase 7b), mehrfach möglich
+local function buyMachine(player: Player, typeId: unknown)
+	if typeof(typeId) ~= "string" then
 		return Result.err(Result.Codes.INVALID_ARGUMENT)
 	end
-	local def = Drills.Get(drillTypeId)
+	local drill = Drills.Get(typeId :: string)
+	local conveyor = Conveyors.Get(typeId :: string)
+	local def: { Id: string, DisplayName: string, RequiredLevel: number, Price: number }? = drill or conveyor
 	if not def then
 		return Result.err(Result.Codes.INVALID_ARGUMENT)
 	end
@@ -191,12 +195,17 @@ local function buyMachine(player: Player, drillTypeId: unknown)
 	DataService.Mutate(player, function(d)
 		d.Cash -= def.Price
 		d.Machines.Seq += 1
-		newId = `d{d.Machines.Seq}`
-		d.Machines.Drills[newId] = { Id = newId, Type = def.Id }
+		if conveyor then
+			newId = `c{d.Machines.Seq}`
+			d.Machines.Conveyors[newId] = { Id = newId, Type = def.Id }
+		else
+			newId = `d{d.Machines.Seq}`
+			d.Machines.Drills[newId] = { Id = newId, Type = def.Id }
+		end
 	end)
 	DataService.RequestSave(player)
 	Log.debug(TAG, `{player.Name} kauft {def.Id} ({newId}) für {def.Price}`)
-	RemoteService.FireClient("Notify", player, { Kind = "Success", Code = "DRILL_PURCHASED", Args = { Name = def.DisplayName } })
+	RemoteService.FireClient("Notify", player, { Kind = "Success", Code = if conveyor then "CONVEYOR_PURCHASED" else "DRILL_PURCHASED", Args = { Name = def.DisplayName } })
 	return Result.ok(newId)
 end
 

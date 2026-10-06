@@ -51,6 +51,8 @@ local MESSAGES: { [string]: string } = {
 	SMELTER_COLLECTED = "{Amount} bars moved to storage.",
 	VEHICLE_LOADED = "Your vehicle is fully loaded!",
 	DRILL_PLACED = "{Name} placed and drilling!",
+	CONVEYOR_PURCHASED = "{Name} purchased! Install it at a conveyor spot in your hall.",
+	CONVEYOR_PLACED = "{Name} installed!",
 	DRILL_REMOVED = "{Name} moved back to your inventory.",
 	NOT_OWNED = "You don't own this item yet.",
 
@@ -118,6 +120,8 @@ Strings.Shop = table.freeze({
 	VehicleSpeed = "Top Speed",
 	Vehicles = "VEHICLES",
 	Drills = "DRILLS",
+	Conveyors = "CONVEYORS",
+	Throughput = "Throughput",
 	Production = "Production",
 	PerMinute = "%s ore / min",
 	Output = "Output buffer",
@@ -263,6 +267,19 @@ Strings.Driving = table.freeze({
 	Cargo = "CARGO %s / %s",
 	Reset = "RESET VEHICLE",
 	Exit = "Press Space to get out",
+})
+
+Strings.ConveyorSlot = table.freeze({
+	Title = "CONVEYOR · %s",
+	Empty = "No conveyor installed here yet.",
+	NoConveyors = "No conveyors in your inventory. Buy one at the Machine Shop in town.",
+	Available = "Available: %d",
+	PerMinute = "%s / min",
+	Install = "INSTALL",
+	Remove = "REMOVE",
+	Running = "Running",
+	Idle = "Idle – nothing to move",
+	Close = "X",
 })
 
 Strings.Hud = table.freeze({

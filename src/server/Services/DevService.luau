@@ -172,6 +172,19 @@ function DevService.Init()
 	end
 	setMine.Parent = folder
 
+	-- Förderbänder und Schmelzer-Inhalt leeren (Trichter, Ablage, Priorität):
+	--   game.ServerStorage.DevTools.ClearSmelter:Invoke(game.Players:GetPlayers()[1])
+	local clearSmelter = Instance.new("BindableFunction")
+	clearSmelter.Name = "ClearSmelter"
+	clearSmelter.OnInvoke = function(player: Player): string
+		local ok = DataService.Mutate(player, function(data)
+			table.clear(data.Machines.Conveyors)
+			data.Smelter = { Input = {}, Output = {}, Priority = "" }
+		end)
+		return if ok then "ok" else "Profil nicht geladen"
+	end
+	clearSmelter.Parent = folder
+
 	folder.Parent = ServerStorage
 end
 
