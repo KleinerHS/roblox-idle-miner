@@ -188,3 +188,9 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Source Question:** Q-023
 **Decision:** 100 Einheiten pro Sekunde.
 **Affected systems:** Garage, Loading, Balance
+
+## D-030 – Verladeturm: nur mit Fahrer, schmelzbares Erz bleibt für den Schmelzer
+
+**Source:** Felix, 2026-10-06 („a und b“)
+**Decision:** Der Turm belädt nur, wenn der Spieler im Fahrzeug sitzt (ein nur geparktes Fahrzeug leert das Lager nicht; Anzeige „GET IN TO LOAD“). Solange ein Schmelzer gebaut ist, lädt der Turm kein schmelzbares Erz – es bleibt im Lager für den Schmelzer.
+**Affected systems:** Loading, Smelter

@@ -188,7 +188,7 @@ Werte sind Vorschläge aus Q-021. Für den Test: `SetLevel(…, 14)` und `SetCas
 | 6.4 | Kaufen | Utility Pickup kaufen | Meldung „… Get it at the glowing ring …“, Karte zeigt OWNED |
 | 6.5 | Ausparken | In der Garage auf den Leuchtring treten → DRIVE | Pickup steht auf Stellplatz 1, du sitzt am Steuer, Fahranzeige unten |
 | 6.6 | Fahren (A-Chassis, D-026) | W/S, A/D, Kurven, Bremsen | Federung, Automatik schaltet selbst, Tacho und Motorsound; kein Überschlag; Tor öffnet beim Heranfahren |
-| 6.7 | Laden (D-025) | Fahrzeug auf Stellplatz stehen lassen bzw. rückwärts darunter fahren und anhalten | Schurre fährt aus, Lampe grün, Anzeige zählt hoch; voll → „FULL“ (blau); leeres Lager → „STORAGE EMPTY“ (orange) |
+| 6.7 | Laden (D-025, D-030) | Im Fahrzeug sitzend auf dem Stellplatz bzw. unter der Schurre anhalten | Schurre fährt aus, Lampe grün, Anzeige zählt hoch; voll → „FULL“ (blau); leeres Lager → „STORAGE EMPTY“ (orange); ausgestiegen → „GET IN TO LOAD“, kein Laden; mit Schmelzer bleibt Kupfer/Zinn/Eisen im Lager |
 | 6.8 | Verkaufen | Zur Stadtmitte, in die markierte Zone vor dem Verkaufsgebäude fahren | „SELL CARGO“ öffnet sich; SELL ALL → Geld und XP, Fahrzeug leer |
 | 6.9 | Zweites Fahrzeug | Weiteres Fahrzeug kaufen, am Ring DRIVE | Steht auf Stellplatz 2; ein drittes ginge nur nach PARK AWAY eines anderen |
 | 6.10 | Reset | Fahrzeug festfahren → RESET VEHICLE | Steht wieder auf seinem Stellplatz, Ladung unverändert |

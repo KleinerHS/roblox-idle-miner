@@ -3,6 +3,9 @@
 -- Steht ein eigenes Fahrzeug still unter einer Schurre, speist der Turm direkt aus dem
 -- Firmenlager in die Ladefläche: alles Verkaufbare, wertvollstes Material zuerst, bis das
 -- Fahrzeug voll ist. Keine Bedienung nötig (D-025: manuelles Beladen entfällt).
+-- D-030 (Felix): Geladen wird nur, wenn der Spieler im Fahrzeug sitzt (ein nur geparktes
+-- Fahrzeug leert das Lager nicht), und solange ein Schmelzer gebaut ist, bleibt schmelzbares
+-- Erz im Lager für den Schmelzer.
 -- Jeder Transfer ist eine einzige Profiländerung (Lager − n / Fahrzeug + n), ohne Yield
 -- dazwischen → keine Duplikation (docs/07 §11). Die Ladung gehört zur Fahrzeug-ID.
 
@@ -17,6 +20,7 @@ local Materials = require(Shared.Definitions.Materials)
 local Vehicles = require(Shared.Definitions.Vehicles)
 local Types = require(Shared.Types)
 local NumberFormat = require(Shared.Util.NumberFormat)
+local SmelterLogic = require(Shared.Util.SmelterLogic)
 
 local GarageTemplate = require(script.Parent.Parent.World.GarageTemplate)
 local DataService = require(script.Parent.DataService)
@@ -42,12 +46,13 @@ local function sum(items: Types.ItemCounts): number
 	return total
 end
 
--- Verkaufbare Materialien im Lager, wertvollstes zuerst (D-025)
-local function loadOrder(storage: Types.ItemCounts): { string }
+-- Verkaufbare Materialien im Lager, wertvollstes zuerst (D-025); mit Schmelzer ohne
+-- schmelzbares Erz (D-030)
+local function loadOrder(storage: Types.ItemCounts, keepSmeltable: boolean): { string }
 	local ids = {}
 	for id, amount in storage do
 		local material = Materials.Get(id)
-		if amount > 0 and material and material.SellValue then
+		if amount > 0 and material and material.SellValue and not (keepSmeltable and SmelterLogic.IsSmeltable(id)) then
 			table.insert(ids, id)
 		end
 	end
@@ -101,10 +106,14 @@ local function tickBay(player: Player, data: Types.PlayerData, garage: Model, ba
 	if free <= 0 then
 		return { state = "Full", vehicleId = vehicleId, extended = false }
 	end
+	-- Nur beladen, wenn der Spieler am Steuer sitzt (D-030)
+	if VehicleService.GetDriven(player) ~= vehicleId then
+		return { state = "Parked", vehicleId = vehicleId, extended = false }
+	end
 	local budget = math.min(free, math.floor(BalanceConfig.Loading.UnitsPerSecond * TICK_SECONDS))
 	local plan: { [string]: number } = {}
 	local total = 0
-	for _, id in loadOrder(data.Storage.Items) do
+	for _, id in loadOrder(data.Storage.Items, data.Buildings.build_smelter == true) do
 		local take = math.min(data.Storage.Items[id], budget - total)
 		if take > 0 then
 			plan[id] = take
@@ -150,7 +159,10 @@ local function tickPlayer(player: Player)
 		local value = "READY"
 		if record and def then
 			local fill = `{NumberFormat.withSeparators(sum(record.Cargo))} / {NumberFormat.withSeparators(def.Capacity)}`
-			value = if new.state == "Full" then `FULL · {fill}` elseif new.state == "NoStock" then "STORAGE EMPTY" else fill
+			value = if new.state == "Full" then `FULL · {fill}`
+				elseif new.state == "NoStock" then "STORAGE EMPTY"
+				elseif new.state == "Parked" then `GET IN TO LOAD · {fill}`
+				else fill
 		end
 		GarageTemplate.setBayState(garage, bay, new.state, title, value)
 		-- Schurre nur bei Zustandswechsel bewegen

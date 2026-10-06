@@ -370,7 +370,7 @@ Selbsttest per Studio-MCP (2026-10-06):
 - Schmelzer über den Bau-Button gebaut (Level 10), Anzeige „IDLE“.
 - Einfüllen: Coal → `INVALID_ARGUMENT`; 50 Copper → OK; nach 10 s Trichter 48 → 42, 4 Barren, Anzeige „RUNNING · IN 42 / 200 · OUT 4 / 100“; COLLECT → 4 Copper Bars im Lager.
 - Fenster „SMELTER“: Status, „Smelting: Copper → Copper Bar“, Trichter/Ablage, AUTO-Priorität, FEED/FEED ALL/PREFER, COLLECT BARS.
-- Gefunden (offene Frage an Felix): Der Verladeturm (D-025) zieht schmelzbares Erz sofort in ein geparktes Fahrzeug, so dass der Schmelzer leer ausgeht.
+- Gefunden: Der Verladeturm (D-025) zog schmelzbares Erz sofort in ein geparktes Fahrzeug → gelöst mit D-030 (nur mit Fahrer laden, schmelzbares Erz bleibt beim Schmelzer). Getestet: im Fahrzeug 107 Coal geladen, 100 Copper blieben im Lager; ausgestiegen → kein Laden, Anzeige „GET IN TO LOAD“.
 - Felix' Profil zurückgesetzt (Level 7, $83.613, Minen 03/04 und Schmelzer entfernt, Barren entfernt). Durch den Test liegen 250 Copper im Pickup; im (abgebauten) Schmelzer stehen noch 28 Copper und 7 Barren in den Daten.
 
 ## Werkzeuge
