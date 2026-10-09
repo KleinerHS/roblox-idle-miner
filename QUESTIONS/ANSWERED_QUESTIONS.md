@@ -461,3 +461,45 @@ Vorschlag: 100 Einheiten pro Sekunde (Pickup in 10 s voll, Box Truck in 60 s). `
 **Decision:** D-029
 
 ---
+
+---
+
+## Q-020 – Drill-Werte (Phase 5)
+
+**Status:** ANSWERED
+**Date:** 2026-10-10
+
+Vorschlag: MK1 $8.000 Lv 6 60/min Puffer 300 · MK2 $25.000 Lv 9 120/min Puffer 600 · MK3 $75.000 Lv 12 240/min Puffer 1.200.
+
+### Answer (Felix, 2026-10-10)
+„ok aber mk 3 sollte 500 abbauen“ / „Drill MK3 500 Erz pro Minute.“ – übernommen, MK3 = 25 Erz alle 3 s.
+
+**Decision:** D-031
+
+---
+
+## Q-021 – Garage und Fahrzeugwerte (Phase 6)
+
+**Status:** ANSWERED
+**Date:** 2026-10-10
+
+Vorschlag: Garage $10.000 Lv 7 · Pickup $6.000 Lv 7, 1.000, 55 · Van $20.000 Lv 10, 2.500, 52 · Box Truck $60.000 Lv 14, 6.000, 46.
+
+### Answer (Felix, 2026-10-10)
+„ok“ – übernommen.
+
+**Decision:** D-031
+
+---
+
+## Q-024 – Förderband-Werte (Phase 7b)
+
+**Status:** ANSWERED
+**Date:** 2026-10-10
+
+Vorschlag: MK1 $50.000 Lv 35 120/min · MK2 $150.000 Lv 45 300/min · MK3 $500.000 Lv 60 800/min.
+
+### Answer (Felix, 2026-10-10)
+„Förderband MK1 $15.000 ab Level 12, MK2 und MK3 erst einführen, wenn es Schmelzer-Upgrades gibt.“ – MK1 120/min bleibt.
+
+**Decision:** D-031

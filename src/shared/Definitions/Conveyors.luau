@@ -4,7 +4,8 @@
 -- Feste Strecken (LayoutConfig.ConveyorPaths):
 --   StorageToSmelter – schmelzbares Erz vom Lager in den Schmelzer-Trichter
 --   SmelterToStorage – fertige Barren aus der Ablage zurück ins Lager
--- Throughput = Einheiten pro Minute. Werte: Vorschlag Q-024 (docs: erster Conveyor ~Level 35).
+-- Throughput = Einheiten pro Minute. Werte: Q-024 / D-031 (Felix). MK2 und MK3 kommen erst,
+-- wenn es Schmelzer-Upgrades gibt.
 
 local Pickaxes = require(script.Parent.Pickaxes)
 
@@ -25,30 +26,10 @@ local list: { ConveyorDefinition } = {
 		Id = "conveyor_mk1",
 		DisplayName = "Conveyor MK1",
 		Tier = 1,
-		RequiredLevel = 35, -- TODO_BALANCE (Q-024, docs/00 §18 ~Level 35)
-		Price = 50000, -- TODO_BALANCE (Q-024)
-		Throughput = 120, -- TODO_BALANCE (Q-024)
+		RequiredLevel = 12, -- Q-024 (Felix, D-031)
+		Price = 15000, -- Q-024
+		Throughput = 120, -- Q-024
 		FrameColor = Color3.fromRGB(236, 182, 40),
-		PersistenceClass = "Progression",
-	},
-	{
-		Id = "conveyor_mk2",
-		DisplayName = "Conveyor MK2",
-		Tier = 2,
-		RequiredLevel = 45, -- TODO_BALANCE (Q-024)
-		Price = 150000, -- TODO_BALANCE (Q-024)
-		Throughput = 300, -- TODO_BALANCE (Q-024)
-		FrameColor = Color3.fromRGB(220, 110, 40),
-		PersistenceClass = "Progression",
-	},
-	{
-		Id = "conveyor_mk3",
-		DisplayName = "Conveyor MK3",
-		Tier = 3,
-		RequiredLevel = 60, -- TODO_BALANCE (Q-024)
-		Price = 500000, -- TODO_BALANCE (Q-024)
-		Throughput = 800, -- TODO_BALANCE (Q-024)
-		FrameColor = Color3.fromRGB(70, 130, 200),
 		PersistenceClass = "Progression",
 	},
 }

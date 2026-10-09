@@ -194,3 +194,9 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Source:** Felix, 2026-10-06 („a und b“)
 **Decision:** Der Turm belädt nur, wenn der Spieler im Fahrzeug sitzt (ein nur geparktes Fahrzeug leert das Lager nicht; Anzeige „GET IN TO LOAD“). Solange ein Schmelzer gebaut ist, lädt der Turm kein schmelzbares Erz – es bleibt im Lager für den Schmelzer.
 **Affected systems:** Loading, Smelter
+
+## D-031 – Werte für Drills, Fahrzeuge und Förderbänder
+
+**Source Question:** Q-020, Q-021, Q-024 (Felix, 2026-10-10)
+**Decision:** Drills wie vorgeschlagen, aber MK3 mit 500 Erz/Min (25 Erz alle 3 s). Garage und Fahrzeuge wie vorgeschlagen. Förderband MK1 $15.000 ab Level 12, 120/min; MK2 und MK3 entfallen, bis es Schmelzer-Upgrades gibt. Weicht bewusst von docs/00 §18 ab (erster Conveyor ~Level 35).
+**Affected systems:** Drill, Garage, Vehicles, Conveyors, Balance

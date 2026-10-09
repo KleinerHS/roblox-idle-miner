@@ -25,17 +25,17 @@ export type DrillDefinition = {
 	PersistenceClass: Pickaxes.PersistenceClass,
 }
 
--- Alle Zahlen: Vorschlag Q-020, TODO_BALANCE bis zur Bestätigung
+-- Alle Zahlen: Q-020, von Felix bestätigt (2026-10-10, MK3 auf 500 Erz/Min angehoben)
 local list: { DrillDefinition } = {
 	{
 		Id = "drill_mk1",
 		DisplayName = "Drill MK1",
 		Tier = 1,
-		RequiredLevel = 6, -- TODO_BALANCE (Q-020)
-		Price = 8000, -- TODO_BALANCE (Q-020)
-		OrePerCycle = 5, -- TODO_BALANCE (Q-020) → 60 Erz/Min
-		CycleSeconds = 5, -- TODO_BALANCE (Q-020)
-		OutputCapacity = 300, -- TODO_BALANCE (Q-020)
+		RequiredLevel = 6,
+		Price = 8000,
+		OrePerCycle = 5, -- → 60 Erz/Min
+		CycleSeconds = 5,
+		OutputCapacity = 300,
 		BodyColor = Color3.fromRGB(230, 160, 40),
 		PersistenceClass = "Progression",
 	},
@@ -43,11 +43,11 @@ local list: { DrillDefinition } = {
 		Id = "drill_mk2",
 		DisplayName = "Drill MK2",
 		Tier = 2,
-		RequiredLevel = 9, -- TODO_BALANCE (Q-020)
-		Price = 25000, -- TODO_BALANCE (Q-020)
-		OrePerCycle = 10, -- TODO_BALANCE (Q-020) → 120 Erz/Min
-		CycleSeconds = 5, -- TODO_BALANCE (Q-020)
-		OutputCapacity = 600, -- TODO_BALANCE (Q-020)
+		RequiredLevel = 9,
+		Price = 25000,
+		OrePerCycle = 10, -- → 120 Erz/Min
+		CycleSeconds = 5,
+		OutputCapacity = 600,
 		BodyColor = Color3.fromRGB(200, 70, 50),
 		PersistenceClass = "Progression",
 	},
@@ -55,11 +55,11 @@ local list: { DrillDefinition } = {
 		Id = "drill_mk3",
 		DisplayName = "Drill MK3",
 		Tier = 3,
-		RequiredLevel = 12, -- TODO_BALANCE (Q-020)
-		Price = 75000, -- TODO_BALANCE (Q-020)
-		OrePerCycle = 20, -- TODO_BALANCE (Q-020) → 240 Erz/Min
-		CycleSeconds = 5, -- TODO_BALANCE (Q-020)
-		OutputCapacity = 1200, -- TODO_BALANCE (Q-020)
+		RequiredLevel = 12,
+		Price = 75000,
+		OrePerCycle = 25, -- Q-020: 500 Erz/Min (Felix)
+		CycleSeconds = 3,
+		OutputCapacity = 1200,
 		BodyColor = Color3.fromRGB(60, 120, 190),
 		PersistenceClass = "Progression",
 	},

@@ -57,12 +57,12 @@ local list: { BuildStepDefinition } = {
 		Requires = "build_roof",
 		RequiresCompanySetup = true,
 	},
-	-- Garage nach dem Lager, vor dem Schmelzer (docs/07 §3, docs/00 §9). Vorschlag Q-021.
+	-- Garage nach dem Lager, vor dem Schmelzer (docs/07 §3, docs/00 §9). Werte Q-021 (bestätigt).
 	{
 		Id = "build_garage",
 		DisplayName = "Garage",
-		Price = 10000, -- TODO_BALANCE (Q-021)
-		RequiredLevel = 7, -- TODO_BALANCE (Q-021)
+		Price = 10000,
+		RequiredLevel = 7,
 		Requires = "build_storage",
 		RequiresCompanySetup = true,
 	},
