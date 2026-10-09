@@ -353,230 +353,116 @@ function GarageTemplate.chuteGoals(model: Model, bay: number, bottomY: number?):
 	return goals
 end
 
--- Werkstatt-Ecke rechts neben dem Auswahlring (Rückmeldung Felix 2026-10-10): Reifenregal und
--- Werkbank an der Vorderwand, Teileregal, Kompressor, Schlauchtrommel und Ölfässer an der
--- Seitenwand, Hebebühne in der Mitte, Werkzeugwagen und Reifenstapel. Lokal zur Plotmitte,
--- Bereich x 76..104, z −54..−6 (frei von Ring, Stellplätzen, Turm und Hallenstützen).
-local function props(model: Model, o: CFrame)
-	local cfg = LayoutConfig.Garage
-	local deco = Instance.new("Folder")
-	deco.Name = "Workshop"
-	deco.Parent = model
-	local RED = Color3.fromRGB(190, 50, 40)
-	local BLUE = Color3.fromRGB(40, 90, 150)
-	local ORANGE = Color3.fromRGB(222, 120, 40)
+-- Deko-Ecke rechts neben dem Auswahlring (Felix 2026-10-10: keine Werkstatt, nur Deko, damit die
+-- Halle nicht leer wirkt): Hochregale mit Paletten und Kartons, Ölfässer, Palettenstapel.
+-- Lokal zur Plotmitte, Bereich x 76..104, z −54..−6 (frei von Ring, Stellplätzen, Turm, Stützen).
+local PALLET_WOOD = Color3.fromRGB(176, 140, 96)
+local CARTON = { Color3.fromRGB(184, 146, 98), Color3.fromRGB(168, 130, 84), Color3.fromRGB(196, 160, 112) }
+local RACK_UPRIGHT = Color3.fromRGB(40, 90, 150)
+local RACK_BEAM = Color3.fromRGB(222, 120, 40)
 
-	-- Reifenregal an der Vorderwand: zwei Ebenen mit je acht stehenden Reifen
-	local rack = o * CFrame.new(84, 0, -52.4)
-	for _, dx in { -5.85, 5.85 } do
-		for _, dz in { -1.05, 1.05 } do
-			part(deco, `TireRackPost{dx}_{dz}`, Vector3.new(0.3, 7.6, 0.3), rack * CFrame.new(dx, 3.8, dz), ORANGE)
-		end
-		part(deco, `TireRackTop{dx}`, Vector3.new(0.3, 0.3, 2.4), rack * CFrame.new(dx, 7.45, 0), ORANGE)
+-- Europalette (Unterkante = cf), 4 × 0.5 × 3.4
+local function pallet(parent: Instance, name: string, cf: CFrame)
+	part(parent, `{name}Deck`, Vector3.new(4, 0.15, 3.4), cf * CFrame.new(0, 0.425, 0), PALLET_WOOD, Enum.Material.WoodPlanks)
+	for _, dz in { -1.4, 0, 1.4 } do
+		part(parent, `{name}Runner{dz}`, Vector3.new(4, 0.35, 0.5), cf * CFrame.new(0, 0.175, dz), PALLET_WOOD:Lerp(Color3.new(0, 0, 0), 0.15), Enum.Material.WoodPlanks)
 	end
-	for level, railY in { 0.5, 4 } do
-		for _, dz in { -0.6, 0.6 } do
-			part(deco, `TireRackRail{level}_{dz}`, Vector3.new(11.8, 0.2, 0.2), rack * CFrame.new(0, railY, dz), STEEL)
-		end
-		for i = 0, 7 do
-			local cf = rack * CFrame.new(-4.55 + i * 1.3, railY + 0.1 + 1.375, 0)
-			local tire = part(deco, `RackTire{level}_{i}`, Vector3.new(1.1, 3, 3), cf, RUBBER, Enum.Material.Rubber)
-			tire.Shape = Enum.PartType.Cylinder
-			local rim = part(deco, `RackRim{level}_{i}`, Vector3.new(1.15, 1.6, 1.6), cf, STEEL_LIGHT)
-			rim.Shape = Enum.PartType.Cylinder
-		end
-	end
+end
 
-	-- Werkbank mit Lochwand und Leuchte an der Vorderwand
-	local bench = o * CFrame.new(96.5, 0, -52.6)
-	part(deco, "BenchTop", Vector3.new(9, 0.3, 2.6), bench * CFrame.new(0, 3.3, 0), Color3.fromRGB(130, 92, 58), Enum.Material.Wood)
-	for _, dx in { -4.3, 4.3 } do
-		for _, dz in { -1.1, 1.1 } do
-			part(deco, `BenchLeg{dx}_{dz}`, Vector3.new(0.3, 3.15, 0.3), bench * CFrame.new(dx, 1.575, dz), STEEL_DARK)
-		end
-	end
-	part(deco, "BenchShelf", Vector3.new(8.9, 0.15, 2.4), bench * CFrame.new(0, 0.8, 0), STEEL)
-	for i, dx in { -3, -1, 1.2 } do
-		part(deco, `BenchBin{i}`, Vector3.new(1.6, 1, 1.8), bench * CFrame.new(dx, 1.375, 0), if i == 2 then BLUE else RED, Enum.Material.SmoothPlastic)
-	end
-	part(deco, "BenchVise", Vector3.new(1.2, 0.7, 1), bench * CFrame.new(-3.6, 3.8, 0.6), STEEL)
-	part(deco, "BenchToolbox", Vector3.new(2, 0.9, 1), bench * CFrame.new(0.5, 3.9, -0.4), RED)
-	part(deco, "BenchToolboxHandle", Vector3.new(1.2, 0.15, 0.15), bench * CFrame.new(0.5, 4.45, -0.4), STEEL_DARK)
-	part(deco, "BenchCharger", Vector3.new(1.2, 0.8, 0.9), bench * CFrame.new(3.2, 3.85, -0.3), YELLOW, Enum.Material.SmoothPlastic)
-	local peg = o * CFrame.new(96.5, 0, -54)
-	part(deco, "Pegboard", Vector3.new(9, 4, 0.3), peg * CFrame.new(0, 6, 0), Color3.fromRGB(176, 150, 112), Enum.Material.WoodPlanks)
-	local pegTools = {
-		{ Vector3.new(0.3, 2.2, 0.15), -3.4, 6, STEEL_LIGHT },
-		{ Vector3.new(1, 0.5, 0.15), -3.4, 7.1, STEEL_LIGHT },
-		{ Vector3.new(0.25, 1.8, 0.15), -2, 5.8, Color3.fromRGB(130, 92, 58) },
-		{ Vector3.new(1.1, 0.5, 0.15), -2, 6.7, STEEL_DARK },
-		{ Vector3.new(0.2, 1.5, 0.15), -0.8, 5.9, YELLOW },
-		{ Vector3.new(0.2, 1.5, 0.15), -0.3, 5.9, RED },
-		{ Vector3.new(0.2, 1.5, 0.15), 0.2, 5.9, BLUE },
-		{ Vector3.new(2.4, 1, 0.15), 2, 6.6, STEEL },
-		{ Vector3.new(0.6, 1.4, 0.15), 3.6, 5.6, ORANGE },
-	}
-	for i, tool in pegTools do
-		part(deco, `PegTool{i}`, tool[1], peg * CFrame.new(tool[2], tool[3], 0.22), tool[4])
-	end
-	for _, dx in { -3.5, 3.5 } do
-		part(deco, `BenchLampBracket{dx}`, Vector3.new(0.2, 0.2, 1.2), peg * CFrame.new(dx, 9, 0.75), STEEL_DARK)
-	end
-	local tube = part(deco, "BenchLamp", Vector3.new(8, 0.3, 0.6), peg * CFrame.new(0, 8.75, 1.2), Color3.fromRGB(255, 240, 210), Enum.Material.Neon)
-	tube.CastShadow = false
-	local benchLight = Instance.new("SpotLight")
-	benchLight.Face = Enum.NormalId.Bottom
-	benchLight.Range = 12
-	benchLight.Angle = 90
-	benchLight.Brightness = 1.2
-	benchLight.Color = Color3.fromRGB(255, 240, 210)
-	benchLight.Parent = tube
-
-	-- Teileregal an der Seitenwand
-	local shelf = o * CFrame.new(102.6, 0, -45)
-	for _, dz in { -4.85, 4.85 } do
-		for _, dx in { -0.85, 0.85 } do
-			part(deco, `ShelfPost{dz}_{dx}`, Vector3.new(0.3, 9, 0.3), shelf * CFrame.new(dx, 4.5, dz), ORANGE)
-		end
-	end
-	local rng = Random.new(41)
-	local boxColors = { RED, BLUE, YELLOW, STEEL, Color3.fromRGB(70, 120, 70) }
-	for level = 1, 4 do
-		local y = 0.4 + (level - 1) * 2.4
-		part(deco, `ShelfBoard{level}`, Vector3.new(2, 0.2, 9.9), shelf * CFrame.new(0, y, 0), STEEL)
-		for b = 1, 4 do
-			local h = rng:NextNumber(0.8, 1.6)
-			part(deco, `ShelfBox{level}_{b}`, Vector3.new(1.5, h, rng:NextNumber(1.2, 1.7)), shelf * CFrame.new(0, y + 0.1 + h / 2, -3.3 + (b - 1) * 2.2), boxColors[rng:NextInteger(1, #boxColors)], Enum.Material.SmoothPlastic)
-		end
-	end
-
-	-- Druckluft-Kompressor mit Kessel, Motor und Manometer
-	local comp = o * CFrame.new(101.5, 0, -26)
-	local tank = part(deco, "CompressorTank", Vector3.new(5, 1.8, 1.8), comp * CFrame.new(0, 1.6, 0) * CFrame.Angles(0, math.rad(90), 0), RED)
-	tank.Shape = Enum.PartType.Cylinder
-	for _, dz in { -1.6, 1.6 } do
-		part(deco, `CompressorFoot{dz}`, Vector3.new(1.6, 0.7, 0.4), comp * CFrame.new(0, 0.35, dz), STEEL_DARK)
-	end
-	part(deco, "CompressorMotor", Vector3.new(1.4, 1.1, 1.4), comp * CFrame.new(0, 3.05, -1), STEEL_DARK)
-	part(deco, "CompressorPump", Vector3.new(1, 1.2, 1.2), comp * CFrame.new(0, 3.1, 0.7), STEEL_LIGHT)
-	local flywheel = part(deco, "CompressorFlywheel", Vector3.new(0.25, 1.4, 1.4), comp * CFrame.new(-0.62, 3.1, 0.7), STEEL)
-	flywheel.Shape = Enum.PartType.Cylinder
-	local gauge = part(deco, "CompressorGauge", Vector3.new(0.15, 0.6, 0.6), comp * CFrame.new(-0.95, 1.9, 1.6), WHITE, Enum.Material.SmoothPlastic)
-	gauge.Shape = Enum.PartType.Cylinder
-	-- Schlauchtrommel an der Wand
-	local reel = o * CFrame.new(103.8, 5, -20)
-	local reelDisc = part(deco, "HoseReel", Vector3.new(0.6, 2.2, 2.2), reel, YELLOW)
-	reelDisc.Shape = Enum.PartType.Cylinder
-	local reelHose = part(deco, "HoseReelCoil", Vector3.new(0.7, 1.6, 1.6), reel * CFrame.new(-0.1, 0, 0), RUBBER, Enum.Material.Rubber)
-	reelHose.Shape = Enum.PartType.Cylinder
-	part(deco, "HoseDrop", Vector3.new(0.2, 3.4, 0.2), reel * CFrame.new(-0.3, -2.2, 0.6), RUBBER, Enum.Material.Rubber)
-
-	-- Ölfässer auf Auffangwanne
-	local pallet = o * CFrame.new(99, 0, -9)
-	part(deco, "SpillPallet", Vector3.new(4.4, 0.4, 4.4), pallet * CFrame.new(0, 0.2, 0), YELLOW, Enum.Material.SmoothPlastic)
-	for i, p in { Vector2.new(-0.95, -0.95), Vector2.new(0.95, -0.95), Vector2.new(0, 1) } do
-		local drum = part(deco, `OilDrum{i}`, Vector3.new(2.6, 1.6, 1.6), pallet * CFrame.new(p.X, 1.7, p.Y) * CFrame.Angles(0, 0, math.rad(90)), if i == 3 then RED else BLUE)
-		drum.Shape = Enum.PartType.Cylinder
-	end
-
-	-- Zwei-Säulen-Hebebühne mit markierter Standfläche
-	local lift = o * CFrame.new(88, 0, -28)
-	local pad = part(deco, "LiftFloor", Vector3.new(11, 0.05, 16), lift * CFrame.new(0, 0.025, 0), STEEL_DARK, Enum.Material.SmoothPlastic)
-	flat(pad)
-	for _, side in { -1, 1 } do
-		local x = side * 6
-		part(deco, `LiftBase{side}`, Vector3.new(2, 0.2, 2), lift * CFrame.new(x, 0.1, 0), STEEL_DARK)
-		part(deco, `LiftPost{side}`, Vector3.new(1.2, 11, 1.2), lift * CFrame.new(x, 5.5, 0), BLUE)
-		part(deco, `LiftCarriage{side}`, Vector3.new(1.6, 1.6, 1.6), lift * CFrame.new(x, 1.4, 0), STEEL)
-		for _, dz in { -1.6, 1.6 } do
-			local arm = lift * CFrame.new(x - side * 2.6, 1.2, dz * 0.6) * CFrame.Angles(0, math.rad(side * dz * 12), 0)
-			part(deco, `LiftArm{side}_{dz}`, Vector3.new(3.6, 0.35, 0.5), arm, STEEL_LIGHT)
-			local liftPad = part(deco, `LiftPad{side}_{dz}`, Vector3.new(0.3, 0.8, 0.8), arm * CFrame.new(-side * 1.5, 0.32, 0) * CFrame.Angles(0, 0, math.rad(90)), RUBBER, Enum.Material.Rubber)
-			liftPad.Shape = Enum.PartType.Cylinder
-		end
-		part(deco, `LiftWarn{side}`, Vector3.new(1.25, 1.5, 1.25), lift * CFrame.new(x, 3.4, 0), YELLOW, Enum.Material.SmoothPlastic)
-	end
-	part(deco, "LiftPump", Vector3.new(0.8, 1.4, 0.8), lift * CFrame.new(-7, 4, 0), RED)
-	part(deco, "LiftBeam", Vector3.new(13.2, 0.8, 0.8), lift * CFrame.new(0, 11.4, 0), BLUE)
-
-	-- Rollende Werkzeugwagen vor dem Teileregal
-	for i, x in { 95.5, 98.5 } do
-		local chest = o * CFrame.new(x, 0, -40)
-		part(deco, `ToolChest{i}`, Vector3.new(2.6, 3.4, 1.8), chest * CFrame.new(0, 2.1, 0), if i == 1 then RED else BLUE)
-		part(deco, `ToolChestTop{i}`, Vector3.new(2.7, 0.12, 1.9), chest * CFrame.new(0, 3.86, 0), STEEL_DARK)
-		for d = 1, 4 do
-			part(deco, `ToolChestDrawer{i}_{d}`, Vector3.new(2.3, 0.08, 0.06), chest * CFrame.new(0, 0.6 + d * 0.72, 0.92), STEEL_LIGHT)
-		end
-		for _, dx in { -1, 1 } do
-			for _, dz in { -0.65, 0.65 } do
-				local castor = part(deco, `ToolChestWheel{i}_{dx}_{dz}`, Vector3.new(0.25, 0.4, 0.4), chest * CFrame.new(dx, 0.2, dz), RUBBER, Enum.Material.Rubber)
-				castor.Shape = Enum.PartType.Cylinder
+-- Palette mit 2 × 2 Kartonstapeln (zufällige Höhe bis maxLayers)
+local function cartonPallet(parent: Instance, name: string, cf: CFrame, rng: Random, maxLayers: number)
+	pallet(parent, name, cf)
+	for ix, dx in { -0.95, 0.95 } do
+		for iz, dz in { -0.8, 0.8 } do
+			local layers = rng:NextInteger(1, maxLayers)
+			for layer = 1, layers do
+				local box = cf * CFrame.new(dx, 0.5 + (layer - 0.5) * 1.25, dz)
+				part(parent, `{name}Carton{ix}{iz}_{layer}`, Vector3.new(1.8, 1.25, 1.5), box, CARTON[rng:NextInteger(1, #CARTON)], Enum.Material.Cardboard)
+				if layer == layers then
+					local tape = part(parent, `{name}Tape{ix}{iz}`, Vector3.new(1.82, 0.03, 0.3), box * CFrame.new(0, 0.635, 0), Color3.fromRGB(150, 110, 60), Enum.Material.SmoothPlastic)
+					tape.CanCollide = false
+				end
 			end
 		end
 	end
+end
 
-	-- Reifenstapel neben der Hebebühne
-	for i = 1, 3 do
-		local cf = o * CFrame.new(78, 0.55 + (i - 1) * 1.15, -42) * CFrame.Angles(0, 0, math.rad(90))
-		local tire = part(deco, `StackTire{i}`, Vector3.new(1.1, 3.2, 3.2), cf, RUBBER, Enum.Material.Rubber)
-		tire.Shape = Enum.PartType.Cylinder
-		local rim = part(deco, `StackRim{i}`, Vector3.new(1.16, 1.7, 1.7), cf, STEEL_LIGHT)
-		rim.Shape = Enum.PartType.Cylinder
-	end
-
-	-- Motor auf Montageständer
-	local stand = o * CFrame.new(81, 0, -15)
-	part(deco, "EngineStandBase", Vector3.new(3.2, 0.25, 0.4), stand * CFrame.new(0, 0.3, 0), RED)
-	part(deco, "EngineStandFoot", Vector3.new(0.4, 0.25, 2.8), stand * CFrame.new(-1.4, 0.3, 0), RED)
-	part(deco, "EngineStandPost", Vector3.new(0.35, 2.6, 0.35), stand * CFrame.new(-1.4, 1.7, 0), RED)
-	part(deco, "EngineStandArm", Vector3.new(0.9, 0.3, 0.3), stand * CFrame.new(-0.9, 2.9, 0), STEEL_DARK)
-	part(deco, "EngineBlock", Vector3.new(2, 1.6, 1.8), stand * CFrame.new(0.5, 2.9, 0), STEEL)
-	part(deco, "EngineHead", Vector3.new(1.6, 0.5, 1.9), stand * CFrame.new(0.5, 3.95, 0), RED)
-	local pulley = part(deco, "EnginePulley", Vector3.new(0.2, 0.9, 0.9), stand * CFrame.new(0.5, 2.6, -1) * CFrame.Angles(0, math.rad(90), 0), STEEL_DARK)
-	pulley.Shape = Enum.PartType.Cylinder
-	-- Rangierwagenheber neben der Hebebühne
-	local jack = o * CFrame.new(86, 0, -40.5)
-	part(deco, "JackBody", Vector3.new(1.2, 0.6, 3), jack * CFrame.new(0, 0.5, 0), RED)
-	part(deco, "JackSaddle", Vector3.new(0.8, 0.25, 0.8), jack * CFrame.new(0, 0.9, -1.2), STEEL_DARK)
-	part(deco, "JackHandle", Vector3.new(0.15, 0.15, 3.4), jack * CFrame.new(0, 1.6, 2.9) * CFrame.Angles(math.rad(-25), 0, 0), STEEL_DARK)
-	for _, dx in { -0.65, 0.65 } do
-		for _, dz in { -1.1, 1.1 } do
-			local w = part(deco, `JackWheel{dx}_{dz}`, Vector3.new(0.2, 0.4, 0.4), jack * CFrame.new(dx, 0.2, dz), STEEL_DARK)
-			w.Shape = Enum.PartType.Cylinder
+-- Hochregal: Länge entlang lokal X, Front zu lokal +Z, Unterkante = cf. bays Fächer à 6 Studs,
+-- drei Ebenen (Boden, 4.6, 9.2) mit Kartonpaletten; Stapelhöhe bleibt unter dem nächsten Träger.
+local function highRack(parent: Instance, name: string, cf: CFrame, bays: number, rng: Random)
+	local length = bays * 6
+	for i = 0, bays do
+		local x = -length / 2 + i * 6
+		for _, dz in { -1.4, 1.4 } do
+			part(parent, `{name}Upright{i}_{dz}`, Vector3.new(0.35, 13.5, 0.35), cf * CFrame.new(x, 6.75, dz), RACK_UPRIGHT)
+		end
+		for _, y in { 2.3, 6.9, 11.5 } do
+			part(parent, `{name}Brace{i}_{y}`, Vector3.new(0.15, 0.15, 2.45), cf * CFrame.new(x, y, 0), RACK_UPRIGHT)
 		end
 	end
-	-- Altöl-Auffanggerät
-	local caddy = o * CFrame.new(96.5, 0, -18)
-	local caddyTank = part(deco, "DrainTank", Vector3.new(1.6, 1.4, 1.4), caddy * CFrame.new(0, 1.2, 0) * CFrame.Angles(0, 0, math.rad(90)), YELLOW, Enum.Material.SmoothPlastic)
-	caddyTank.Shape = Enum.PartType.Cylinder
-	part(deco, "DrainPipe", Vector3.new(0.25, 3.4, 0.25), caddy * CFrame.new(0, 3.6, 0), STEEL_DARK)
-	local funnel = part(deco, "DrainFunnel", Vector3.new(0.3, 1.8, 1.8), caddy * CFrame.new(0, 5.4, 0) * CFrame.Angles(0, 0, math.rad(90)), YELLOW, Enum.Material.SmoothPlastic)
-	funnel.Shape = Enum.PartType.Cylinder
-	for _, dx in { -0.5, 0.5 } do
-		local w = part(deco, `DrainWheel{dx}`, Vector3.new(0.2, 0.5, 0.5), caddy * CFrame.new(dx * 1.1, 0.25, 0), RUBBER, Enum.Material.Rubber)
-		w.Shape = Enum.PartType.Cylinder
+	for level, y in { 4.6, 9.2 } do
+		for _, dz in { -1.4, 1.4 } do
+			part(parent, `{name}Beam{level}_{dz}`, Vector3.new(length, 0.4, 0.25), cf * CFrame.new(0, y, dz), RACK_BEAM)
+		end
+	end
+	for b = 1, bays do
+		local x = -length / 2 + (b - 0.5) * 6
+		for level, y in { 0, 4.8, 9.4 } do
+			if level == 1 or rng:NextNumber() < 0.85 then
+				cartonPallet(parent, `{name}Pallet{b}_{level}`, cf * CFrame.new(x, y, 0), rng, if level == 1 then 3 else 2)
+			end
+		end
+	end
+end
+
+local function drum(parent: Instance, name: string, cf: CFrame, color: Color3)
+	local d = part(parent, name, Vector3.new(2.6, 1.6, 1.6), cf * CFrame.new(0, 1.3, 0) * CFrame.Angles(0, 0, math.rad(90)), color)
+	d.Shape = Enum.PartType.Cylinder
+	local lid = part(parent, `{name}Lid`, Vector3.new(0.06, 1.3, 1.3), cf * CFrame.new(0, 2.62, 0) * CFrame.Angles(0, 0, math.rad(90)), color:Lerp(Color3.new(0, 0, 0), 0.25))
+	lid.Shape = Enum.PartType.Cylinder
+end
+
+local function props(model: Model, o: CFrame)
+	local cfg = LayoutConfig.Garage
+	local deco = Instance.new("Folder")
+	deco.Name = "Decoration"
+	deco.Parent = model
+	local rng = Random.new(17)
+	local BLUE = Color3.fromRGB(40, 90, 150)
+	local RED = Color3.fromRGB(190, 50, 40)
+	local GREEN = Color3.fromRGB(60, 110, 60)
+
+	-- Hochregale an Vorder- und Seitenwand
+	highRack(deco, "RackFront", o * CFrame.new(90, 0, -52.2), 4, rng)
+	highRack(deco, "RackSide", o * CFrame.new(102.4, 0, -42) * CFrame.Angles(0, math.rad(90), 0), 2, rng)
+
+	-- Ölfässer auf Auffangwanne und eine Palette mit Fässern
+	local spill = o * CFrame.new(99, 0, -9)
+	part(deco, "SpillPallet", Vector3.new(4.4, 0.4, 4.4), spill * CFrame.new(0, 0.2, 0), YELLOW, Enum.Material.SmoothPlastic)
+	for i, p in { Vector2.new(-0.95, -0.95), Vector2.new(0.95, -0.95), Vector2.new(0, 1) } do
+		drum(deco, `SpillDrum{i}`, spill * CFrame.new(p.X, 0.4, p.Y), if i == 3 then RED else BLUE)
+	end
+	local drumPallet = o * CFrame.new(99.5, 0, -26)
+	pallet(deco, "DrumPallet", drumPallet)
+	for i, p in { Vector2.new(-0.95, -0.8), Vector2.new(0.95, -0.8), Vector2.new(-0.95, 0.8), Vector2.new(0.95, 0.8) } do
+		drum(deco, `PalletDrum{i}`, drumPallet * CFrame.new(p.X, 0.5, p.Y), if i == 2 then GREEN else BLUE)
+	end
+	drum(deco, "LooseDrum1", o * CFrame.new(95.5, 0, -24.5), RED)
+	drum(deco, "LooseDrum2", o * CFrame.new(96, 0, -27.6), BLUE)
+
+	-- Kartonpaletten und ein Stapel leerer Paletten auf dem Boden
+	cartonPallet(deco, "FloorPallet1", o * CFrame.new(86, 0, -40) * CFrame.Angles(0, math.rad(8), 0), rng, 3)
+	cartonPallet(deco, "FloorPallet2", o * CFrame.new(91, 0, -40.5) * CFrame.Angles(0, math.rad(-4), 0), rng, 2)
+	cartonPallet(deco, "FloorPallet3", o * CFrame.new(84, 0, -18) * CFrame.Angles(0, math.rad(90), 0), rng, 3)
+	for i = 1, 6 do
+		pallet(deco, `EmptyPallet{i}`, o * CFrame.new(80, (i - 1) * 0.5, -46) * CFrame.Angles(0, math.rad(if i % 2 == 0 then 3 else -2), 0))
 	end
 
-	-- Feuerlöscher an der Hallenstütze und Schild an der Seitenwand
+	-- Feuerlöscher an der Hallenstütze
 	local ext = o * CFrame.new(102.7, 3, -35)
 	local extBody = part(deco, "Extinguisher", Vector3.new(1.2, 0.5, 0.5), ext * CFrame.Angles(0, 0, math.rad(90)), Color3.fromRGB(200, 40, 40), Enum.Material.SmoothPlastic)
 	extBody.Shape = Enum.PartType.Cylinder
 	part(deco, "ExtinguisherBracket", Vector3.new(0.5, 0.2, 0.4), ext * CFrame.new(0.25, 0.3, 0), STEEL_DARK)
-	local sign = part(deco, "ServiceSign", Vector3.new(0.2, 3, 12), o * CFrame.new(103.9, 14, -25), STEEL_DARK, Enum.Material.SmoothPlastic)
-	local gui = Instance.new("SurfaceGui")
-	gui.Face = Enum.NormalId.Left
-	gui.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
-	gui.PixelsPerStud = 30
-	gui.LightInfluence = 0.3
-	gui.Parent = sign
-	local label = Instance.new("TextLabel")
-	label.Size = UDim2.fromScale(1, 1)
-	label.BackgroundTransparency = 1
-	label.Font = Enum.Font.GothamBlack
-	label.TextScaled = true
-	label.TextColor3 = ACCENT_DEFAULT
-	label.Text = "SERVICE"
-	label.Parent = gui
 
 	-- Firmenfarbener Streifen auf dem Boden entlang der Garage (dezenter Akzent)
 	local line = part(model, "GarageAccentLine", Vector3.new(0.6, 0.06, 40), o * CFrame.new(cfg.Ring.X - 9, 0.03, cfg.Ring.Y + 4), ACCENT_DEFAULT, Enum.Material.SmoothPlastic)

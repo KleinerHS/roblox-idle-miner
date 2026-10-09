@@ -59,7 +59,7 @@ local list: { DrillDefinition } = {
 		Price = 75000,
 		OrePerCycle = 25, -- Q-020: 500 Erz/Min (Felix)
 		CycleSeconds = 3,
-		OutputCapacity = 1200,
+		OutputCapacity = 2500, -- reicht wie MK1/MK2 für 5 Minuten Produktion
 		BodyColor = Color3.fromRGB(60, 120, 190),
 		PersistenceClass = "Progression",
 	},
