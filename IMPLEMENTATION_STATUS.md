@@ -413,6 +413,25 @@ Selbsttest per Studio-MCP (2026-10-10, ein Spieler):
 - Eigener Trade-Prompt am Server vorhanden, lokal ausgeblendet.
 - Nicht selbst prüfbar: der eigentliche Handel (braucht 2 Spieler) → Test 9.1–9.8.
 
+## Nachbesserungen nach Felix' Test vom 2026-10-10 (Version 0.16.1) – TESTING_REQUIRED
+
+Testergebnis Felix: 0 ok · 1 Drills ok (Shop-Optik verbessern) · 2 ok bis auf Bohrkopf und Namensschild · 3 Garage ok bis auf die Ecke und den Motorsound/Tacho · 4 Minenkauf ok, Schmelzer/Förderbänder im nächsten Test · 5 Handel ganz am Ende.
+
+| Änderung | Dateien / Instanzen | Status |
+|---|---|---|
+| BUG-002: Bohrkopf drehte sich um die falsche Achse (Pivot war der gedrehte Zylinder) → Pivot ist jetzt die Bohrachse | `DrillModelBuilder.luau` | TESTING_REQUIRED |
+| BUG-003: Namensschild ragte in die Lüftungsgitter → Lüftung nur noch rechts, eigene Namensschilder links/rechts, Tank nach außen | `DrillModelBuilder.luau` | TESTING_REQUIRED |
+| BUG-004: Werkbank im Machine-Shop ragte in eine Stütze → Werkstatt neu zwischen den Stützen | `MachineShopBuilder.luau` | TESTING_REQUIRED |
+| Machine-Shop: Kasse direkt rechts am Eingang mit Schild „$ CASHIER“ und Monitor, alle 3 Drills (MK1–MK3) auf breiter Plattform mit Infotafeln, größere Werkstatt (Lochwand mit Werkzeug, Regalbrett, Unterschränke, Schraubstock, Schleifbock, Ständerbohrmaschine, Leuchte, Werkzeugwagen, Gasflaschen), Deko (2 Teileregale, Spinde, Ölfässer, Ersatzbohrköpfe, Laufkran, Sicherheitsschilder, Feuerlöscher, Eingangsmatte) | `MachineShopBuilder.luau` | TESTING_REQUIRED |
+| Garage-Ecke rechts neben dem Ring: alte 3 Gegenstände entfernt; neu Reifenregal, Werkbank mit Lochwand und Leuchte, Teileregal, Kompressor, Schlauchtrommel, Ölfässer auf Auffangwanne, Hebebühne, 2 Werkzeugwagen, Reifenstapel, Motor auf Montageständer, Wagenheber, Altöl-Auffanggerät, Schild „SERVICE“, Feuerlöscher | `GarageTemplate.luau` | TESTING_REQUIRED |
+| Fahrzeuge: Tacho (A-Chassis-Plugin „Gauges“) entfernt; nur noch ein leiser Motorton (Leerlauf-Loop, Tonhöhe steigt sanft mit der Drehzahl, Reichweite 80 Studs), alle anderen Sounds (Auspuff, Getriebe, Turbo, Lader, BOV, Zündung) entfernt | Place-Datei: `ServerStorage.Vendor.AChassis` (Kit + 3 Tunes) – **Place speichern!** | TESTING_REQUIRED |
+
+Selbsttest per Studio-MCP (2026-10-10):
+- Überschneidungsprüfung Machine-Shop (alle Teile gegeneinander): keine Überschneidung zwischen Einrichtung, Wänden/Stützen und den 3 Drills; nur gewollte Verbindungen innerhalb eines Objekts.
+- Überschneidungsprüfung Garage-Ecke gegen Garage und Hallenwände/-stützen: nur der Feuerlöscher-Halter sitzt (gewollt) an der Stütze.
+- Bohrkopf aller 3 Drills: Pivot liegt auf der Bohrachse, Drehung um 73° → kein Teil ändert seinen Abstand zur Achse.
+- Testfahrzeug (Pickup): nur ein Motorton (Lautstärke ~0,3), kein Tacho im A-Chassis-Interface, keine Fehler im Output.
+
 ## Werkzeuge
 
 | Werkzeug | Dateien | Status |

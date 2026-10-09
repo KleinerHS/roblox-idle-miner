@@ -103,15 +103,37 @@ function DrillModelBuilder.build(def: Drills.DrillDefinition, cf: CFrame): Model
 	local bodyPart = part(model, "Body", v(4.2, 3, 4.2), at(0, 2.5, 2.4), body, Enum.Material.Metal)
 	bodyPart.Name = "Body"
 	part(model, "BodyRoof", v(4.4, 0.25, 4.4), at(0, 4.1, 2.4), bodyDark)
-	for i = 1, 5 do
-		part(model, `Louver{i}`, v(0.06, 0.18, 3), at(2.13, 1.6 + i * 0.36, 2.4), STEEL_DARK)
-		part(model, `LouverL{i}`, v(0.06, 0.18, 3), at(-2.13, 1.6 + i * 0.36, 2.4), STEEL_DARK)
+	-- Rechte Seite: Lüftungsgitter in der unteren Hälfte, oben Platz für das Typenschild
+	for i = 1, 4 do
+		part(model, `Louver{i}`, v(0.06, 0.18, 3), at(2.13, 1.3 + i * 0.32, 2.4), STEEL_DARK)
+	end
+	-- Typenschild auf beiden Seiten oben am Gehäuse (frei von Gittern und Anbauten)
+	for _, side in { -1, 1 } do
+		local plate = part(model, `NamePlate{side}`, v(0.06, 0.75, 3.4), at(side * 2.14, 3.4, 2.4), STEEL_DARK, Enum.Material.SmoothPlastic)
+		local gui = Instance.new("SurfaceGui")
+		gui.Face = if side > 0 then Enum.NormalId.Right else Enum.NormalId.Left
+		gui.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
+		gui.PixelsPerStud = 40
+		gui.LightInfluence = 0.3
+		gui.Parent = plate
+		local text = Instance.new("TextLabel")
+		text.Size = UDim2.fromScale(1, 1)
+		text.BackgroundTransparency = 1
+		text.Font = Enum.Font.GothamBlack
+		text.TextScaled = true
+		text.TextColor3 = Color3.fromRGB(245, 245, 240)
+		text.Text = def.DisplayName:upper()
+		text.Parent = gui
 	end
 	part(model, "Grill", v(3.2, 0.1, 3.2), at(0, 4.25, 2.4), STEEL_DARK, Enum.Material.DiamondPlate)
 	local exhaustBase = at(1.5, 4.2, 3.9).Position
 	cylinderBetween(model, "Exhaust", exhaustBase, exhaustBase + v(0, 2.2, 0), 0.45 * s, STEEL_DARK)
 	part(model, "ExhaustCap", v(0.6, 0.12, 0.6), at(1.5, 6.45, 3.9), STEEL_DARK)
-	cylinderZ(model, "FuelTank", 2.6 * s, 1.1 * s, at(-1.6, 1.5, 2.6), STEEL_LIGHT)
+	-- Satteltank außen an der linken Seite, unterhalb des Typenschilds, mit zwei Halteschellen
+	cylinderZ(model, "FuelTank", 2.6 * s, 0.9 * s, at(-2.62, 1.55, 2.4), STEEL_LIGHT)
+	for i, z in { 1.5, 3.3 } do
+		part(model, `TankStrap{i}`, v(0.55, 0.12, 0.15), at(-2.4, 1.98, z), STEEL_DARK)
+	end
 	part(model, "Plate", v(1.6, 0.6, 0.06), at(0, 3.2, 4.53), CHROME, Enum.Material.SmoothPlastic)
 
 	-- Ausleger nach vorn mit Hydraulik
@@ -151,7 +173,8 @@ function DrillModelBuilder.build(def: Drills.DrillDefinition, cf: CFrame): Model
 			part(bit, `Tooth{ri}_{i}`, v(0.32, 0.5, 0.32), tooth, CHROME, Enum.Material.SmoothPlastic)
 		end
 	end
-	bit.PrimaryPart = core
+	-- Drehachse = Bohrachse (lokale Z-Achse von axis). Bewusst KEIN PrimaryPart: dessen Achsen
+	-- sind wegen der Zylinder-Drehung vertauscht, der Client dreht um GetPivot() (= WorldPivot).
 	bit.WorldPivot = axis
 
 	-- Staub und kleine Steinpartikel an der Bohrspitze (nur im Betrieb, docs/05 §28).
@@ -210,23 +233,6 @@ function DrillModelBuilder.build(def: Drills.DrillDefinition, cf: CFrame): Model
 	light.Color = STATUS_IDLE
 	light.Parent = lamp
 
-	-- Typenschild
-	local sign = Instance.new("SurfaceGui")
-	sign.Face = Enum.NormalId.Right
-	sign.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
-	sign.PixelsPerStud = 40
-	sign.LightInfluence = 0.3
-	sign.Parent = bodyPart
-	local label = Instance.new("TextLabel")
-	label.AnchorPoint = Vector2.new(0.5, 0)
-	label.Position = UDim2.fromScale(0.5, 0.06)
-	label.Size = UDim2.fromScale(0.9, 0.22)
-	label.BackgroundTransparency = 1
-	label.Font = Enum.Font.GothamBlack
-	label.TextScaled = true
-	label.TextColor3 = Color3.fromRGB(245, 245, 240)
-	label.Text = def.DisplayName:upper()
-	label.Parent = sign
 
 	return model
 end
