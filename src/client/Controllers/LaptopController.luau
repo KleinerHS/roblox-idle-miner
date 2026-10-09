@@ -613,6 +613,43 @@ local function renderProduction(snapshot: Types.StateSnapshot)
 	end
 end
 
+-- COMPANY: Firmenname, Logo, Farbe (docs/09 §25) und Einstellungen (Handelsanfragen, docs/13 §12)
+local function renderCompany(snapshot: Types.StateSnapshot)
+	label(TEXT.CompanyTitle, 24, UITheme.Colors.TextPrimary, 1, true)
+	local logo = CompanyIdentity.LogoById[snapshot.Company.LogoId]
+	local color = CompanyIdentity.ColorById[snapshot.Company.ColorId]
+	local box = card(2, 92)
+	cardText(box, `{if logo then logo.Glyph .. "  " else ""}{snapshot.Company.Name}`, 0, 22, UITheme.Colors.TextPrimary, true)
+	cardText(box, `{TEXT.CompanyColor}: {if color then color.DisplayName else "-"}`, 32, 15, UITheme.Colors.TextSecondary)
+	Create("Frame", {
+		AnchorPoint = Vector2.new(1, 0.5),
+		Position = UDim2.fromScale(1, 0.5),
+		Size = UDim2.fromOffset(48, 48),
+		BackgroundColor3 = accent(snapshot),
+		Parent = box,
+	}, { Create("UICorner", { CornerRadius = UDim.new(1, 0) }) })
+	cardText(box, TEXT.CompanyChangeHint, 54, 13, UITheme.Colors.TextSecondary)
+
+	label(TEXT.Settings, 16, UITheme.Colors.TextSecondary, 3, true)
+	local settingsBox = card(4, 60)
+	local enabled = snapshot.Settings.TradeRequests
+	cardText(settingsBox, TEXT.TradeRequests, 8, 17, UITheme.Colors.TextPrimary, true)
+	local toggle: TextButton = Create("TextButton", {
+		AnchorPoint = Vector2.new(1, 0.5),
+		Position = UDim2.fromScale(1, 0.5),
+		Size = UDim2.fromOffset(110, 36),
+		BackgroundColor3 = if enabled then UITheme.Colors.Positive else UITheme.Colors.SurfaceRaised,
+		Font = UITheme.FontBold,
+		TextSize = 15,
+		TextColor3 = if enabled then Color3.fromRGB(20, 24, 28) else UITheme.Colors.TextPrimary,
+		Text = if enabled then TEXT.On else TEXT.Off,
+		Parent = settingsBox,
+	}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
+	toggle.Activated:Connect(function()
+		call("SetTradeRequests", nil, not enabled)
+	end)
+end
+
 function LaptopController.Render()
 	if not gui or not gui.Enabled then
 		return
@@ -639,6 +676,8 @@ function LaptopController.Render()
 		renderElevator(snapshot)
 	elseif currentApp == "PRODUCTION" then
 		renderProduction(snapshot)
+	elseif currentApp == "COMPANY" then
+		renderCompany(snapshot)
 	else
 		label(currentApp, 24, UITheme.Colors.TextPrimary, 1, true)
 		label(TEXT.ComingSoon, 16, UITheme.Colors.TextSecondary, 2)

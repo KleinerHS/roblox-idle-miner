@@ -253,6 +253,8 @@ function WorkerVisualService.Init()
 	end)
 	PhysicsService:CollisionGroupSetCollidable(GROUP_WORKERS, GROUP_WORKERS, false)
 	PhysicsService:CollisionGroupSetCollidable(GROUP_WORKERS, GROUP_PLAYERS, false)
+	-- Spieler blockieren sich nicht gegenseitig (docs/13 §4, Phase 9)
+	PhysicsService:CollisionGroupSetCollidable(GROUP_PLAYERS, GROUP_PLAYERS, false)
 end
 
 function WorkerVisualService.Start()

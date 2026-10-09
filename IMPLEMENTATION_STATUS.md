@@ -16,7 +16,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 6 | Garage & Vehicles | TESTING_REQUIRED (6a, 6b, 6c) |
 | 7 | Conveyors (7a Minenkauf & Schmelzer vorgezogen, D-024) | TESTING_REQUIRED (7a und 7b selbst getestet) |
 | 8 | Smelter | NOT_STARTED |
-| 9 | Multiplayer Hardening / Trading | NOT_STARTED |
+| 9 | Multiplayer Hardening / Trading | TESTING_REQUIRED (Handel braucht den Zwei-Spieler-Test) |
 | 10 | Offline Production | NOT_STARTED |
 | 11 | Prestige | NOT_STARTED |
 | 12 | Content Expansion | NOT_STARTED |
@@ -394,6 +394,24 @@ Selbsttest per Studio-MCP (2026-10-06):
 - Platz-Fenster zeigt „Conveyor MK1 · 120 / min · REMOVE“; REMOVE → Band im Inventar, Vorschau wieder da.
 - Überschneidungen nur gewollt (Band mündet in den Trichter, startet an der Ablage); Pfosten von Band 2 vom Anschluss-Pad weggesetzt.
 - Felix' Profil danach zurückgesetzt (Level 7, $84.363, keine Bänder, kein Schmelzer, Test-Kupfer/Barren entfernt).
+
+## Phase 9 – Multiplayer Hardening & Handel (Version 0.16.0) – TESTING_REQUIRED
+
+| System | Dateien | Status |
+|---|---|---|
+| Prüfung aller Prompts/Remotes auf Besitz: Bau-Buttons, Elevator, Mine-Slots, Lager, Laptop, Schmelzer, Förderband-Pfosten, Garage/Fahrzeuge, Verkaufszone – alle nur für den Besitzer (bereits vorhanden, geprüft) | diverse Services | TESTING_REQUIRED |
+| Spieler blockieren sich nicht gegenseitig (Kollisionsgruppe Players ↔ Players aus, docs/13 §4) | `WorkerVisualService.luau` | TESTING_REQUIRED |
+| Datenschema v8: `Settings.TradeRequests`, Migration v7 → v8 | `DataSchema.luau`, `Types.luau`, `DataService.luau` | TESTING_REQUIRED |
+| Handel: Prompt „Trade“ (Taste T) am anderen Spieler, Anfrage mit Ablaufzeit und Spam-Schutz, eine Sitzung pro Spieler, Angebote (Lager-Materialien, unplatzierte Drills), Änderung setzt Sperren zurück, LOCK → 3 s Bestätigungsphase → CONFIRM, Prüfung direkt vor dem Tausch (verbunden, Abstand, Bestand, Drill unplatziert, Lagerplatz), atomarer Tausch beider Profile, Drill erhält beim Empfänger neue Instanz-ID, kein XP, Abbruch bei Disconnect, Protokoll im Server-Log | `src/server/Services/TradeService.luau`, `GameConfig.Trade` | TESTING_REQUIRED |
+| Handelsfenster (YOUR OFFER / THEIR OFFER, Lager mit Mengenfeld, Drills, LOCK/CONFIRM/CANCEL), Anfrage-Popup, eigener Prompt ausgeblendet | `src/client/Controllers/TradeController.luau` | TESTING_REQUIRED |
+| Laptop-App COMPANY: Name, Logo, Farbe, Schalter „Trade requests ON/OFF“ | `LaptopController.luau` | TESTING_REQUIRED |
+
+Selbsttest per Studio-MCP (2026-10-10, ein Spieler):
+- Migration v7 → v8 („geladen: v8“), 22 Services / 19 Controller ohne Fehler.
+- Handel-Remotes ohne Partner: an sich selbst / unbekannte ID → `INVALID_ARGUMENT`; Antwort/Angebot/Bestätigen ohne Sitzung → `NOT_AVAILABLE`; Abbrechen → OK.
+- Einstellung: Trade requests aus/an über Remote, Snapshot folgt; Laptop COMPANY zeigt Name, Farbe, Schalter.
+- Eigener Trade-Prompt am Server vorhanden, lokal ausgeblendet.
+- Nicht selbst prüfbar: der eigentliche Handel (braucht 2 Spieler) → Test 9.1–9.8.
 
 ## Werkzeuge
 

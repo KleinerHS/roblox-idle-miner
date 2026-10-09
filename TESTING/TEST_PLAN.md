@@ -210,3 +210,19 @@ Für den Test: `SetLevel(…, 35)`, `SetCash(…, 1000000)`, `AddStorage(…, "o
 | 7.7 | Rückweg | Zweites Band an „Smelter → Storage“ | Barren laufen automatisch ins Lager |
 | 7.8 | Entfernen | Pfosten → REMOVE | Band zurück im Inventar, Vorschau wieder da |
 | 7.9 | Speichern | Stop → Play | Bänder und Schmelzer-Inhalt bleiben |
+
+## Phase 9 – Handel & Mehrspieler (2 Spieler: Test → Clients and Servers → 2 Spieler)
+
+Vorher bei beiden etwas ins Lager legen, z. B. `AddStorage(…, "ore_coal", 200)`.
+
+| # | Test | Schritte | Erwartet |
+|---|---|---|---|
+| 9.1 | Anfrage | Spieler 1 geht zu Spieler 2, hält **T** („Trade“) | Spieler 2 sieht „… wants to trade with you“ mit ACCEPT/DECLINE |
+| 9.2 | Ablehnen | DECLINE | Spieler 1 bekommt „… declined …“ |
+| 9.3 | Fenster | Neue Anfrage, ACCEPT | Beide sehen YOUR OFFER / THEIR OFFER und ihr Lager |
+| 9.4 | Angebot | Beide fügen Material hinzu | Gegenseite sieht das Angebot sofort |
+| 9.5 | Zurücksetzen | Beide LOCK, dann ändert einer sein Angebot | Beide Sperren sind wieder aufgehoben |
+| 9.6 | Abschluss | Beide LOCK → 3 s warten → beide CONFIRM | „Trade completed!“, Lagerbestände getauscht, kein XP |
+| 9.7 | Abbruch | Während eines Trades verlässt einer das Spiel | Beim anderen „Trade cancelled.“, nichts getauscht |
+| 9.8 | Ausschalten | Laptop → COMPANY → Trade requests OFF; anderer Spieler fragt an | „This player doesn't accept trade requests.“ |
+| 9.9 | Kein Blockieren | Spieler laufen ineinander | Sie gehen durcheinander durch |

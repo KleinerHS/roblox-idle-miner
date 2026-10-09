@@ -1,5 +1,5 @@
 --!strict
--- Datenschema v7: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
+-- Datenschema v8: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
 -- Regeln:
 --  * Defaults gibt es nur hier.
 --  * Jede Strukturänderung erhöht CURRENT_VERSION und bekommt eine Migration
@@ -15,7 +15,7 @@ local Backpacks = require(Shared.Definitions.Backpacks)
 local Mines = require(Shared.Definitions.Mines)
 local Types = require(Shared.Types)
 
-local CURRENT_VERSION = 7
+local CURRENT_VERSION = 8
 
 local DataSchema = {
 	CurrentVersion = CURRENT_VERSION,
@@ -91,6 +91,11 @@ local TEMPLATE: Types.PlayerData = {
 		Priority = "",
 	},
 
+	-- Einstellungen (v8): Handelsanfragen erlauben (docs/13 §12)
+	Settings = {
+		TradeRequests = true,
+	},
+
 	Stats = {
 		FirstJoinTime = 0,
 		JoinCount = 0,
@@ -157,6 +162,12 @@ local MIGRATIONS: { [number]: (data: { [string]: any }) -> () } = {
 	[6] = function(data)
 		if typeof(data.Machines) == "table" and typeof(data.Machines.Conveyors) ~= "table" then
 			data.Machines.Conveyors = {}
+		end
+	end,
+	-- v7 → v8: Einstellungen ergänzt (Phase 9)
+	[7] = function(data)
+		if typeof(data.Settings) ~= "table" then
+			data.Settings = { TradeRequests = true }
 		end
 	end,
 }

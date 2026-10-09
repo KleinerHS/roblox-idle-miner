@@ -119,6 +119,11 @@ export type PlayerData = {
 	-- Schmelzer (ab DataVersion 6): Erz im Trichter, fertige Barren, bevorzugtes Erz ("" = auto)
 	Smelter: SmelterState,
 
+	-- Einstellungen (ab DataVersion 8)
+	Settings: {
+		TradeRequests: boolean,
+	},
+
 	Stats: {
 		FirstJoinTime: number,
 		JoinCount: number,
@@ -158,6 +163,7 @@ export type StateSnapshot = {
 	Buildings: { [string]: boolean },
 	UnlockedMines: { [string]: boolean },
 	Smelter: SmelterState,
+	Settings: { TradeRequests: boolean },
 	PrestigeCount: number,
 }
 

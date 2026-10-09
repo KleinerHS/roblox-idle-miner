@@ -107,6 +107,26 @@ local Remotes: { [string]: RemoteDefinition } = {
 	PlaceConveyor = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
 	-- Entfernen (zurück ins Inventar): (conveyorId: string) -> Result<conveyorId>
 	RemoveConveyor = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
+	-- Handel (Phase 9, docs/13): Anfrage an einen Spieler: (targetUserId: number) -> Result<requestId>
+	TradeRequest = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 4, Window = 10 } },
+	-- Anfrage erhalten: { RequestId, FromName, Timeout }
+	TradeRequestReceived = { Kind = "Event", Direction = "ServerToClient" },
+	-- Anfrage beantworten: (requestId: string, accept: boolean) -> Result
+	TradeRespond = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
+	-- Eigenes Angebot setzen: (materials: {[id]=n}, drillIds: {string}) -> Result
+	TradeSetOffer = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 15, Window = 10 } },
+	-- Angebot sperren/entsperren: (locked: boolean) -> Result
+	TradeLock = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 10, Window = 10 } },
+	-- Bestätigen (nach der kurzen Bestätigungsphase): () -> Result<boolean>
+	TradeConfirm = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
+	-- Abbrechen: () -> Result
+	TradeCancel = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
+	-- Zustand der Sitzung an beide: { TradeId, PartnerName, Mine, Theirs, MyLocked, TheirLocked, MyConfirmed, TheirConfirmed, ConfirmIn }
+	TradeUpdate = { Kind = "Event", Direction = "ServerToClient" },
+	-- Sitzung beendet: { Reason: "Completed" | "Cancelled" }
+	TradeClosed = { Kind = "Event", Direction = "ServerToClient" },
+	-- Handelsanfragen erlauben: (enabled: boolean) -> Result
+	SetTradeRequests = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 5, Window = 10 } },
 	-- Kapazitäts-Upgrade am Laptop: (kind: "storage" | "elevator") -> Result<{ Capacity: number }>
 	BuyUpgrade = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
 }
