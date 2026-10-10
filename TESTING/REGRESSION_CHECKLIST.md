@@ -34,6 +34,7 @@ Nach Änderungen an Economy, Inventory, Save, Trading oder Prestige die betroffe
 - [ ] Phase 6: Tresen-Verkauf aus dem Rucksack unverändert (Test 2d.3)
 - [ ] 0.16.1: Machine-Shop-Kasse (Prompt „Shop“) funktioniert an neuer Stelle, Bohrkopf dreht um die eigene Achse, keine Teile ragen ineinander (Drill, Shop, Garage-Ecke)
 - [ ] 0.16.1: Fahrzeuge fahren unverändert, ein leiser Motorton, kein Tacho
+- [ ] Phase 11: Prestige nur ab Level 100 am Laptop mit 2-Schritt-Bestätigung, Reset-/Behalten-Liste korrekt, Bonus auf Verkaufsgeld und Mining Speed (Test 11.1–11.8)
 - [ ] Phase 10: Offline max. 1 h, nur Material (Geld nur minus Lohn), Kapazitäten halten, kein Fenster unter 60 s (Test 10.1–10.7)
 - [ ] Phase 9: Handel nur nach Annahme, Änderung setzt Sperren zurück, atomarer Tausch, Abbruch bei Disconnect (Test 9.1–9.7)
 - [ ] Phase 9: Fremde Bedienelemente gesperrt, Spieler blockieren sich nicht (Test 2a.9, 2b.7, 9.9)

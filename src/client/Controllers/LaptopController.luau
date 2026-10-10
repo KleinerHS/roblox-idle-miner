@@ -22,6 +22,7 @@ local BalanceConfig = require(Shared.Config.BalanceConfig)
 local CompanyIdentity = require(Shared.Definitions.CompanyIdentity)
 local Types = require(Shared.Types)
 local NumberFormat = require(Shared.Util.NumberFormat)
+local PrestigeLogic = require(Shared.Util.PrestigeLogic)
 
 local Net = require(script.Parent.Parent.Net)
 local Create = require(script.Parent.Parent.UI.Create)
@@ -650,6 +651,108 @@ local function renderCompany(snapshot: Types.StateSnapshot)
 	end)
 end
 
+-- PRESTIGE (docs/12 §50–52, docs/09 §74): Voraussetzung, Bonus, Reset-/Behalten-Liste und
+-- Bestätigung in zwei Schritten mit Wartezeit – nie mit einem einzelnen Klick.
+local CONFIRM_SECONDS = 3
+local confirmStartedAt: number? = nil
+
+local function bonusText(count: number): string
+	local money = math.floor((PrestigeLogic.MoneyMultiplier(count) - 1) * 100 + 0.5)
+	local speed = math.floor((PrestigeLogic.SpeedMultiplier(count) - 1) * 100 + 0.5)
+	return string.format(TEXT.PrestigeBonusLine, money, speed)
+end
+
+local function listCard(order: number, title: string, lines: { string }, color: Color3)
+	local box = card(order, 28 + #lines * 20)
+	cardText(box, title, 0, 15, color, true)
+	for i, line in lines do
+		cardText(box, line, 4 + i * 20, 14, UITheme.Colors.TextPrimary)
+	end
+end
+
+local function renderPrestige(snapshot: Types.StateSnapshot)
+	local count = snapshot.PrestigeCount
+	local required = BalanceConfig.Prestige.RequiredLevel
+	local available = PrestigeLogic.IsAvailable(snapshot.MiningLevel)
+	label(TEXT.PrestigeTitle, 24, UITheme.Colors.TextPrimary, 1, true)
+
+	if confirmStartedAt then
+		-- Schritt 2: Bestätigung
+		local box = card(2, 64)
+		cardText(box, TEXT.PrestigeConfirmTitle, 0, 22, UITheme.Colors.Warning, true)
+		cardText(box, TEXT.PrestigeConfirmText, 30, 15, UITheme.Colors.TextPrimary)
+		listCard(3, TEXT.PrestigeResets, TEXT.PrestigeResetList, UITheme.Colors.Negative)
+		listCard(4, TEXT.PrestigeKeeps, TEXT.PrestigeKeepList, UITheme.Colors.Positive)
+		listCard(5, TEXT.PrestigeGain, { bonusText(count + 1) }, UITheme.Colors.Positive)
+		local row = Create("Frame", { Size = UDim2.new(1, 0, 0, 44), BackgroundTransparency = 1, LayoutOrder = 6, Parent = content })
+		local cancel: TextButton = Create("TextButton", {
+			Size = UDim2.new(0.5, -4, 1, 0),
+			BackgroundColor3 = UITheme.Colors.SurfaceRaised,
+			Font = UITheme.FontBold,
+			TextSize = 16,
+			TextColor3 = UITheme.Colors.TextPrimary,
+			Text = TEXT.PrestigeCancel,
+			Parent = row,
+		}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
+		cancel.Activated:Connect(function()
+			confirmStartedAt = nil
+			LaptopController.Render()
+		end)
+		local remaining = math.ceil(CONFIRM_SECONDS - (os.clock() - (confirmStartedAt :: number)))
+		local ready = remaining <= 0
+		local confirm: TextButton = Create("TextButton", {
+			AnchorPoint = Vector2.new(1, 0),
+			Position = UDim2.fromScale(1, 0),
+			Size = UDim2.new(0.5, -4, 1, 0),
+			BackgroundColor3 = if ready then UITheme.Colors.Negative else UITheme.Colors.Surface,
+			Font = UITheme.FontBold,
+			TextSize = 16,
+			TextColor3 = UITheme.Colors.TextPrimary,
+			AutoButtonColor = ready,
+			Text = if ready then TEXT.PrestigeConfirm else string.format(TEXT.PrestigeConfirmIn, remaining),
+			Parent = row,
+		}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
+		if ready then
+			confirm.Activated:Connect(function()
+				confirmStartedAt = nil
+				call("Prestige", { Level = required })
+				LaptopController.Render()
+			end)
+		else
+			task.delay(1, LaptopController.Render)
+		end
+		return
+	end
+
+	-- Schritt 1: Übersicht
+	local box = card(2, 70)
+	cardText(box, string.format(TEXT.PrestigeCount, count), 0, 20, UITheme.Colors.TextPrimary, true)
+	cardText(box, if count > 0 then bonusText(count) else TEXT.PrestigeNoBonus, 30, 15, UITheme.Colors.TextSecondary)
+	local req = card(3, 62)
+	cardText(req, string.format(TEXT.PrestigeRequirement, required, snapshot.MiningLevel), 0, 16, if available then UITheme.Colors.Positive else UITheme.Colors.TextPrimary, true)
+	bar(req, 28, snapshot.MiningLevel / required, snapshot)
+	listCard(4, TEXT.PrestigeGain, { bonusText(count + 1) }, UITheme.Colors.Positive)
+	listCard(5, TEXT.PrestigeResets, TEXT.PrestigeResetList, UITheme.Colors.Negative)
+	listCard(6, TEXT.PrestigeKeeps, TEXT.PrestigeKeepList, UITheme.Colors.Positive)
+	local start: TextButton = Create("TextButton", {
+		Size = UDim2.new(1, 0, 0, 46),
+		BackgroundColor3 = if available then accent(snapshot) else UITheme.Colors.Surface,
+		Font = UITheme.FontBold,
+		TextSize = 17,
+		TextColor3 = if available then Color3.fromRGB(20, 24, 28) else UITheme.Colors.TextSecondary,
+		AutoButtonColor = available,
+		Text = if available then TEXT.PrestigeStart else string.format(TEXT.PrestigeLocked, required),
+		LayoutOrder = 7,
+		Parent = content,
+	}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
+	if available then
+		start.Activated:Connect(function()
+			confirmStartedAt = os.clock()
+			LaptopController.Render()
+		end)
+	end
+end
+
 function LaptopController.Render()
 	if not gui or not gui.Enabled then
 		return
@@ -678,6 +781,8 @@ function LaptopController.Render()
 		renderProduction(snapshot)
 	elseif currentApp == "COMPANY" then
 		renderCompany(snapshot)
+	elseif currentApp == "PRESTIGE" then
+		renderPrestige(snapshot)
 	else
 		label(currentApp, 24, UITheme.Colors.TextPrimary, 1, true)
 		label(TEXT.ComingSoon, 16, UITheme.Colors.TextSecondary, 2)
@@ -702,6 +807,7 @@ local function zoomTo(open: boolean)
 end
 
 local function close()
+	confirmStartedAt = nil
 	gui.Enabled = false
 	zoomTo(false)
 end
@@ -784,6 +890,7 @@ local function build()
 			Parent = nav,
 		}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
 		button.Activated:Connect(function()
+			confirmStartedAt = nil
 			currentApp = app
 			LaptopController.Render()
 		end)

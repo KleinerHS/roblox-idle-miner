@@ -26,6 +26,9 @@ local Remotes: { [string]: RemoteDefinition } = {
 	PlotAssigned = { Kind = "Event", Direction = "ServerToClient" },
 	GetMyPlot = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 5, Window = 10 } },
 
+	-- Prestige ausführen (docs/12 §50–64): () -> Result<{ Count }>; Bestätigung macht der Client
+	Prestige = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 2, Window = 10 } },
+
 	-- Offline-Zusammenfassung nach dem Login (OfflineSimulation.Summary, docs/14 §15)
 	OfflineSummary = { Kind = "Event", Direction = "ServerToClient" },
 

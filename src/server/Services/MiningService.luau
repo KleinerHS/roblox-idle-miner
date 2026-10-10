@@ -17,6 +17,7 @@ local Backpacks = require(Shared.Definitions.Backpacks)
 local Types = require(Shared.Types)
 local Result = require(Shared.Util.Result)
 local Log = require(Shared.Util.Log)
+local PrestigeLogic = require(Shared.Util.PrestigeLogic)
 
 local ToolBuilder = require(script.Parent.Parent.World.ToolBuilder)
 local DataService = require(script.Parent.DataService)
@@ -121,9 +122,10 @@ local function hit(player: Player, slotIndex: unknown)
 		return Result.err(Result.Codes.TOO_FAR)
 	end
 
-	-- Cooldown nach Mining Speed (Hits pro Sekunde)
+	-- Cooldown nach Mining Speed (Hits pro Sekunde), inkl. Prestige-Bonus
 	local now = os.clock()
-	local minInterval = (1 / pickaxe.MiningSpeed) * GameConfig.Mining.CooldownTolerance
+	local speed = pickaxe.MiningSpeed * PrestigeLogic.SpeedMultiplier(data.Prestige.Count)
+	local minInterval = (1 / speed) * GameConfig.Mining.CooldownTolerance
 	if lastHit[player] and now - lastHit[player] < minInterval then
 		return Result.err(Result.Codes.COOLDOWN)
 	end

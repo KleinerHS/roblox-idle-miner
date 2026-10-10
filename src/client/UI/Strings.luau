@@ -53,6 +53,8 @@ local MESSAGES: { [string]: string } = {
 	TRADE_SENT = "Trade request sent.",
 	TRADE_DECLINED = "{Name} declined your trade request.",
 	TRADE_BUSY = "One of you is already trading.",
+	IN_VEHICLE = "Get out of your vehicle first.",
+	PRESTIGE_DONE = "PRESTIGE {Count}! Your company starts again – stronger than before.",
 	TRADE_DISABLED = "This player doesn't accept trade requests.",
 	TRADE_DONE = "Trade completed!",
 	TRADE_CANCELLED = "Trade cancelled.",
@@ -118,6 +120,7 @@ Strings.Sell = table.freeze({
 	Pending = "SELLING…",
 	Sold = "SOLD",
 	Close = "X",
+	PrestigeBonus = " (+%d%% Prestige)",
 })
 
 Strings.Shop = table.freeze({
@@ -157,7 +160,7 @@ Strings.Storage = table.freeze({
 })
 
 Strings.Laptop = table.freeze({
-	Apps = { "DASHBOARD", "EMPLOYEES", "STORAGE", "ELEVATOR", "PRODUCTION", "COMPANY" },
+	Apps = { "DASHBOARD", "EMPLOYEES", "STORAGE", "ELEVATOR", "PRODUCTION", "COMPANY", "PRESTIGE" },
 	ComingSoon = "This app is coming soon.",
 	Employees = "EMPLOYEES",
 	NeedStorage = "Build the Storage first to hire workers.",
@@ -228,6 +231,37 @@ Strings.Laptop = table.freeze({
 	InventoryTitle = "INVENTORY",
 	InventoryLine = "%s × %d available",
 	InventoryHint = "Place it at a mining slot inside a mine.",
+
+	-- Prestige (Phase 11)
+	PrestigeTitle = "PRESTIGE",
+	PrestigeCount = "Prestige %d",
+	PrestigeNoBonus = "No prestige bonus yet.",
+	PrestigeBonusLine = "+%d%% money from sales · +%d%% mining speed",
+	PrestigeRequirement = "Requires Mining Level %d  (you: %d)",
+	PrestigeGain = "YOU GAIN (PERMANENT)",
+	PrestigeResets = "RESETS",
+	PrestigeKeeps = "YOU KEEP",
+	PrestigeResetList = {
+		"Cash, Mining Level and XP",
+		"All buildings – your hut, hall, storage, garage, smelter",
+		"Mine unlocks, storage and elevator upgrades",
+		"Workers, drills and conveyors",
+		"All ore and bars (storage, backpack, machines, vehicle cargo)",
+	},
+	PrestigeKeepList = {
+		"Prestige count and all prestige bonuses",
+		"Company name, logo and color",
+		"Pickaxes and backpacks",
+		"Vehicles (stored until you rebuild your garage)",
+		"Robux purchases",
+	},
+	PrestigeStart = "PRESTIGE…",
+	PrestigeLocked = "Reach Mining Level %d to prestige",
+	PrestigeConfirmTitle = "PRESTIGE?",
+	PrestigeConfirmText = "Your company progression will restart. This cannot be undone.",
+	PrestigeCancel = "CANCEL",
+	PrestigeConfirm = "PRESTIGE",
+	PrestigeConfirmIn = "PRESTIGE (%d)",
 })
 
 Strings.DrillSlot = table.freeze({

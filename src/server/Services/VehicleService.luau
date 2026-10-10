@@ -496,6 +496,11 @@ function VehicleService.Start()
 	task.spawn(doorLoop)
 end
 
+-- Alle Fahrzeuge des Spielers aus der Welt nehmen (Prestige: Garage wird zurückgesetzt)
+function VehicleService.ClearAll(player: Player)
+	clearAll(player)
+end
+
 -- Gespawntes Modell eines Fahrzeugs (für Beladen/Verkauf in Phase 6c)
 function VehicleService.GetModel(player: Player, vehicleId: string): Model?
 	return spawned[player] and spawned[player][vehicleId]

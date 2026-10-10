@@ -238,3 +238,18 @@ Vorher bei beiden etwas ins Lager legen, z. B. `AddStorage(…, "ore_coal", 200)
 | 10.5 | Kein Geld | `SetCash(…, 0)`, dann `SimulateOffline(…, 600)` | Kein Erz abgebaut, Hinweis zu unbezahlten Workern |
 | 10.6 | Schmelzer | Schmelzer + Förderbänder, schmelzbares Erz im Lager, `SimulateOffline(…, 600)` | Barren in der Liste und im Lager |
 | 10.7 | Kein Geld aus Produktion | Vor/nach dem Fenster Geld vergleichen | Geld sinkt nur um „Wages paid“, Fahrzeugladung unverändert |
+## Phase 11 – Prestige
+
+Achtung: Ein echtes Prestige setzt den Spielstand zurück (so gewollt). Vorher ggf. Level setzen:
+`game.ServerStorage.DevTools.SetLevel:Invoke(game.Players:GetPlayers()[1], 100)`
+
+| # | Test | Schritte | Erwartet |
+|---|---|---|---|
+| 11.1 | Gesperrt | Unter Level 100 Laptop → PRESTIGE | Voraussetzung mit Balken, Knopf „Reach Mining Level 100 to prestige“, nicht klickbar |
+| 11.2 | Übersicht | Level 100 → PRESTIGE | Bonus nach Prestige (+10 % / +5 %), Listen RESETS und YOU KEEP, Knopf „PRESTIGE…“ |
+| 11.3 | Bestätigung | PRESTIGE… | „PRESTIGE?“, Knopf zählt 3-2-1 herunter, erst dann klickbar; CANCEL kehrt zurück |
+| 11.4 | Ausführen | PRESTIGE bestätigen | Respawn am Plot-Start, nur der Hütten-Baubutton, Geld $800, Level 1, Meldung „PRESTIGE 1!“, Firmenname/Farbe am Schild bleiben |
+| 11.5 | Behalten | Nach Prestige Rucksack/Spitzhacke prüfen, Garage neu bauen | Spitzhacke und Rucksack noch ausgerüstet; Fahrzeuge in der Garagen-Auswahl, ohne Ladung |
+| 11.6 | Bonus | Erz verkaufen | Verkaufsfenster zeigt „(+10% Prestige)“, Geld 10 % höher, XP unverändert; Mining spürbar schneller |
+| 11.7 | Kein Offline-Nachschlag | Nach Prestige Stop → Play nach > 1 Minute | Kein altes Material aus der Zeit vor dem Prestige |
+| 11.8 | Rejoin | Stop → Play | Prestige-Zähler und Bonus bleiben |

@@ -402,6 +402,11 @@ local function addPrompt(player: Player, character: Model)
 	prompt.Parent = root
 end
 
+-- Läuft für den Spieler gerade ein Handel (Anfrage angenommen)? Für Prestige (docs/12 §63)
+function TradeService.IsTrading(player: Player): boolean
+	return sessions[player] ~= nil
+end
+
 function TradeService.Init()
 	RemoteService.OnInvoke("TradeRequest", request)
 	RemoteService.OnInvoke("TradeRespond", respond)

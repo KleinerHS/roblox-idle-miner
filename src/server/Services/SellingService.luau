@@ -16,6 +16,7 @@ local LayoutConfig = require(Shared.Config.LayoutConfig)
 local Materials = require(Shared.Definitions.Materials)
 local Result = require(Shared.Util.Result)
 local Leveling = require(Shared.Util.Leveling)
+local PrestigeLogic = require(Shared.Util.PrestigeLogic)
 local Log = require(Shared.Util.Log)
 
 local SellingBuilder = require(script.Parent.Parent.World.SellingBuilder)
@@ -92,6 +93,8 @@ local function sellAll(player: Player, vehicleId: unknown)
 	if next(sold) == nil then
 		return Result.err(Result.Codes.NOTHING_TO_SELL)
 	end
+	-- Prestige-Bonus nur aufs Geld (docs/12 §57), XP unverändert
+	cash = math.floor(cash * PrestigeLogic.MoneyMultiplier(data.Prestige.Count))
 
 	-- Prüfung oben und Änderung hier ohne Yield dazwischen → atomar, kein Doppelverkauf
 	local levelsGained = 0

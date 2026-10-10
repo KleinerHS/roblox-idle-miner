@@ -14,6 +14,7 @@ local GameConfig = require(Shared.Config.GameConfig)
 local Mines = require(Shared.Definitions.Mines)
 local Ores = require(Shared.Definitions.Ores)
 local Pickaxes = require(Shared.Definitions.Pickaxes)
+local PrestigeLogic = require(Shared.Util.PrestigeLogic)
 
 local Net = require(script.Parent.Parent.Net)
 local Strings = require(script.Parent.Parent.UI.Strings)
@@ -160,7 +161,7 @@ local function onActivated(tool: Tool)
 	if not pickaxe then
 		return
 	end
-	busyUntil = now + 1 / pickaxe.MiningSpeed
+	busyUntil = now + 1 / (pickaxe.MiningSpeed * PrestigeLogic.SpeedMultiplier((snapshot :: any).PrestigeCount or 0))
 
 	if not Mines.Get(ElevatorController.GetLocation()) then
 		NotificationController.Show("Info", "NOT_IN_MINE")

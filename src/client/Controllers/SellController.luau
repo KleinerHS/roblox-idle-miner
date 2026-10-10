@@ -14,6 +14,7 @@ local Shared = ReplicatedStorage:WaitForChild("Shared")
 local UITheme = require(Shared.Config.UITheme)
 local Materials = require(Shared.Definitions.Materials)
 local NumberFormat = require(Shared.Util.NumberFormat)
+local PrestigeLogic = require(Shared.Util.PrestigeLogic)
 
 local Net = require(script.Parent.Parent.Net)
 local Create = require(script.Parent.Parent.UI.Create)
@@ -122,7 +123,11 @@ local function refresh()
 		end
 	end
 	emptyLabel.Visible = count == 0
-	totalLabel.Text = `{TEXT.Total}  {NumberFormat.cash(cash)}   ·   +{NumberFormat.withSeparators(xp)} Mining XP`
+	-- Prestige-Bonus wie auf dem Server (nur Geld)
+	local multiplier = PrestigeLogic.MoneyMultiplier(if snapshot then snapshot.PrestigeCount else 0)
+	cash = math.floor(cash * multiplier)
+	local bonus = if multiplier > 1 then string.format(TEXT.PrestigeBonus, math.floor((multiplier - 1) * 100 + 0.5)) else ""
+	totalLabel.Text = `{TEXT.Total}  {NumberFormat.cash(cash)}{bonus}   ·   +{NumberFormat.withSeparators(xp)} Mining XP`
 	sellButton:SetEnabled(count > 0 and not selling)
 end
 

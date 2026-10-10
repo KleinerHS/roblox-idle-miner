@@ -18,7 +18,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 8 | Smelter | NOT_STARTED |
 | 9 | Multiplayer Hardening / Trading | TESTING_REQUIRED (Handel braucht den Zwei-Spieler-Test) |
 | 10 | Offline Production | TESTING_REQUIRED (Version 0.17.0) |
-| 11 | Prestige | NOT_STARTED |
+| 11 | Prestige | TESTING_REQUIRED (Version 0.18.0, Bonus-Werte Q-025 offen) |
 | 12 | Content Expansion | NOT_STARTED |
 | 13 | Visual Polish | NOT_STARTED |
 | 14 | Balance | NOT_STARTED |
@@ -412,6 +412,16 @@ Selbsttest per Studio-MCP (2026-10-10, ein Spieler):
 - Einstellung: Trade requests aus/an über Remote, Snapshot folgt; Laptop COMPANY zeigt Name, Farbe, Schalter.
 - Eigener Trade-Prompt am Server vorhanden, lokal ausgeblendet.
 - Nicht selbst prüfbar: der eigentliche Handel (braucht 2 Spieler) → Test 9.1–9.8.
+
+## Phase 11 – Prestige (Version 0.18.0) – TESTING_REQUIRED
+
+| System | Dateien | Status |
+|---|---|---|
+| Prestige-Werte zentral: ab Level 100, Bonus je Prestige +10 % Verkaufsgeld, +5 % Mining Speed (max. +50 %) – additiv, kein x2/x4 (Vorschlag Q-025, `TODO_BALANCE`) | `BalanceConfig.Prestige`, `src/shared/Util/PrestigeLogic.luau` | TESTING_REQUIRED |
+| Reset als reine Funktion (D-033): Vorlage + Erhaltenes (Zähler +1, Firma, Spitzhacken, Rucksäcke, Fahrzeuge ohne Ladung/Stellplatz, Robux-Käufe, Einstellungen, Statistik, ID-Zähler); neuer Offline-Zeitstempel | `src/server/Util/PrestigeReset.luau` | TESTING_REQUIRED |
+| Remote `Prestige`: nur ab Level 100, am eigenen Laptop, nicht im Handel, nicht im Fahrzeug, kein Doppelauslösen; Reset atomar in einem Mutate, sofort Save; danach Fahrzeuge weg, Gebäude neu (Startzustand), Worker-Figuren weg, Spieler respawnt, Meldung „PRESTIGE n!“ | `src/server/Services/PrestigeService.luau`, `TradeService.IsTrading`, `VehicleService.ClearAll` | TESTING_REQUIRED |
+| Boni wirken: Verkaufsgeld × Faktor (XP unverändert), Mining-Cooldown Server und Client mit Speed-Faktor, Verkaufsfenster zeigt „(+n% Prestige)“ | `SellingService.luau`, `MiningService.luau`, `MiningController.luau`, `SellController.luau` | TESTING_REQUIRED |
+| Laptop-App PRESTIGE: Zähler, aktueller Bonus, Voraussetzung mit Balken, Bonus nach dem nächsten Prestige, Listen RESETS / YOU KEEP; Bestätigung in 2 Schritten (PRESTIGE… → PRESTIGE? mit 3 s Wartezeit, CANCEL) | `LaptopController.luau`, `Strings.Laptop` | TESTING_REQUIRED |
 
 ## Phase 10 – Offline-Produktion (Version 0.17.0) – TESTING_REQUIRED
 
