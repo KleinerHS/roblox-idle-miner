@@ -503,3 +503,17 @@ Vorschlag: MK1 $50.000 Lv 35 120/min · MK2 $150.000 Lv 45 300/min · MK3 $500.0
 „Förderband MK1 $15.000 ab Level 12, MK2 und MK3 erst einführen, wenn es Schmelzer-Upgrades gibt.“ – MK1 120/min bleibt.
 
 **Decision:** D-031
+
+---
+
+## Q-025 – Prestige-Bonus (Phase 11)
+
+**Status:** ANSWERED
+**Date:** 2026-10-10
+
+Vorschlag: je Prestige +10 % Verkaufsgeld (nicht XP), +5 % Mining Speed bis max. +50 %, additiv.
+
+### Answer (Felix, 2026-10-10)
+„Q-025: ok (+10 % Geld, +5 % Speed bis max. +50 %). D-033: ok.“
+
+**Decision:** D-034

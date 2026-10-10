@@ -110,14 +110,14 @@ local BalanceConfig = {
 	-- Preis(n) = BasePrice * Growth ^ (n - FirstPaidMine), auf ganze Dollar gerundet.
 	-- Mine 03 = $3.000, jede weitere Mine +50 %.
 	-- Prestige (docs/12 §50–64, docs/11 §42–47). Ab Level 100 (fest). Bonus additiv je Prestige,
-	-- dadurch sinkt das relative Wachstum (kein x2/x4/x8, docs/11 §45). Vorschlag Q-025.
+	-- dadurch sinkt das relative Wachstum (kein x2/x4/x8, docs/11 §45). Bestätigt (D-034).
 	Prestige = {
 		RequiredLevel = 100,
 		-- Verkaufserlös (Geld, nicht XP) +n je Prestige: Faktor = 1 + n * Count
-		MoneyBonusPerPrestige = 0.10, -- TODO_BALANCE (Q-025)
+		MoneyBonusPerPrestige = 0.10, -- Felix (D-034)
 		-- Mining Speed (Hits pro Sekunde) +n je Prestige, gedeckelt
-		SpeedBonusPerPrestige = 0.05, -- TODO_BALANCE (Q-025)
-		SpeedBonusMax = 0.50, -- TODO_BALANCE (Q-025)
+		SpeedBonusPerPrestige = 0.05, -- Felix (D-034)
+		SpeedBonusMax = 0.50, -- Felix (D-034)
 	},
 
 	MinePrice = {

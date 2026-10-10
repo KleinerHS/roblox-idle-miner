@@ -18,7 +18,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 8 | Smelter | NOT_STARTED |
 | 9 | Multiplayer Hardening / Trading | TESTING_REQUIRED (Handel braucht den Zwei-Spieler-Test) |
 | 10 | Offline Production | TESTING_REQUIRED (Version 0.17.0) |
-| 11 | Prestige | TESTING_REQUIRED (Version 0.18.0, Bonus-Werte Q-025 offen) |
+| 11 | Prestige | TESTING_REQUIRED (Version 0.18.0; Bonus D-034 und Reset-Liste D-033 bestätigt) |
 | 12 | Content Expansion | NOT_STARTED |
 | 13 | Visual Polish | NOT_STARTED |
 | 14 | Balance | NOT_STARTED |
@@ -417,7 +417,7 @@ Selbsttest per Studio-MCP (2026-10-10, ein Spieler):
 
 | System | Dateien | Status |
 |---|---|---|
-| Prestige-Werte zentral: ab Level 100, Bonus je Prestige +10 % Verkaufsgeld, +5 % Mining Speed (max. +50 %) – additiv, kein x2/x4 (Vorschlag Q-025, `TODO_BALANCE`) | `BalanceConfig.Prestige`, `src/shared/Util/PrestigeLogic.luau` | TESTING_REQUIRED |
+| Prestige-Werte zentral: ab Level 100, Bonus je Prestige +10 % Verkaufsgeld, +5 % Mining Speed (max. +50 %) – additiv, kein x2/x4 (bestätigt, D-034) | `BalanceConfig.Prestige`, `src/shared/Util/PrestigeLogic.luau` | TESTING_REQUIRED |
 | Reset als reine Funktion (D-033): Vorlage + Erhaltenes (Zähler +1, Firma, Spitzhacken, Rucksäcke, Fahrzeuge ohne Ladung/Stellplatz, Robux-Käufe, Einstellungen, Statistik, ID-Zähler); neuer Offline-Zeitstempel | `src/server/Util/PrestigeReset.luau` | TESTING_REQUIRED |
 | Remote `Prestige`: nur ab Level 100, am eigenen Laptop, nicht im Handel, nicht im Fahrzeug, kein Doppelauslösen; Reset atomar in einem Mutate, sofort Save; danach Fahrzeuge weg, Gebäude neu (Startzustand), Worker-Figuren weg, Spieler respawnt, Meldung „PRESTIGE n!“ | `src/server/Services/PrestigeService.luau`, `TradeService.IsTrading`, `VehicleService.ClearAll` | TESTING_REQUIRED |
 | Boni wirken: Verkaufsgeld × Faktor (XP unverändert), Mining-Cooldown Server und Client mit Speed-Faktor, Verkaufsfenster zeigt „(+n% Prestige)“ | `SellingService.luau`, `MiningService.luau`, `MiningController.luau`, `SellController.luau` | TESTING_REQUIRED |

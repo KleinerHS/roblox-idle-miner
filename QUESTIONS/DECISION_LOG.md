@@ -206,8 +206,14 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Source:** docs/14 §7–16, docs/06 §50 (Verfahren nicht festgelegt)
 **Decision:** Abwesenheit in Abschnitte zu 10 s (eine Elevator-Fahrt) teilen, je Abschnitt dieselben Regeln wie online mit Raten × Dauer; höchstens 360 Abschnitte. Lohn wird offline jede Minute wie online gezahlt (unbezahlte Worker pausieren). Fenster erst ab 60 s Abwesenheit, kürzere Reconnects werden still nachgerechnet.
 **Affected systems:** Offline, Production, Workers, Smelter, Conveyors
-## D-033 – Prestige-Reset-Liste (aus docs/12 §53–64 und D-012, Veto möglich)
+## D-033 – Prestige-Reset-Liste (aus docs/12 §53–64 und D-012, von Felix bestätigt 2026-10-10)
 
 **Source:** docs/12 §53–64, D-012
 **Decision:** Zurückgesetzt: Geld, Level/XP, alle Gebäude inkl. Hütte/Büro (docs/12 §62: Startprogression wieder anbieten), Minen, Lager inkl. Inhalt und Upgrade, Elevator-Upgrade, Worker, Drills, Förderbänder, Schmelzer, Produktionspuffer, Rucksack-Inhalt, Fahrzeugladungen. Erhalten: Prestige-Zähler/Bonus, Firmenidentität (docs/12 §60), Spitzhacken, Rucksäcke, Fahrzeuge (eingelagert bis zur neuen Garage), Robux-Käufe, Einstellungen, Statistik. Prestige nur am Laptop, nicht im Handel oder Fahrzeug, Bestätigung in 2 Schritten mit 3 s Wartezeit.
 **Affected systems:** Prestige, Data, Buildings, Vehicles, Trade
+
+## D-034 – Prestige-Bonus
+
+**Source Question:** Q-025 (Felix, 2026-10-10)
+**Decision:** Je Prestige +10 % Verkaufsgeld (XP unverändert) und +5 % Mining Speed, Speed-Bonus höchstens +50 %; additiv.
+**Affected systems:** Prestige, Selling, Mining, Balance
