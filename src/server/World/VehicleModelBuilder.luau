@@ -37,6 +37,8 @@ local SPECS: { [string]: Spec } = {
 	Pickup = { r = 1.4, w = 1.1, track = 3.15, front = -5.2, rear = 4.6, width = 7.2, length = 16.4 },
 	Van = { r = 1.5, w = 1.2, track = 3.2, front = -5.8, rear = 5.2, width = 7.4, length = 17.6 },
 	BoxTruck = { r = 1.8, w = 1.5, track = 3.5, front = -7.6, rear = 7.4, width = 8.4, length = 24 },
+	Truck = { r = 2, w = 1.6, track = 3.7, front = -8.8, rear = 7.6, width = 8.8, length = 27 },
+	Hauler = { r = 2.5, w = 2, track = 4, front = -8.4, rear = 7.4, width = 9.6, length = 28 },
 }
 
 type Ctx = { model: Model, cf: CFrame, parts: { BasePart }, def: Vehicles.VehicleDefinition }
@@ -187,6 +189,89 @@ local function buildBoxTruck(ctx: Ctx, spec: Spec)
 	return Vector3.new(-1.8, floorY + 1.6, -8.4)
 end
 
+-- Kipper-LKW (Phase 12c, vorläufiges Modell): Fahrerhaus wie Box Truck, offene Stahlmulde
+local function buildTruck(ctx: Ctx, spec: Spec)
+	local paint = ctx.def.PaintColor
+	local hw = spec.width / 2
+	local floorY = spec.r + 1
+	local cab = box(ctx, "Cab", Vector3.new(spec.width - 0.2, 5.4, 5.6), 0, floorY + 2.7, -10, paint, Enum.Material.SmoothPlastic)
+	box(ctx, "CabRoof", Vector3.new(spec.width - 0.4, 0.4, 5.2), 0, floorY + 5.6, -9.8, paint, Enum.Material.SmoothPlastic)
+	box(ctx, "Windshield", Vector3.new(spec.width - 1, 2.6, 0.2), 0, floorY + 3.8, -12.85, GLASS, Enum.Material.Glass).Transparency = 0.35
+	for _, side in { -1, 1 } do
+		box(ctx, `SideWindow{side}`, Vector3.new(0.12, 2, 2.6), side * (hw - 0.08), floorY + 3.9, -10.4, GLASS, Enum.Material.Glass).Transparency = 0.3
+		box(ctx, `Mirror{side}`, Vector3.new(0.3, 1.3, 0.5), side * (hw + 0.5), floorY + 3.6, -12.1, TRIM)
+		box(ctx, `Step{side}`, Vector3.new(0.8, 0.25, 1.6), side * (hw - 0.3), spec.r + 0.7, -9.8, CHROME)
+		box(ctx, `SideGuard{side}`, Vector3.new(0.2, 0.6, 9), side * (hw - 0.4), spec.r + 0.4, 0, CHROME)
+	end
+	doorText(cab, Enum.NormalId.Left)
+	box(ctx, "Grille", Vector3.new(4.8, 2, 0.2), 0, floorY + 1.3, -12.9, TRIM)
+	box(ctx, "Frame", Vector3.new(5, 0.9, 23), 0, spec.r + 0.6, 0.5, TRIM)
+	-- Mulde: Boden, Seitenwände, Stirnwand mit Schutzdach, Heckklappe
+	local bedZ, bedLen, bedH = 3.2, 16.4, 4
+	box(ctx, "BedFloor", Vector3.new(spec.width, 0.5, bedLen), 0, floorY + 0.4, bedZ, paint:Lerp(Color3.new(0, 0, 0), 0.3), Enum.Material.DiamondPlate)
+	for _, side in { -1, 1 } do
+		local wall = box(ctx, `BedSide{side}`, Vector3.new(0.4, bedH, bedLen), side * (hw - 0.2), floorY + 0.4 + bedH / 2, bedZ, paint, Enum.Material.Metal)
+		if side < 0 then
+			doorText(wall, Enum.NormalId.Left)
+		end
+		local stripe = box(ctx, `AccentStripe{side}`, Vector3.new(0.06, 0.6, bedLen), side * (hw + 0.03), floorY + 0.4 + bedH - 0.5, bedZ, ACCENT_DEFAULT)
+		accentPart(stripe)
+		for i = -2, 2 do
+			box(ctx, `BedRib{side}_{i}`, Vector3.new(0.2, bedH, 0.4), side * (hw + 0.1), floorY + 0.4 + bedH / 2, bedZ + i * 3.6, paint:Lerp(Color3.new(0, 0, 0), 0.2), Enum.Material.Metal)
+		end
+	end
+	box(ctx, "BedFront", Vector3.new(spec.width, bedH + 1, 0.4), 0, floorY + 0.9 + bedH / 2, bedZ - bedLen / 2, paint, Enum.Material.Metal)
+	box(ctx, "CabGuard", Vector3.new(spec.width - 0.4, 0.3, 2), 0, floorY + bedH + 1.3, bedZ - bedLen / 2 - 0.8, paint, Enum.Material.Metal)
+	box(ctx, "Tailgate", Vector3.new(spec.width, bedH, 0.4), 0, floorY + 0.4 + bedH / 2, bedZ + bedLen / 2, paint:Lerp(Color3.new(0, 0, 0), 0.15), Enum.Material.Metal)
+	local cargo = box(ctx, "CargoFill", Vector3.new(spec.width - 1, 2.6, bedLen - 1), 0, floorY + 1.9, bedZ, CARGO, Enum.Material.Slate)
+	cargo.Transparency = 1
+	cargo.CanCollide = false
+	lightsAndBumpers(ctx, spec, -13, bedZ + bedLen / 2 + 0.2, floorY + 0.6)
+	return Vector3.new(-1.9, floorY + 1.7, -9.8)
+end
+
+-- Großer Mining-Muldenkipper (Phase 12c, vorläufiges Modell): Fahrerhaus links auf Plattform,
+-- hohe, nach hinten ansteigende Mulde, große Räder
+local function buildHauler(ctx: Ctx, spec: Spec)
+	local paint = ctx.def.PaintColor
+	local hw = spec.width / 2
+	local floorY = spec.r + 0.8
+	box(ctx, "Frame", Vector3.new(5.4, 1.2, 22), 0, spec.r + 0.4, 0, TRIM)
+	-- Motorblock vorne, Plattform darüber
+	box(ctx, "Engine", Vector3.new(5.4, 3.6, 4.4), 0, floorY + 1.6, -10.6, paint, Enum.Material.Metal)
+	box(ctx, "Radiator", Vector3.new(5, 3, 0.3), 0, floorY + 1.6, -12.9, TRIM, Enum.Material.DiamondPlate)
+	box(ctx, "Deck", Vector3.new(spec.width, 0.4, 5), 0, floorY + 3.6, -10.4, paint:Lerp(Color3.new(0, 0, 0), 0.25), Enum.Material.DiamondPlate)
+	local cab = box(ctx, "Cab", Vector3.new(3.6, 4, 3.8), -hw + 2, floorY + 5.8, -10.2, paint, Enum.Material.SmoothPlastic)
+	box(ctx, "CabRoof", Vector3.new(3.8, 0.3, 4), -hw + 2, floorY + 7.95, -10.2, paint, Enum.Material.SmoothPlastic)
+	box(ctx, "Windshield", Vector3.new(3.2, 2, 0.2), -hw + 2, floorY + 6.4, -12.15, GLASS, Enum.Material.Glass).Transparency = 0.35
+	box(ctx, "SideWindow", Vector3.new(0.12, 1.8, 2.6), -hw + 0.15, floorY + 6.4, -10.2, GLASS, Enum.Material.Glass).Transparency = 0.3
+	doorText(cab, Enum.NormalId.Left)
+	for _, side in { -1, 1 } do
+		box(ctx, `Railing{side}`, Vector3.new(0.15, 1.2, 5), side * (hw - 0.1), floorY + 4.4, -10.4, Color3.fromRGB(236, 236, 230), Enum.Material.Metal)
+		box(ctx, `Ladder{side}`, Vector3.new(0.6, 3.4, 0.2), side * (hw - 0.6), floorY + 1.8, -12.7, TRIM, Enum.Material.Metal)
+		box(ctx, `Mirror{side}`, Vector3.new(0.3, 1.2, 0.5), side * (hw + 0.4), floorY + 6, -12.2, TRIM)
+	end
+	-- Mulde: Boden steigt nach hinten an, Vordach über dem Fahrerhaus
+	local bedZ, bedLen, bedH = 3, 17, 5
+	local tilt = CFrame.Angles(math.rad(-6), 0, 0)
+	box(ctx, "BedFloor", Vector3.new(spec.width + 0.4, 0.6, bedLen), 0, floorY + 3.2, bedZ, paint:Lerp(Color3.new(0, 0, 0), 0.3), Enum.Material.Metal, tilt)
+	for _, side in { -1, 1 } do
+		local wall = box(ctx, `BedSide{side}`, Vector3.new(0.5, bedH, bedLen), side * (hw - 0.05), floorY + 3.2 + bedH / 2, bedZ, paint, Enum.Material.Metal, tilt)
+		if side < 0 then
+			doorText(wall, Enum.NormalId.Left)
+		end
+		local stripe = box(ctx, `AccentStripe{side}`, Vector3.new(0.06, 0.8, bedLen), side * (hw + 0.24), floorY + 3.2 + bedH - 0.8, bedZ, ACCENT_DEFAULT, nil, tilt)
+		accentPart(stripe)
+	end
+	box(ctx, "BedFront", Vector3.new(spec.width + 0.4, bedH + 1.6, 0.5), 0, floorY + 4.6 + bedH / 2, bedZ - bedLen / 2 - 0.4, paint, Enum.Material.Metal)
+	box(ctx, "Canopy", Vector3.new(spec.width + 0.4, 0.4, 5.4), 0, floorY + 9.3, -10.4, paint, Enum.Material.Metal)
+	local cargo = box(ctx, "CargoFill", Vector3.new(spec.width - 1, 3, bedLen - 1.5), 0, floorY + 5, bedZ, CARGO, Enum.Material.Slate, tilt)
+	cargo.Transparency = 1
+	cargo.CanCollide = false
+	lightsAndBumpers(ctx, spec, -13, bedZ + bedLen / 2 + 0.6, floorY + 1.2)
+	return Vector3.new(-hw + 2, floorY + 4.4, -10)
+end
+
 local function wheel(ctx: Ctx, spec: Spec, name: string, x: number, z: number): Part
 	local tire = Instance.new("Part")
 	tire.Name = name
@@ -244,6 +329,10 @@ function VehicleModelBuilder.build(def: Vehicles.VehicleDefinition, cf: CFrame, 
 		seatPos = buildPickup(ctx, spec)
 	elseif def.Style == "Van" then
 		seatPos = buildVan(ctx, spec)
+	elseif def.Style == "Truck" then
+		seatPos = buildTruck(ctx, spec)
+	elseif def.Style == "Hauler" then
+		seatPos = buildHauler(ctx, spec)
 	else
 		seatPos = buildBoxTruck(ctx, spec)
 	end

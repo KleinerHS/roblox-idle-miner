@@ -531,3 +531,15 @@ Vorschlag: Kurve aus BalanceConfig.ContentCurve (Erzwert ×1,6 bis Platinum, dan
 „Q-026: ok, Kurve als Startwert. Weiter mit 12b.“
 
 **Decision:** D-035
+
+---
+
+## Q-027 – Weitere Ausrüstungsstufen, Drills MK4–MK6, Upgrades (Phase 12b)
+
+**Status:** ANSWERED
+**Date:** 2026-10-10
+
+### Answer (Felix, 2026-10-10)
+„Q-027: ok als Startwert. Weiter mit 12c. das autohaus soll noch etwas größer werden aber maximal 6 fahrzeuge ausstellen …“
+
+**Decision:** D-036

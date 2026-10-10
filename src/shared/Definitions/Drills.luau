@@ -63,17 +63,17 @@ local list: { DrillDefinition } = {
 		BodyColor = Color3.fromRGB(60, 120, 190),
 		PersistenceClass = "Progression",
 	},
-	-- MK4–MK6 (Phase 12b, Vorschlag Q-027): Preis ≈ 25.000 × Erzwert auf diesem Level (wie MK3),
+	-- MK4–MK6 (Phase 12b, Startwert D-036): Preis ≈ 25.000 × Erzwert auf diesem Level (wie MK3),
 	-- Puffer = 5 Minuten Produktion. Modellgröße wie MK3 (passt in jeden Mining-Slot).
 	{
 		Id = "drill_mk4",
 		DisplayName = "Drill MK4",
 		Tier = 4,
-		RequiredLevel = 25, -- TODO_BALANCE (Q-027)
-		Price = 1300000, -- TODO_BALANCE (Q-027)
-		OrePerCycle = 60, -- TODO_BALANCE (Q-027) → 1.200 Erz/Min
+		RequiredLevel = 25, -- Startwert (D-036)
+		Price = 1300000, -- Startwert (D-036)
+		OrePerCycle = 60, -- Startwert (D-036) → 1.200 Erz/Min
 		CycleSeconds = 3,
-		OutputCapacity = 6000, -- TODO_BALANCE (Q-027)
+		OutputCapacity = 6000, -- Startwert (D-036)
 		BodyColor = Color3.fromRGB(70, 140, 80),
 		PersistenceClass = "Progression",
 	},
@@ -81,11 +81,11 @@ local list: { DrillDefinition } = {
 		Id = "drill_mk5",
 		DisplayName = "Drill MK5",
 		Tier = 5,
-		RequiredLevel = 45, -- TODO_BALANCE (Q-027)
-		Price = 98000000, -- TODO_BALANCE (Q-027)
-		OrePerCycle = 150, -- TODO_BALANCE (Q-027) → 3.000 Erz/Min
+		RequiredLevel = 45, -- Startwert (D-036)
+		Price = 98000000, -- Startwert (D-036)
+		OrePerCycle = 150, -- Startwert (D-036) → 3.000 Erz/Min
 		CycleSeconds = 3,
-		OutputCapacity = 15000, -- TODO_BALANCE (Q-027)
+		OutputCapacity = 15000, -- Startwert (D-036)
 		BodyColor = Color3.fromRGB(120, 40, 50),
 		PersistenceClass = "Progression",
 	},
@@ -93,11 +93,11 @@ local list: { DrillDefinition } = {
 		Id = "drill_mk6",
 		DisplayName = "Drill MK6",
 		Tier = 6,
-		RequiredLevel = 70, -- TODO_BALANCE (Q-027)
-		Price = 6500000000, -- TODO_BALANCE (Q-027)
-		OrePerCycle = 375, -- TODO_BALANCE (Q-027) → 7.500 Erz/Min
+		RequiredLevel = 70, -- Startwert (D-036)
+		Price = 6500000000, -- Startwert (D-036)
+		OrePerCycle = 375, -- Startwert (D-036) → 7.500 Erz/Min
 		CycleSeconds = 3,
-		OutputCapacity = 37500, -- TODO_BALANCE (Q-027)
+		OutputCapacity = 37500, -- Startwert (D-036)
 		BodyColor = Color3.fromRGB(40, 40, 46),
 		PersistenceClass = "Progression",
 	},

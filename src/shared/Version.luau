@@ -4,6 +4,6 @@
 
 return {
 	Game = "Roblox Idle Miner",
-	Version = "0.20.0",
-	Phase = "Phase 12b – Ausrüstung, Drills, Upgrades",
+	Version = "0.21.0",
+	Phase = "Phase 12c – Fahrzeuge & Fahrzeughaus",
 }

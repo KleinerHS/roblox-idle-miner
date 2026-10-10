@@ -67,11 +67,11 @@ local BalanceConfig = {
 			{ Capacity = 5000, Cost = 8000, RequiredLevel = 6 }, -- Felix (D-022)
 			{ Capacity = 10000, Cost = 20000, RequiredLevel = 8 }, -- Felix (D-022)
 			{ Capacity = 25000, Cost = 50000, RequiredLevel = 10 }, -- Felix (D-022)
-			-- Phase 12b (Vorschlag Q-027): Kosten ≈ 15.000 × Erzwert auf diesem Level
-			{ Capacity = 50000, Cost = 200000, RequiredLevel = 20 }, -- TODO_BALANCE (Q-027)
-			{ Capacity = 100000, Cost = 13000000, RequiredLevel = 35 }, -- TODO_BALANCE (Q-027)
-			{ Capacity = 250000, Cost = 360000000, RequiredLevel = 55 }, -- TODO_BALANCE (Q-027)
-			{ Capacity = 500000, Cost = 18000000000, RequiredLevel = 80 }, -- TODO_BALANCE (Q-027)
+			-- Phase 12b (Startwert D-036): Kosten ≈ 15.000 × Erzwert auf diesem Level
+			{ Capacity = 50000, Cost = 200000, RequiredLevel = 20 }, -- Startwert (D-036)
+			{ Capacity = 100000, Cost = 13000000, RequiredLevel = 35 }, -- Startwert (D-036)
+			{ Capacity = 250000, Cost = 360000000, RequiredLevel = 55 }, -- Startwert (D-036)
+			{ Capacity = 500000, Cost = 18000000000, RequiredLevel = 80 }, -- Startwert (D-036)
 		},
 	},
 
@@ -108,12 +108,12 @@ local BalanceConfig = {
 			{ Capacity = 500, Cost = 10000, RequiredLevel = 7 }, -- Felix (D-022)
 			{ Capacity = 750, Cost = 20000, RequiredLevel = 9 }, -- Felix (D-022)
 			{ Capacity = 1000, Cost = 40000, RequiredLevel = 11 }, -- Felix (D-022)
-			-- Phase 12b (Vorschlag Q-027): Kosten ≈ 15.000 × Erzwert auf diesem Level
-			{ Capacity = 1500, Cost = 120000, RequiredLevel = 18 }, -- TODO_BALANCE (Q-027)
-			{ Capacity = 2500, Cost = 3200000, RequiredLevel = 30 }, -- TODO_BALANCE (Q-027)
-			{ Capacity = 4000, Cost = 59000000, RequiredLevel = 45 }, -- TODO_BALANCE (Q-027)
-			{ Capacity = 6000, Cost = 1700000000, RequiredLevel = 65 }, -- TODO_BALANCE (Q-027)
-			{ Capacity = 10000, Cost = 44000000000, RequiredLevel = 85 }, -- TODO_BALANCE (Q-027)
+			-- Phase 12b (Startwert D-036): Kosten ≈ 15.000 × Erzwert auf diesem Level
+			{ Capacity = 1500, Cost = 120000, RequiredLevel = 18 }, -- Startwert (D-036)
+			{ Capacity = 2500, Cost = 3200000, RequiredLevel = 30 }, -- Startwert (D-036)
+			{ Capacity = 4000, Cost = 59000000, RequiredLevel = 45 }, -- Startwert (D-036)
+			{ Capacity = 6000, Cost = 1700000000, RequiredLevel = 65 }, -- Startwert (D-036)
+			{ Capacity = 10000, Cost = 44000000000, RequiredLevel = 85 }, -- Startwert (D-036)
 		},
 	},
 

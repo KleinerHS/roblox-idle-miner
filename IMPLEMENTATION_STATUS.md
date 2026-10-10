@@ -19,7 +19,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 9 | Multiplayer Hardening / Trading | TESTING_REQUIRED (Handel braucht den Zwei-Spieler-Test) |
 | 10 | Offline Production | TESTING_REQUIRED (Version 0.17.0) |
 | 11 | Prestige | TESTING_REQUIRED (Version 0.18.0; Bonus D-034 und Reset-Liste D-033 bestätigt) |
-| 12 | Content Expansion | TESTING_REQUIRED (12a Minen/Erze/Barren D-035; 12b Ausrüstung/Drills/Upgrades, Werte Q-027 offen; 12c Fahrzeuge offen) |
+| 12 | Content Expansion | TESTING_REQUIRED (12a D-035, 12b D-036, 12c Fahrzeuge – Werte Q-028 offen) |
 | 13 | Visual Polish | NOT_STARTED |
 | 14 | Balance | NOT_STARTED |
 
@@ -423,6 +423,19 @@ Schritte: 12a alle Minen/Erze/Barren über zentrale Kurven · 12b weitere Spitzh
 |---|---|---|
 | Zentrale Wachstumskurven (Q-026, `TODO_BALANCE`): Erzwert ab Lead × 1,6 bis Platinum, danach × 1,35, auf 2 Stellen gerundet; Erz-XP folgt der Level-Kurve; Barren = 2 Erz × 1,4 (XP × 1,25); Minen-Level linear Mine 08 (L16) → Mine 100 (L100); Minenpreis ab Mine 09 = Erzwert × 4.500 (zweite Mine × 1,25). Bestätigte Einzelwerte (D-017/D-019/D-028) haben Vorrang. | `src/shared/Definitions/ContentCurve.luau`, `BalanceConfig.ContentCurve`, `Ores.luau`, `Mines.luau`, `Recipes.luau` | TESTING_REQUIRED |
 | Folge: alle 100 Minen haben Level und Preis (kein „Coming soon“ mehr), alle 50 Erze und 22 Barren sind verkaufbar, alle Metall-Rezepte aktiv | – | TESTING_REQUIRED |
+
+### 12c – Fahrzeuge & Fahrzeughaus (Version 0.21.0) – TESTING_REQUIRED
+
+| System | Dateien / Instanzen | Status |
+|---|---|---|
+| Tipper Truck (Level 25, 12.000) und Mining Hauler (Level 45, 25.000) – Werte Q-028, Modelle vorläufig (Kipper-Mulde bzw. Muldenkipper mit Fahrerhaus links, große Räder) | `Vehicles.luau`, `VehicleModelBuilder.luau` (Bauformen Truck/Hauler) | TESTING_REQUIRED |
+| A-Chassis-Abstimmung je neuem Fahrzeug (aus Box Truck abgeleitet: Gewicht 7.000 / 9.500 kg, Drehmoment 700 / 950) | Place-Datei: `ServerStorage.Vendor.AChassis.Tunes.vehicle_truck` / `vehicle_hauler` – **Place speichern!** | TESTING_REQUIRED |
+| Fahrzeughaus größer (90 × 68 statt 72 × 56), zwei Reihen à drei Drehteller, max. 6 Fahrzeuge (D-036), Fahrzeuge quer, Infotafel vor jedem Drehteller; frei vom Machine-Shop | `VehicleShopBuilder.luau`, `LayoutConfig.VehicleShop` | TESTING_REQUIRED |
+
+Selbsttest per Studio-MCP (2026-10-10):
+- Play ohne Fehler; Fahrzeughaus zeigt 5 Fahrzeuge; keine Überschneidung zwischen Fahrzeugen, Möbeln und dem Machine-Shop.
+- Tipper Truck und Mining Hauler mit A-Chassis gebaut (Sitz, Ladung vorhanden), Hauler gefahren: fährt geradeaus an, bleibt aufrecht.
+- 12a/12b im Spiel: 100 Minen (Mine 09 Level 17 / $36K, Mine 100 Level 100 / $180B), 22 Rezepte aktiv; Rucksacktisch: alle 7 Rucksäcke liegen auf dem Tisch.
 
 ### 12b – Ausrüstung, Drills, Upgrades (Version 0.20.0) – TESTING_REQUIRED
 

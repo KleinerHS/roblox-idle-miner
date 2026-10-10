@@ -8,7 +8,7 @@
 
 local Pickaxes = require(script.Parent.Pickaxes)
 
-export type VehicleStyle = "Pickup" | "Van" | "BoxTruck"
+export type VehicleStyle = "Pickup" | "Van" | "BoxTruck" | "Truck" | "Hauler"
 
 export type VehicleDefinition = {
 	Id: string,
@@ -67,6 +67,34 @@ local list: { VehicleDefinition } = {
 		MaxSpeed = 46,
 		Acceleration = 0.65,
 		PaintColor = Color3.fromRGB(196, 60, 46),
+		PersistenceClass = "Permanent",
+	},
+	-- Phase 12c (docs/07 §6: mittlerer LKW, großer Mining-Truck). Vorschlag Q-028:
+	-- Preis ≈ 20.000 × Erzwert auf diesem Level, Modelle vorläufig (Feinschliff am Ende)
+	{
+		Id = "vehicle_truck",
+		DisplayName = "Tipper Truck",
+		Tier = 4,
+		Style = "Truck",
+		RequiredLevel = 25, -- TODO_BALANCE (Q-028)
+		Price = 1000000, -- TODO_BALANCE (Q-028)
+		Capacity = 12000, -- TODO_BALANCE (Q-028)
+		MaxSpeed = 44, -- TODO_BALANCE (Q-028)
+		Acceleration = 0.55, -- TODO_BALANCE (Q-028)
+		PaintColor = Color3.fromRGB(46, 96, 160),
+		PersistenceClass = "Permanent",
+	},
+	{
+		Id = "vehicle_hauler",
+		DisplayName = "Mining Hauler",
+		Tier = 5,
+		Style = "Hauler",
+		RequiredLevel = 45, -- TODO_BALANCE (Q-028)
+		Price = 78000000, -- TODO_BALANCE (Q-028)
+		Capacity = 25000, -- TODO_BALANCE (Q-028)
+		MaxSpeed = 40, -- TODO_BALANCE (Q-028)
+		Acceleration = 0.45, -- TODO_BALANCE (Q-028)
+		PaintColor = Color3.fromRGB(236, 182, 40),
 		PersistenceClass = "Permanent",
 	},
 }

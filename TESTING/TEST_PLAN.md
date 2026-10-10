@@ -270,3 +270,13 @@ Achtung: Ein echtes Prestige setzt den Spielstand zurück (so gewollt). Vorher g
 | 12b.3 | Kauf hohe Stufe | `SetLevel(…, 20)`, `SetCash(…, 200000)`, Industrial Pickaxe kaufen | Ausgerüstet, gelber Kopf, Power 8 |
 | 12b.4 | Drill MK4 | `SetLevel(…, 25)`, `SetCash(…, 2e6)`, MK4 kaufen und in Mine platzieren | Grüner Drill, so groß wie MK3, ~1.200 Erz/Min |
 | 12b.5 | Upgrades | Laptop → STORAGE / ELEVATOR mit hohem Level und Geld | Weitere Stufen bis 500.000 bzw. 10.000 |
+## Phase 12c – Fahrzeuge & Fahrzeughaus
+
+Vorher: Place speichern (neue A-Chassis-Abstimmungen liegen in der Place-Datei).
+
+| # | Test | Schritte | Erwartet |
+|---|---|---|---|
+| 12c.1 | Fahrzeughaus | Hineingehen | 5 Fahrzeuge auf 6 Drehtellern in zwei Reihen, Infotafeln lesbar, nichts ragt ineinander |
+| 12c.2 | Kauf | `SetLevel(…, 45)`, `SetCash(…, 1e8)`, Tipper Truck und Mining Hauler kaufen | Beide im Fuhrpark der Garage |
+| 12c.3 | Fahren | Am Ring Mining Hauler wählen, losfahren | Fährt schwer/träge, passt durch das Tor, bleibt aufrecht |
+| 12c.4 | Beladen/Verkaufen | Unter dem Turm laden, zur Verkaufszone fahren | Ladung sichtbar in der Mulde, Verkauf funktioniert |

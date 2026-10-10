@@ -223,3 +223,9 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Source Question:** Q-026 (Felix, 2026-10-10)
 **Decision:** Minen 09–100, Erze und Barren nutzen die Kurve aus BalanceConfig.ContentCurve als Startwert; Feinschliff in der Balance-Phase. D-019 (+50 % je Mine) gilt nur bis Mine 08.
 **Affected systems:** Ores, Mines, Recipes, Balance
+
+## D-036 – Ausrüstung, Drills MK4–MK6, Upgrades als Startwert; Fahrzeughaus max. 6 Fahrzeuge
+
+**Source Question:** Q-027 (Felix, 2026-10-10)
+**Decision:** Werte aus Phase 12b gelten als Startwert. Das Fahrzeughaus wird größer und stellt höchstens 6 Fahrzeuge aus. Fahrzeugmodelle dürfen vorläufig sein, Feinschliff ganz am Ende.
+**Affected systems:** Equipment, Drills, Upgrades, Vehicle Shop

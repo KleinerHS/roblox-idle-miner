@@ -189,20 +189,29 @@ function VehicleShopBuilder.build(parent: Instance): Model
 	local display = Instance.new("Folder")
 	display.Name = "VehicleDisplay"
 	display.Parent = model
-	local count = #Vehicles.List
+	-- Zwei Reihen à drei Drehteller (max. DisplaySlots Fahrzeuge). Fahrzeuge stehen quer, damit
+	-- auch die langen LKW nebeneinander passen; Infotafel vor jedem Drehteller.
+	local slots = cfg.DisplaySlots
+	local columnX = { -29, 0, 29 }
+	local rowZ = { -15, 11 }
 	for i, def in Vehicles.List do
-		local x = (i - (count + 1) / 2) * (W / count)
-		local z = 2
-		local turntable = part(display, `Turntable{i}`, Vector3.new(0.4, 24, 24), o * CFrame.new(x, 0.8, z) * CFrame.Angles(0, 0, math.rad(90)), Color3.fromRGB(56, 58, 64), Enum.Material.Metal)
+		if i > slots then
+			break
+		end
+		local row = math.floor((i - 1) / 3) + 1
+		local x = columnX[(i - 1) % 3 + 1]
+		local z = rowZ[row]
+		local turntable = part(display, `Turntable{i}`, Vector3.new(0.4, 22, 22), o * CFrame.new(x, 0.8, z) * CFrame.Angles(0, 0, math.rad(90)), Color3.fromRGB(56, 58, 64), Enum.Material.Metal)
 		turntable.Shape = Enum.PartType.Cylinder
-		local ring = part(display, `TurntableRing{i}`, Vector3.new(0.42, 24.6, 24.6), o * CFrame.new(x, 0.78, z) * CFrame.Angles(0, 0, math.rad(90)), RED, Enum.Material.Neon)
+		local ring = part(display, `TurntableRing{i}`, Vector3.new(0.42, 22.6, 22.6), o * CFrame.new(x, 0.78, z) * CFrame.Angles(0, 0, math.rad(90)), RED, Enum.Material.Neon)
 		ring.Shape = Enum.PartType.Cylinder
 		ring.Transparency = 0.45
-		local vehicle = VehicleModelBuilder.build(def, o * CFrame.new(x, 1, z) * CFrame.Angles(0, math.rad(25 - (i - 1) * 25), 0), false)
+		local yaw = if i % 2 == 0 then -90 else 90
+		local vehicle = VehicleModelBuilder.build(def, o * CFrame.new(x, 1, z) * CFrame.Angles(0, math.rad(yaw), 0), false)
 		vehicle.Parent = display
-		local plate = part(display, `InfoStand{i}`, Vector3.new(4.2, 1.8, 0.2), o * CFrame.new(x, 2.4, z - 14) * CFrame.Angles(math.rad(-15), 0, 0), DARK, Enum.Material.SmoothPlastic)
+		local plate = part(display, `InfoStand{i}`, Vector3.new(4.2, 1.8, 0.2), o * CFrame.new(x, 2.4, z - 12.6) * CFrame.Angles(math.rad(-15), 0, 0), DARK, Enum.Material.SmoothPlastic)
 		surfaceText(plate, def.DisplayName:upper(), WHITE)
-		part(display, `InfoStandPost{i}`, Vector3.new(0.3, 1.8, 0.3), o * CFrame.new(x, 1.4, z - 13.9), STEEL, Enum.Material.Metal)
+		part(display, `InfoStandPost{i}`, Vector3.new(0.3, 1.8, 0.3), o * CFrame.new(x, 1.4, z - 12.5), STEEL, Enum.Material.Metal)
 		local spot = part(display, `Spot{i}`, Vector3.new(2.4, 0.2, 2.4), o * CFrame.new(x, 0.6 + H - 0.3, z), LIGHT, Enum.Material.Neon)
 		local light = Instance.new("SpotLight")
 		light.Face = Enum.NormalId.Bottom
