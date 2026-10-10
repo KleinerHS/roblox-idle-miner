@@ -15,11 +15,11 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 5 | Drill | TESTING_REQUIRED (5a, 5b; Test von Felix zurückgestellt, 2026-10-05) |
 | 6 | Garage & Vehicles | TESTING_REQUIRED (6a, 6b, 6c) |
 | 7 | Conveyors (7a Minenkauf & Schmelzer vorgezogen, D-024) | TESTING_REQUIRED (7a und 7b selbst getestet) |
-| 8 | Smelter | NOT_STARTED |
+| 8 | Smelter | TESTING_REQUIRED (mit 7a vorgezogen gebaut: Schmelzer, Rezepte, Barren, D-024/D-028) |
 | 9 | Multiplayer Hardening / Trading | TESTING_REQUIRED (Handel braucht den Zwei-Spieler-Test) |
 | 10 | Offline Production | TESTING_REQUIRED (Version 0.17.0) |
 | 11 | Prestige | TESTING_REQUIRED (Version 0.18.0; Bonus D-034 und Reset-Liste D-033 bestätigt) |
-| 12 | Content Expansion | NOT_STARTED |
+| 12 | Content Expansion | TESTING_REQUIRED (12a Minen 09–100 / Erze / Barren; Werte Q-026 offen) |
 | 13 | Visual Polish | NOT_STARTED |
 | 14 | Balance | NOT_STARTED |
 
@@ -412,6 +412,17 @@ Selbsttest per Studio-MCP (2026-10-10, ein Spieler):
 - Einstellung: Trade requests aus/an über Remote, Snapshot folgt; Laptop COMPANY zeigt Name, Farbe, Schalter.
 - Eigener Trade-Prompt am Server vorhanden, lokal ausgeblendet.
 - Nicht selbst prüfbar: der eigentliche Handel (braucht 2 Spieler) → Test 9.1–9.8.
+
+## Phase 12 – Content Expansion – Details
+
+Schritte: 12a alle Minen/Erze/Barren über zentrale Kurven · 12b weitere Spitzhacken, Rucksäcke, Drills, Fahrzeuge, Ausbaustufen (offen).
+
+### 12a – Minen 09–100, Erze, Barren (Version 0.19.0) – TESTING_REQUIRED
+
+| System | Dateien | Status |
+|---|---|---|
+| Zentrale Wachstumskurven (Q-026, `TODO_BALANCE`): Erzwert ab Lead × 1,6 bis Platinum, danach × 1,35, auf 2 Stellen gerundet; Erz-XP folgt der Level-Kurve; Barren = 2 Erz × 1,4 (XP × 1,25); Minen-Level linear Mine 08 (L16) → Mine 100 (L100); Minenpreis ab Mine 09 = Erzwert × 4.500 (zweite Mine × 1,25). Bestätigte Einzelwerte (D-017/D-019/D-028) haben Vorrang. | `src/shared/Definitions/ContentCurve.luau`, `BalanceConfig.ContentCurve`, `Ores.luau`, `Mines.luau`, `Recipes.luau` | TESTING_REQUIRED |
+| Folge: alle 100 Minen haben Level und Preis (kein „Coming soon“ mehr), alle 50 Erze und 22 Barren sind verkaufbar, alle Metall-Rezepte aktiv | – | TESTING_REQUIRED |
 
 ## Phase 11 – Prestige (Version 0.18.0) – TESTING_REQUIRED
 

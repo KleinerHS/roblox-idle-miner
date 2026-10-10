@@ -4,6 +4,7 @@
 -- Werte (SellValue/XPValue) kommen aus BalanceConfig.OreValues.
 
 local BalanceConfig = require(script.Parent.Parent.Config.BalanceConfig)
+local ContentCurve = require(script.Parent.ContentCurve)
 
 export type OreDefinition = {
 	Id: string,
@@ -12,7 +13,7 @@ export type OreDefinition = {
 	Tier: number,
 	MineStart: number,
 	MineEnd: number,
-	-- nil = noch nicht gebalanced (TODO_BALANCE), dann nicht verkaufbar
+	-- Feste Werte aus BalanceConfig.OreValues, sonst aus ContentCurve (Phase 12)
 	SellValue: number?,
 	XPValue: number?,
 }
@@ -76,8 +77,19 @@ local MINES_PER_ORE = 2
 local list: { OreDefinition } = {}
 local byId: { [string]: OreDefinition } = {}
 
+local function fixedSell(tier: number): number?
+	local entry = ORE_LIST[tier]
+	local values = entry and BalanceConfig.OreValues[entry.Id]
+	return if values then values.SellValue else nil
+end
+local function fixedXP(tier: number): number?
+	local entry = ORE_LIST[tier]
+	local values = entry and BalanceConfig.OreValues[entry.Id]
+	return if values then values.XPValue else nil
+end
+
 for tier, entry in ORE_LIST do
-	local values = BalanceConfig.OreValues[entry.Id]
+	local sell, xp = ContentCurve.oreValues(tier, fixedSell, fixedXP)
 	local ore: OreDefinition = table.freeze({
 		Id = entry.Id,
 		DisplayName = entry.DisplayName,
@@ -85,8 +97,8 @@ for tier, entry in ORE_LIST do
 		Tier = tier,
 		MineStart = (tier - 1) * MINES_PER_ORE + 1,
 		MineEnd = tier * MINES_PER_ORE,
-		SellValue = if values then values.SellValue else nil,
-		XPValue = if values then values.XPValue else nil,
+		SellValue = sell,
+		XPValue = xp,
 	})
 	assert(byId[ore.Id] == nil, `Doppelte Erz-ID {ore.Id}`)
 	table.insert(list, ore)

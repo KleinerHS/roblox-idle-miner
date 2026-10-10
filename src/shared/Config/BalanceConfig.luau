@@ -120,10 +120,35 @@ local BalanceConfig = {
 		SpeedBonusMax = 0.50, -- Felix (D-034)
 	},
 
+	-- Kurven für alle Inhalte ohne festen Einzelwert (Phase 12, ContentCurve.luau).
+	-- Vorschlag Q-026, alles TODO_BALANCE bis zur Balance-Phase (docs/16 Phase 14).
+	ContentCurve = {
+		-- Erzwert je Tier ab Tier 5 (Lead): Vorgänger × Wachstum
+		OreValueGrowthEarly = 1.6, -- TODO_BALANCE (Q-026) bis Tier EarlyUntilTier
+		EarlyUntilTier = 15, -- TODO_BALANCE (Q-026)
+		OreValueGrowthLate = 1.35, -- TODO_BALANCE (Q-026) danach
+		-- Erz-XP = XP-Bedarf (Level der ersten Mine) / XPDivisor, mindestens +1 je Tier
+		XPDivisor = 2000, -- TODO_BALANCE (Q-026)
+		-- Barren: Wert und XP der eingesetzten Erze × Faktor (Copper–Iron: ~1.4 / ~1.25)
+		BarValueFactor = 1.4, -- TODO_BALANCE (Q-026)
+		BarXPFactor = 1.25, -- TODO_BALANCE (Q-026)
+		-- Minen-Level linear zwischen Anker (Mine 08 = Level 16, D-028) und Mine 100
+		LevelAnchorMine = 8,
+		LevelAnchorLevel = 16,
+		LastMine = 100,
+		LastMineLevel = 100, -- TODO_BALANCE (Q-026) docs/02 §30: Mine 100 und Level 100 als Endziel
+		-- Minenpreis ab Mine 09 = Erzwert × Vielfaches (zweite Mine einer Erzart × Faktor)
+		MinePriceOreMultiple = 4500, -- TODO_BALANCE (Q-026)
+		SecondMinePriceFactor = 1.25, -- TODO_BALANCE (Q-026)
+	},
+
+	-- Minenpreis Mine 03–08 (D-019: $3.000, je +50 %). Ab Mine 09 über ContentCurve.
 	MinePrice = {
 		FirstPaidMine = 3,
 		BasePrice = 3000,
 		Growth = 1.5,
+		-- letzte Mine mit D-019-Formel
+		LastFormulaMine = 8,
 	},
 }
 

@@ -9,6 +9,7 @@
 
 local BalanceConfig = require(script.Parent.Parent.Config.BalanceConfig)
 local Ores = require(script.Parent.Ores)
+local ContentCurve = require(script.Parent.ContentCurve)
 
 export type BarDefinition = {
 	Id: string,
@@ -47,7 +48,12 @@ for _, oreId in METALS do
 	assert(ore, `Rezept für unbekanntes Erz {oreId}`)
 	local metal = (oreId:gsub("^ore_", ""))
 	local barId = "bar_" .. metal
+	-- Fester Wert (D-028) oder aus der Kurve (Phase 12)
 	local value = BalanceConfig.BarValues[barId]
+	if not value and ore.SellValue and ore.XPValue then
+		local sell, xp = ContentCurve.barValues(ore.SellValue, ore.XPValue)
+		value = { SellValue = sell, XPValue = xp }
+	end
 	local bar: BarDefinition = table.freeze({
 		Id = barId,
 		DisplayName = ore.DisplayName .. " Bar",

@@ -253,3 +253,11 @@ Achtung: Ein echtes Prestige setzt den Spielstand zurück (so gewollt). Vorher g
 | 11.6 | Bonus | Erz verkaufen | Verkaufsfenster zeigt „(+10% Prestige)“, Geld 10 % höher, XP unverändert; Mining spürbar schneller |
 | 11.7 | Kein Offline-Nachschlag | Nach Prestige Stop → Play nach > 1 Minute | Kein altes Material aus der Zeit vor dem Prestige |
 | 11.8 | Rejoin | Stop → Play | Prestige-Zähler und Bonus bleiben |
+## Phase 12a – Minen 09–100
+
+| # | Test | Schritte | Erwartet |
+|---|---|---|---|
+| 12a.1 | Elevator-Liste | Elevator öffnen, ganz nach unten scrollen | Mine 09–100 mit Level und Preis, kein „Coming soon“ |
+| 12a.2 | Mine 09 | `SetLevel(…, 17)`, `SetCash(…, 50000)`, Mine 09 kaufen und hinfahren | Lead-Erzwand, Abbau, Verkauf $8 je Erz |
+| 12a.3 | Späte Mine | `SetLevel(…, 100)`, `SetCash(…, 1e12)`, `SetMineUnlocked(…, "mine_099", true)`, hinfahren | Raum mit Diamond-Erz, dunklerer Fels, Abbau funktioniert |
+| 12a.4 | Barren | Lead ins Lager (`AddStorage(…, "ore_lead", 200)`), Schmelzer | Lead Bar entsteht und ist verkaufbar |

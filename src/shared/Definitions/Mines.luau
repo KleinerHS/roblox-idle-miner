@@ -4,6 +4,7 @@
 
 local BalanceConfig = require(script.Parent.Parent.Config.BalanceConfig)
 local Ores = require(script.Parent.Ores)
+local ContentCurve = require(script.Parent.ContentCurve)
 
 export type MineDefinition = {
 	Id: string,
@@ -15,10 +16,13 @@ export type MineDefinition = {
 	UnlockCost: number,
 }
 
-local function unlockCost(number: number): number
+local function unlockCost(number: number, oreSell: number): number
 	local price = BalanceConfig.MinePrice
 	if number < price.FirstPaidMine then
 		return 0
+	end
+	if number > price.LastFormulaMine then
+		return ContentCurve.minePrice(number, oreSell)
 	end
 	return math.floor(price.BasePrice * price.Growth ^ (number - price.FirstPaidMine) + 0.5)
 end
@@ -34,8 +38,8 @@ for _, ore in Ores.List do
 			Id = id,
 			Number = number,
 			OreId = ore.Id,
-			RequiredLevel = if unlock then unlock.RequiredLevel else nil,
-			UnlockCost = unlockCost(number),
+			RequiredLevel = if unlock then unlock.RequiredLevel else ContentCurve.mineLevel(number),
+			UnlockCost = unlockCost(number, ore.SellValue or 0),
 		})
 		list[number] = mine
 		byId[id] = mine
