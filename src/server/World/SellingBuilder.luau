@@ -58,14 +58,13 @@ local function surfaceText(target: BasePart, text: string, color: Color3, face: 
 	label.Parent = gui
 end
 
--- Baut das Gebäude. Eingang (lokal -Z) zeigt von der Mitte weg zur Straße.
+-- Baut das Gebäude. Eingang (lokal -Z) zeigt zur Platzmitte (Kreisverkehr, Phase 13a).
 function SellingBuilder.build(parent: Instance): Model
 	local cfg = LayoutConfig.SellingBuilding
 	local center = LayoutConfig.MapCenter
 	local pos = Vector3.new(center.X + cfg.Offset.X, LayoutConfig.GroundY + 1, center.Z + cfg.Offset.Y)
-	-- LookVector (= lokale -Z, Vorderseite) zeigt von der Mitte weg zur Straße
-	local outward = Vector3.new(pos.X - center.X, 0, pos.Z - center.Z)
-	local o = CFrame.lookAt(pos, pos + outward)
+	-- LookVector (= lokale -Z, Vorderseite) zeigt zur Platzmitte
+	local o = CFrame.lookAt(pos, Vector3.new(center.X, pos.Y, center.Z))
 
 	local W, H, D = cfg.Size.X, cfg.Size.Y, cfg.Size.Z
 	local t = 0.8

@@ -102,10 +102,11 @@ local function makeBlockers(lakes: { Vector3 }): { Blocker }
 		function(p)
 			return Vector2.new(p.X - cfg.MapCenter.X, p.Z - cfg.MapCenter.Z).Magnitude < cfg.CenterPlazaRadius + 14
 		end,
-		-- Freiflächen um Wasserturm und Windrad
+		-- Freiflächen um die Wahrzeichen
 		function(p)
-			for _, spot in cfg.Environment.LandmarkClearings do
-				if Vector2.new(p.X - spot.X, p.Z - spot.Z).Magnitude < spot.Y then
+			local env = cfg.Environment
+			for _, spot in { env.WaterTower, env.Windmill } do
+				if Vector2.new(p.X - spot.X, p.Z - spot.Y).Magnitude < env.LandmarkClearance then
 					return true
 				end
 			end
@@ -251,7 +252,7 @@ local function roadDetails(parent: Instance, plotId: number)
 		part(folder, `Sidewalk{side}`, Vector3.new(5, 1.2, length), cf * CFrame.new(x + side * (cfg.RoadWidth / 2 + 2.5), cfg.GroundY + 0.6, -halfZ - length / 2), PAVING, Enum.Material.Pavement)
 		part(folder, `Curb{side}`, Vector3.new(0.6, 1.3, length), cf * CFrame.new(x + side * (cfg.RoadWidth / 2 + 0.3), cfg.GroundY + 0.65, -halfZ - length / 2), PAVING_DARK, Enum.Material.Concrete)
 		-- Laternen versetzt auf beiden Seiten
-		local count = math.floor(length / 36)
+		local count = math.floor(length / 60)
 		for n = 1, count do
 			local lz = -halfZ - (n - 0.5) * (length / count) + (if side > 0 then 9 else -9)
 			streetLamp(folder, `Lamp{side}_{n}`, cf * CFrame.new(x + side * (cfg.RoadWidth / 2 + 3.6), cfg.GroundY + 1.2, lz) * CFrame.Angles(0, math.rad(if side > 0 then 90 else -90), 0))
@@ -265,8 +266,8 @@ local function plazaCenter(parent: Instance)
 	folder.Name = "Plaza"
 	folder.Parent = parent
 	local c = LayoutConfig.MapCenter
-	disc(folder, "PlazaRing", 32, 0.1, c.X, c.Z, TOP + 0.05, PAVING_DARK, Enum.Material.Cobblestone)
-	disc(folder, "PlazaInner", 26, 0.1, c.X, c.Z, TOP + 0.07, PAVING, Enum.Material.Cobblestone)
+	disc(folder, "PlazaRing", 37, 0.1, c.X, c.Z, TOP + 0.25, PAVING_DARK, Enum.Material.Cobblestone)
+	disc(folder, "PlazaInner", 31, 0.1, c.X, c.Z, TOP + 0.27, PAVING, Enum.Material.Cobblestone)
 	-- Brunnen: Becken, Wasser, Säule mit zwei Schalen
 	disc(folder, "FountainRim", 10, 1.6, c.X, c.Z, TOP + 1.7, Color3.fromRGB(160, 150, 136), Enum.Material.Concrete)
 	local water = disc(folder, "FountainWater", 9.2, 0.3, c.X, c.Z, TOP + 1.75, WATER, Enum.Material.Glass)
@@ -309,6 +310,84 @@ local function plazaCenter(parent: Instance)
 	end
 end
 
+-- Kreisverkehr um den Brunnen und Speichen bis zum Platzrand, in Verlängerung der Zufahrten
+local function plazaRoads(parent: Instance)
+	local folder = Instance.new("Folder")
+	folder.Name = "PlazaRoads"
+	folder.Parent = parent
+	local cfg = LayoutConfig
+	local c = cfg.MapCenter
+	local inner, outer = cfg.RoundaboutInner, cfg.RoundaboutOuter
+	local roadTop = TOP + 0.06
+	-- Ring aus tangentialen Segmenten
+	local segments = 64
+	local mid = (inner + outer) / 2
+	local segLen = 2 * math.pi * outer / segments + 0.6
+	for i = 1, segments do
+		local a = (i - 0.5) / segments * math.pi * 2
+		local cf = CFrame.new(c.X + math.cos(a) * mid, roadTop - 0.05, c.Z + math.sin(a) * mid) * CFrame.Angles(0, -a, 0)
+		part(folder, `Ring{i}`, Vector3.new(outer - inner, 0.1, segLen), cf, Color3.fromRGB(58, 60, 64), Enum.Material.Asphalt).CanCollide = false
+		if i % 2 == 0 then
+			local dash = part(folder, `RingDash{i}`, Vector3.new(0.5, 0.04, segLen * 0.6), cf * CFrame.new(0, 0.07, 0), LINE_WHITE, Enum.Material.SmoothPlastic)
+			dash.CanCollide = false
+		end
+	end
+	-- Inselbordstein um den Brunnenplatz
+	disc(folder, "IslandCurb", inner, 0.4, c.X, c.Z, TOP + 0.2, PAVING_DARK, Enum.Material.Concrete)
+	-- Speichen: Fortsetzung jeder Zufahrt (gleiche Linie) vom Platzrand bis in den Ring
+	for plotId = 1, GameConfig.MaxPlots do
+		local cf = plotCFrame(plotId)
+		local R = cfg.PlotRingRadius
+		local x = cfg.DoorCenterX
+		local zEdge = math.sqrt(cfg.CenterPlazaRadius ^ 2 - x ^ 2) - R
+		local zRing = math.sqrt((outer - 3) ^ 2 - x ^ 2) - R
+		local length = zEdge - zRing
+		local zMid = (zEdge + zRing) / 2
+		part(folder, `Spoke{plotId}`, Vector3.new(cfg.RoadWidth, 0.1, length), cf * CFrame.new(x, roadTop - 0.04, zMid), Color3.fromRGB(58, 60, 64), Enum.Material.Asphalt).CanCollide = false
+		local z = zEdge - 4
+		local n = 0
+		while z - 6 > zRing + 4 do
+			n += 1
+			local dash = part(folder, `SpokeDash{plotId}_{n}`, Vector3.new(0.5, 0.04, 6), cf * CFrame.new(x, roadTop + 0.03, z - 3), LINE_YELLOW, Enum.Material.SmoothPlastic)
+			dash.CanCollide = false
+			z -= 12
+		end
+		for _, side in { -1, 1 } do
+			local edge = part(folder, `SpokeEdge{plotId}_{side}`, Vector3.new(0.4, 0.04, length), cf * CFrame.new(x + side * (cfg.RoadWidth / 2 - 1.2), roadTop + 0.03, zMid), LINE_WHITE, Enum.Material.SmoothPlastic)
+			edge.CanCollide = false
+		end
+		-- Zebrastreifen am Platzrand
+		for k = -5, 5 do
+			local stripe = part(folder, `Crossing{plotId}_{k}`, Vector3.new(1.2, 0.04, 5), cf * CFrame.new(x + k * 2.4, roadTop + 0.03, zEdge - 6), LINE_WHITE, Enum.Material.SmoothPlastic)
+			stripe.CanCollide = false
+		end
+	end
+end
+
+-- Holzhütte wie im Referenzbild (Satteldach, Veranda)
+local function cabin(parent: Instance, index: number, pos: Vector2)
+	local m = Instance.new("Model")
+	m.Name = `Cabin{index}`
+	local c = LayoutConfig.MapCenter
+	local cf = CFrame.lookAt(Vector3.new(pos.X, TOP, pos.Y), Vector3.new(c.X, TOP, c.Z))
+	local W, D, H = 16, 12, 8
+	part(m, "Base", Vector3.new(W + 1, 0.8, D + 1), cf * CFrame.new(0, 0.4, 0), PAVING_DARK, Enum.Material.Concrete)
+	part(m, "Walls", Vector3.new(W, H, D), cf * CFrame.new(0, 0.8 + H / 2, 0), Color3.fromRGB(136, 96, 62), Enum.Material.WoodPlanks)
+	for _, side in { -1, 1 } do
+		part(m, `Roof{side}`, Vector3.new(W + 1.6, 0.6, D / 2 + 2.2), cf * CFrame.new(0, 0.8 + H + 2, side * (D / 4 + 0.6)) * CFrame.Angles(math.rad(side * 32), 0, 0), Color3.fromRGB(70, 66, 64), Enum.Material.Slate)
+	end
+	part(m, "Gable", Vector3.new(W - 0.4, 3.6, D * 0.55), cf * CFrame.new(0, 0.8 + H + 1.3, 0), Color3.fromRGB(120, 84, 54), Enum.Material.WoodPlanks)
+	part(m, "Door", Vector3.new(3, 5.6, 0.2), cf * CFrame.new(0, 0.8 + 2.8, -D / 2 - 0.1), Color3.fromRGB(84, 56, 36), Enum.Material.Wood)
+	for _, x in { -5, 5 } do
+		local win = part(m, `Window{x}`, Vector3.new(2.6, 2.2, 0.2), cf * CFrame.new(x, 0.8 + 4.6, -D / 2 - 0.1), LAMP, Enum.Material.Neon)
+		win.Transparency = 0.25
+		part(m, `WindowFrame{x}`, Vector3.new(3, 2.6, 0.15), cf * CFrame.new(x, 0.8 + 4.6, -D / 2 - 0.05), WOOD, Enum.Material.Wood)
+	end
+	part(m, "Porch", Vector3.new(W, 0.4, 4), cf * CFrame.new(0, 1, -D / 2 - 2), WOOD, Enum.Material.WoodPlanks)
+	part(m, "Chimney", Vector3.new(1.6, 4, 1.6), cf * CFrame.new(W / 2 - 3, 0.8 + H + 3, D / 4), Color3.fromRGB(120, 100, 90), Enum.Material.Brick)
+	m.Parent = parent
+end
+
 -- Parkplätze vor den Shops und Grüninseln in den freien Sektoren des Platzes (Referenzbild)
 local function plazaDressing(parent: Instance)
 	local folder = Instance.new("Folder")
@@ -346,11 +425,6 @@ local function plazaDressing(parent: Instance)
 				return false
 			end
 		end
-		for _, sector in { { 0, 34 }, { 61, 24 }, { 180, 20 }, { 270, 18 } } do
-			if near(sector[1], sector[2]) then
-				return false
-			end
-		end
 		return true
 	end
 	for deg = 0, 359, 9 do
@@ -364,9 +438,9 @@ local function plazaDressing(parent: Instance)
 		end
 	end
 	-- Grüninseln mit Bäumen, Felsen, Bank und Laterne
-	for i, angle in { 125, 225, 305 } do
+	for i, angle in { 120, 240 } do
 		local a = math.rad(angle)
-		local ix, iz = c.X + math.cos(a) * 100, c.Z - math.sin(a) * 100
+		local ix, iz = c.X + math.cos(a) * 105, c.Z - math.sin(a) * 105
 		disc(folder, `Island{i}Curb`, 21, 0.5, ix, iz, TOP + 0.45, PAVING_DARK, Enum.Material.Concrete)
 		disc(folder, `Island{i}`, 20, 0.5, ix, iz, TOP + 0.5, GRASS, Enum.Material.Grass)
 		for t = 1, 4 do
@@ -390,8 +464,8 @@ local function landmarks(parent: Instance)
 	folder.Parent = parent
 	local c = LayoutConfig.MapCenter
 	-- Wasserturm
-	local a = math.rad(62)
-	local tower = CFrame.new(c.X + math.cos(a) * 185, GROUND_TOP, c.Z - math.sin(a) * 185)
+	local env = LayoutConfig.Environment
+	local tower = CFrame.new(c.X + env.WaterTower.X, TOP, c.Z + env.WaterTower.Y)
 	for _, dx in { -4, 4 } do
 		for _, dz in { -4, 4 } do
 			part(folder, `TowerLeg{dx}_{dz}`, Vector3.new(0.8, 26, 0.8), tower * CFrame.new(dx, 13, dz), WOOD, Enum.Material.Wood)
@@ -408,7 +482,7 @@ local function landmarks(parent: Instance)
 	end
 	part(folder, "TowerRoof", Vector3.new(8, 8, 8), tower * CFrame.new(0, 38.5, 0) * CFrame.Angles(math.rad(45), math.rad(45), 0), Color3.fromRGB(110, 90, 72), Enum.Material.WoodPlanks)
 	-- Windrad
-	local w = CFrame.new(c.X + 190, GROUND_TOP, c.Z - 6) * CFrame.Angles(0, math.rad(-90), 0)
+	local w = CFrame.lookAt(Vector3.new(c.X + env.Windmill.X, TOP, c.Z + env.Windmill.Y), Vector3.new(c.X, TOP, c.Z))
 	for _, dx in { -3, 3 } do
 		part(folder, `MillLeg{dx}`, Vector3.new(0.6, 34, 0.6), w * CFrame.new(dx, 17, 0) * CFrame.Angles(0, 0, math.rad(-dx * 1.2)), STEEL, Enum.Material.Metal)
 		part(folder, `MillLegB{dx}`, Vector3.new(0.6, 34, 0.6), w * CFrame.new(0, 17, dx) * CFrame.Angles(math.rad(dx * 1.2), 0, 0), STEEL, Enum.Material.Metal)
@@ -429,7 +503,14 @@ function EnvironmentBuilder.build(parent: Instance): Folder
 	local rng = Random.new(env.Seed)
 
 	-- Wiese (über der Baseplate, unter Plots/Straßen)
-	disc(folder, "Ground", env.GroundRadius, 2, c.X, c.Z, GROUND_TOP, GRASS, Enum.Material.Grass)
+	local tile, n = env.GroundTile, env.GroundTiles
+	for ix = 1, n do
+		for iz = 1, n do
+			local x = c.X + (ix - (n + 1) / 2) * tile
+			local z = c.Z + (iz - (n + 1) / 2) * tile
+			part(folder, `Ground{ix}_{iz}`, Vector3.new(tile, 2, tile), CFrame.new(x, GROUND_TOP - 1, z), GRASS, Enum.Material.Grass)
+		end
+	end
 
 	-- Seen zwischen den Plots
 	local lakes: { Vector3 } = {}
@@ -490,7 +571,11 @@ function EnvironmentBuilder.build(parent: Instance): Folder
 		roadDetails(folder, plotId)
 	end
 
+	plazaRoads(folder)
 	plazaCenter(folder)
+	for i, pos in env.Cabins do
+		cabin(folder, i, pos)
+	end
 	plazaDressing(folder)
 	landmarks(folder)
 

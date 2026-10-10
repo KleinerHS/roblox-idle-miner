@@ -15,7 +15,8 @@ local LayoutConfig = {
 	GroundY = 0,
 
 	-- Radius der Plot-Mittelpunkte um die Map-Mitte. TODO_LAYOUT
-	PlotRingRadius = 420,
+	-- Felix (2026-10-10): Map doppelt so groß
+	PlotRingRadius = 840,
 
 	-- Winkel je Plot in Grad (0° = +X, 90° = Richtung -Z = "oben" im Masterplan).
 	-- Anordnung wie im Masterplan: 2 oben, 1 oben links, 3 oben rechts,
@@ -119,7 +120,8 @@ local LayoutConfig = {
 	-- Position relativ zu MapCenter (X/Z); Eingang zeigt nach +Z zur Straße Richtung Plot 5.
 	-- TODO_LAYOUT bis zum Bau der zentralen Service-Area.
 	SellingBuilding = {
-		Offset = Vector2.new(0, 82),
+		-- Sektor zwischen den Straßen zu Plot 4 und Plot 5, Eingang zum Kreisverkehr
+		Offset = Vector2.new(75, 130),
 		Size = Vector3.new(44, 16, 28),
 	},
 	-- Maximale Entfernung zum Verkaufstresen
@@ -128,19 +130,19 @@ local LayoutConfig = {
 	-- Equipment-Shop in der Mitte (CENTRAL_AREA_REFERENCE.png: links, blau).
 	-- Position relativ zu MapCenter; Eingang zeigt zur Platzmitte. TODO_LAYOUT
 	EquipmentShop = {
-		Offset = Vector2.new(-88, -6),
+		Offset = Vector2.new(-150, 0),
 		Size = Vector3.new(40, 16, 30),
 	},
 	-- Machine-Shop in der Mitte (CENTRAL_AREA_REFERENCE.png: hinten, orange). Liegt zwischen
 	-- den Straßen zu Plot 2 und Plot 3; Rolltor zeigt zur Platzmitte. TODO_LAYOUT
 	MachineShop = {
-		Offset = Vector2.new(44, -80),
+		Offset = Vector2.new(80, -139),
 		Size = Vector3.new(52, 18, 40),
 	},
 	-- Fahrzeughaus in der Mitte (CENTRAL_AREA_REFERENCE.png: rechts, rot). Liegt zwischen den
 	-- Straßen zu Plot 3 und Plot 4; Glasfront zeigt zur Platzmitte. TODO_LAYOUT
 	VehicleShop = {
-		Offset = Vector2.new(98, -4),
+		Offset = Vector2.new(185, 0),
 		-- Großer Glas-Showroom (D-027): Breite, Höhe, Tiefe. Phase 12c: Platz für 6 Fahrzeuge
 		-- in zwei Reihen (Felix); bleibt innerhalb des Platzes (CenterPlazaRadius) und frei
 		-- vom Machine-Shop.
@@ -160,27 +162,30 @@ local LayoutConfig = {
 	-- Rein optisch; Zahlen sind Gestaltungswerte (TODO_LAYOUT), keine Balance.
 	Environment = {
 		Seed = 42,
-		-- Radius der Wiesenscheibe (Teilgröße max. 2048 → Radius ≤ 1024)
-		GroundRadius = 1020,
+		-- Wiese als Kacheln (Teilgröße max. 2048): Kachelgröße und Anzahl je Richtung
+		GroundTile = 2040,
+		GroundTiles = 2,
 		-- Seen in den Lücken zwischen den Plots (Winkel wie PlotAngles)
 		LakeAngles = { 0, 120, 240 },
-		LakeRadius = 430,
-		LakeSize = 46,
+		LakeRadius = 860,
+		LakeSize = 80,
 		-- Bergkette als Ring um die Map
-		MountainCount = 34,
-		MountainInner = 760,
-		MountainOuter = 900,
-		MountainMinHeight = 140,
-		MountainMaxHeight = 260,
+		MountainCount = 52,
+		MountainInner = 1480,
+		MountainOuter = 1720,
+		MountainMinHeight = 240,
+		MountainMaxHeight = 420,
 		-- Wald bis zu diesem Radius, Felsen bis zur Bergkette
-		TreeCount = 420,
-		ForestOuter = 700,
-		RockCount = 90,
-		-- Freiflächen um Wasserturm und Windrad (Mittelpunkt X/Z, Radius)
-		LandmarkClearings = {
-			Vector3.new(87, 22, -163),
-			Vector3.new(190, 16, -6),
-		},
+		TreeCount = 1000,
+		ForestOuter = 1400,
+		RockCount = 220,
+		-- Wahrzeichen wie im Referenzbild (X/Z): Wasserturm hinter dem Machine-Shop,
+		-- Windrad hinter dem Fahrzeughaus; Holzhütten in den freien Sektoren
+		WaterTower = Vector2.new(120, -210),
+		Windmill = Vector2.new(255, 60),
+		Cabins = { Vector2.new(-75, -150), Vector2.new(-80, 140), Vector2.new(-60, -175) },
+		-- Freiflächen um die Wahrzeichen (Radius)
+		LandmarkClearance = 24,
 	},
 
 	-- Zaun
@@ -190,7 +195,11 @@ local LayoutConfig = {
 	EntranceWidth = 40,
 
 	-- Platzhalter-Zentrum und Straßen (nur zur Orientierung, bis die Map gebaut wird).
-	CenterPlazaRadius = 140,
+	-- Platz in der Mitte mit Kreisverkehr, Speichen und Shops dazwischen (MAP_MASTERPLAN)
+	CenterPlazaRadius = 280,
+	-- Kreisverkehr um den Brunnen: Innen-/Außenradius der Fahrbahn
+	RoundaboutInner = 40,
+	RoundaboutOuter = 64,
 	RoadWidth = 28,
 }
 

@@ -427,6 +427,13 @@ Schritte (Vorschlag): 13a Map & Umgebung · 13b Halle/Plot von außen · 13c Min
 | Platz: Pflaster statt Asphalt, Brunnen mit Wasserspiel, Beete mit Bäumen, Bänke, Laternen, Parkplätze vor Fahrzeughaus/Machine-/Equipment-Shop, drei Grüninseln, Baumreihe am Platzrand; Wasserturm und Windrad wie im Referenzbild | `EnvironmentBuilder.luau`, `PlotBuilder.luau` | TESTING_REQUIRED |
 | Edit-Vorschau baut die Umgebung mit (Plugin neu bauen) | `plugin/EditPreview.server.luau` | TESTING_REQUIRED |
 
+Nachtrag Felix (2026-10-10): Map doppelt so groß, Mitte mit mehr Platz wie im Map-Bild →
+- Plots auf Radius 840 (vorher 420), Platz Radius 280 (vorher 140); Zufahrten entsprechend länger.
+- Mitte neu: Kreisverkehr um den Brunnen, sechs Speichen in Verlängerung der Zufahrten (mit Zebrastreifen), Shops in den Sektoren dazwischen (Fahrzeughaus 0°, Machine-Shop 60°, Equipment-Shop 180°, Verkauf 300° mit Eingang zum Kreisverkehr), Parkplätze, Grüninseln, Holzhütten, Wasserturm, Windrad.
+- Umgebung skaliert: Wiese als Kacheln, 52 Berge (240–420 hoch), 1.000 Bäume, 220 Felsen, größere Seen; Laternen alle 60 Studs.
+- Prüfung: keine Überschneidung von Shops mit Straßen/Platzausstattung/Hütten/Wahrzeichen, keine Bäume/Felsen/Seen/Berge auf Plots oder Straßen; Play ohne Fehler. Gesamt ~10.000 Teile in der Vorschau.
+- Hallengröße: Rückfrage an Felix (A: jede Seite ×2, B: doppelte Fläche).
+
 Selbsttest per Studio-MCP (2026-10-10): Vorschau in Edit gebaut (0,1 s, ~3.400 Teile); keine Bäume/Felsen auf Plots oder Straßen, keine Überschneidung von Platzausstattung, Wasserturm und Windrad mit den Shops; Play ohne Fehler, ~55 FPS im Studio-Client.
 
 ## Phase 12 – Content Expansion – Details
