@@ -35,6 +35,7 @@ local SERVICE_ORDER = {
 	"ConveyorService",
 	"TradeService",
 	"ProductionService",
+	"OfflineService",
 	"WorkerVisualService",
 	"DrillVisualService",
 	"CompanyService",

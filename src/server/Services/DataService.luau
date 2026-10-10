@@ -104,6 +104,9 @@ local function queueSnapshot(player: Player)
 	end)
 end
 
+-- Abwesenheit beim letzten Laden (Sekunden, gekappt), für OfflineService
+local offlineSeconds: { [Player]: number } = {}
+
 local function onProfileReady(player: Player, profile: Profile)
 	local data = profile.Data
 	local now = os.time()
@@ -111,7 +114,10 @@ local function onProfileReady(player: Player, profile: Profile)
 		data.Stats.FirstJoinTime = now
 	end
 	data.Stats.JoinCount += 1
-	-- LastValidTime wird für die Offline-Berechnung (Phase 10) vor dem Überschreiben ausgewertet.
+	-- Offline-Zeit nur aus der Serverzeit (docs/14 §7, §16), vor dem Überschreiben auswerten.
+	-- LastValidTime = 0 (neues Profil) ergibt keine Offline-Zeit.
+	local previous = data.LastValidTime
+	offlineSeconds[player] = if previous > 0 then math.clamp(now - previous, 0, GameConfig.Offline.MaxSeconds) else 0
 	data.LastValidTime = now
 
 	profile.OnSave:Connect(function()
@@ -188,6 +194,7 @@ function DataService.Start()
 	end
 
 	Players.PlayerRemoving:Connect(function(player)
+		offlineSeconds[player] = nil
 		local profile = profiles[player]
 		if profile then
 			profile:EndSession()
@@ -215,6 +222,11 @@ end
 function DataService.Get(player: Player): Types.PlayerData?
 	local profile = profiles[player]
 	return if profile then profile.Data else nil
+end
+
+-- Offline-Zeit dieses Logins in Sekunden (serverseitig, max. GameConfig.Offline.MaxSeconds)
+function DataService.GetOfflineSeconds(player: Player): number
+	return offlineSeconds[player] or 0
 end
 
 function DataService.IsLoaded(player: Player): boolean

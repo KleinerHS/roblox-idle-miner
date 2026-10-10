@@ -26,6 +26,9 @@ local Remotes: { [string]: RemoteDefinition } = {
 	PlotAssigned = { Kind = "Event", Direction = "ServerToClient" },
 	GetMyPlot = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 5, Window = 10 } },
 
+	-- Offline-Zusammenfassung nach dem Login (OfflineSimulation.Summary, docs/14 §15)
+	OfflineSummary = { Kind = "Event", Direction = "ServerToClient" },
+
 	-- Kurze Meldung an den Spieler: { Kind = "Info"|"Success"|"Warning"|"Special", Code, Args? }
 	Notify = { Kind = "Event", Direction = "ServerToClient" },
 

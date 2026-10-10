@@ -14,6 +14,7 @@ local Log = require(ReplicatedStorage:WaitForChild("Shared").Util.Log)
 local DataSchema = require(script.Parent.Parent.Data.DataSchema)
 local DataService = require(script.Parent.DataService)
 local BuildingService = require(script.Parent.BuildingService)
+local OfflineService = require(script.Parent.OfflineService)
 
 local TAG = "DevService"
 
@@ -184,6 +185,16 @@ function DevService.Init()
 		return if ok then "ok" else "Profil nicht geladen"
 	end
 	clearSmelter.Parent = folder
+
+	-- Offline-Zeit nachrechnen wie beim Login, inkl. Fenster „WHILE YOU WERE AWAY“ (Phase 10):
+	--   game.ServerStorage.DevTools.SimulateOffline:Invoke(game.Players:GetPlayers()[1], 1800)
+	local simulate = Instance.new("BindableFunction")
+	simulate.Name = "SimulateOffline"
+	simulate.OnInvoke = function(player: Player, seconds: number): string
+		local summary = OfflineService.Apply(player, seconds)
+		return if summary then `ok ({summary.Seconds} s)` else "nichts zu tun"
+	end
+	simulate.Parent = folder
 
 	folder.Parent = ServerStorage
 end

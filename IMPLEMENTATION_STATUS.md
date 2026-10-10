@@ -17,7 +17,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 7 | Conveyors (7a Minenkauf & Schmelzer vorgezogen, D-024) | TESTING_REQUIRED (7a und 7b selbst getestet) |
 | 8 | Smelter | NOT_STARTED |
 | 9 | Multiplayer Hardening / Trading | TESTING_REQUIRED (Handel braucht den Zwei-Spieler-Test) |
-| 10 | Offline Production | NOT_STARTED |
+| 10 | Offline Production | TESTING_REQUIRED (Version 0.17.0) |
 | 11 | Prestige | NOT_STARTED |
 | 12 | Content Expansion | NOT_STARTED |
 | 13 | Visual Polish | NOT_STARTED |
@@ -412,6 +412,28 @@ Selbsttest per Studio-MCP (2026-10-10, ein Spieler):
 - Einstellung: Trade requests aus/an über Remote, Snapshot folgt; Laptop COMPANY zeigt Name, Farbe, Schalter.
 - Eigener Trade-Prompt am Server vorhanden, lokal ausgeblendet.
 - Nicht selbst prüfbar: der eigentliche Handel (braucht 2 Spieler) → Test 9.1–9.8.
+
+## Phase 10 – Offline-Produktion (Version 0.17.0) – TESTING_REQUIRED
+
+| System | Dateien | Status |
+|---|---|---|
+| Offline-Zeit nur aus der Serverzeit: `LastValidTime` (bei jedem Save gesetzt) bis Login, gekappt auf 3600 s; neues Profil = 0 | `DataService.luau` (`GetOfflineSeconds`), `GameConfig.Offline` | TESTING_REQUIRED |
+| Offline-Simulation (D-032): Abschnitte zu 10 s (eine Elevator-Fahrt), max. 360; je Abschnitt Lohn (jede Minute, Einstellungsreihenfolge, unbezahlte pausieren) → Mining-Worker/Drills in den Slot-Puffer → Transport → Elevator → Lager → Förderband → Schmelzer → Förderband → Lager; jeder Schritt nur bis zur Kapazität des nächsten; kein Geld aus Produktion, Fahrzeuge unberührt | `src/server/Util/OfflineSimulation.luau` | TESTING_REQUIRED |
+| OfflineService: rechnet beim Login nach, schickt ab 60 s Abwesenheit die Zusammenfassung (nur Serverwerte) | `src/server/Services/OfflineService.luau`, Remote `OfflineSummary` | TESTING_REQUIRED |
+| Fenster „WHILE YOU WERE AWAY – n MIN“: abgebautes Erz je Sorte, geschmolzene Barren, gezahlter Lohn, Lagerfüllung mit Balken, Hinweise (Lager voll nach n min, Worker unbezahlt, 1-Stunden-Grenze), CONTINUE | `src/client/Controllers/OfflineController.luau`, `Strings.Offline` | TESTING_REQUIRED |
+| DevTool `SimulateOffline(player, seconds)` – gleicher Weg wie beim Login | `DevService.luau` | TESTING_REQUIRED |
+
+Selbsttest per Studio-MCP (2026-10-10):
+- Rechnung mit Testprofilen (ohne Felix' Spielstand):
+  - 1 Mining- + 1 Transport-Worker, Lager 1.000, 60 min → Lager nach 33 min voll (2.000 s), danach Elevator (100) und Slot-Puffer (200) voll, abgebaut 1.300, Lohn 540.
+  - Großes Lager, 10 min → 300 Erz (30/min), Lohn 90.
+  - Kein Geld → keine Produktion; Geld für 3 Minuten → 90 Erz, danach pausiert.
+  - Drill MK3 ohne Transport → Puffer 2.500 voll, dann Stopp.
+  - Ohne Lager → nichts.
+  - Schmelzer mit beiden Bändern, 10 min → 200 Kupferbarren (1 je 3 s) zurück im Lager, Kohle bleibt liegen; nur Band zum Schmelzer → Ablage nach 100 Barren voll; Trichter mit 50 Erz → 25 Barren.
+- Echter Login mit Felix' Profil: 335 s offline → 1.815 Erz (5 Drills MK1 + 1 Miner = 330/min), Lohn 174 (29/min), Fenster „WHILE YOU WERE AWAY – 6 MIN“ erschien.
+- `SimulateOffline` mit 0 s → „nichts zu tun“, mit 99.999 s → auf 3.600 s gekappt, Hinweis „limited to 1 hour“. Felix' Geld danach auf den Stand vor diesem Test zurückgesetzt ($3.627).
+- Stop → Play nach 3 s: kein Fenster (unter 60 s), Geld blieb erhalten.
 
 ## Nachbesserungen nach Felix' Test vom 2026-10-10 (Version 0.16.1) – TESTING_REQUIRED
 

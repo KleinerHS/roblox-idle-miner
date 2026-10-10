@@ -200,3 +200,9 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Source Question:** Q-020, Q-021, Q-024 (Felix, 2026-10-10)
 **Decision:** Drills wie vorgeschlagen, aber MK3 mit 500 Erz/Min (25 Erz alle 3 s) und Puffer 2.500, damit er wie MK1/MK2 5 Minuten Produktion fasst (Felix: Hinweis übernehmen). Garage und Fahrzeuge wie vorgeschlagen. Förderband MK1 $15.000 ab Level 12, 120/min; MK2 und MK3 entfallen, bis es Schmelzer-Upgrades gibt. Weicht bewusst von docs/00 §18 ab (erster Conveyor ~Level 35).
 **Affected systems:** Drill, Garage, Vehicles, Conveyors, Balance
+
+## D-032 – Verfahren der Offline-Produktion (technischer Vorschlag, Veto möglich)
+
+**Source:** docs/14 §7–16, docs/06 §50 (Verfahren nicht festgelegt)
+**Decision:** Abwesenheit in Abschnitte zu 10 s (eine Elevator-Fahrt) teilen, je Abschnitt dieselben Regeln wie online mit Raten × Dauer; höchstens 360 Abschnitte. Lohn wird offline jede Minute wie online gezahlt (unbezahlte Worker pausieren). Fenster erst ab 60 s Abwesenheit, kürzere Reconnects werden still nachgerechnet.
+**Affected systems:** Offline, Production, Workers, Smelter, Conveyors

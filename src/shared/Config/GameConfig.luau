@@ -28,6 +28,9 @@ local GameConfig = {
 	Offline = {
 		-- Maximale Offline-Produktion in Sekunden (docs/14 §7, verbindlich).
 		MaxSeconds = 3600,
+		-- Erst ab dieser Abwesenheit erscheint das Fenster „WHILE YOU WERE AWAY“ (kurze
+		-- Reconnects werden still nachgerechnet)
+		MinSummarySeconds = 60,
 	},
 
 	-- Direkter Handel (docs/13 §5–12)

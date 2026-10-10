@@ -226,3 +226,15 @@ Vorher bei beiden etwas ins Lager legen, z. B. `AddStorage(…, "ore_coal", 200)
 | 9.7 | Abbruch | Während eines Trades verlässt einer das Spiel | Beim anderen „Trade cancelled.“, nichts getauscht |
 | 9.8 | Ausschalten | Laptop → COMPANY → Trade requests OFF; anderer Spieler fragt an | „This player doesn't accept trade requests.“ |
 | 9.9 | Kein Blockieren | Spieler laufen ineinander | Sie gehen durcheinander durch |
+
+## Phase 10 – Offline-Produktion
+
+| # | Test | Schritte | Erwartet |
+|---|---|---|---|
+| 10.1 | Echter Login | Worker/Drills laufen lassen, Spiel verlassen, ≥ 2 Minuten warten, wieder Play | Fenster „WHILE YOU WERE AWAY – n MIN“ mit Erz je Sorte, Lohn und Lagerfüllung; Lager/Puffer entsprechend gestiegen, Geld nur um den Lohn gesunken |
+| 10.2 | Kurzer Reconnect | Stop → sofort Play | Kein Fenster |
+| 10.3 | 1-Stunden-Grenze | Server-Befehlszeile: `game.ServerStorage.DevTools.SimulateOffline:Invoke(game.Players:GetPlayers()[1], 7200)` | „60 MIN“ und Hinweis „limited to 1 hour“ |
+| 10.4 | Lager voll | Lager fast voll, dann `SimulateOffline(…, 1800)` | Hinweis „Storage was full after n min“, Lager 100 % – nicht mehr als die Kapazität |
+| 10.5 | Kein Geld | `SetCash(…, 0)`, dann `SimulateOffline(…, 600)` | Kein Erz abgebaut, Hinweis zu unbezahlten Workern |
+| 10.6 | Schmelzer | Schmelzer + Förderbänder, schmelzbares Erz im Lager, `SimulateOffline(…, 600)` | Barren in der Liste und im Lager |
+| 10.7 | Kein Geld aus Produktion | Vor/nach dem Fenster Geld vergleichen | Geld sinkt nur um „Wages paid“, Fahrzeugladung unverändert |

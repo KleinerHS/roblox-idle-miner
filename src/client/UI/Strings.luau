@@ -332,6 +332,20 @@ Strings.Hud = table.freeze({
 	MineAvailable = "NEW MINE FOR SALE",
 })
 
+Strings.Offline = table.freeze({
+	Title = "WHILE YOU WERE AWAY – %d MIN",
+	Subtitle = "Your company kept working while you were offline.",
+	Mined = "%s mined",
+	Smelted = "%s smelted",
+	Wages = "Wages paid",
+	NothingProduced = "Nothing was produced.",
+	StorageFullAfter = "Storage was full after %d min – more ore is waiting in the mines.",
+	Unpaid = "Not enough money for all wages – some workers paused.",
+	Capped = "Offline production is limited to 1 hour.",
+	Storage = "Storage: %d%% full (%s / %s)",
+	Continue = "CONTINUE",
+})
+
 Strings.CompanySetup = table.freeze({
 	Title = "Found your company",
 	Subtitle = "Choose a name, a logo and your company color.",
