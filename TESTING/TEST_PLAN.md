@@ -280,3 +280,12 @@ Vorher: Place speichern (neue A-Chassis-Abstimmungen liegen in der Place-Datei).
 | 12c.2 | Kauf | `SetLevel(…, 45)`, `SetCash(…, 1e8)`, Tipper Truck und Mining Hauler kaufen | Beide im Fuhrpark der Garage |
 | 12c.3 | Fahren | Am Ring Mining Hauler wählen, losfahren | Fährt schwer/träge, passt durch das Tor, bleibt aufrecht |
 | 12c.4 | Beladen/Verkaufen | Unter dem Turm laden, zur Verkaufszone fahren | Ladung sichtbar in der Mulde, Verkauf funktioniert |
+## Phase 13a – Map & Umgebung
+
+| # | Test | Schritte | Erwartet |
+|---|---|---|---|
+| 13a.1 | Überblick | Play, Kamera weit herauszoomen | Wiese, Wald, Seen, Bergkette mit Schneegipfeln rundum, keine graue Fläche |
+| 13a.2 | Straßen | Zufahrt entlanglaufen | Mittel-/Randlinien, Gehwege, Laternen; nichts im Weg |
+| 13a.3 | Platz | In die Mitte gehen | Brunnen mit Wasserspiel, Bänke, Beete, Parkplätze, Grüninseln, keine Teile in den Shops |
+| 13a.4 | Fahren | Mit einem Fahrzeug von der Halle bis zum Verkauf | Weg frei, keine Kollision mit Bäumen/Laternen auf der Straße |
+| 13a.5 | Leistung | Mit vielen Spielern / auf schwächerem Gerät | Flüssig (Wald ~3.400 Teile) |

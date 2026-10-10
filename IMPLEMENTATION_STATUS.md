@@ -20,7 +20,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 10 | Offline Production | TESTING_REQUIRED (Version 0.17.0) |
 | 11 | Prestige | TESTING_REQUIRED (Version 0.18.0; Bonus D-034 und Reset-Liste D-033 bestätigt) |
 | 12 | Content Expansion | TESTING_REQUIRED (12a D-035, 12b D-036, 12c Fahrzeuge – Werte Q-028 offen) |
-| 13 | Visual Polish | NOT_STARTED |
+| 13 | Visual Polish | TESTING_REQUIRED (13a Map & Umgebung) |
 | 14 | Balance | NOT_STARTED |
 
 ## Setup – Details
@@ -412,6 +412,22 @@ Selbsttest per Studio-MCP (2026-10-10, ein Spieler):
 - Einstellung: Trade requests aus/an über Remote, Snapshot folgt; Laptop COMPANY zeigt Name, Farbe, Schalter.
 - Eigener Trade-Prompt am Server vorhanden, lokal ausgeblendet.
 - Nicht selbst prüfbar: der eigentliche Handel (braucht 2 Spieler) → Test 9.1–9.8.
+
+## Phase 13 – Visual Polish – Details
+
+Schritte (Vorschlag): 13a Map & Umgebung · 13b Halle/Plot von außen · 13c Mine-Shaft · 13d Licht, Atmosphäre, Effekte, Sound · 13e UI. Feinschliff einzelner Modelle (Fahrzeuge usw.) ganz am Ende (D-036).
+
+### 13a – Map & Umgebung (Version 0.22.0) – TESTING_REQUIRED
+
+| System | Dateien | Status |
+|---|---|---|
+| Wiese statt grauer Baseplate (Baseplate zur Laufzeit grün eingefärbt, Place-Datei unverändert) | `EnvironmentBuilder.luau`, `PlotService.luau` | TESTING_REQUIRED |
+| Bergkette (34 Berge) mit verschneiten Gipfeln rund um die Map, Nadelwald (420 Bäume), Felsen, drei Seen mit Sandufer zwischen den Plots | `EnvironmentBuilder.luau`, `LayoutConfig.Environment` | TESTING_REQUIRED |
+| Zufahrtsstraßen: gestrichelte Mittellinie, Randlinien, Gehwege mit Bordstein, Laternen beidseitig | `EnvironmentBuilder.luau` | TESTING_REQUIRED |
+| Platz: Pflaster statt Asphalt, Brunnen mit Wasserspiel, Beete mit Bäumen, Bänke, Laternen, Parkplätze vor Fahrzeughaus/Machine-/Equipment-Shop, drei Grüninseln, Baumreihe am Platzrand; Wasserturm und Windrad wie im Referenzbild | `EnvironmentBuilder.luau`, `PlotBuilder.luau` | TESTING_REQUIRED |
+| Edit-Vorschau baut die Umgebung mit (Plugin neu bauen) | `plugin/EditPreview.server.luau` | TESTING_REQUIRED |
+
+Selbsttest per Studio-MCP (2026-10-10): Vorschau in Edit gebaut (0,1 s, ~3.400 Teile); keine Bäume/Felsen auf Plots oder Straßen, keine Überschneidung von Platzausstattung, Wasserturm und Windrad mit den Shops; Play ohne Fehler, ~55 FPS im Studio-Client.
 
 ## Phase 12 – Content Expansion – Details
 

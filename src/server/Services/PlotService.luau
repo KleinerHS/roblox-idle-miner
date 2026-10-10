@@ -13,6 +13,7 @@ local Signal = require(Shared.Util.Signal)
 local Log = require(Shared.Util.Log)
 
 local PlotBuilder = require(script.Parent.Parent.World.PlotBuilder)
+local EnvironmentBuilder = require(script.Parent.Parent.World.EnvironmentBuilder)
 local RemoteService = require(script.Parent.RemoteService)
 
 local TAG = "PlotService"
@@ -91,6 +92,19 @@ end
 
 function PlotService.Init()
 	local folder = PlotBuilder.buildAll()
+	-- Umgebung (Wiese, Wald, Berge, Seen, Straßendetails, Platz) – reine Optik (Phase 13a)
+	local oldEnvironment = workspace:FindFirstChild("Environment")
+	if oldEnvironment then
+		oldEnvironment:Destroy()
+	end
+	EnvironmentBuilder.build(workspace)
+	-- Die Baseplate der Place-Datei liegt unter der Wiese; außerhalb davon soll sie nicht als graue
+	-- Fläche auffallen (nur zur Laufzeit, die Place-Datei bleibt unverändert)
+	local baseplate = workspace:FindFirstChild("Baseplate")
+	if baseplate and baseplate:IsA("BasePart") then
+		baseplate.Color = Color3.fromRGB(70, 112, 56)
+		baseplate.Material = Enum.Material.Grass
+	end
 	for _, child in folder:GetChildren() do
 		local plotId = child:GetAttribute("PlotId")
 		if child:IsA("Model") and typeof(plotId) == "number" then

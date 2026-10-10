@@ -248,8 +248,9 @@ function PlotBuilder.buildCenterPlaceholder(parent: Instance)
 	plaza.CanTouch = false
 	plaza.Size = Vector3.new(1, diameter, diameter)
 	plaza.CFrame = CFrame.new(center.X, LayoutConfig.GroundY + 0.5, center.Z) * CFrame.Angles(0, 0, math.rad(90))
-	plaza.Color = COLOR_ROAD
-	plaza.Material = Enum.Material.Asphalt
+	-- Pflaster wie im Referenzbild (Phase 13a); Brunnen/Beete baut EnvironmentBuilder
+	plaza.Color = Color3.fromRGB(150, 146, 138)
+	plaza.Material = Enum.Material.Pavement
 	plaza.Parent = parent
 end
 

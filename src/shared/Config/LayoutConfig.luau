@@ -156,6 +156,33 @@ local LayoutConfig = {
 	-- Elevator: maximale Entfernung zum Käfig, um ihn zu benutzen
 	ElevatorUseDistance = 16,
 
+	-- Umgebung (Phase 13a, docs/19 §4): Wiese, Seen zwischen den Plots, Bergkette, Wald, Felsen.
+	-- Rein optisch; Zahlen sind Gestaltungswerte (TODO_LAYOUT), keine Balance.
+	Environment = {
+		Seed = 42,
+		-- Radius der Wiesenscheibe (Teilgröße max. 2048 → Radius ≤ 1024)
+		GroundRadius = 1020,
+		-- Seen in den Lücken zwischen den Plots (Winkel wie PlotAngles)
+		LakeAngles = { 0, 120, 240 },
+		LakeRadius = 430,
+		LakeSize = 46,
+		-- Bergkette als Ring um die Map
+		MountainCount = 34,
+		MountainInner = 760,
+		MountainOuter = 900,
+		MountainMinHeight = 140,
+		MountainMaxHeight = 260,
+		-- Wald bis zu diesem Radius, Felsen bis zur Bergkette
+		TreeCount = 420,
+		ForestOuter = 700,
+		RockCount = 90,
+		-- Freiflächen um Wasserturm und Windrad (Mittelpunkt X/Z, Radius)
+		LandmarkClearings = {
+			Vector3.new(87, 22, -163),
+			Vector3.new(190, 16, -6),
+		},
+	},
+
 	-- Zaun
 	FenceHeight = 3,
 	FenceThickness = 1,

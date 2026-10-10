@@ -80,6 +80,7 @@ local function build(folder: Folder, world: Instance, shared: Instance)
 		end
 	end
 	PlotBuilder.buildCenterPlaceholder(plots)
+	require(world:FindFirstChild("EnvironmentBuilder") :: ModuleScript).build(folder)
 
 	-- Stadtmitte (wie SellingService/ShopService: Verkauf, Equipment, Machines, Vehicles)
 	local center = Instance.new("Folder")
