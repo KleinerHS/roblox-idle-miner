@@ -53,6 +53,68 @@ local list: { PickaxeDefinition } = {
 		PersistenceClass = "Permanent",
 		HeadColor = Color3.fromRGB(186, 192, 202),
 	},
+	-- Stufen 4–9 (Phase 12b, Vorschlag Q-027): Preis ≈ 8.000 × Erzwert der besten Mine auf
+	-- diesem Level, Power/Speed steigen gleichmäßig
+	{
+		Id = "pickaxe_reinforced",
+		DisplayName = "Reinforced Pickaxe",
+		RequiredLevel = 10, -- TODO_BALANCE (Q-027)
+		Price = 24000, -- TODO_BALANCE (Q-027)
+		MiningPower = 5, -- TODO_BALANCE (Q-027)
+		MiningSpeed = 1.35, -- TODO_BALANCE (Q-027)
+		PersistenceClass = "Permanent",
+		HeadColor = Color3.fromRGB(96, 104, 120),
+	},
+	{
+		Id = "pickaxe_industrial",
+		DisplayName = "Industrial Pickaxe",
+		RequiredLevel = 20, -- TODO_BALANCE (Q-027)
+		Price = 100000, -- TODO_BALANCE (Q-027)
+		MiningPower = 8, -- TODO_BALANCE (Q-027)
+		MiningSpeed = 1.5, -- TODO_BALANCE (Q-027)
+		PersistenceClass = "Permanent",
+		HeadColor = Color3.fromRGB(222, 150, 40),
+	},
+	{
+		Id = "pickaxe_titanium",
+		DisplayName = "Titanium Pickaxe",
+		RequiredLevel = 35, -- TODO_BALANCE (Q-027)
+		Price = 7000000, -- TODO_BALANCE (Q-027)
+		MiningPower = 12, -- TODO_BALANCE (Q-027)
+		MiningSpeed = 1.65, -- TODO_BALANCE (Q-027)
+		PersistenceClass = "Permanent",
+		HeadColor = Color3.fromRGB(150, 165, 185),
+	},
+	{
+		Id = "pickaxe_carbide",
+		DisplayName = "Tungsten Carbide Pickaxe",
+		RequiredLevel = 50, -- TODO_BALANCE (Q-027)
+		Price = 78000000, -- TODO_BALANCE (Q-027)
+		MiningPower = 18, -- TODO_BALANCE (Q-027)
+		MiningSpeed = 1.8, -- TODO_BALANCE (Q-027)
+		PersistenceClass = "Permanent",
+		HeadColor = Color3.fromRGB(70, 74, 82),
+	},
+	{
+		Id = "pickaxe_diamond",
+		DisplayName = "Diamond-Tipped Pickaxe",
+		RequiredLevel = 70, -- TODO_BALANCE (Q-027)
+		Price = 2100000000, -- TODO_BALANCE (Q-027)
+		MiningPower = 27, -- TODO_BALANCE (Q-027)
+		MiningSpeed = 2.0, -- TODO_BALANCE (Q-027)
+		PersistenceClass = "Permanent",
+		HeadColor = Color3.fromRGB(170, 225, 245),
+	},
+	{
+		Id = "pickaxe_star_metal",
+		DisplayName = "Star Metal Pickaxe",
+		RequiredLevel = 90, -- TODO_BALANCE (Q-027)
+		Price = 57000000000, -- TODO_BALANCE (Q-027)
+		MiningPower = 40, -- TODO_BALANCE (Q-027)
+		MiningSpeed = 2.2, -- TODO_BALANCE (Q-027)
+		PersistenceClass = "Permanent",
+		HeadColor = Color3.fromRGB(240, 225, 160),
+	},
 }
 
 local byId: { [string]: PickaxeDefinition } = {}

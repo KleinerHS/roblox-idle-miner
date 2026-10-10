@@ -63,6 +63,44 @@ local list: { DrillDefinition } = {
 		BodyColor = Color3.fromRGB(60, 120, 190),
 		PersistenceClass = "Progression",
 	},
+	-- MK4–MK6 (Phase 12b, Vorschlag Q-027): Preis ≈ 25.000 × Erzwert auf diesem Level (wie MK3),
+	-- Puffer = 5 Minuten Produktion. Modellgröße wie MK3 (passt in jeden Mining-Slot).
+	{
+		Id = "drill_mk4",
+		DisplayName = "Drill MK4",
+		Tier = 4,
+		RequiredLevel = 25, -- TODO_BALANCE (Q-027)
+		Price = 1300000, -- TODO_BALANCE (Q-027)
+		OrePerCycle = 60, -- TODO_BALANCE (Q-027) → 1.200 Erz/Min
+		CycleSeconds = 3,
+		OutputCapacity = 6000, -- TODO_BALANCE (Q-027)
+		BodyColor = Color3.fromRGB(70, 140, 80),
+		PersistenceClass = "Progression",
+	},
+	{
+		Id = "drill_mk5",
+		DisplayName = "Drill MK5",
+		Tier = 5,
+		RequiredLevel = 45, -- TODO_BALANCE (Q-027)
+		Price = 98000000, -- TODO_BALANCE (Q-027)
+		OrePerCycle = 150, -- TODO_BALANCE (Q-027) → 3.000 Erz/Min
+		CycleSeconds = 3,
+		OutputCapacity = 15000, -- TODO_BALANCE (Q-027)
+		BodyColor = Color3.fromRGB(120, 40, 50),
+		PersistenceClass = "Progression",
+	},
+	{
+		Id = "drill_mk6",
+		DisplayName = "Drill MK6",
+		Tier = 6,
+		RequiredLevel = 70, -- TODO_BALANCE (Q-027)
+		Price = 6500000000, -- TODO_BALANCE (Q-027)
+		OrePerCycle = 375, -- TODO_BALANCE (Q-027) → 7.500 Erz/Min
+		CycleSeconds = 3,
+		OutputCapacity = 37500, -- TODO_BALANCE (Q-027)
+		BodyColor = Color3.fromRGB(40, 40, 46),
+		PersistenceClass = "Progression",
+	},
 }
 
 local byId: { [string]: DrillDefinition } = {}
@@ -75,6 +113,11 @@ local Drills = {
 	List = table.freeze(list),
 	ById = table.freeze(byId),
 }
+
+-- Modellgröße: wächst bis MK3, ab MK4 gleich groß (Mining-Slots haben feste Größe)
+function Drills.Scale(def: DrillDefinition): number
+	return 1 + (math.min(def.Tier, 3) - 1) * 0.25
+end
 
 function Drills.Get(id: string): DrillDefinition?
 	return byId[id]

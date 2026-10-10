@@ -217,3 +217,9 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Source Question:** Q-025 (Felix, 2026-10-10)
 **Decision:** Je Prestige +10 % Verkaufsgeld (XP unverändert) und +5 % Mining Speed, Speed-Bonus höchstens +50 %; additiv.
 **Affected systems:** Prestige, Selling, Mining, Balance
+
+## D-035 – Inhaltskurve als Startwert
+
+**Source Question:** Q-026 (Felix, 2026-10-10)
+**Decision:** Minen 09–100, Erze und Barren nutzen die Kurve aus BalanceConfig.ContentCurve als Startwert; Feinschliff in der Balance-Phase. D-019 (+50 % je Mine) gilt nur bis Mine 08.
+**Affected systems:** Ores, Mines, Recipes, Balance

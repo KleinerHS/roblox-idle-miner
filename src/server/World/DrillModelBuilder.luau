@@ -68,7 +68,7 @@ local function hazard(parent: Instance, name: string, width: number, height: num
 end
 
 function DrillModelBuilder.build(def: Drills.DrillDefinition, cf: CFrame): Model
-	local s = 1 + (def.Tier - 1) * 0.25
+	local s = Drills.Scale(def)
 	local body = def.BodyColor
 	local bodyDark = body:Lerp(Color3.new(0, 0, 0), 0.35)
 
@@ -247,7 +247,7 @@ local SLOT_SIDE_OFFSET = 3
 -- zone.LookVector zeigt in den Raum, die Erzwand liegt bei lokal +Z = zone.Size.Z / 2.
 -- Ergebnis: Bodenmitte des Drills, LookVector zur Wand, Bohrspitze knapp vor der Wand.
 function DrillModelBuilder.slotCFrame(zone: BasePart, floorY: number, def: Drills.DrillDefinition): CFrame
-	local s = 1 + (def.Tier - 1) * 0.25
+	local s = Drills.Scale(def)
 	local wallZ = zone.Size.Z / 2
 	local spot = zone.CFrame * CFrame.new(SLOT_SIDE_OFFSET, 0, wallZ - TIP_Z * s - 0.6)
 	local pos = Vector3.new(spot.Position.X, floorY, spot.Position.Z)
@@ -256,7 +256,7 @@ end
 
 -- Abholpunkt hinter dem Auswurfschacht (für Transport-Worker), Bodenhöhe
 function DrillModelBuilder.outputPoint(drillCF: CFrame, def: Drills.DrillDefinition): Vector3
-	local s = 1 + (def.Tier - 1) * 0.25
+	local s = Drills.Scale(def)
 	return (drillCF * CFrame.new(0, 0, OUTPUT_Z * s + 1.5)).Position
 end
 

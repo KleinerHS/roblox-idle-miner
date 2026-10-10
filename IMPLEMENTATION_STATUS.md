@@ -19,7 +19,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 9 | Multiplayer Hardening / Trading | TESTING_REQUIRED (Handel braucht den Zwei-Spieler-Test) |
 | 10 | Offline Production | TESTING_REQUIRED (Version 0.17.0) |
 | 11 | Prestige | TESTING_REQUIRED (Version 0.18.0; Bonus D-034 und Reset-Liste D-033 bestätigt) |
-| 12 | Content Expansion | TESTING_REQUIRED (12a Minen 09–100 / Erze / Barren; Werte Q-026 offen) |
+| 12 | Content Expansion | TESTING_REQUIRED (12a Minen/Erze/Barren D-035; 12b Ausrüstung/Drills/Upgrades, Werte Q-027 offen; 12c Fahrzeuge offen) |
 | 13 | Visual Polish | NOT_STARTED |
 | 14 | Balance | NOT_STARTED |
 
@@ -423,6 +423,16 @@ Schritte: 12a alle Minen/Erze/Barren über zentrale Kurven · 12b weitere Spitzh
 |---|---|---|
 | Zentrale Wachstumskurven (Q-026, `TODO_BALANCE`): Erzwert ab Lead × 1,6 bis Platinum, danach × 1,35, auf 2 Stellen gerundet; Erz-XP folgt der Level-Kurve; Barren = 2 Erz × 1,4 (XP × 1,25); Minen-Level linear Mine 08 (L16) → Mine 100 (L100); Minenpreis ab Mine 09 = Erzwert × 4.500 (zweite Mine × 1,25). Bestätigte Einzelwerte (D-017/D-019/D-028) haben Vorrang. | `src/shared/Definitions/ContentCurve.luau`, `BalanceConfig.ContentCurve`, `Ores.luau`, `Mines.luau`, `Recipes.luau` | TESTING_REQUIRED |
 | Folge: alle 100 Minen haben Level und Preis (kein „Coming soon“ mehr), alle 50 Erze und 22 Barren sind verkaufbar, alle Metall-Rezepte aktiv | – | TESTING_REQUIRED |
+
+### 12b – Ausrüstung, Drills, Upgrades (Version 0.20.0) – TESTING_REQUIRED
+
+| System | Dateien | Status |
+|---|---|---|
+| 6 weitere Spitzhacken (Reinforced, Industrial, Titanium, Tungsten Carbide, Diamond-Tipped, Star Metal) mit eigener Kopffarbe (Q-027) | `Pickaxes.luau` | TESTING_REQUIRED |
+| 4 weitere Rucksäcke (Expedition, Heavy Duty, Titan, Colossus), max. 15.000 (Q-027) | `Backpacks.luau` | TESTING_REQUIRED |
+| Drills MK4–MK6 (1.200 / 3.000 / 7.500 Erz/Min, Puffer 5 Minuten), Modell ab MK4 so groß wie MK3 (passt in jeden Slot), eigene Farben (Q-027) | `Drills.luau` (`Drills.Scale`), `DrillModelBuilder.luau` | TESTING_REQUIRED |
+| Lager-Upgrades bis 500.000, Elevator-Upgrades bis 10.000 je Fahrt (Q-027) | `BalanceConfig.Storage/Elevator.Upgrades` | TESTING_REQUIRED |
+| Equipment-Shop: Rucksacktisch auf 22 Studs verlängert, Rucksäcke nach Breite verteilt (alle 7 passen); Spitzhacken-Wand zeigt alle 9. Machine-Shop zeigt weiter MK1–MK3 (drei Plätze), MK4–MK6 im Shop-Fenster | `EquipmentShopBuilder.luau`, `MachineShopBuilder.luau` | TESTING_REQUIRED |
 
 ## Phase 11 – Prestige (Version 0.18.0) – TESTING_REQUIRED
 

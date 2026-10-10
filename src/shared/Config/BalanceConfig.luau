@@ -67,6 +67,11 @@ local BalanceConfig = {
 			{ Capacity = 5000, Cost = 8000, RequiredLevel = 6 }, -- Felix (D-022)
 			{ Capacity = 10000, Cost = 20000, RequiredLevel = 8 }, -- Felix (D-022)
 			{ Capacity = 25000, Cost = 50000, RequiredLevel = 10 }, -- Felix (D-022)
+			-- Phase 12b (Vorschlag Q-027): Kosten ≈ 15.000 × Erzwert auf diesem Level
+			{ Capacity = 50000, Cost = 200000, RequiredLevel = 20 }, -- TODO_BALANCE (Q-027)
+			{ Capacity = 100000, Cost = 13000000, RequiredLevel = 35 }, -- TODO_BALANCE (Q-027)
+			{ Capacity = 250000, Cost = 360000000, RequiredLevel = 55 }, -- TODO_BALANCE (Q-027)
+			{ Capacity = 500000, Cost = 18000000000, RequiredLevel = 80 }, -- TODO_BALANCE (Q-027)
 		},
 	},
 
@@ -103,6 +108,12 @@ local BalanceConfig = {
 			{ Capacity = 500, Cost = 10000, RequiredLevel = 7 }, -- Felix (D-022)
 			{ Capacity = 750, Cost = 20000, RequiredLevel = 9 }, -- Felix (D-022)
 			{ Capacity = 1000, Cost = 40000, RequiredLevel = 11 }, -- Felix (D-022)
+			-- Phase 12b (Vorschlag Q-027): Kosten ≈ 15.000 × Erzwert auf diesem Level
+			{ Capacity = 1500, Cost = 120000, RequiredLevel = 18 }, -- TODO_BALANCE (Q-027)
+			{ Capacity = 2500, Cost = 3200000, RequiredLevel = 30 }, -- TODO_BALANCE (Q-027)
+			{ Capacity = 4000, Cost = 59000000, RequiredLevel = 45 }, -- TODO_BALANCE (Q-027)
+			{ Capacity = 6000, Cost = 1700000000, RequiredLevel = 65 }, -- TODO_BALANCE (Q-027)
+			{ Capacity = 10000, Cost = 44000000000, RequiredLevel = 85 }, -- TODO_BALANCE (Q-027)
 		},
 	},
 
@@ -121,25 +132,25 @@ local BalanceConfig = {
 	},
 
 	-- Kurven für alle Inhalte ohne festen Einzelwert (Phase 12, ContentCurve.luau).
-	-- Vorschlag Q-026, alles TODO_BALANCE bis zur Balance-Phase (docs/16 Phase 14).
+	-- Von Felix als Startwert bestätigt (D-035); Feinschliff in der Balance-Phase (docs/16 Phase 14).
 	ContentCurve = {
 		-- Erzwert je Tier ab Tier 5 (Lead): Vorgänger × Wachstum
-		OreValueGrowthEarly = 1.6, -- TODO_BALANCE (Q-026) bis Tier EarlyUntilTier
-		EarlyUntilTier = 15, -- TODO_BALANCE (Q-026)
-		OreValueGrowthLate = 1.35, -- TODO_BALANCE (Q-026) danach
+		OreValueGrowthEarly = 1.6, -- Startwert (D-035) bis Tier EarlyUntilTier
+		EarlyUntilTier = 15, -- Startwert (D-035)
+		OreValueGrowthLate = 1.35, -- Startwert (D-035) danach
 		-- Erz-XP = XP-Bedarf (Level der ersten Mine) / XPDivisor, mindestens +1 je Tier
-		XPDivisor = 2000, -- TODO_BALANCE (Q-026)
+		XPDivisor = 2000, -- Startwert (D-035)
 		-- Barren: Wert und XP der eingesetzten Erze × Faktor (Copper–Iron: ~1.4 / ~1.25)
-		BarValueFactor = 1.4, -- TODO_BALANCE (Q-026)
-		BarXPFactor = 1.25, -- TODO_BALANCE (Q-026)
+		BarValueFactor = 1.4, -- Startwert (D-035)
+		BarXPFactor = 1.25, -- Startwert (D-035)
 		-- Minen-Level linear zwischen Anker (Mine 08 = Level 16, D-028) und Mine 100
 		LevelAnchorMine = 8,
 		LevelAnchorLevel = 16,
 		LastMine = 100,
-		LastMineLevel = 100, -- TODO_BALANCE (Q-026) docs/02 §30: Mine 100 und Level 100 als Endziel
+		LastMineLevel = 100, -- Startwert (D-035) docs/02 §30: Mine 100 und Level 100 als Endziel
 		-- Minenpreis ab Mine 09 = Erzwert × Vielfaches (zweite Mine einer Erzart × Faktor)
-		MinePriceOreMultiple = 4500, -- TODO_BALANCE (Q-026)
-		SecondMinePriceFactor = 1.25, -- TODO_BALANCE (Q-026)
+		MinePriceOreMultiple = 4500, -- Startwert (D-035)
+		SecondMinePriceFactor = 1.25, -- Startwert (D-035)
 	},
 
 	-- Minenpreis Mine 03–08 (D-019: $3.000, je +50 %). Ab Mine 09 über ContentCurve.

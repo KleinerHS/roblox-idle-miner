@@ -70,8 +70,13 @@ local function displayPickaxe(parent: Instance, cf: CFrame, headColor: Color3)
 end
 
 -- Ausstellungs-Rucksack (Größe wächst mit der Kapazität)
+-- Größe je Stufe (Phase 12b: flacher, damit alle Stufen auf den Tisch passen)
+local function backpackScale(tier: number): number
+	return 0.9 + tier * 0.12
+end
+
 local function displayBackpack(parent: Instance, cf: CFrame, tier: number)
-	local s = 1 + tier * 0.25
+	local s = backpackScale(tier)
 	local color = CANVAS[((tier - 1) % #CANVAS) + 1]
 	part(parent, "Bag", Vector3.new(1.6 * s, 2 * s, 1 * s), cf * CFrame.new(0, s, 0), color, Enum.Material.Fabric)
 	part(parent, "Flap", Vector3.new(1.65 * s, 0.6 * s, 1.05 * s), cf * CFrame.new(0, 1.8 * s, 0), color:Lerp(Color3.new(0, 0, 0), 0.25), Enum.Material.Fabric)
@@ -136,15 +141,24 @@ function EquipmentShopBuilder.build(parent: Instance): Model
 	local tables = Instance.new("Folder")
 	tables.Name = "BackpackDisplay"
 	tables.Parent = model
-	part(tables, "Table", Vector3.new(4, 0.4, 16), o * CFrame.new(W / 2 - 4, 3.2, 2), WOOD, Enum.Material.Wood)
-	for _, z in { -5, 9 } do
+	part(tables, "Table", Vector3.new(4, 0.4, 22), o * CFrame.new(W / 2 - 4, 3.2, 2), WOOD, Enum.Material.Wood)
+	for _, z in { -8, 12 } do
 		part(tables, `TableLeg{z}`, Vector3.new(3.4, 3, 0.4), o * CFrame.new(W / 2 - 4, 1.5, z), WOOD_DARK, Enum.Material.Wood)
 	end
+	-- Rucksäcke nebeneinander nach Breite verteilt (alle Stufen auf 22 Studs Tisch)
+	local widths, total = {}, 0
+	for i in Backpacks.List do
+		widths[i] = 1.65 * backpackScale(i)
+		total += widths[i]
+	end
+	local gap = math.max(0.2, (21 - total) / math.max(1, #Backpacks.List - 1))
+	local z = 2 - 10.5
 	for i, def in Backpacks.List do
 		local holder = Instance.new("Folder")
 		holder.Name = def.Id
 		holder.Parent = tables
-		displayBackpack(holder, o * CFrame.new(W / 2 - 4, 3.4, -4 + (i - 1) * 5) * CFrame.Angles(0, math.rad(-90), 0), i)
+		displayBackpack(holder, o * CFrame.new(W / 2 - 4, 3.4, z + widths[i] / 2) * CFrame.Angles(0, math.rad(-90), 0), i)
+		z += widths[i] + gap
 	end
 
 	-- Tresen rechts mit Shop-Prompt

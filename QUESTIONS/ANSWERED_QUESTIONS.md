@@ -517,3 +517,17 @@ Vorschlag: je Prestige +10 % Verkaufsgeld (nicht XP), +5 % Mining Speed bis max.
 „Q-025: ok (+10 % Geld, +5 % Speed bis max. +50 %). D-033: ok.“
 
 **Decision:** D-034
+
+---
+
+## Q-026 – Werte für Minen 09–100, Erze und Barren (Phase 12a)
+
+**Status:** ANSWERED
+**Date:** 2026-10-10
+
+Vorschlag: Kurve aus BalanceConfig.ContentCurve (Erzwert ×1,6 bis Platinum, danach ×1,35; Minen-Level linear bis Mine 100 = Level 100; Minenpreis = Erzwert × 4.500).
+
+### Answer (Felix, 2026-10-10)
+„Q-026: ok, Kurve als Startwert. Weiter mit 12b.“
+
+**Decision:** D-035

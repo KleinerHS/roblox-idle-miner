@@ -163,8 +163,12 @@ function MachineShopBuilder.build(parent: Instance): Model
 	hazardStrip(platform, "PlatformEdge", 31.4, o * CFrame.new(0, 1.82, -4.4))
 	-- Vom Eingang aus gesehen links nach rechts: MK1, MK2, MK3 (lokal +X ist links)
 	local slots = { 10.5, 0, -10.5 }
+	-- Ausgestellt sind MK1–MK3 (Plattform hat drei Plätze); höhere Stufen nur im Shop-Fenster
 	for i, def in Drills.List do
-		local x = slots[i] or 0
+		if i > #slots then
+			break
+		end
+		local x = slots[i]
 		-- Bohrkopf zeigt zum Eingang
 		local display = DrillModelBuilder.build(def, o * CFrame.new(x, 1.8, 7))
 		display.Parent = platform

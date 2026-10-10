@@ -261,3 +261,12 @@ Achtung: Ein echtes Prestige setzt den Spielstand zurück (so gewollt). Vorher g
 | 12a.2 | Mine 09 | `SetLevel(…, 17)`, `SetCash(…, 50000)`, Mine 09 kaufen und hinfahren | Lead-Erzwand, Abbau, Verkauf $8 je Erz |
 | 12a.3 | Späte Mine | `SetLevel(…, 100)`, `SetCash(…, 1e12)`, `SetMineUnlocked(…, "mine_099", true)`, hinfahren | Raum mit Diamond-Erz, dunklerer Fels, Abbau funktioniert |
 | 12a.4 | Barren | Lead ins Lager (`AddStorage(…, "ore_lead", 200)`), Schmelzer | Lead Bar entsteht und ist verkaufbar |
+## Phase 12b – Ausrüstung, Drills, Upgrades
+
+| # | Test | Schritte | Erwartet |
+|---|---|---|---|
+| 12b.1 | Equipment-Shop | Shop betreten | 9 Spitzhacken an der Rückwand, 7 Rucksäcke auf dem Tisch, nichts ragt aus Tisch/Wand |
+| 12b.2 | Shop-Fenster | Tresen → Reiter Pickaxes/Backpacks | Alle Stufen mit Level/Preis, höhere gesperrt („Requires Mining Level …“) |
+| 12b.3 | Kauf hohe Stufe | `SetLevel(…, 20)`, `SetCash(…, 200000)`, Industrial Pickaxe kaufen | Ausgerüstet, gelber Kopf, Power 8 |
+| 12b.4 | Drill MK4 | `SetLevel(…, 25)`, `SetCash(…, 2e6)`, MK4 kaufen und in Mine platzieren | Grüner Drill, so groß wie MK3, ~1.200 Erz/Min |
+| 12b.5 | Upgrades | Laptop → STORAGE / ELEVATOR mit hohem Level und Geld | Weitere Stufen bis 500.000 bzw. 10.000 |

@@ -42,6 +42,40 @@ local list: { BackpackDefinition } = {
 		Capacity = 2500, -- Felix (D-019)
 		PersistenceClass = "Permanent",
 	},
+	-- Stufen 4–7 (Phase 12b, Vorschlag Q-027): Preis ≈ 6.000 × Erzwert auf diesem Level.
+	-- Bewusst nicht größer als 15.000, damit der Rucksack kein Fahrzeug ersetzt.
+	{
+		Id = "backpack_expedition",
+		DisplayName = "Expedition Pack",
+		RequiredLevel = 12, -- TODO_BALANCE (Q-027)
+		Price = 18000, -- TODO_BALANCE (Q-027)
+		Capacity = 5000, -- TODO_BALANCE (Q-027)
+		PersistenceClass = "Permanent",
+	},
+	{
+		Id = "backpack_heavy",
+		DisplayName = "Heavy Duty Pack",
+		RequiredLevel = 30, -- TODO_BALANCE (Q-027)
+		Price = 1300000, -- TODO_BALANCE (Q-027)
+		Capacity = 7500, -- TODO_BALANCE (Q-027)
+		PersistenceClass = "Permanent",
+	},
+	{
+		Id = "backpack_titan",
+		DisplayName = "Titan Pack",
+		RequiredLevel = 55, -- TODO_BALANCE (Q-027)
+		Price = 140000000, -- TODO_BALANCE (Q-027)
+		Capacity = 10000, -- TODO_BALANCE (Q-027)
+		PersistenceClass = "Permanent",
+	},
+	{
+		Id = "backpack_colossus",
+		DisplayName = "Colossus Pack",
+		RequiredLevel = 80, -- TODO_BALANCE (Q-027)
+		Price = 7200000000, -- TODO_BALANCE (Q-027)
+		Capacity = 15000, -- TODO_BALANCE (Q-027)
+		PersistenceClass = "Permanent",
+	},
 }
 
 local byId: { [string]: BackpackDefinition } = {}
