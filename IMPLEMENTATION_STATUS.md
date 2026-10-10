@@ -423,6 +423,12 @@ Selbsttest per Studio-MCP (2026-10-10, ein Spieler):
 | Boni wirken: Verkaufsgeld × Faktor (XP unverändert), Mining-Cooldown Server und Client mit Speed-Faktor, Verkaufsfenster zeigt „(+n% Prestige)“ | `SellingService.luau`, `MiningService.luau`, `MiningController.luau`, `SellController.luau` | TESTING_REQUIRED |
 | Laptop-App PRESTIGE: Zähler, aktueller Bonus, Voraussetzung mit Balken, Bonus nach dem nächsten Prestige, Listen RESETS / YOU KEEP; Bestätigung in 2 Schritten (PRESTIGE… → PRESTIGE? mit 3 s Wartezeit, CANCEL) | `LaptopController.luau`, `Strings.Laptop` | TESTING_REQUIRED |
 
+Selbsttest per Studio-MCP (2026-10-10):
+- Reset mit Testprofil (ohne Felix' Spielstand): Zähler 2 → 3, Geld $800, Level 1, Gebäude/Lager/Worker/Drills/Schmelzer/Puffer/Minen/Rucksack leer, Elevator 100; Firma, Spitzhacke, Fahrzeug (ohne Ladung, ohne Stellplatz), Robux-Käufe, ID-Zähler erhalten; neuer Offline-Zeitstempel.
+- Play: 24 Services / 20 Controller ohne Fehler; Remote `Prestige` bei Level 8 → `LEVEL_TOO_LOW` (Spielstand unverändert).
+- Laptop-App PRESTIGE zeigt Zähler, Voraussetzung (Level 8 / 100), Bonus, beide Listen und den gesperrten Knopf.
+- Echtes Prestige nicht ausgeführt (würde Felix' Spielstand zurücksetzen) → Test 11.2–11.8.
+
 ## Phase 10 – Offline-Produktion (Version 0.17.0) – TESTING_REQUIRED
 
 | System | Dateien | Status |
