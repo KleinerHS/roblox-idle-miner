@@ -42,3 +42,4 @@ Nach Änderungen an Economy, Inventory, Save, Trading oder Prestige die betroffe
 - [ ] 0.24.0: Workspace.HallLayout wird im Spiel übernommen (verschobenes Objekt steht auf allen Plots an der neuen Stelle); ohne HallLayout baut der Code wie bisher
 - [ ] 0.24.0: Lager-, Ofen- und Stellplatz-Anzeigen als schwebende Schrift aktualisieren sich
 - [ ] 0.25.0: Stapler, Lüfter, Rundumleuchten, Arbeiter bewegen sich; Ofentrommel/Schnecke nur beim Schmelzen; keine Ruckler mit 6 Plots
+- [ ] 0.26.0: Gekaufte Kisten erscheinen als Holzkisten mit Aufschrift des Inhalts, Füllung passt; nicht gekaufte Plätze leer; HallLayout drehen/verschieben ändert nichts an der Lage im Spiel

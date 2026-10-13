@@ -209,8 +209,10 @@ local function createLayout()
 		local PlotBuilder = require(worldClone:FindFirstChild("PlotBuilder") :: ModuleScript) :: any
 		local BuildTemplates = require(worldClone:FindFirstChild("BuildTemplates") :: ModuleScript) :: any
 		local PlotExterior = require(worldClone:FindFirstChild("PlotExterior") :: ModuleScript) :: any
+		local HallLayout = require(worldClone:FindFirstChild("HallLayout") :: ModuleScript) :: any
 		local origin = PlotBuilder.getPlotCFrame(SHOWCASE_PLOT)
 		layout:SetAttribute("Origin", origin)
+		HallLayout.makeOrigin(layout, origin)
 		for _, step in BuildSteps.List do
 			local model = BuildTemplates.build(step.Id, origin)
 			if model then

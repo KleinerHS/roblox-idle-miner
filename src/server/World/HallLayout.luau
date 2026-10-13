@@ -4,7 +4,9 @@
 --
 -- In der Place-Datei liegt optional Workspace.HallLayout (Model) mit dem kompletten Ausbau von
 -- Plot 1: je Bauschritt ein Model (Attribut BuildStepId, z. B. "build_smelter") und optional der
--- Folder "Exterior" (Außenbereich). Attribut "Origin" (CFrame) = Plot-1-CFrame beim Erzeugen.
+-- Folder "Exterior" (Außenbereich). Der unsichtbare Part "LayoutOrigin" markiert die Plotmitte;
+-- er wandert mit, wenn das ganze Layout gedreht/verschoben wird (z. B. zum Bearbeiten gerade zum
+-- Raster). Alte Layouts ohne Marker nutzen das Attribut "Origin" (CFrame).
 -- Darin kann jedes Objekt (Regal, Maschine, Zaun …) in Studio frei verschoben werden.
 --
 -- Beim Serverstart wird HallLayout nach ServerStorage verschoben. BuildTemplates/PlotBuilder holen
@@ -17,6 +19,22 @@ local ServerStorage = game:GetService("ServerStorage")
 local HallLayout = {}
 
 HallLayout.Name = "HallLayout"
+HallLayout.OriginName = "LayoutOrigin"
+
+-- Marker für die Plotmitte (unsichtbar, nicht anklickbar im Spiel)
+function HallLayout.makeOrigin(parent: Instance, cf: CFrame): Part
+	local p = Instance.new("Part")
+	p.Name = HallLayout.OriginName
+	p.Anchored = true
+	p.CanCollide = false
+	p.CanQuery = false
+	p.CanTouch = false
+	p.Transparency = 1
+	p.Size = Vector3.new(4, 0.2, 4)
+	p.CFrame = cf
+	p.Parent = parent
+	return p
+end
 
 local layout: Model? = nil
 local origin: CFrame? = nil
@@ -27,9 +45,10 @@ function HallLayout.init()
 	if not found then
 		return
 	end
-	local o = found:GetAttribute("Origin")
+	local marker = found:FindFirstChild(HallLayout.OriginName)
+	local o: any = if marker and marker:IsA("BasePart") then marker.CFrame else found:GetAttribute("Origin")
 	if not found:IsA("Model") or typeof(o) ~= "CFrame" then
-		warn("[HallLayout] Workspace.HallLayout ohne Attribut Origin (CFrame) – wird ignoriert")
+		warn("[HallLayout] Workspace.HallLayout ohne LayoutOrigin/Origin – wird ignoriert")
 		return
 	end
 	found.Parent = ServerStorage

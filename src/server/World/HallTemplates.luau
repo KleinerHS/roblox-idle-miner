@@ -14,6 +14,7 @@ local BalanceConfig = require(ReplicatedStorage:WaitForChild("Shared").Config.Ba
 local CrateRackBuilder = require(script.Parent.CrateRackBuilder)
 local FloatingText = require(script.Parent.FloatingText)
 local AmbientProps = require(script.Parent.AmbientProps)
+local ForkliftBuilder = require(script.Parent.ForkliftBuilder)
 
 local HallTemplates = {}
 
@@ -197,9 +198,12 @@ function HallTemplates.buildStorage(plotCFrame: CFrame): Model
 		local lane = part(lanes, `LaneLine{i}`, Vector3.new(RACKS_PER_ROW * CrateRackBuilder.Bay + 8, 0.06, 0.5), o * CFrame.new(RACK_SHIFT_X, 0.03, z), YELLOW, Enum.Material.SmoothPlastic)
 		lane.CanCollide = false
 	end
-	-- Gabelstapler auf dem vorderen Fahrweg (fährt im Spiel hin und her) und lose Paletten
+	-- Großer, realistischer Stapler mit Kiste fährt auf dem vorderen Fahrweg hin und her
+	local truck = ForkliftBuilder.build(model, "ForkliftLarge", o * CFrame.new(hw - 32, 0, -18) * CFrame.Angles(0, math.rad(90), 0), true)
+	AmbientProps.shuttle(truck, Vector3.new(0, 0, -78), 5, 4)
+	-- Kleiner Stapler steht geparkt rechts vorne, daneben lose Paletten
 	local forklift = group(model, "Forklift")
-	local fork = o * CFrame.new(hw - 28, 0, -18) * CFrame.Angles(0, math.rad(90), 0)
+	local fork = o * CFrame.new(hw - 18, 0, -20) * CFrame.Angles(0, math.rad(-20), 0)
 	forklift.PrimaryPart = part(forklift, "ForkliftBody", Vector3.new(4, 2.4, 6), fork * CFrame.new(0, 2.2, 0), YELLOW, Enum.Material.SmoothPlastic)
 	part(forklift, "ForkliftWeight", Vector3.new(4, 2.2, 1.4), fork * CFrame.new(0, 2.3, 3.4), STEEL, Enum.Material.Metal)
 	part(forklift, "ForkliftRoof", Vector3.new(4, 0.25, 4.6), fork * CFrame.new(0, 7.9, 0.2), STEEL, Enum.Material.Metal)
@@ -212,10 +216,6 @@ function HallTemplates.buildStorage(plotCFrame: CFrame): Model
 			w.Shape = Enum.PartType.Cylinder
 		end
 	end
-	local beaconBase = fork * CFrame.new(0, 8.025, 0.2)
-	local light = part(forklift, "ForkliftLamp", Vector3.new(0.8, 0.5, 0.8), beaconBase * CFrame.new(0, 0.25, 0), Color3.fromRGB(255, 150, 30), Enum.Material.Neon)
-	light.CanCollide = false
-	AmbientProps.shuttle(forklift, Vector3.new(0, 0, -85), 6, 4)
 	local spare = group(model, "SparePallets")
 	for i = 1, 3 do
 		part(spare, `SparePallet{i}`, Vector3.new(6.2, 0.5, 6.2), o * CFrame.new(hw - 10, 0.25 + (i - 1) * 0.5, -40) * CFrame.Angles(0, math.rad(i * 3), 0), CRATE_DARK, Enum.Material.WoodPlanks)

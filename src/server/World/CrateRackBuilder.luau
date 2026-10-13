@@ -1,8 +1,10 @@
 --!strict
--- Hochregale mit Palettenboxen (Phase 13b, Felix D-037): gemeinsam genutzt vom Firmenlager und den
+-- Hochregale mit Palettenkisten (Phase 13b, Felix D-037): gemeinsam genutzt vom Firmenlager und den
 -- beiden Ofen-Lagern. Ein Regal hat 4 Paletten übereinander; jeder Platz ist eine Kiste
--- (CrateSize einer Sorte). Vorhandene Kisten stehen als Gitterboxen im Regal, das Erz ist in Farbe
--- und Füllhöhe sichtbar; nicht vorhandene Plätze bleiben leer.
+-- (CrateSize einer Sorte). Vorhandene Kisten stehen als Holz-Palettenkisten im Regal (WoodCrate,
+-- Name des Inhalts vorne aufgedruckt, Erz als Füllung); nicht vorhandene Plätze bleiben leer.
+-- Kisten werden erst bei Bedarf gebaut (Slot enthält nur einen unsichtbaren Anker), damit
+-- leere Regale keine Teile kosten.
 --
 -- Jedes Regal ist ein eigenes Model "Rack{n}" (eigene Stützen, Träger, Verbände, Plätze), damit es
 -- in Studio einzeln verschoben werden kann. Plätze heißen "Slot{i}" (fortlaufend über den Block) und
@@ -18,6 +20,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local BalanceConfig = require(Shared.Config.BalanceConfig)
 local Materials = require(Shared.Definitions.Materials)
+local WoodCrate = require(script.Parent.WoodCrate)
 
 local CrateRackBuilder = {}
 
@@ -25,9 +28,6 @@ local RACK_BAY = 9 -- Breite eines Regals (X)
 local RACK_DEPTH = 8.5 -- Tiefe (Z)
 local LEVEL_Y = { 0, 7.8, 15.6, 23.4 } -- Unterkante der Palette je Ebene
 local RACK_HEIGHT = 31
-local BOX = 7.4 -- Gitterbox-Grundfläche
-local BOX_H = 5.6 -- Wandhöhe der Gitterbox
-local BOX_FRONT_H = 2 -- niedrige Klappe zum Fahrweg, damit das Erz sichtbar ist
 
 CrateRackBuilder.Bay = RACK_BAY
 CrateRackBuilder.Depth = RACK_DEPTH
@@ -36,9 +36,6 @@ CrateRackBuilder.Levels = #LEVEL_Y
 local UPRIGHT = Color3.fromRGB(40, 90, 150)
 local BEAM = Color3.fromRGB(226, 150, 40)
 local YELLOW = Color3.fromRGB(236, 182, 40)
-local PALLET = Color3.fromRGB(140, 100, 58)
-local STEEL = Color3.fromRGB(70, 74, 80)
-local MESH = Color3.fromRGB(150, 156, 164)
 
 local function part(parent: Instance, name: string, size: Vector3, cf: CFrame, color: Color3, material: Enum.Material): Part
 	local p = Instance.new("Part")
@@ -79,6 +76,11 @@ local function rack(parent: Instance, name: string, base: CFrame, face: number, 
 			part(m, `Beam{level}_{z}`, Vector3.new(hw * 2 - 0.5, 0.45, 0.3), base * CFrame.new(0, LEVEL_Y[level] - 0.25, z), BEAM, Enum.Material.Metal)
 		end
 	end
+	-- Gitterroste auf den Ebenen 2–4 (darauf stehen die Paletten)
+	for level = 2, #LEVEL_Y do
+		local deck = part(m, `Deck{level}`, Vector3.new(hw * 2 - 0.5, 0.08, RACK_DEPTH + 0.3), base * CFrame.new(0, LEVEL_Y[level] - 0.04, 0), Color3.fromRGB(120, 126, 134), Enum.Material.DiamondPlate)
+		deck.Transparency = 0.25
+	end
 	for _, z in { -hd, hd } do
 		part(m, `TopBeam{z}`, Vector3.new(hw * 2 - 0.5, 0.45, 0.3), base * CFrame.new(0, RACK_HEIGHT - 0.3, z), BEAM, Enum.Material.Metal)
 	end
@@ -89,18 +91,15 @@ local function rack(parent: Instance, name: string, base: CFrame, face: number, 
 		part(m, "GuardRight", Vector3.new(0.6, 1.2, RACK_DEPTH + 1), base * CFrame.new(-hw - 0.55, 0.6, 0), YELLOW, Enum.Material.SmoothPlastic)
 	end
 	for level = 1, #LEVEL_Y do
-		local slotBase = base * CFrame.new(0, LEVEL_Y[level], 0)
+		-- Anker: Mitte der Kistenunterseite, -Z = Vorderseite (zum Fahrweg)
+		local anchorCF = base * CFrame.new(0, LEVEL_Y[level], 0) * (if face == 1 then CFrame.Angles(0, math.pi, 0) else CFrame.identity)
 		local slot = Instance.new("Model")
 		slot.Name = `Slot{firstSlot + level - 1}`
-		part(slot, "Pallet", Vector3.new(BOX + 0.2, 0.5, BOX + 0.2), slotBase * CFrame.new(0, 0.25, 0), PALLET, Enum.Material.WoodPlanks)
-		part(slot, "Floor", Vector3.new(BOX, 0.2, BOX), slotBase * CFrame.new(0, 0.6, 0), STEEL, Enum.Material.Metal)
-		for _, side in { -1, 1 } do
-			part(slot, `WallX{side}`, Vector3.new(0.15, BOX_H, BOX), slotBase * CFrame.new(side * (BOX / 2 - 0.075), 0.7 + BOX_H / 2, 0), MESH, Enum.Material.DiamondPlate)
-			local h = if side == face then BOX_FRONT_H else BOX_H
-			part(slot, `WallZ{side}`, Vector3.new(BOX - 0.3, h, 0.15), slotBase * CFrame.new(0, 0.7 + h / 2, side * (BOX / 2 - 0.075)), MESH, Enum.Material.DiamondPlate)
-		end
-		local fill = part(slot, "Fill", Vector3.new(BOX - 0.4, 0.2, BOX - 0.4), slotBase * CFrame.new(0, 0.8, 0), Color3.new(0.2, 0.2, 0.2), Enum.Material.Slate)
-		fill.CanCollide = false
+		local anchor = part(slot, "Anchor", Vector3.new(1, 0.2, 1), anchorCF * CFrame.new(0, 0.1, 0), BEAM, Enum.Material.SmoothPlastic)
+		anchor.Transparency = 1
+		anchor.CanCollide = false
+		anchor.CanQuery = false
+		slot.PrimaryPart = anchor
 		slot.Parent = m
 	end
 	m.Parent = parent
@@ -119,7 +118,8 @@ function CrateRackBuilder.build(parent: Instance, origin: CFrame, rows: { Row },
 	end
 end
 
--- Kisten anzeigen: Sorten nach Stufe, je Sorte ceil(n / CrateSize) Kisten, Füllhöhe zeigt die Menge
+-- Kisten anzeigen: Sorten nach Stufe, je Sorte ceil(n / CrateSize) Kisten, Füllhöhe zeigt die Menge.
+-- Gekaufte Plätze bekommen eine Holzkiste (bei Bedarf gebaut), andere werden geleert.
 function CrateRackBuilder.update(container: Instance, items: { [string]: number }, owned: number)
 	local size = BalanceConfig.Storage.CrateSize
 	local ids = {}
@@ -129,12 +129,16 @@ function CrateRackBuilder.update(container: Instance, items: { [string]: number 
 		end
 	end
 	Materials.SortIds(ids)
-	local plan: { { color: Color3, fraction: number } } = {}
+	local plan: { { name: string, color: Color3, fraction: number } } = {}
 	for _, id in ids do
 		local mat = Materials.Get(id)
 		local n = items[id]
 		while n > 0 do
-			table.insert(plan, { color = if mat then mat.Color else Color3.new(0.3, 0.3, 0.3), fraction = math.min(n, size) / size })
+			table.insert(plan, {
+				name = if mat then mat.DisplayName else id,
+				color = if mat then mat.Color else Color3.new(0.3, 0.3, 0.3),
+				fraction = math.min(n, size) / size,
+			})
 			n -= size
 		end
 	end
@@ -146,24 +150,25 @@ function CrateRackBuilder.update(container: Instance, items: { [string]: number 
 		if not index then
 			continue
 		end
-		local present = index <= owned
-		local entry = if present then plan[index] else nil
-		local pallet = slot:FindFirstChild("Pallet")
-		for _, p in slot:GetChildren() do
-			if p:IsA("BasePart") then
-				if p.Name == "Fill" then
-					p.Transparency = if entry then 0 else 1
-					if entry and pallet and pallet:IsA("BasePart") then
-						local h = math.max(0.2, (BOX_H - 0.3) * entry.fraction)
-						p.Size = Vector3.new(BOX - 0.4, h, BOX - 0.4)
-						p.CFrame = pallet.CFrame * CFrame.new(0, -0.25 + 0.7 + h / 2, 0)
-						p.Color = entry.color
-					end
-				else
-					p.Transparency = if present then 0 else 1
-					p.CanCollide = present
-				end
+		local crate = slot:FindFirstChild("Crate")
+		if index > owned then
+			if crate then
+				crate:Destroy()
 			end
+			continue
+		end
+		if not (crate and crate:IsA("Model")) then
+			local anchor = slot:FindFirstChild("Anchor")
+			if not (anchor and anchor:IsA("BasePart")) then
+				continue
+			end
+			crate = WoodCrate.build(slot, anchor.CFrame * CFrame.new(0, -0.1, 0))
+		end
+		local entry = plan[index]
+		if entry then
+			WoodCrate.setContent(crate :: Model, entry.name, entry.color, entry.fraction)
+		else
+			WoodCrate.setContent(crate :: Model, "", nil, 0)
 		end
 	end
 end
