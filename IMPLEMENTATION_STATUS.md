@@ -460,6 +460,12 @@ Selbsttest 13b-1 (2026-10-13): Vorschau gebaut, Draufsicht ohne Dach mit dem Ref
 
 Selbsttest 13b-2 (2026-10-13): Felix' Profil v8 → v9 migriert (6.000 → 6 Kisten); Kauf Kiste 7 für $5.063 (Geld danach erstattet, Kiste 7 behalten, weil der Elevator sie sofort belegt hat); Kisten-Regeln mit Testdaten geprüft (Platz je Sorte, Gesamtbelegung, voll); Offline-Rechnung mit Kisten (Zinn bleibt im Elevator, wenn alle Kisten belegt sind); Laptop zeigt „7 used · 6 owned · max 128“ und den Kaufknopf.
 
+| 13b-3 | Dateien | Status |
+|---|---|---|
+| Hochregallager statt Silo: 32 große Regale in vier Reihen (eine Doppelreihe), je 4 Paletten übereinander = 128 Plätze; Gitterboxen mit niedriger Klappe zum Fahrweg, Erz sichtbar in Farbe und Füllhöhe; nicht gekaufte Plätze leer; Anfahrschutz, Fahrwege, Gabelstapler, Leerpaletten; Anzeige vorne mit Bestand und Kisten („7 / 20 crates“), Terminal | `HallTemplates.buildStorage`, `HallTemplates.setStorageDisplay`, `StorageService` | TESTING_REQUIRED |
+
+Selbsttest 13b-3 (2026-10-13): Vorschau mit 20 Kisten und sechs Sorten – Boxen erscheinen der Reihe nach in der vorderen Reihe, Farben und Füllhöhe passen; keine Box berührt einen Regalbalken; Lager überschneidet nichts in der Halle.
+
 ## Phase 12 – Content Expansion – Details
 
 Schritte: 12a alle Minen/Erze/Barren über zentrale Kurven · 12b weitere Spitzhacken, Rucksäcke, Drills, Fahrzeuge, Ausbaustufen (offen).

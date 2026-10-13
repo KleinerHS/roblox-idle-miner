@@ -3,12 +3,15 @@
 -- docs/06 §13–16, FACTORY_MASTERPLAN_TOPDOWN.png). Maße aus LayoutConfig.
 --
 -- Vereinbarte Namen/Attribute:
---   Lager: Part "StorageDisplay" (SurfaceGui "Display" mit "Amount" und "Fill"),
+--   Lager: Part "StorageDisplay" (SurfaceGui "Display" mit "Amount", "Crates" und "Fill"),
+--          Folder "Crates" mit Slot1..SlotN (Palette, Gitterbox, "Fill" = Erz),
 --          Part "StorageTerminalPart" mit ProximityPrompt "StoragePrompt" (Attribute StorageTerminal = true)
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local LayoutConfig = require(ReplicatedStorage:WaitForChild("Shared").Config.LayoutConfig)
+local BalanceConfig = require(ReplicatedStorage:WaitForChild("Shared").Config.BalanceConfig)
+local Materials = require(ReplicatedStorage:WaitForChild("Shared").Definitions.Materials)
 
 local HallTemplates = {}
 
@@ -143,68 +146,135 @@ function HallTemplates.buildRoof(plotCFrame: CFrame): Model
 end
 
 -- Regal mit Kisten (Stahlrahmen orange wie im Masterplan)
-local function rack(parent: Instance, name: string, cf: CFrame, width: number, rng: Random)
+-- Hochregallager (Phase 13b-3, Felix D-037): 32 große Regale in vier Reihen, je 4 Palettenboxen
+-- übereinander. Jeder Platz ist eine Kiste (1.000 einer Sorte). Gekaufte Kisten stehen als
+-- Gitterboxen im Regal, ihr Erz ist sichtbar (Farbe und Füllhöhe); nicht gekaufte Plätze bleiben
+-- leer. Vorne: Anzeige mit Gesamtbestand und Kisten, Terminal zum Abladen/Entnehmen.
+local RACK_BAY = 9 -- Breite eines Regals (X)
+local RACK_DEPTH = 8.5 -- Tiefe (Z)
+local LEVEL_Y = { 0, 7.8, 15.6, 23.4 } -- Unterkante der Palette je Ebene
+local RACK_HEIGHT = 31
+local RACKS_PER_ROW = 8
+-- Reihen (Z lokal zur Zone, Blickrichtung der Fächer): hinten an der Wand, Doppelreihe, vorne
+local ROWS = { 47, 23.5, 15, -9 }
+-- Richtung, aus der die Fächer einer Reihe beschickt werden (−1 = von vorne/−Z, 1 = von hinten)
+local ROW_FACE = { -1, 1, -1, -1 }
+local BOX = 7.4 -- Gitterbox-Grundfläche
+local BOX_H = 5.6 -- Wandhöhe der Gitterbox
+local BOX_FRONT_H = 2 -- niedrige Klappe vorne, damit das Erz sichtbar ist
+
+-- Platz Nr. 1..128 → CFrame der Palettenunterkante (lokal zur Zone). Reihenfolge: vordere Reihe
+-- zuerst (gut sichtbar), innerhalb einer Reihe von links nach rechts, unten nach oben.
+local function slotOffset(index: number): (Vector3, number)
+	local perRow = RACKS_PER_ROW * #LEVEL_Y
+	local rowOrder = { 4, 3, 2, 1 }
+	local rowIndex = rowOrder[math.floor((index - 1) / perRow) + 1]
+	local inRow = (index - 1) % perRow
+	local rack = math.floor(inRow / #LEVEL_Y)
+	local level = inRow % #LEVEL_Y + 1
+	local x = (RACKS_PER_ROW / 2 - rack - 0.5) * RACK_BAY
+	return Vector3.new(x, LEVEL_Y[level], ROWS[rowIndex]), ROW_FACE[rowIndex]
+end
+
+local function buildRackRows(parent: Instance, o: CFrame)
 	local folder = Instance.new("Folder")
-	folder.Name = name
+	folder.Name = "Racks"
 	folder.Parent = parent
-	local depth, height = 3.2, 10
-	for _, x in { -width / 2, 0, width / 2 } do
-		for _, z in { -depth / 2, depth / 2 } do
-			part(folder, "Upright", Vector3.new(0.4, height, 0.4), cf * CFrame.new(x, height / 2, z), RACK, Enum.Material.Metal)
-		end
-	end
-	for level, y in { 0.4, 3.6, 6.8 } do
-		part(folder, `Shelf{level}`, Vector3.new(width + 0.4, 0.3, depth + 0.2), cf * CFrame.new(0, y, 0), STEEL, Enum.Material.DiamondPlate)
-		for slot = 1, 3 do
-			if rng:NextNumber() < 0.8 then
-				local s = rng:NextNumber(2.2, 2.8)
-				local x = -width / 2 + (slot - 0.5) * (width / 3)
-				part(folder, `Crate{level}_{slot}`, Vector3.new(s, s, s * 0.95), cf * CFrame.new(x, y + 0.15 + s / 2, 0) * CFrame.Angles(0, rng:NextNumber(-0.1, 0.1), 0), if rng:NextNumber() < 0.5 then CRATE else CRATE_DARK, Enum.Material.WoodPlanks)
+	local length = RACKS_PER_ROW * RACK_BAY
+	for r, z in ROWS do
+		for k = 0, RACKS_PER_ROW do
+			local x = length / 2 - k * RACK_BAY
+			for _, dz in { -RACK_DEPTH / 2, RACK_DEPTH / 2 } do
+				part(folder, `Upright{r}_{k}_{dz}`, Vector3.new(0.5, RACK_HEIGHT, 0.5), o * CFrame.new(x, RACK_HEIGHT / 2, z + dz), Color3.fromRGB(40, 90, 150), Enum.Material.Metal)
 			end
+			-- Kreuzverband an der Seite jedes Rahmens
+			for level = 1, 3 do
+				local y0, y1 = LEVEL_Y[level] + 1, LEVEL_Y[level + 1] + 1
+				local h = y1 - y0
+				local len = math.sqrt(h * h + RACK_DEPTH * RACK_DEPTH)
+				part(folder, `Brace{r}_{k}_{level}`, Vector3.new(0.2, 0.2, len), o * CFrame.new(x, (y0 + y1) / 2, z) * CFrame.Angles(math.atan2(h, RACK_DEPTH) * (if level % 2 == 0 then 1 else -1), 0, 0), Color3.fromRGB(40, 90, 150), Enum.Material.Metal)
+			end
+		end
+		for level = 2, #LEVEL_Y do
+			for _, dz in { -RACK_DEPTH / 2, RACK_DEPTH / 2 } do
+				part(folder, `Beam{r}_{level}_{dz}`, Vector3.new(length + 0.5, 0.45, 0.3), o * CFrame.new(0, LEVEL_Y[level] - 0.25, z + dz), RACK, Enum.Material.Metal)
+			end
+		end
+		for _, dz in { -RACK_DEPTH / 2, RACK_DEPTH / 2 } do
+			part(folder, `TopBeam{r}_{dz}`, Vector3.new(length + 0.5, 0.45, 0.3), o * CFrame.new(0, RACK_HEIGHT - 0.3, z + dz), RACK, Enum.Material.Metal)
+		end
+		-- Anfahrschutz (gelb) an den Stirnseiten der Reihe
+		for _, sx in { -1, 1 } do
+			part(folder, `Guard{r}_{sx}`, Vector3.new(0.6, 1.2, RACK_DEPTH + 1), o * CFrame.new(sx * (length / 2 + 0.6), 0.6, z), YELLOW, Enum.Material.SmoothPlastic)
 		end
 	end
 end
 
--- Lagerbereich: Regale wie im Bild plus Silo mit gut lesbarer Füllanzeige (D-010),
--- Terminal zum Abladen/Entnehmen (D-004).
+-- Alle 128 Plätze: Palette, Gitterbox, Erzfüllung. Sichtbarkeit setzt setStorageDisplay.
+local function buildSlots(parent: Instance, o: CFrame, count: number)
+	local folder = Instance.new("Folder")
+	folder.Name = "Crates"
+	folder.Parent = parent
+	for i = 1, count do
+		local offset, face = slotOffset(i)
+		local base = o * CFrame.new(offset)
+		local slot = Instance.new("Model")
+		slot.Name = `Slot{i}`
+		part(slot, "Pallet", Vector3.new(BOX + 0.2, 0.5, BOX + 0.2), base * CFrame.new(0, 0.25, 0), CRATE_DARK, Enum.Material.WoodPlanks)
+		part(slot, "Floor", Vector3.new(BOX, 0.2, BOX), base * CFrame.new(0, 0.6, 0), STEEL, Enum.Material.Metal)
+		for _, side in { -1, 1 } do
+			part(slot, `WallX{side}`, Vector3.new(0.15, BOX_H, BOX), base * CFrame.new(side * (BOX / 2 - 0.075), 0.7 + BOX_H / 2, 0), Color3.fromRGB(150, 156, 164), Enum.Material.DiamondPlate)
+			-- Seite zum Fahrweg nur als niedrige Klappe (Erz sichtbar), Rückseite voll hoch
+			local h = if side == face then BOX_FRONT_H else BOX_H
+			part(slot, `WallZ{side}`, Vector3.new(BOX - 0.3, h, 0.15), base * CFrame.new(0, 0.7 + h / 2, side * (BOX / 2 - 0.075)), Color3.fromRGB(150, 156, 164), Enum.Material.DiamondPlate)
+		end
+		local fill = part(slot, "Fill", Vector3.new(BOX - 0.4, 0.2, BOX - 0.4), base * CFrame.new(0, 0.8, 0), Color3.new(0.2, 0.2, 0.2), Enum.Material.Slate)
+		fill.CanCollide = false
+		slot:SetAttribute("BaseY", 0.7)
+		slot.Parent = folder
+	end
+end
+
 function HallTemplates.buildStorage(plotCFrame: CFrame): Model
 	local model = Instance.new("Model")
 	model.Name = "Storage"
 	local zone = LayoutConfig.HallZones.Storage
 	local o = plotCFrame * CFrame.new(zone.Center.X, LayoutConfig.HallFloorTop, zone.Center.Y)
 	local hw, hd = zone.Size.X / 2, zone.Size.Y / 2
-	local rng = Random.new(4242)
 
-	-- Regalreihen hinten und in der Mitte
-	rack(model, "RackBackA", o * CFrame.new(10, 0, hd - 4), 14, rng)
-	rack(model, "RackBackB", o * CFrame.new(-6, 0, hd - 4), 14, rng)
-	rack(model, "RackMidA", o * CFrame.new(10, 0, 6), 14, rng)
-	rack(model, "RackMidB", o * CFrame.new(-6, 0, 6), 14, rng)
-	-- Paletten und lose Kisten am Boden
-	for i, p in { Vector2.new(22, -6), Vector2.new(24, 2), Vector2.new(-2, -10) } do
-		part(model, `Pallet{i}`, Vector3.new(4, 0.5, 4), o * CFrame.new(p.X, 0.25, p.Y), CRATE_DARK, Enum.Material.WoodPlanks)
-		part(model, `PalletCrate{i}`, Vector3.new(3, 3, 3), o * CFrame.new(p.X, 2, p.Y) * CFrame.Angles(0, rng:NextNumber(-0.3, 0.3), 0), CRATE, Enum.Material.WoodPlanks)
+	buildRackRows(model, o)
+	buildSlots(model, o, BalanceConfig.Storage.MaxCrates)
+
+	-- Fahrwege: gelbe Linien vor den Reihen, Gabelstapler und lose Paletten links
+	for i, z in { 35.25, 3 } do
+		local lane = part(model, `LaneLine{i}`, Vector3.new(RACKS_PER_ROW * RACK_BAY + 8, 0.06, 0.5), o * CFrame.new(0, 0.03, z), YELLOW, Enum.Material.SmoothPlastic)
+		lane.CanCollide = false
 	end
-
-	-- Silo rechts im Lagerbereich (lokal -X), Anzeige zeigt nach vorne (-Z)
-	local siloCF = o * CFrame.new(-hw + 9, 0, 2)
-	local r, h = 6.5, 22
-	local body = part(model, "SiloBody", Vector3.new(h, r * 2, r * 2), siloCF * CFrame.new(0, 3 + h / 2, 0) * CFrame.Angles(0, 0, math.rad(90)), SILO, Enum.Material.Metal)
-	body.Shape = Enum.PartType.Cylinder
+	local frontLane = part(model, "LaneFront", Vector3.new(RACKS_PER_ROW * RACK_BAY + 8, 0.06, 0.5), o * CFrame.new(0, 0.03, -18), YELLOW, Enum.Material.SmoothPlastic)
+	frontLane.CanCollide = false
+	local fork = o * CFrame.new(hw - 18, 0, -20) * CFrame.Angles(0, math.rad(-20), 0)
+	part(model, "ForkliftBody", Vector3.new(4, 2.4, 6), fork * CFrame.new(0, 2.2, 0), YELLOW, Enum.Material.SmoothPlastic)
+	part(model, "ForkliftWeight", Vector3.new(4, 2.2, 1.4), fork * CFrame.new(0, 2.3, 3.4), STEEL, Enum.Material.Metal)
+	part(model, "ForkliftRoof", Vector3.new(4, 0.25, 4.6), fork * CFrame.new(0, 7.9, 0.2), STEEL, Enum.Material.Metal)
+	for _, dx in { -1.8, 1.8 } do
+		part(model, `ForkliftPost{dx}`, Vector3.new(0.25, 4.6, 0.25), fork * CFrame.new(dx, 5.6, 2.4), STEEL, Enum.Material.Metal)
+		part(model, `ForkliftMast{dx}`, Vector3.new(0.4, 7, 0.4), fork * CFrame.new(dx * 0.8, 4.4, -3.2), STEEL, Enum.Material.Metal)
+		part(model, `ForkliftFork{dx}`, Vector3.new(0.4, 0.2, 3.4), fork * CFrame.new(dx * 0.6, 1.3, -4.9), STEEL, Enum.Material.Metal)
+		for _, dz in { -1.8, 1.8 } do
+			local w = part(model, `ForkliftWheel{dx}_{dz}`, Vector3.new(0.8, 1.8, 1.8), fork * CFrame.new(dx * 1.1, 0.9, dz), Color3.fromRGB(30, 30, 32), Enum.Material.Rubber)
+			w.Shape = Enum.PartType.Cylinder
+		end
+	end
 	for i = 1, 3 do
-		local ring = part(model, `SiloRing{i}`, Vector3.new(0.4, r * 2 + 0.3, r * 2 + 0.3), siloCF * CFrame.new(0, 3 + i * (h / 4), 0) * CFrame.Angles(0, 0, math.rad(90)), WALL_DARK, Enum.Material.Metal)
-		ring.Shape = Enum.PartType.Cylinder
+		part(model, `SparePallet{i}`, Vector3.new(6.2, 0.5, 6.2), o * CFrame.new(hw - 10, 0.25 + (i - 1) * 0.5, -40) * CFrame.Angles(0, math.rad(i * 3), 0), CRATE_DARK, Enum.Material.WoodPlanks)
 	end
-	local cap = part(model, "SiloCap", Vector3.new(r * 1.6, r * 1.6, r * 1.6), siloCF * CFrame.new(0, 3 + h, 0), SILO, Enum.Material.Metal)
-	cap.Shape = Enum.PartType.Ball
-	for i, p in { Vector2.new(r - 1, r - 1), Vector2.new(-r + 1, r - 1), Vector2.new(r - 1, -r + 1), Vector2.new(-r + 1, -r + 1) } do
-		part(model, `SiloLeg{i}`, Vector3.new(0.8, 3.4, 0.8), siloCF * CFrame.new(p.X, 1.7, p.Y), STEEL, Enum.Material.Metal)
-	end
-	part(model, "SiloPipe", Vector3.new(1.2, 1.2, 12), siloCF * CFrame.new(r + 1, h - 2, 6) , WALL_DARK, Enum.Material.Metal)
-	part(model, "SiloLadder", Vector3.new(1.4, h, 0.3), siloCF * CFrame.new(r * 0.7, 3 + h / 2, -r * 0.75) * CFrame.Angles(0, math.rad(45), 0), STEEL, Enum.Material.DiamondPlate)
 
-	-- Füllanzeige am Silo (aus normaler Entfernung lesbar, docs/06 §16)
-	local display = part(model, "StorageDisplay", Vector3.new(9, 4.5, 0.3), siloCF * CFrame.new(0, 9, -r - 0.4), Color3.fromRGB(24, 27, 33), Enum.Material.SmoothPlastic)
+	-- Anzeige vorne (aus normaler Entfernung lesbar, docs/06 §16): Bestand und Kisten
+	local displayCF = o * CFrame.new(0, 0, -hd + 6)
+	for _, dx in { -5, 5 } do
+		part(model, `DisplayPost{dx}`, Vector3.new(0.6, 9, 0.6), displayCF * CFrame.new(dx, 4.5, 0.3), STEEL, Enum.Material.Metal)
+	end
+	local display = part(model, "StorageDisplay", Vector3.new(12, 5, 0.3), displayCF * CFrame.new(0, 10, 0), Color3.fromRGB(24, 27, 33), Enum.Material.SmoothPlastic)
 	local gui = Instance.new("SurfaceGui")
 	gui.Name = "Display"
 	gui.Face = Enum.NormalId.Front
@@ -214,7 +284,7 @@ function HallTemplates.buildStorage(plotCFrame: CFrame): Model
 	gui.Parent = display
 	local title = Instance.new("TextLabel")
 	title.Name = "Title"
-	title.Size = UDim2.new(1, 0, 0.3, 0)
+	title.Size = UDim2.new(1, 0, 0.26, 0)
 	title.BackgroundTransparency = 1
 	title.Font = Enum.Font.GothamBold
 	title.TextScaled = true
@@ -223,18 +293,28 @@ function HallTemplates.buildStorage(plotCFrame: CFrame): Model
 	title.Parent = gui
 	local amount = Instance.new("TextLabel")
 	amount.Name = "Amount"
-	amount.Position = UDim2.fromScale(0, 0.3)
-	amount.Size = UDim2.new(1, 0, 0.42, 0)
+	amount.Position = UDim2.fromScale(0, 0.26)
+	amount.Size = UDim2.new(1, 0, 0.34, 0)
 	amount.BackgroundTransparency = 1
 	amount.Font = Enum.Font.GothamBlack
 	amount.TextScaled = true
 	amount.TextColor3 = Color3.fromRGB(240, 242, 245)
 	amount.Text = "0 / 0"
 	amount.Parent = gui
+	local crates = Instance.new("TextLabel")
+	crates.Name = "Crates"
+	crates.Position = UDim2.fromScale(0, 0.6)
+	crates.Size = UDim2.new(1, 0, 0.18, 0)
+	crates.BackgroundTransparency = 1
+	crates.Font = Enum.Font.GothamBold
+	crates.TextScaled = true
+	crates.TextColor3 = Color3.fromRGB(200, 205, 214)
+	crates.Text = ""
+	crates.Parent = gui
 	local barBack = Instance.new("Frame")
 	barBack.Name = "Bar"
-	barBack.Position = UDim2.fromScale(0.06, 0.78)
-	barBack.Size = UDim2.fromScale(0.88, 0.14)
+	barBack.Position = UDim2.fromScale(0.06, 0.82)
+	barBack.Size = UDim2.fromScale(0.88, 0.12)
 	barBack.BackgroundColor3 = Color3.fromRGB(48, 53, 63)
 	barBack.BorderSizePixel = 0
 	barBack.Parent = gui
@@ -245,8 +325,8 @@ function HallTemplates.buildStorage(plotCFrame: CFrame): Model
 	fill.BorderSizePixel = 0
 	fill.Parent = barBack
 
-	-- Terminal vorne im Lagerbereich: Rucksack abladen / Material entnehmen
-	local terminalCF = o * CFrame.new(10, 0, -hd + 6)
+	-- Terminal vorne links im Lagerbereich: Rucksack abladen / Material entnehmen
+	local terminalCF = o * CFrame.new(hw - 30, 0, -hd + 8)
 	part(model, "TerminalPost", Vector3.new(1.4, 3.6, 1.4), terminalCF * CFrame.new(0, 1.8, 0), STEEL, Enum.Material.Metal)
 	local screen = part(model, "TerminalScreen", Vector3.new(3, 2, 0.4), terminalCF * CFrame.new(0, 4.2, 0) * CFrame.Angles(math.rad(-15), 0, 0), Color3.fromRGB(90, 170, 255), Enum.Material.Neon)
 	screen.Transparency = 0.1
@@ -267,7 +347,8 @@ function HallTemplates.buildStorage(plotCFrame: CFrame): Model
 	return model
 end
 
--- Füllanzeige aktualisieren
+-- Anzeige und Regalbelegung aktualisieren: gekaufte Kisten sichtbar, Sorten der Reihe nach
+-- (Stufe), jede Sorte belegt ceil(Menge / Kistengröße) Kisten, Füllhöhe zeigt die Menge.
 function HallTemplates.setStorageDisplay(storageModel: Model, storage: { Crates: number, Capacity: number, Items: { [string]: number } }, text: string)
 	local used, capacity = 0, storage.Capacity
 	for _, n in storage.Items do
@@ -275,19 +356,74 @@ function HallTemplates.setStorageDisplay(storageModel: Model, storage: { Crates:
 	end
 	local display = storageModel:FindFirstChild("StorageDisplay")
 	local gui = display and display:FindFirstChild("Display")
-	if not gui then
+	if gui then
+		local amount = gui:FindFirstChild("Amount")
+		if amount and amount:IsA("TextLabel") then
+			amount.Text = text
+		end
+		local size = BalanceConfig.Storage.CrateSize
+		local usedCrates = 0
+		for _, n in storage.Items do
+			if n > 0 then
+				usedCrates += math.ceil(n / size)
+			end
+		end
+		local cratesLabel = gui:FindFirstChild("Crates")
+		if cratesLabel and cratesLabel:IsA("TextLabel") then
+			cratesLabel.Text = `{usedCrates} / {storage.Crates} crates`
+		end
+		local bar = gui:FindFirstChild("Bar")
+		local fill = bar and bar:FindFirstChild("Fill")
+		if fill and fill:IsA("Frame") then
+			local ratio = if storage.Crates > 0 then math.clamp(usedCrates / storage.Crates, 0, 1) else 0
+			fill.Size = UDim2.fromScale(ratio, 1)
+			fill.BackgroundColor3 = if ratio >= 1 then Color3.fromRGB(226, 92, 92) elseif ratio >= 0.8 then Color3.fromRGB(240, 180, 70) else Color3.fromRGB(88, 196, 120)
+		end
+	end
+
+	-- Kisten im Regal
+	local slots = storageModel:FindFirstChild("Crates")
+	if not slots then
 		return
 	end
-	local amount = gui:FindFirstChild("Amount")
-	if amount and amount:IsA("TextLabel") then
-		amount.Text = text
+	local size = BalanceConfig.Storage.CrateSize
+	local ids = {}
+	for id, n in storage.Items do
+		if n > 0 then
+			table.insert(ids, id)
+		end
 	end
-	local bar = gui:FindFirstChild("Bar")
-	local fill = bar and bar:FindFirstChild("Fill")
-	if fill and fill:IsA("Frame") then
-		local ratio = if capacity > 0 then math.clamp(used / capacity, 0, 1) else 0
-		fill.Size = UDim2.fromScale(ratio, 1)
-		fill.BackgroundColor3 = if ratio >= 1 then Color3.fromRGB(226, 92, 92) elseif ratio >= 0.8 then Color3.fromRGB(240, 180, 70) else Color3.fromRGB(88, 196, 120)
+	Materials.SortIds(ids)
+	local plan: { { color: Color3, fraction: number } } = {}
+	for _, id in ids do
+		local mat = Materials.Get(id)
+		local n = storage.Items[id]
+		while n > 0 do
+			table.insert(plan, { color = if mat then mat.Color else Color3.new(0.3, 0.3, 0.3), fraction = math.min(n, size) / size })
+			n -= size
+		end
+	end
+	for i, slot in slots:GetChildren() do
+		local index = tonumber(slot.Name:match("%d+")) or i
+		local owned = index <= storage.Crates
+		for _, p in slot:GetChildren() do
+			if p:IsA("BasePart") then
+				if p.Name == "Fill" then
+					local entry = if owned then plan[index] else nil
+					p.Transparency = if entry then 0 else 1
+					if entry then
+						local h = math.max(0.2, (BOX_H - 0.3) * entry.fraction)
+						local pallet = slot:FindFirstChild("Pallet") :: BasePart
+						p.Size = Vector3.new(BOX - 0.4, h, BOX - 0.4)
+						p.CFrame = pallet.CFrame * CFrame.new(0, -0.25 + 0.7 + h / 2, 0)
+						p.Color = entry.color
+					end
+				else
+					p.Transparency = if owned then 0 else 1
+					p.CanCollide = owned
+				end
+			end
+		end
 	end
 end
 
