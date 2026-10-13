@@ -13,6 +13,7 @@ local LayoutConfig = require(ReplicatedStorage:WaitForChild("Shared").Config.Lay
 local BalanceConfig = require(ReplicatedStorage:WaitForChild("Shared").Config.BalanceConfig)
 local CrateRackBuilder = require(script.Parent.CrateRackBuilder)
 local FloatingText = require(script.Parent.FloatingText)
+local AmbientProps = require(script.Parent.AmbientProps)
 
 local HallTemplates = {}
 
@@ -94,6 +95,20 @@ function HallTemplates.buildWalls(plotCFrame: CFrame): Model
 	for z = -hz + 20, hz - 20, 20 do
 		part(model, `ColumnL{z}`, Vector3.new(1.2, H, 1.2), base * CFrame.new(hx - 1.4, H / 2, z), STEEL, Enum.Material.Metal)
 		part(model, `ColumnR{z}`, Vector3.new(1.2, H, 1.2), base * CFrame.new(-hx + 1.4, H / 2, z), STEEL, Enum.Material.Metal)
+	end
+	-- Wandlüfter (drehen sich im Spiel) zwischen den Stützen: rechts über der Schmelze, links über
+	-- der Garage, vorne rechts neben dem Tor
+	local fans = Instance.new("Model")
+	fans.Name = "WallFans"
+	fans.Parent = model
+	for i, z in { -70, -30, 10 } do
+		AmbientProps.wallFan(fans, `FanRight{i}`, base * CFrame.new(-hx + 1.4, 20, z) * CFrame.Angles(0, math.rad(-90), 0), 7)
+	end
+	for i, z in { -70, -30 } do
+		AmbientProps.wallFan(fans, `FanLeft{i}`, base * CFrame.new(hx - 1.4, 20, z) * CFrame.Angles(0, math.rad(90), 0), 7)
+	end
+	for i, x in { -130, -90, -30 } do
+		AmbientProps.wallFan(fans, `FanFront{i}`, base * CFrame.new(x, 20, -hz + 1.4) * CFrame.Angles(0, math.rad(180), 0), 7)
 	end
 	return model
 end
@@ -182,10 +197,10 @@ function HallTemplates.buildStorage(plotCFrame: CFrame): Model
 		local lane = part(lanes, `LaneLine{i}`, Vector3.new(RACKS_PER_ROW * CrateRackBuilder.Bay + 8, 0.06, 0.5), o * CFrame.new(RACK_SHIFT_X, 0.03, z), YELLOW, Enum.Material.SmoothPlastic)
 		lane.CanCollide = false
 	end
-	-- Gabelstapler und lose Paletten links vorne
+	-- Gabelstapler auf dem vorderen Fahrweg (fährt im Spiel hin und her) und lose Paletten
 	local forklift = group(model, "Forklift")
-	local fork = o * CFrame.new(hw - 18, 0, -20) * CFrame.Angles(0, math.rad(-20), 0)
-	part(forklift, "ForkliftBody", Vector3.new(4, 2.4, 6), fork * CFrame.new(0, 2.2, 0), YELLOW, Enum.Material.SmoothPlastic)
+	local fork = o * CFrame.new(hw - 28, 0, -18) * CFrame.Angles(0, math.rad(90), 0)
+	forklift.PrimaryPart = part(forklift, "ForkliftBody", Vector3.new(4, 2.4, 6), fork * CFrame.new(0, 2.2, 0), YELLOW, Enum.Material.SmoothPlastic)
 	part(forklift, "ForkliftWeight", Vector3.new(4, 2.2, 1.4), fork * CFrame.new(0, 2.3, 3.4), STEEL, Enum.Material.Metal)
 	part(forklift, "ForkliftRoof", Vector3.new(4, 0.25, 4.6), fork * CFrame.new(0, 7.9, 0.2), STEEL, Enum.Material.Metal)
 	for _, dx in { -1.8, 1.8 } do
@@ -197,10 +212,32 @@ function HallTemplates.buildStorage(plotCFrame: CFrame): Model
 			w.Shape = Enum.PartType.Cylinder
 		end
 	end
+	local beaconBase = fork * CFrame.new(0, 8.025, 0.2)
+	local light = part(forklift, "ForkliftLamp", Vector3.new(0.8, 0.5, 0.8), beaconBase * CFrame.new(0, 0.25, 0), Color3.fromRGB(255, 150, 30), Enum.Material.Neon)
+	light.CanCollide = false
+	AmbientProps.shuttle(forklift, Vector3.new(0, 0, -85), 6, 4)
 	local spare = group(model, "SparePallets")
 	for i = 1, 3 do
 		part(spare, `SparePallet{i}`, Vector3.new(6.2, 0.5, 6.2), o * CFrame.new(hw - 10, 0.25 + (i - 1) * 0.5, -40) * CFrame.Angles(0, math.rad(i * 3), 0), CRATE_DARK, Enum.Material.WoodPlanks)
 	end
+
+	-- Packplatz vorne: Packtisch, gewickelte Paletten, Hubwagen, Hütchen am Ende des Fahrwegs
+	local work = group(model, "PackingArea")
+	AmbientProps.workbench(work, "PackingTable", o * CFrame.new(-10, 0, -48))
+	AmbientProps.cartonPallet(work, "WrappedPallet1", o * CFrame.new(-30, 0, -46), 3, true)
+	AmbientProps.cartonPallet(work, "WrappedPallet2", o * CFrame.new(-38, 0, -46), 2, true)
+	AmbientProps.cartonPallet(work, "OpenPallet", o * CFrame.new(-22, 0, -40), 2, false)
+	AmbientProps.palletTruck(work, "PalletTruck", o * CFrame.new(2, 0, -42) * CFrame.Angles(0, math.rad(35), 0))
+	AmbientProps.cones(work, "LaneCones", o * CFrame.new(-50, 0, -18) * CFrame.Angles(0, math.rad(90), 0), 3, 2.5)
+	-- Pausenecke rechts vorne (zur Hütte hin)
+	local rest = group(model, "BreakArea")
+	AmbientProps.breakTable(rest, "BreakTable", o * CFrame.new(hw - 11, 0, -26))
+	AmbientProps.lockers(rest, "Lockers", o * CFrame.new(hw - 2, 0, -30) * CFrame.Angles(0, math.rad(90), 0), 4)
+	AmbientProps.vending(rest, "VendingMachine", o * CFrame.new(hw - 2.5, 0, -20) * CFrame.Angles(0, math.rad(90), 0))
+	AmbientProps.waterCooler(rest, "WaterCooler", o * CFrame.new(hw - 2.2, 0, -15.5))
+	-- Arbeiter: Packplatz ↔ Regale, Pausenecke ↔ Terminal
+	AmbientProps.staffPath(model, "StaffPacking", { (o * CFrame.new(-6, 0, -44)).Position, (o * CFrame.new(-30, 0, -30)).Position, (o * CFrame.new(-60, 0, -30)).Position })
+	AmbientProps.staffPath(model, "StaffBreak", { (o * CFrame.new(hw - 16, 0, -29)).Position, (o * CFrame.new(hw - 18, 0, -42)).Position, (o * CFrame.new(hw - 41, 0, -38)).Position })
 
 	-- Schwebende Info-Schrift vorne über dem Lager (Felix: keine Tafeln, freundliche Schrift)
 	FloatingText.create(model, "StorageDisplay", o * CFrame.new(RACK_SHIFT_X, 36, -hd + 30), 22, {

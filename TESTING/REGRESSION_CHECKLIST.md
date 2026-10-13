@@ -41,3 +41,4 @@ Nach Änderungen an Economy, Inventory, Save, Trading oder Prestige die betroffe
 - [ ] Phase 9: Fremde Bedienelemente gesperrt, Spieler blockieren sich nicht (Test 2a.9, 2b.7, 9.9)
 - [ ] 0.24.0: Workspace.HallLayout wird im Spiel übernommen (verschobenes Objekt steht auf allen Plots an der neuen Stelle); ohne HallLayout baut der Code wie bisher
 - [ ] 0.24.0: Lager-, Ofen- und Stellplatz-Anzeigen als schwebende Schrift aktualisieren sich
+- [ ] 0.25.0: Stapler, Lüfter, Rundumleuchten, Arbeiter bewegen sich; Ofentrommel/Schnecke nur beim Schmelzen; keine Ruckler mit 6 Plots

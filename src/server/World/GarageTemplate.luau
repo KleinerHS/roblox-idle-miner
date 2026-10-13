@@ -15,6 +15,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local LayoutConfig = require(ReplicatedStorage:WaitForChild("Shared").Config.LayoutConfig)
 local FloatingText = require(script.Parent.FloatingText)
+local AmbientProps = require(script.Parent.AmbientProps)
 
 local GarageTemplate = {}
 
@@ -176,6 +177,7 @@ local function tower(model: Model, o: CFrame)
 	-- Wartungsleiter
 	part(model, "TowerLadder", Vector3.new(1.6, H, 0.2), t * CFrame.new(0, 0.8 + H / 2, 4.6), STEEL_LIGHT, Enum.Material.DiamondPlate)
 	part(model, "TowerPlatform", Vector3.new(10, 0.4, 10), t * CFrame.new(0, 0.8 + H, 0), STEEL_LIGHT, Enum.Material.DiamondPlate)
+	AmbientProps.beacon(model, "TowerBeacon", t * CFrame.new(4.2, 1 + H, -3.6))
 	part(model, "TowerRail", Vector3.new(10, 0.2, 0.2), t * CFrame.new(0, 0.8 + H + 1.2, -5), YELLOW, Enum.Material.SmoothPlastic)
 
 	-- Silo oben mit Firmenfarbband und Trichter nach unten
@@ -416,6 +418,21 @@ local function props(model: Model, o: CFrame)
 	local extBody = part(deco, "Extinguisher", Vector3.new(1.2, 0.5, 0.5), ext * CFrame.Angles(0, 0, math.rad(90)), Color3.fromRGB(200, 40, 40), Enum.Material.SmoothPlastic)
 	extBody.Shape = Enum.PartType.Cylinder
 	part(deco, "ExtinguisherBracket", Vector3.new(0.5, 0.2, 0.4), ext * CFrame.new(0.25, 0.3, 0), STEEL_DARK)
+
+	-- Werkstattecke rechts vom Tor (Felix: „nicht so leer und tot“) mit einem Arbeiter
+	local shop = Instance.new("Model")
+	shop.Name = "Workshop"
+	shop.Parent = model
+	AmbientProps.workbench(shop, "Workbench", o * CFrame.new(-28, 0, -78.5) * CFrame.Angles(0, math.rad(180), 0))
+	AmbientProps.drums(shop, "OilDrums", o * CFrame.new(-18, 0, -72), 4)
+	AmbientProps.partsShelf(shop, "PartsShelf", o * CFrame.new(-42, 0, -66) * CFrame.Angles(0, math.rad(-90), 0))
+	AmbientProps.tireStack(shop, "Tires1", o * CFrame.new(-42, 0, -52), 5)
+	AmbientProps.tireStack(shop, "Tires2", o * CFrame.new(-42, 0, -47.5), 4)
+	AmbientProps.cartonPallet(shop, "GarageWrapped", o * CFrame.new(-22, 0, -22), 3, true)
+	AmbientProps.cartonPallet(shop, "GarageOpen", o * CFrame.new(-29, 0, -22), 2, false)
+	AmbientProps.palletTruck(shop, "GaragePalletTruck", o * CFrame.new(-34, 0, -30) * CFrame.Angles(0, math.rad(60), 0))
+	AmbientProps.cones(shop, "LaneCones", o * CFrame.new(-12, 0, -60) * CFrame.Angles(0, math.rad(90), 0), 4, 6)
+	AmbientProps.staffPath(model, "StaffWorkshop", { (o * CFrame.new(-26, 0, -75)).Position, (o * CFrame.new(-36, 0, -56)).Position, (o * CFrame.new(-26, 0, -26)).Position })
 
 	-- Firmenfarbener Streifen auf dem Boden entlang der Garage (dezenter Akzent)
 	local line = part(model, "GarageAccentLine", Vector3.new(0.6, 0.06, 40), o * CFrame.new(cfg.Ring.X - 9, 0.03, cfg.Ring.Y + 4), ACCENT_DEFAULT, Enum.Material.SmoothPlastic)

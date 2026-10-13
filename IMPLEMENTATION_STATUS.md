@@ -486,6 +486,15 @@ Selbsttest 13b-4 (2026-10-13): Vorschau im Betrieb (Glut, heiße Zone, Partikel)
 
 Selbsttest 13b-5 (2026-10-13): Überschneidungsprüfung Ofen/Lager/Halle – nur gewollte Berührungen (Fallrohr in die Ofenglocke, Tankleitungen in die Wand, Feuerlöscherhalter an Stütze); Screenshots mit dem Referenzbild verglichen; HallLayout angelegt (7 Gebäude + Außenbereich); Play mit Felix' Profil: Server übernimmt HallLayout, alle 6 Plots korrekt versetzt/gedreht, Lager zeigt 8 von 8 Kisten, Ofen- und Stellplatz-Anzeigen laufen, Förderbänder vorhanden, keine Fehler.
 
+| 13b-6 Hallen-Leben (Version 0.25.0) | Dateien | Status |
+|---|---|---|
+| Bewegung (nur Client-Optik, nur in Kameranähe): Gabelstapler fährt im vorderen Lagergang hin und her, Wandlüfter drehen sich, orange Rundumleuchten (Turm immer, Ofen nur im Betrieb), Ofentrommel und Schnecke drehen sich beim Schmelzen, Kontroll-LEDs blinken | `src/shared/Definitions/AmbientTags.luau`, `src/client/Controllers/HallAmbienceController.luau`, `SmelterTemplate` (Attribut `Running`) | TESTING_REQUIRED |
+| Arbeiter (dekorative Figuren) laufen feste Wege und arbeiten an den Enden: Packplatz, Pausenecke, Werkstatt, Ofen-Gehweg, Ausgangslager (6 Wege) | `AmbientProps.staffPath`, `HallAmbienceController` | TESTING_REQUIRED |
+| Mehr Einrichtung: Packplatz (Packtisch, gewickelte Paletten, Hubwagen, Hütchen), Pausenecke (Tisch mit Hockern, Spinde, Getränkeautomat, Wasserspender), Werkstattecke in der Garage (Werkbank mit Werkzeugwand, Ölfässer auf Wanne, Teileregal, Reifenstapel, Paletten, Hubwagen, Leitkegel), 8 Wandlüfter | `src/server/World/AmbientProps.luau`, `HallTemplates`, `GarageTemplate` | TESTING_REQUIRED |
+| HallLayout neu erzeugt (Felix hatte noch nichts verschoben – geprüft) | `Workspace.HallLayout` | TESTING_REQUIRED |
+
+Selbsttest 13b-6 (2026-10-13): Überschneidungsprüfung der neuen Teile, Fahrweg des Staplers und alle Laufwege frei; Play: Stapler fährt, Lüfter/Leuchten/Ofen/Schnecke drehen (Ofen nur mit Running), 5 Arbeiter in Sichtweite unterwegs, keine Fehler.
+
 ## Phase 12 – Content Expansion – Details
 
 Schritte: 12a alle Minen/Erze/Barren über zentrale Kurven · 12b weitere Spitzhacken, Rucksäcke, Drills, Fahrzeuge, Ausbaustufen (offen).

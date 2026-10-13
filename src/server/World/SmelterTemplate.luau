@@ -26,6 +26,7 @@ local BalanceConfig = require(Shared.Config.BalanceConfig)
 
 local CrateRackBuilder = require(script.Parent.CrateRackBuilder)
 local FloatingText = require(script.Parent.FloatingText)
+local AmbientProps = require(script.Parent.AmbientProps)
 
 local SmelterTemplate = {}
 
@@ -206,6 +207,8 @@ end
 function SmelterTemplate.build(plotCFrame: CFrame): Model
 	local model = Instance.new("Model")
 	model.Name = "Smelter"
+	-- Betriebszustand für die Client-Animation (Ofentrommel, Schnecke, Rundumleuchten)
+	model:SetAttribute("Running", false)
 	local zone = LayoutConfig.HallZones.Smelter
 	local floorY = LayoutConfig.HallFloorTop
 	-- Positionen lokal zur Plotmitte (X/Z), y über Hallenboden
@@ -266,6 +269,26 @@ function SmelterTemplate.build(plotCFrame: CFrame): Model
 		local d = math.max(segments[i][4] :: number, segments[i + 1][4] :: number) + 0.6
 		cylinder(kiln, `Flange{i}`, 0.6, d, onAxis(z), STEEL_DARK, Enum.Material.Metal)
 	end
+	-- Längsleisten auf Trommel und Konus: drehen sich im Betrieb mit (sichtbare Rotation)
+	local spinner = group(kiln, "KilnSpin")
+	local axis = part(spinner, "Axis", Vector3.new(0.2, 0.2, 0.2), onAxis(backZ - 35), STEEL_DARK)
+	axis.Transparency = 1
+	axis.CanCollide = false
+	axis.CanQuery = false
+	spinner.PrimaryPart = axis
+	local barRuns = {
+		{ backZ - 27.5, backZ - 33.6, 7.6 }, -- Trommel vor dem Laufring
+		{ backZ - 36.4, backZ - 43.5, 7.6 }, -- Trommel hinter dem Laufring
+		{ backZ - 49.5, frontZ + 2.5, 5.1 }, -- vorderer Konus
+	}
+	for r, run in barRuns do
+		local a, b, radius = run[1], run[2], run[3]
+		for i = 0, 7 do
+			local bar = part(spinner, `Bar{r}_{i}`, Vector3.new(math.abs(a - b), 0.5, 0.9), onAxis((a + b) / 2) * CFrame.Angles(math.rad(i * 45), 0, 0) * CFrame.new(0, radius, 0), SHELL_DARK, Enum.Material.Metal)
+			bar.CanCollide = false
+		end
+	end
+	AmbientProps.spin(spinner, "X", 30, true)
 	cylinder(kiln, "GirthGear", 1.4, 18, onAxis(backZ - 22), STEEL, Enum.Material.DiamondPlate)
 	part(kiln, "DriveMotor", Vector3.new(4, 4, 6), at(kilnX + 11, 2.4, backZ - 22), ORANGE, Enum.Material.Metal)
 	part(kiln, "DriveGearbox", Vector3.new(3.4, 3.4, 3.4), at(kilnX + 8, 3.6, backZ - 22), STEEL_DARK, Enum.Material.Metal)
@@ -424,11 +447,13 @@ function SmelterTemplate.build(plotCFrame: CFrame): Model
 	local sTo = pos(kilnX, 6, outputZ + CrateRackBuilder.Depth / 2 + 2)
 	local sLen = (sTo - sFrom).Magnitude
 	local sCF = CFrame.lookAt((sFrom + sTo) / 2, sTo)
-	local core = part(screw, "Core", Vector3.new(1.2, 1.2, sLen), sCF, STEEL_DARK, Enum.Material.Metal)
+	local screwSpin = group(screw, "ScrewSpin")
+	local core = part(screwSpin, "Core", Vector3.new(1.2, 1.2, sLen), sCF, STEEL_DARK, Enum.Material.Metal)
 	core.CanCollide = false
+	screwSpin.PrimaryPart = core
 	local turns = math.floor(sLen / 1.2)
 	for i = 1, turns do
-		local flight = part(screw, `Flight{i}`, Vector3.new(4.2, 0.25, 1), sCF * CFrame.new(0, 0, -sLen / 2 + i * 1.2) * CFrame.Angles(0, 0, math.rad(i * 30)), SHELL_LIGHT, Enum.Material.Metal)
+		local flight = part(screwSpin, `Flight{i}`, Vector3.new(4.2, 0.25, 1), sCF * CFrame.new(0, 0, -sLen / 2 + i * 1.2) * CFrame.Angles(0, 0, math.rad(i * 30)), SHELL_LIGHT, Enum.Material.Metal)
 		flight.CanCollide = false
 	end
 	for _, sx in { -1, 1 } do
@@ -436,6 +461,7 @@ function SmelterTemplate.build(plotCFrame: CFrame): Model
 			part(screw, `Rail{sx}_{sy}`, Vector3.new(0.35, 0.35, sLen), sCF * CFrame.new(sx * 2.6, sy * 2.6, 0), YELLOW, Enum.Material.Metal)
 		end
 	end
+	AmbientProps.spin(screwSpin, "Z", 120, true)
 	local frames = math.floor(sLen / 5)
 	for i = 0, frames do
 		local f = sCF * CFrame.new(0, 0, -sLen / 2 + i * (sLen / frames))
@@ -575,6 +601,17 @@ function SmelterTemplate.build(plotCFrame: CFrame): Model
 		part(wall, `ExtinguisherSign{i}`, Vector3.new(0.12, 1.2, 1.2), at(hallRight + 0.9, 5, z), Color3.fromRGB(200, 30, 30), Enum.Material.SmoothPlastic).CanCollide = false
 	end
 
+	-- Leben: Rundumleuchten im Betrieb, Arbeiter auf dem Gehweg, blinkende Kontroll-LEDs
+	AmbientProps.beacon(model, "BeaconFeedBin", at(kilnX + 4, gh + 11.4, backZ - 3), true)
+	AmbientProps.beacon(model, "BeaconHopper", at(kilnX + 4.3, 12.4, hz - 4.3), true)
+	AmbientProps.staffPath(model, "StaffKiln", { pos(kilnX + 24, 0, frontZ - 16), pos(kilnX + 24, 0, frontZ + 20), pos(kilnX + 22, 0, frontZ + 40) })
+	AmbientProps.staffPath(model, "StaffOutput", { pos(outputX + 19, 0, outputZ - 11), pos(outputX - 13, 0, outputZ - 11) })
+	for _, d in model:GetDescendants() do
+		if d:IsA("BasePart") and d.Name:match("Led%d*$") then
+			AmbientProps.blink(d)
+		end
+	end
+
 	-- Zwei Tanks außen an der rechten Hallenwand mit Leitungen in die Halle
 	local tankX = hallRight - 20
 	for i, tz in { zz + 48, zz + 14 } do
@@ -616,6 +653,7 @@ local STATUS_TEXT: { [string]: string } = {
 function SmelterTemplate.setStatus(model: Model, status: string, inputText: string, outputText: string)
 	local color = STATUS_COLORS[status] or LAMP_IDLE
 	local running = status == "Running"
+	model:SetAttribute("Running", running)
 	local lamp = model:FindFirstChild("StatusLight", true)
 	if lamp and lamp:IsA("BasePart") then
 		lamp.Color = color

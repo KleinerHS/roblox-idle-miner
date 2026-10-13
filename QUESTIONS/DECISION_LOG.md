@@ -241,3 +241,9 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Source:** Felix, 2026-10-13
 **Decision:** Alle Objekte der Halle sind einzeln gruppiert. Die Place-Datei enthält `Workspace.HallLayout` (Ausbau von Plot 1); Felix verschiebt darin frei, der Server übernimmt das Layout für alle Plots. Funktionsteile behalten ihre Namen. Förderband-Strecken und Fahrzeug-Stellplätze bleiben in `LayoutConfig`. Info-Anzeigen sind schwebende, freundliche Schrift statt Schilder.
 **Affected systems:** World-Builder, Plot, Building, Storage, Smelter, Garage
+
+## D-039 – Hallen-Leben als reine Client-Optik
+
+**Source:** Felix, 2026-10-13 („es soll nicht so leer und tot wirken“)
+**Decision:** Bewegung (Stapler, Lüfter, Rundumleuchten, Ofentrommel, Schnecke, LEDs) und dekorative Arbeiter laufen nur auf dem Client über Tags (AmbientTags), ohne Spiellogik und nur in Kameranähe. Die Objekte stecken in den Gebäuden und sind wie alles andere im HallLayout verschiebbar (Laufwege = unsichtbare Punkte P1…Pn).
+**Affected systems:** World-Builder, Client
