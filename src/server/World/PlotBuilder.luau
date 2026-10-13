@@ -16,6 +16,8 @@ local Shared = ReplicatedStorage:WaitForChild("Shared")
 local GameConfig = require(Shared.Config.GameConfig)
 local LayoutConfig = require(Shared.Config.LayoutConfig)
 
+local PlotExterior = require(script.Parent.PlotExterior)
+
 local PlotBuilder = {}
 
 local PLOT_TAG = "Plot"
@@ -52,41 +54,6 @@ function PlotBuilder.getPlotCFrame(plotId: number): CFrame
 	local position = center + Vector3.new(math.cos(angle), 0, -math.sin(angle)) * LayoutConfig.PlotRingRadius
 	position = Vector3.new(position.X, LayoutConfig.GroundY, position.Z)
 	return CFrame.lookAt(position, Vector3.new(center.X, LayoutConfig.GroundY, center.Z))
-end
-
-local function buildFence(model: Model, origin: CFrame)
-	local size = LayoutConfig.PlotSize
-	local h = LayoutConfig.FenceHeight
-	local t = LayoutConfig.FenceThickness
-	local halfX = size.X / 2
-	local halfZ = size.Y / 2
-	local y = 1 + h / 2
-
-	makePart("Fence_Back", Vector3.new(size.X, h, t), origin * CFrame.new(0, y, halfZ), COLOR_FENCE, Enum.Material.Metal, model)
-	makePart("Fence_Left", Vector3.new(t, h, size.Y), origin * CFrame.new(halfX, y, 0), COLOR_FENCE, Enum.Material.Metal, model)
-	makePart("Fence_Right", Vector3.new(t, h, size.Y), origin * CFrame.new(-halfX, y, 0), COLOR_FENCE, Enum.Material.Metal, model)
-
-	-- Vorderseite (-Z) mit Zufahrtslücke vor dem Rolltor
-	local gapCenter = LayoutConfig.DoorCenterX
-	local gapHalf = LayoutConfig.EntranceWidth / 2
-	local leftStart, leftEnd = gapCenter + gapHalf, halfX
-	local rightStart, rightEnd = -halfX, gapCenter - gapHalf
-	makePart(
-		"Fence_FrontLeft",
-		Vector3.new(leftEnd - leftStart, h, t),
-		origin * CFrame.new((leftStart + leftEnd) / 2, y, -halfZ),
-		COLOR_FENCE,
-		Enum.Material.Metal,
-		model
-	)
-	makePart(
-		"Fence_FrontRight",
-		Vector3.new(rightEnd - rightStart, h, t),
-		origin * CFrame.new((rightStart + rightEnd) / 2, y, -halfZ),
-		COLOR_FENCE,
-		Enum.Material.Metal,
-		model
-	)
 end
 
 local function buildSign(model: Model, origin: CFrame, plotId: number)
@@ -209,7 +176,8 @@ function PlotBuilder.build(parent: Instance, plotId: number): Model
 	)
 
 	buildMarkings(model, origin)
-	buildFence(model, origin)
+	-- Zaun und Außenbereich wie im Referenzbild (Phase 13b-1)
+	PlotExterior.build(model, origin)
 	buildSign(model, origin, plotId)
 	buildRoad(model, origin)
 

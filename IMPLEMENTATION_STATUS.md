@@ -436,6 +436,21 @@ Nachtrag Felix (2026-10-10): Map doppelt so groß, Mitte mit mehr Platz wie im M
 
 Selbsttest per Studio-MCP (2026-10-10): Vorschau in Edit gebaut (0,1 s, ~3.400 Teile); keine Bäume/Felsen auf Plots oder Straßen, keine Überschneidung von Platzausstattung, Wasserturm und Windrad mit den Shops; Play ohne Fehler, ~55 FPS im Studio-Client.
 
+### 13b – Halle wie FACTORY_MASTERPLAN_TOPDOWN.png (in Arbeit)
+
+Felix (2026-10-10/13): Halle wie im Bild, nach erstem Entwurf (480 × 250) wieder kleiner; Hütte und Elevator kompakt neben dem Lager; Lager mit großen Hochregalen (4 Palettenboxen übereinander, ~30 Regale), Kisten à 1.000 je Erzsorte, am Laptop kaufbar (1. $100, 2. $500, 3. $1.000, dann ×1,5); Ofen etwas kleiner und wie im Foto mit Glühen im Betrieb, Eingangs- und Ausgangslager mit je 4 Hochregalen, je ein Förderband; später ein großes Lager hinter der Halle (offen).
+
+Teilschritte: 13b-1 Halle/Grundriss/Außenbereich · 13b-2 Kisten-Logik und Kauf · 13b-3 Lager-Hochregale · 13b-4 Ofen mit Lagern, Bändern und Tanks.
+
+| 13b-1 | Dateien | Status |
+|---|---|---|
+| Halle 300 × 200, Wände 36 hoch, Glastor 100 breit / 26 hoch; Plot 390 × 290 | `LayoutConfig` | IMPLEMENTED |
+| Grundriss wie im Bild: Hütte und Elevator kompakt links neben dem Lager, Lager hinten Mitte (150 × 110), Schmelze rechts über die ganze Tiefe, Garage vorne; Kaufknöpfe, Spawn, Stellplätze, Turm, Ring, Garagen-Deko an der linken Wand angepasst | `LayoutConfig`, `GarageTemplate.luau` | IMPLEMENTED |
+| Außenbereich: Holzzaun, Asphalt-Vorplatz mit Bordsteinen und Haltelinie, Gehweg an der Hallenfront, Beete mit Bäumen und Büschen, Pförtnerhäuschen, Gabelstapler, Kisten, Laternen; rechts vorne zwei Hochregale mit Kisten und grüner Container; Kies-Seitenhöfe mit Regalen, Reifen, Fässern, Felsen; Hinterhof mit Bäumen, Klimageräten, Laternen | `src/server/World/PlotExterior.luau`, `PlotBuilder.luau` | IMPLEMENTED |
+| Edit-Vorschau-Plugin ohne Umhängen von ReplicatedStorage.Shared (störte Rojo) | `plugin/EditPreview.server.luau` | IMPLEMENTED |
+
+Selbsttest 13b-1 (2026-10-13): Vorschau gebaut, Draufsicht ohne Dach mit dem Referenzbild verglichen; keine Überschneidung zwischen Außenbereich und Halle, Hallenbauten untereinander nur gewollte Berührungen (Feuerlöscher an Stütze, Glastor im Torrahmen).
+
 ## Phase 12 – Content Expansion – Details
 
 Schritte: 12a alle Minen/Erze/Barren über zentrale Kurven · 12b weitere Spitzhacken, Rucksäcke, Drills, Fahrzeuge, Ausbaustufen (offen).

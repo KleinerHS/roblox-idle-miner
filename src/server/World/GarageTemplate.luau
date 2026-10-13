@@ -191,7 +191,7 @@ local function tower(model: Model, o: CFrame)
 		cone.Shape = Enum.PartType.Cylinder
 	end
 	-- Zuführrohr vom Lager (hinten, +Z) über das Silo: Material kommt direkt aus dem Lager
-	local pipeLen = 30
+	local pipeLen = cfg.TowerFeedLength
 	local pipe = part(model, "TowerFeedPipe", Vector3.new(pipeLen, 1.6, 1.6), t * CFrame.new(0, siloBase + 5.6, 4 + pipeLen / 2) * CFrame.Angles(0, math.rad(90), 0), STEEL_LIGHT)
 	pipe.Shape = Enum.PartType.Cylinder
 	for i = 1, 5 do
@@ -433,33 +433,33 @@ local function props(model: Model, o: CFrame)
 	local GREEN = Color3.fromRGB(60, 110, 60)
 
 	-- Hochregale an Vorder- und Seitenwand
-	highRack(deco, "RackFront", o * CFrame.new(90, 0, -52.2), 4, rng)
-	highRack(deco, "RackSide", o * CFrame.new(102.4, 0, -42) * CFrame.Angles(0, math.rad(90), 0), 2, rng)
+	highRack(deco, "RackFront", o * CFrame.new(135, 0, -79.2), 4, rng)
+	highRack(deco, "RackSide", o * CFrame.new(147.4, 0, -69) * CFrame.Angles(0, math.rad(90), 0), 2, rng)
 
 	-- Ölfässer auf Auffangwanne und eine Palette mit Fässern
-	local spill = o * CFrame.new(99, 0, -9)
+	local spill = o * CFrame.new(144, 0, -36)
 	part(deco, "SpillPallet", Vector3.new(4.4, 0.4, 4.4), spill * CFrame.new(0, 0.2, 0), YELLOW, Enum.Material.SmoothPlastic)
 	for i, p in { Vector2.new(-0.95, -0.95), Vector2.new(0.95, -0.95), Vector2.new(0, 1) } do
 		drum(deco, `SpillDrum{i}`, spill * CFrame.new(p.X, 0.4, p.Y), if i == 3 then RED else BLUE)
 	end
-	local drumPallet = o * CFrame.new(99.5, 0, -26)
+	local drumPallet = o * CFrame.new(144.5, 0, -53)
 	pallet(deco, "DrumPallet", drumPallet)
 	for i, p in { Vector2.new(-0.95, -0.8), Vector2.new(0.95, -0.8), Vector2.new(-0.95, 0.8), Vector2.new(0.95, 0.8) } do
 		drum(deco, `PalletDrum{i}`, drumPallet * CFrame.new(p.X, 0.5, p.Y), if i == 2 then GREEN else BLUE)
 	end
-	drum(deco, "LooseDrum1", o * CFrame.new(95.5, 0, -24.5), RED)
-	drum(deco, "LooseDrum2", o * CFrame.new(96, 0, -27.6), BLUE)
+	drum(deco, "LooseDrum1", o * CFrame.new(140.5, 0, -51.5), RED)
+	drum(deco, "LooseDrum2", o * CFrame.new(141, 0, -54.6), BLUE)
 
 	-- Kartonpaletten und ein Stapel leerer Paletten auf dem Boden
-	cartonPallet(deco, "FloorPallet1", o * CFrame.new(86, 0, -40) * CFrame.Angles(0, math.rad(8), 0), rng, 3)
-	cartonPallet(deco, "FloorPallet2", o * CFrame.new(91, 0, -40.5) * CFrame.Angles(0, math.rad(-4), 0), rng, 2)
-	cartonPallet(deco, "FloorPallet3", o * CFrame.new(84, 0, -18) * CFrame.Angles(0, math.rad(90), 0), rng, 3)
+	cartonPallet(deco, "FloorPallet1", o * CFrame.new(131, 0, -67) * CFrame.Angles(0, math.rad(8), 0), rng, 3)
+	cartonPallet(deco, "FloorPallet2", o * CFrame.new(136, 0, -67.5) * CFrame.Angles(0, math.rad(-4), 0), rng, 2)
+	cartonPallet(deco, "FloorPallet3", o * CFrame.new(129, 0, -45) * CFrame.Angles(0, math.rad(90), 0), rng, 3)
 	for i = 1, 6 do
-		pallet(deco, `EmptyPallet{i}`, o * CFrame.new(80, (i - 1) * 0.5, -46) * CFrame.Angles(0, math.rad(if i % 2 == 0 then 3 else -2), 0))
+		pallet(deco, `EmptyPallet{i}`, o * CFrame.new(125, (i - 1) * 0.5, -73) * CFrame.Angles(0, math.rad(if i % 2 == 0 then 3 else -2), 0))
 	end
 
 	-- Feuerlöscher an der Hallenstütze
-	local ext = o * CFrame.new(102.7, 3, -35)
+	local ext = o * CFrame.new(147.7, 3, -62)
 	local extBody = part(deco, "Extinguisher", Vector3.new(1.2, 0.5, 0.5), ext * CFrame.Angles(0, 0, math.rad(90)), Color3.fromRGB(200, 40, 40), Enum.Material.SmoothPlastic)
 	extBody.Shape = Enum.PartType.Cylinder
 	part(deco, "ExtinguisherBracket", Vector3.new(0.5, 0.2, 0.4), ext * CFrame.new(0.25, 0.3, 0), STEEL_DARK)

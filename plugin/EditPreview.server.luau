@@ -9,9 +9,9 @@
 --   - wird beim Play nicht mitkopiert (der Server baut die echte Welt selbst).
 --
 -- Frische Module bei jedem Aufbau: require() cached pro ModuleScript-Instanz. Deshalb
--- werden World und Shared geklont und die Klone required. Weil die Builder Shared über
--- ReplicatedStorage:WaitForChild("Shared") finden, wird der Shared-Klon für die Dauer des
--- (yield-freien) Aufbaus kurz an die Stelle des Originals gesetzt und danach zurückgetauscht.
+-- werden World und Shared geklont und die Klone required. Die Builder finden Shared über
+-- ReplicatedStorage:WaitForChild("Shared"); in den World-Klonen wird das auf den Shared-Klon
+-- in ServerStorage umgeschrieben (Originale bleiben unangetastet, Rojo wird nicht gestört).
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
@@ -115,21 +115,27 @@ local function create()
 	local folder = Instance.new("Folder")
 	folder.Name = PREVIEW_NAME
 
-	-- Klone für frische Module (siehe Kopfkommentar)
-	local sharedClone = original:Clone()
-	local worldClone = world:Clone()
+	-- Klone für frische Module (siehe Kopfkommentar). Das Original wird NICHT umgehängt (das
+	-- störte die Rojo-Synchronisierung): Der Shared-Klon liegt in ServerStorage, und in den
+	-- World-Klonen wird der Verweis auf ReplicatedStorage.Shared auf diesen Klon umgeschrieben.
 	local holder = Instance.new("Folder")
-	holder.Name = "PreviewModules"
+	holder.Name = "_PreviewModules"
+	holder.Archivable = false
+	local sharedClone = original:Clone()
+	sharedClone.Name = "_PreviewShared"
+	local worldClone = world:Clone()
 	worldClone.Parent = holder
+	for _, d in worldClone:GetDescendants() do
+		if d:IsA("ModuleScript") then
+			d.Source = d.Source:gsub('ReplicatedStorage:WaitForChild%("Shared"%)', 'game:GetService("ServerStorage"):WaitForChild("_PreviewShared")')
+		end
+	end
+	sharedClone.Parent = game:GetService("ServerStorage")
+	holder.Parent = game:GetService("ServerStorage")
 
 	local recording = ChangeHistoryService:TryBeginRecording("Idle Miner World Preview")
-
-	-- Tausch ohne Yield dazwischen; Original wird in jedem Fall zurückgesetzt
-	original.Parent = nil
-	sharedClone.Parent = ReplicatedStorage
 	local ok, err = pcall(build, folder, worldClone, sharedClone)
 	sharedClone:Destroy()
-	original.Parent = ReplicatedStorage
 	holder:Destroy()
 
 	if ok then

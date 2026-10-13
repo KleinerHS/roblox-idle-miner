@@ -583,4 +583,9 @@ function EnvironmentBuilder.build(parent: Instance): Folder
 	return folder
 end
 
+-- Bausteine auch für den Außenbereich der Plots (PlotExterior)
+EnvironmentBuilder.pine = pine
+EnvironmentBuilder.boulder = boulder
+EnvironmentBuilder.streetLamp = streetLamp
+
 return table.freeze(EnvironmentBuilder)
