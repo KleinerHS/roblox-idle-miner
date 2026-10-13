@@ -229,7 +229,7 @@ end
 
 local function updateSpawn(state: PlotState)
 	local office = state.models.build_office
-	local anchor = office and office:FindFirstChild("SpawnAnchor")
+	local anchor = office and office:FindFirstChild("SpawnAnchor", true)
 	if anchor and anchor:IsA("BasePart") then
 		PlotBuilder.setSpawn(state.plot, anchor.CFrame)
 	else

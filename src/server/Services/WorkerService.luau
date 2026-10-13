@@ -37,7 +37,7 @@ local unpaid: { [Player]: { [string]: boolean } } = {}
 
 local function laptopPart(player: Player): BasePart?
 	local office = BuildingService.GetModel(player, "build_office")
-	local laptop = office and office:FindFirstChild("Laptop")
+	local laptop = office and office:FindFirstChild("Laptop", true)
 	local base = laptop and laptop:FindFirstChild("Base")
 	return if base and base:IsA("BasePart") then base else nil
 end

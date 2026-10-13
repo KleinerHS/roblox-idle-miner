@@ -148,7 +148,9 @@ end
 -- Regal mit Kisten (Stahlrahmen orange wie im Masterplan)
 -- Hochregallager (Phase 13b-3, Felix D-037): 32 große Regale in vier Reihen (eine Doppelreihe),
 -- je 4 Palettenboxen übereinander (CrateRackBuilder). Vorne: Anzeige und Terminal.
-local RACKS_PER_ROW = 8
+-- 12 Regale je Reihe bis zur Bereichsmarkierung rechts (Felix 2026-10-13), Block nach rechts versetzt
+local RACKS_PER_ROW = 12
+local RACK_SHIFT_X = -18
 local STORAGE_ROWS = {
 	{ Z = -9, Face = -1 },
 	{ Z = 15, Face = -1 },
@@ -163,14 +165,14 @@ function HallTemplates.buildStorage(plotCFrame: CFrame): Model
 	local o = plotCFrame * CFrame.new(zone.Center.X, LayoutConfig.HallFloorTop, zone.Center.Y)
 	local hw, hd = zone.Size.X / 2, zone.Size.Y / 2
 
-	CrateRackBuilder.build(model, o, STORAGE_ROWS, RACKS_PER_ROW)
+	CrateRackBuilder.build(model, o * CFrame.new(RACK_SHIFT_X, 0, 0), STORAGE_ROWS, RACKS_PER_ROW)
 
 	-- Fahrwege: gelbe Linien vor den Reihen, Gabelstapler und lose Paletten links
 	for i, z in { 35.25, 3 } do
-		local lane = part(model, `LaneLine{i}`, Vector3.new(RACKS_PER_ROW * CrateRackBuilder.Bay + 8, 0.06, 0.5), o * CFrame.new(0, 0.03, z), YELLOW, Enum.Material.SmoothPlastic)
+		local lane = part(model, `LaneLine{i}`, Vector3.new(RACKS_PER_ROW * CrateRackBuilder.Bay + 8, 0.06, 0.5), o * CFrame.new(RACK_SHIFT_X, 0.03, z), YELLOW, Enum.Material.SmoothPlastic)
 		lane.CanCollide = false
 	end
-	local frontLane = part(model, "LaneFront", Vector3.new(RACKS_PER_ROW * CrateRackBuilder.Bay + 8, 0.06, 0.5), o * CFrame.new(0, 0.03, -18), YELLOW, Enum.Material.SmoothPlastic)
+	local frontLane = part(model, "LaneFront", Vector3.new(RACKS_PER_ROW * CrateRackBuilder.Bay + 8, 0.06, 0.5), o * CFrame.new(RACK_SHIFT_X, 0.03, -18), YELLOW, Enum.Material.SmoothPlastic)
 	frontLane.CanCollide = false
 	local fork = o * CFrame.new(hw - 18, 0, -20) * CFrame.Angles(0, math.rad(-20), 0)
 	part(model, "ForkliftBody", Vector3.new(4, 2.4, 6), fork * CFrame.new(0, 2.2, 0), YELLOW, Enum.Material.SmoothPlastic)
@@ -274,7 +276,7 @@ function HallTemplates.setStorageDisplay(storageModel: Model, storage: { Crates:
 	for _, n in storage.Items do
 		used += n
 	end
-	local display = storageModel:FindFirstChild("StorageDisplay")
+	local display = storageModel:FindFirstChild("StorageDisplay", true)
 	local gui = display and display:FindFirstChild("Display")
 	if gui then
 		local amount = gui:FindFirstChild("Amount")

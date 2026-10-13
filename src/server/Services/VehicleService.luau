@@ -79,7 +79,7 @@ end
 
 local function nearRing(player: Player): boolean
 	local garage = garageModel(player)
-	local ring = garage and garage:FindFirstChild("GarageRing")
+	local ring = garage and garage:FindFirstChild("GarageRing", true)
 	local root = rootOf(player)
 	if not (ring and ring:IsA("BasePart") and root) then
 		return false
@@ -173,7 +173,7 @@ end
 local function spawnAtBay(player: Player, record: Types.VehicleRecord): Model?
 	local def = Vehicles.Get(record.Type)
 	local garage = garageModel(player)
-	local bayPart = garage and record.Bay and garage:FindFirstChild(`BaySpawn{record.Bay}`)
+	local bayPart = garage and record.Bay and garage:FindFirstChild(`BaySpawn{record.Bay}`, true)
 	local data = DataService.Get(player)
 	if not (def and bayPart and bayPart:IsA("BasePart") and data) then
 		return nil
@@ -368,7 +368,7 @@ local doors: { [Player]: DoorState } = {}
 
 local function registerDoor(player: Player)
 	local garage = garageModel(player)
-	local door = garage and garage:FindFirstChild("GarageDoor")
+	local door = garage and garage:FindFirstChild("GarageDoor", true)
 	if not (door and door:IsA("BasePart")) then
 		doors[player] = nil
 		return
@@ -461,7 +461,7 @@ function VehicleService.Start()
 		if stepId ~= GARAGE_STEP then
 			return
 		end
-		local ring = model:FindFirstChild("GarageRing")
+		local ring = model:FindFirstChild("GarageRing", true)
 		if ring and ring:IsA("BasePart") then
 			ring.Touched:Connect(function(hit)
 				local character = hit:FindFirstAncestorOfClass("Model")

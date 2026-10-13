@@ -77,7 +77,7 @@ end
 
 local function isNearTerminal(player: Player): boolean
 	local model = BuildingService.GetModel(player, STORAGE_STEP)
-	local terminal = model and model:FindFirstChild("StorageTerminalPart")
+	local terminal = model and model:FindFirstChild("StorageTerminalPart", true)
 	local character = player.Character
 	local root = character and character:FindFirstChild("HumanoidRootPart")
 	if not (terminal and terminal:IsA("BasePart") and root and root:IsA("BasePart")) then

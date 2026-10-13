@@ -44,7 +44,7 @@ end
 
 local function nearTerminal(player: Player): boolean
 	local model = smelterModel(player)
-	local terminal = model and model:FindFirstChild("SmelterTerminalPart")
+	local terminal = model and model:FindFirstChild("SmelterTerminalPart", true)
 	local character = player.Character
 	local root = character and character:FindFirstChild("HumanoidRootPart")
 	if not (terminal and terminal:IsA("BasePart") and root and root:IsA("BasePart")) then

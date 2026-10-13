@@ -308,7 +308,7 @@ local BAY_COLORS: { [string]: Color3 } = {
 
 function GarageTemplate.setBayState(model: Model, bay: number, state: string, title: string, value: string)
 	local color = BAY_COLORS[state] or BAY_COLORS.Idle
-	local lamp = model:FindFirstChild(`ChuteLamp{bay}`)
+	local lamp = model:FindFirstChild(`ChuteLamp{bay}`, true)
 	if lamp and lamp:IsA("BasePart") then
 		lamp.Color = color
 		local glow = lamp:FindFirstChild("Glow")
@@ -317,7 +317,7 @@ function GarageTemplate.setBayState(model: Model, bay: number, state: string, ti
 			glow.Enabled = state ~= "Idle"
 		end
 	end
-	local display = model:FindFirstChild(`BayDisplay{bay}`)
+	local display = model:FindFirstChild(`BayDisplay{bay}`, true)
 	local gui = display and display:FindFirstChild("Display")
 	if gui then
 		local t = gui:FindFirstChild("Title")
@@ -336,8 +336,8 @@ end
 -- nil = eingefahren. Gibt { [Part] = { Size, CFrame } } für einen Tween zurück.
 function GarageTemplate.chuteGoals(model: Model, bay: number, bottomY: number?): { [BasePart]: { [string]: any } }
 	local goals = {}
-	local tube = model:FindFirstChild(`ChuteTube{bay}`)
-	local nozzle = model:FindFirstChild(`ChuteNozzle{bay}`)
+	local tube = model:FindFirstChild(`ChuteTube{bay}`, true)
+	local nozzle = model:FindFirstChild(`ChuteNozzle{bay}`, true)
 	if not (tube and tube:IsA("BasePart") and nozzle and nozzle:IsA("BasePart")) then
 		return goals
 	end

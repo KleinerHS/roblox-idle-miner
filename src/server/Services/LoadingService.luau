@@ -92,7 +92,7 @@ end
 
 -- Ein Takt für einen Stellplatz; gibt den neuen Zustand zurück
 local function tickBay(player: Player, data: Types.PlayerData, garage: Model, bay: number): BayState
-	local point = garage:FindFirstChild(`LoadPoint{bay}`)
+	local point = garage:FindFirstChild(`LoadPoint{bay}`, true)
 	if not (point and point:IsA("BasePart")) then
 		return { state = "Idle", vehicleId = nil, extended = false }
 	end

@@ -65,7 +65,7 @@ local BalanceConfig = {
 	Storage = {
 		CrateSize = 1000, -- Felix (D-037)
 		-- Plätze in den Hochregalen der Halle (32 Regale × 4 Paletten übereinander)
-		MaxCrates = 128, -- Felix (D-037: ~30 Regale × 4)
+		MaxCrates = 192, -- Felix (2026-10-13: 48 Regale × 4, bis zur Markierung)
 		-- Kisten eines neuen Profils (die erste Kiste wird gekauft)
 		StartCrates = 0, -- Felix (D-037: Startkiste kostet $100)
 		-- Preis der 1., 2., 3. Kiste, danach jeweils × CrateGrowth

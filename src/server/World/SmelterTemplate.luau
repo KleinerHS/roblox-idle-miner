@@ -330,7 +330,7 @@ local STATUS_TEXT: { [string]: string } = {
 function SmelterTemplate.setStatus(model: Model, status: string, inputText: string, outputText: string)
 	local color = STATUS_COLORS[status] or LAMP_IDLE
 	local running = status == "Running"
-	local lamp = model:FindFirstChild("StatusLight")
+	local lamp = model:FindFirstChild("StatusLight", true)
 	if lamp and lamp:IsA("BasePart") then
 		lamp.Color = color
 		local l = lamp:FindFirstChild("Glow")
@@ -338,7 +338,7 @@ function SmelterTemplate.setStatus(model: Model, status: string, inputText: stri
 			l.Color = color
 		end
 	end
-	local glow = model:FindFirstChild("FurnaceGlow")
+	local glow = model:FindFirstChild("FurnaceGlow", true)
 	if glow and glow:IsA("BasePart") then
 		glow.Color = if running then GLOW else GLOW_OFF
 		local l = glow:FindFirstChild("Glow")
@@ -346,7 +346,7 @@ function SmelterTemplate.setStatus(model: Model, status: string, inputText: stri
 			l.Enabled = running
 		end
 	end
-	local hot = model:FindFirstChild("KilnHotZone")
+	local hot = model:FindFirstChild("KilnHotZone", true)
 	if hot and hot:IsA("BasePart") then
 		hot.Color = if running then GLOW_HOT else HOT_OFF
 		hot.Material = if running then Enum.Material.Neon else Enum.Material.Metal
@@ -356,7 +356,7 @@ function SmelterTemplate.setStatus(model: Model, status: string, inputText: stri
 			d.Enabled = running
 		end
 	end
-	local display = model:FindFirstChild("SmelterDisplay")
+	local display = model:FindFirstChild("SmelterDisplay", true)
 	local gui = display and display:FindFirstChild("Display")
 	if gui then
 		local statusLabel = gui:FindFirstChild("Status")
@@ -379,7 +379,7 @@ end
 function SmelterTemplate.setCrates(model: Model, input: { [string]: number }, output: { [string]: number })
 	local cfg = BalanceConfig.Smelter
 	for name, items in { InputStore = input, OutputStore = output } do
-		local block = model:FindFirstChild(name)
+		local block = model:FindFirstChild(name, true)
 		local crates = block and block:FindFirstChild("Crates")
 		if crates then
 			CrateRackBuilder.update(crates, items, if name == "InputStore" then cfg.InputCrates else cfg.OutputCrates)
