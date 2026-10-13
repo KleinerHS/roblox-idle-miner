@@ -503,6 +503,13 @@ Selbsttest 13b-6 (2026-10-13): Überschneidungsprüfung der neuen Teile, Fahrweg
 
 Selbsttest 13b-7 (2026-10-13): Layout neu erzeugt in Felix' Drehung/Lage; Play: Halle auf Plot 1 an richtiger Stelle, 8 Kisten mit Aufschrift (6 × COAL, 2 × COPPER), Stapler fährt mit Kiste, keine Überschneidungen auf dem Fahrweg, keine Fehler.
 
+| 13b-8 Verladestation (Version 0.27.0) | Dateien | Status |
+|---|---|---|
+| Verladeturm neu wie eine echte LKW-Verladestation, Farben wie die Halle (gelbe I-Profile, dunkle Verbände, graue Bunker, orange Antriebe): Turm mit Kreuzverbänden, Laufrost, Geländern und Steigleiter mit Rückenschutz; Silo mit Bändern, Firmenfarbe, Füllstandsmarken, Dach, Staubfilter, Rundumleuchte, Trichter und Schieber; Zuführrohr aus dem Lager unter der Decke abgehängt; Portal über beiden Stellplätzen mit Laufsteg; je Stellplatz Förderschnecke, Bunker, Schieber, Faltenbalg-Rüssel, Statuslampe, Strahler; Steuerkabine | `GarageTemplate.tower` | TESTING_REQUIRED |
+| Rüssel weiter vorne über der Ladefläche (Stellplatzmitte + 4 statt Heck), LoadPoint entsprechend; Rüssel fährt bis 15 Studs aus | `GarageTemplate`, `LoadingService` (unverändert) | TESTING_REQUIRED |
+
+Selbsttest 13b-8 (2026-10-13): Überschneidungsprüfung (nur Zuführrohr ins Silodach, gewollt); Sichtprüfung; Garage im HallLayout ersetzt (Felix' Drehung bleibt, keine eigenen Änderungen in der Garage); Play: LoadPoint bei (28, −56), Rüssel fährt bis auf Zielhöhe aus, keine Fehler. Beladen mit echtem Fahrzeug von Felix zu testen.
+
 ## Phase 12 – Content Expansion – Details
 
 Schritte: 12a alle Minen/Erze/Barren über zentrale Kurven · 12b weitere Spitzhacken, Rucksäcke, Drills, Fahrzeuge, Ausbaustufen (offen).
