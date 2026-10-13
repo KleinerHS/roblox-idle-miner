@@ -201,21 +201,8 @@ function HallTemplates.buildStorage(plotCFrame: CFrame): Model
 	-- Großer, realistischer Stapler mit Kiste fährt auf dem vorderen Fahrweg hin und her
 	local truck = ForkliftBuilder.build(model, "ForkliftLarge", o * CFrame.new(hw - 32, 0, -18) * CFrame.Angles(0, math.rad(90), 0), true)
 	AmbientProps.shuttle(truck, Vector3.new(0, 0, -78), 5, 4)
-	-- Kleiner Stapler steht geparkt rechts vorne, daneben lose Paletten
-	local forklift = group(model, "Forklift")
-	local fork = o * CFrame.new(hw - 18, 0, -20) * CFrame.Angles(0, math.rad(-20), 0)
-	forklift.PrimaryPart = part(forklift, "ForkliftBody", Vector3.new(4, 2.4, 6), fork * CFrame.new(0, 2.2, 0), YELLOW, Enum.Material.SmoothPlastic)
-	part(forklift, "ForkliftWeight", Vector3.new(4, 2.2, 1.4), fork * CFrame.new(0, 2.3, 3.4), STEEL, Enum.Material.Metal)
-	part(forklift, "ForkliftRoof", Vector3.new(4, 0.25, 4.6), fork * CFrame.new(0, 7.9, 0.2), STEEL, Enum.Material.Metal)
-	for _, dx in { -1.8, 1.8 } do
-		part(forklift, `ForkliftPost{dx}`, Vector3.new(0.25, 4.6, 0.25), fork * CFrame.new(dx, 5.6, 2.4), STEEL, Enum.Material.Metal)
-		part(forklift, `ForkliftMast{dx}`, Vector3.new(0.4, 7, 0.4), fork * CFrame.new(dx * 0.8, 4.4, -3.2), STEEL, Enum.Material.Metal)
-		part(forklift, `ForkliftFork{dx}`, Vector3.new(0.4, 0.2, 3.4), fork * CFrame.new(dx * 0.6, 1.3, -4.9), STEEL, Enum.Material.Metal)
-		for _, dz in { -1.8, 1.8 } do
-			local w = part(forklift, `ForkliftWheel{dx}_{dz}`, Vector3.new(0.8, 1.8, 1.8), fork * CFrame.new(dx * 1.1, 0.9, dz), Color3.fromRGB(30, 30, 32), Enum.Material.Rubber)
-			w.Shape = Enum.PartType.Cylinder
-		end
-	end
+	-- Zweiter Stapler (gleiches Modell, ohne Last) steht geparkt vorne mitte, daneben lose Paletten
+	ForkliftBuilder.build(model, "Forklift", o * CFrame.new(25, 0, -40) * CFrame.Angles(0, math.rad(8), 0), false)
 	local spare = group(model, "SparePallets")
 	for i = 1, 3 do
 		part(spare, `SparePallet{i}`, Vector3.new(6.2, 0.5, 6.2), o * CFrame.new(hw - 10, 0.25 + (i - 1) * 0.5, -40) * CFrame.Angles(0, math.rad(i * 3), 0), CRATE_DARK, Enum.Material.WoodPlanks)
