@@ -11,7 +11,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local LayoutConfig = require(ReplicatedStorage:WaitForChild("Shared").Config.LayoutConfig)
 local BalanceConfig = require(ReplicatedStorage:WaitForChild("Shared").Config.BalanceConfig)
-local Materials = require(ReplicatedStorage:WaitForChild("Shared").Definitions.Materials)
+local CrateRackBuilder = require(script.Parent.CrateRackBuilder)
 
 local HallTemplates = {}
 
@@ -146,94 +146,15 @@ function HallTemplates.buildRoof(plotCFrame: CFrame): Model
 end
 
 -- Regal mit Kisten (Stahlrahmen orange wie im Masterplan)
--- Hochregallager (Phase 13b-3, Felix D-037): 32 große Regale in vier Reihen, je 4 Palettenboxen
--- übereinander. Jeder Platz ist eine Kiste (1.000 einer Sorte). Gekaufte Kisten stehen als
--- Gitterboxen im Regal, ihr Erz ist sichtbar (Farbe und Füllhöhe); nicht gekaufte Plätze bleiben
--- leer. Vorne: Anzeige mit Gesamtbestand und Kisten, Terminal zum Abladen/Entnehmen.
-local RACK_BAY = 9 -- Breite eines Regals (X)
-local RACK_DEPTH = 8.5 -- Tiefe (Z)
-local LEVEL_Y = { 0, 7.8, 15.6, 23.4 } -- Unterkante der Palette je Ebene
-local RACK_HEIGHT = 31
+-- Hochregallager (Phase 13b-3, Felix D-037): 32 große Regale in vier Reihen (eine Doppelreihe),
+-- je 4 Palettenboxen übereinander (CrateRackBuilder). Vorne: Anzeige und Terminal.
 local RACKS_PER_ROW = 8
--- Reihen (Z lokal zur Zone, Blickrichtung der Fächer): hinten an der Wand, Doppelreihe, vorne
-local ROWS = { 47, 23.5, 15, -9 }
--- Richtung, aus der die Fächer einer Reihe beschickt werden (−1 = von vorne/−Z, 1 = von hinten)
-local ROW_FACE = { -1, 1, -1, -1 }
-local BOX = 7.4 -- Gitterbox-Grundfläche
-local BOX_H = 5.6 -- Wandhöhe der Gitterbox
-local BOX_FRONT_H = 2 -- niedrige Klappe vorne, damit das Erz sichtbar ist
-
--- Platz Nr. 1..128 → CFrame der Palettenunterkante (lokal zur Zone). Reihenfolge: vordere Reihe
--- zuerst (gut sichtbar), innerhalb einer Reihe von links nach rechts, unten nach oben.
-local function slotOffset(index: number): (Vector3, number)
-	local perRow = RACKS_PER_ROW * #LEVEL_Y
-	local rowOrder = { 4, 3, 2, 1 }
-	local rowIndex = rowOrder[math.floor((index - 1) / perRow) + 1]
-	local inRow = (index - 1) % perRow
-	local rack = math.floor(inRow / #LEVEL_Y)
-	local level = inRow % #LEVEL_Y + 1
-	local x = (RACKS_PER_ROW / 2 - rack - 0.5) * RACK_BAY
-	return Vector3.new(x, LEVEL_Y[level], ROWS[rowIndex]), ROW_FACE[rowIndex]
-end
-
-local function buildRackRows(parent: Instance, o: CFrame)
-	local folder = Instance.new("Folder")
-	folder.Name = "Racks"
-	folder.Parent = parent
-	local length = RACKS_PER_ROW * RACK_BAY
-	for r, z in ROWS do
-		for k = 0, RACKS_PER_ROW do
-			local x = length / 2 - k * RACK_BAY
-			for _, dz in { -RACK_DEPTH / 2, RACK_DEPTH / 2 } do
-				part(folder, `Upright{r}_{k}_{dz}`, Vector3.new(0.5, RACK_HEIGHT, 0.5), o * CFrame.new(x, RACK_HEIGHT / 2, z + dz), Color3.fromRGB(40, 90, 150), Enum.Material.Metal)
-			end
-			-- Kreuzverband an der Seite jedes Rahmens
-			for level = 1, 3 do
-				local y0, y1 = LEVEL_Y[level] + 1, LEVEL_Y[level + 1] + 1
-				local h = y1 - y0
-				local len = math.sqrt(h * h + RACK_DEPTH * RACK_DEPTH)
-				part(folder, `Brace{r}_{k}_{level}`, Vector3.new(0.2, 0.2, len), o * CFrame.new(x, (y0 + y1) / 2, z) * CFrame.Angles(math.atan2(h, RACK_DEPTH) * (if level % 2 == 0 then 1 else -1), 0, 0), Color3.fromRGB(40, 90, 150), Enum.Material.Metal)
-			end
-		end
-		for level = 2, #LEVEL_Y do
-			for _, dz in { -RACK_DEPTH / 2, RACK_DEPTH / 2 } do
-				part(folder, `Beam{r}_{level}_{dz}`, Vector3.new(length + 0.5, 0.45, 0.3), o * CFrame.new(0, LEVEL_Y[level] - 0.25, z + dz), RACK, Enum.Material.Metal)
-			end
-		end
-		for _, dz in { -RACK_DEPTH / 2, RACK_DEPTH / 2 } do
-			part(folder, `TopBeam{r}_{dz}`, Vector3.new(length + 0.5, 0.45, 0.3), o * CFrame.new(0, RACK_HEIGHT - 0.3, z + dz), RACK, Enum.Material.Metal)
-		end
-		-- Anfahrschutz (gelb) an den Stirnseiten der Reihe
-		for _, sx in { -1, 1 } do
-			part(folder, `Guard{r}_{sx}`, Vector3.new(0.6, 1.2, RACK_DEPTH + 1), o * CFrame.new(sx * (length / 2 + 0.6), 0.6, z), YELLOW, Enum.Material.SmoothPlastic)
-		end
-	end
-end
-
--- Alle 128 Plätze: Palette, Gitterbox, Erzfüllung. Sichtbarkeit setzt setStorageDisplay.
-local function buildSlots(parent: Instance, o: CFrame, count: number)
-	local folder = Instance.new("Folder")
-	folder.Name = "Crates"
-	folder.Parent = parent
-	for i = 1, count do
-		local offset, face = slotOffset(i)
-		local base = o * CFrame.new(offset)
-		local slot = Instance.new("Model")
-		slot.Name = `Slot{i}`
-		part(slot, "Pallet", Vector3.new(BOX + 0.2, 0.5, BOX + 0.2), base * CFrame.new(0, 0.25, 0), CRATE_DARK, Enum.Material.WoodPlanks)
-		part(slot, "Floor", Vector3.new(BOX, 0.2, BOX), base * CFrame.new(0, 0.6, 0), STEEL, Enum.Material.Metal)
-		for _, side in { -1, 1 } do
-			part(slot, `WallX{side}`, Vector3.new(0.15, BOX_H, BOX), base * CFrame.new(side * (BOX / 2 - 0.075), 0.7 + BOX_H / 2, 0), Color3.fromRGB(150, 156, 164), Enum.Material.DiamondPlate)
-			-- Seite zum Fahrweg nur als niedrige Klappe (Erz sichtbar), Rückseite voll hoch
-			local h = if side == face then BOX_FRONT_H else BOX_H
-			part(slot, `WallZ{side}`, Vector3.new(BOX - 0.3, h, 0.15), base * CFrame.new(0, 0.7 + h / 2, side * (BOX / 2 - 0.075)), Color3.fromRGB(150, 156, 164), Enum.Material.DiamondPlate)
-		end
-		local fill = part(slot, "Fill", Vector3.new(BOX - 0.4, 0.2, BOX - 0.4), base * CFrame.new(0, 0.8, 0), Color3.new(0.2, 0.2, 0.2), Enum.Material.Slate)
-		fill.CanCollide = false
-		slot:SetAttribute("BaseY", 0.7)
-		slot.Parent = folder
-	end
-end
+local STORAGE_ROWS = {
+	{ Z = -9, Face = -1 },
+	{ Z = 15, Face = -1 },
+	{ Z = 23.5, Face = 1 },
+	{ Z = 47, Face = -1 },
+}
 
 function HallTemplates.buildStorage(plotCFrame: CFrame): Model
 	local model = Instance.new("Model")
@@ -242,15 +163,14 @@ function HallTemplates.buildStorage(plotCFrame: CFrame): Model
 	local o = plotCFrame * CFrame.new(zone.Center.X, LayoutConfig.HallFloorTop, zone.Center.Y)
 	local hw, hd = zone.Size.X / 2, zone.Size.Y / 2
 
-	buildRackRows(model, o)
-	buildSlots(model, o, BalanceConfig.Storage.MaxCrates)
+	CrateRackBuilder.build(model, o, STORAGE_ROWS, RACKS_PER_ROW)
 
 	-- Fahrwege: gelbe Linien vor den Reihen, Gabelstapler und lose Paletten links
 	for i, z in { 35.25, 3 } do
-		local lane = part(model, `LaneLine{i}`, Vector3.new(RACKS_PER_ROW * RACK_BAY + 8, 0.06, 0.5), o * CFrame.new(0, 0.03, z), YELLOW, Enum.Material.SmoothPlastic)
+		local lane = part(model, `LaneLine{i}`, Vector3.new(RACKS_PER_ROW * CrateRackBuilder.Bay + 8, 0.06, 0.5), o * CFrame.new(0, 0.03, z), YELLOW, Enum.Material.SmoothPlastic)
 		lane.CanCollide = false
 	end
-	local frontLane = part(model, "LaneFront", Vector3.new(RACKS_PER_ROW * RACK_BAY + 8, 0.06, 0.5), o * CFrame.new(0, 0.03, -18), YELLOW, Enum.Material.SmoothPlastic)
+	local frontLane = part(model, "LaneFront", Vector3.new(RACKS_PER_ROW * CrateRackBuilder.Bay + 8, 0.06, 0.5), o * CFrame.new(0, 0.03, -18), YELLOW, Enum.Material.SmoothPlastic)
 	frontLane.CanCollide = false
 	local fork = o * CFrame.new(hw - 18, 0, -20) * CFrame.Angles(0, math.rad(-20), 0)
 	part(model, "ForkliftBody", Vector3.new(4, 2.4, 6), fork * CFrame.new(0, 2.2, 0), YELLOW, Enum.Material.SmoothPlastic)
@@ -383,47 +303,8 @@ function HallTemplates.setStorageDisplay(storageModel: Model, storage: { Crates:
 
 	-- Kisten im Regal
 	local slots = storageModel:FindFirstChild("Crates")
-	if not slots then
-		return
-	end
-	local size = BalanceConfig.Storage.CrateSize
-	local ids = {}
-	for id, n in storage.Items do
-		if n > 0 then
-			table.insert(ids, id)
-		end
-	end
-	Materials.SortIds(ids)
-	local plan: { { color: Color3, fraction: number } } = {}
-	for _, id in ids do
-		local mat = Materials.Get(id)
-		local n = storage.Items[id]
-		while n > 0 do
-			table.insert(plan, { color = if mat then mat.Color else Color3.new(0.3, 0.3, 0.3), fraction = math.min(n, size) / size })
-			n -= size
-		end
-	end
-	for i, slot in slots:GetChildren() do
-		local index = tonumber(slot.Name:match("%d+")) or i
-		local owned = index <= storage.Crates
-		for _, p in slot:GetChildren() do
-			if p:IsA("BasePart") then
-				if p.Name == "Fill" then
-					local entry = if owned then plan[index] else nil
-					p.Transparency = if entry then 0 else 1
-					if entry then
-						local h = math.max(0.2, (BOX_H - 0.3) * entry.fraction)
-						local pallet = slot:FindFirstChild("Pallet") :: BasePart
-						p.Size = Vector3.new(BOX - 0.4, h, BOX - 0.4)
-						p.CFrame = pallet.CFrame * CFrame.new(0, -0.25 + 0.7 + h / 2, 0)
-						p.Color = entry.color
-					end
-				else
-					p.Transparency = if owned then 0 else 1
-					p.CanCollide = owned
-				end
-			end
-		end
+	if slots then
+		CrateRackBuilder.update(slots, storage.Items, storage.Crates)
 	end
 end
 

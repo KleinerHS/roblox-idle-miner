@@ -20,7 +20,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 10 | Offline Production | TESTING_REQUIRED (Version 0.17.0) |
 | 11 | Prestige | TESTING_REQUIRED (Version 0.18.0; Bonus D-034 und Reset-Liste D-033 bestätigt) |
 | 12 | Content Expansion | TESTING_REQUIRED (12a D-035, 12b D-036, 12c Fahrzeuge – Werte Q-028 offen) |
-| 13 | Visual Polish | TESTING_REQUIRED (13a Map & Umgebung) |
+| 13 | Visual Polish | TESTING_REQUIRED (13a Map & Umgebung, 13b Halle/Lager/Ofen; weiter: 13c Mine-Shaft, 13d Licht/Effekte/Sound, 13e UI) |
 | 14 | Balance | NOT_STARTED |
 
 ## Setup – Details
@@ -465,6 +465,16 @@ Selbsttest 13b-2 (2026-10-13): Felix' Profil v8 → v9 migriert (6.000 → 6 Kis
 | Hochregallager statt Silo: 32 große Regale in vier Reihen (eine Doppelreihe), je 4 Paletten übereinander = 128 Plätze; Gitterboxen mit niedriger Klappe zum Fahrweg, Erz sichtbar in Farbe und Füllhöhe; nicht gekaufte Plätze leer; Anfahrschutz, Fahrwege, Gabelstapler, Leerpaletten; Anzeige vorne mit Bestand und Kisten („7 / 20 crates“), Terminal | `HallTemplates.buildStorage`, `HallTemplates.setStorageDisplay`, `StorageService` | TESTING_REQUIRED |
 
 Selbsttest 13b-3 (2026-10-13): Vorschau mit 20 Kisten und sechs Sorten – Boxen erscheinen der Reihe nach in der vorderen Reihe, Farben und Füllhöhe passen; keine Box berührt einen Regalbalken; Lager überschneidet nichts in der Halle.
+
+| 13b-4 | Dateien | Status |
+|---|---|---|
+| Ofen wie im Foto, etwas kleiner: Drehrohrofen in Längsrichtung mit Laufringen, Tragrollen auf Sockeln, Zahnkranz und Antrieb; Brennerhaube vorne mit glühender Öffnung, heißer Rohrzone, Feuer, Funken und Rauch aus dem Kamin nur im Betrieb | `SmelterTemplate.luau` | TESTING_REQUIRED |
+| Eingangslager hinten (4 Hochregale, 16 Kisten Erz) mit Zuführband zum Aufgabetrichter; Ausgangslager vorne (der „viereckige Klotz“, 4 Hochregale, 16 Kisten Barren) mit Schnecke von der Haube; Kisten zeigen Erz/Barren | `SmelterTemplate.luau`, `CrateRackBuilder.luau`, `SmelterService.updateVisual` | TESTING_REQUIRED |
+| Je ein Förderband: Lager → Eingangslager, Ausgangslager → Lager (Strecken neu) | `LayoutConfig.ConveyorPaths` | TESTING_REQUIRED |
+| Zwei Tanks außen an der rechten Wand mit Leitungen in die Halle | `SmelterTemplate.luau` | TESTING_REQUIRED |
+| Gemeinsamer Hochregal-Baustein für Lager und Ofen-Lager | `src/server/World/CrateRackBuilder.luau`, `HallTemplates.luau` | TESTING_REQUIRED |
+
+Selbsttest 13b-4 (2026-10-13): Vorschau im Betrieb (Glut, heiße Zone, Partikel) und Draufsicht ohne Dach mit dem Referenzbild verglichen; keine ungewollten Überschneidungen (nur Bodenplatte, Leitungen in die Wand, Tankbeine auf Kies); Play mit Felix' Profil ohne Fehler, Lager zeigt 7 Kisten, Ofen-Anzeige läuft, Förderbänder vorhanden.
 
 ## Phase 12 – Content Expansion – Details
 

@@ -64,12 +64,22 @@ local function updateVisual(player: Player)
 	local cfg = BalanceConfig.Smelter
 	local inputText = `IN  {CrateLogic.used(state.Input)} / {cfg.InputCrates} crates`
 	local outputText = `OUT {CrateLogic.used(state.Output)} / {cfg.OutputCrates} crates`
-	local key = `{status}|{inputText}|{outputText}`
+	-- Kistenbelegung als Schlüssel, damit nur bei Änderungen neu gezeichnet wird
+	local parts = {}
+	for id, n in state.Input do
+		table.insert(parts, `i{id}{n}`)
+	end
+	for id, n in state.Output do
+		table.insert(parts, `o{id}{n}`)
+	end
+	table.sort(parts)
+	local key = `{status}|{table.concat(parts, ",")}`
 	if lastVisual[player] == key then
 		return
 	end
 	lastVisual[player] = key
-	SmelterTemplate.setStatus(model, status, inputText, outputText, CrateLogic.used(state.Output) / cfg.OutputCrates)
+	SmelterTemplate.setStatus(model, status, inputText, outputText)
+	SmelterTemplate.setCrates(model, state.Input, state.Output)
 end
 
 local function tickPlayer(player: Player)

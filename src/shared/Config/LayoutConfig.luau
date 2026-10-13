@@ -77,9 +77,8 @@ local LayoutConfig = {
 	-- Hallenboden, Z. Erster Punkt = Förderband-Platz ("PLACE CONVEYOR HERE"). TODO_LAYOUT
 	ConveyorPaths = {
 		-- Phase 13b (Felix): je ein Band – Lager → Eingangslager des Ofens, Ausgangslager → Lager.
-		-- Endpunkte werden mit dem Ofen-Umbau (13b-4) an die Regalblöcke angepasst.
-		StorageToSmelter = { Vector3.new(-40, 1.2, 95), Vector3.new(-56, 1.2, 95) },
-		SmelterToStorage = { Vector3.new(-56, 1.2, 0), Vector3.new(-40, 1.2, 0), Vector3.new(-40, 1.2, 9) },
+		StorageToSmelter = { Vector3.new(-40, 1.2, 96), Vector3.new(-58, 1.2, 96) },
+		SmelterToStorage = { Vector3.new(-96, 1.2, -32), Vector3.new(-45, 1.2, -32), Vector3.new(-45, 1.2, 4) },
 	} :: { [string]: { Vector3 } },
 
 	-- Garage im vorderen Hallenbereich (docs/07 §3, D-008, D-016), lokal zur Plotmitte.
