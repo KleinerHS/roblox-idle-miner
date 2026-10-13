@@ -229,3 +229,10 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Source Question:** Q-027 (Felix, 2026-10-10)
 **Decision:** Werte aus Phase 12b gelten als Startwert. Das Fahrzeughaus wird größer und stellt höchstens 6 Fahrzeuge aus. Fahrzeugmodelle dürfen vorläufig sein, Feinschliff ganz am Ende.
 **Affected systems:** Equipment, Drills, Upgrades, Vehicle Shop
+
+## D-037 – Lager aus Palettenboxen, Kisten-Kauf, Ofen-Lager
+
+**Source:** Felix, 2026-10-10 und 2026-10-13
+**Decision:** Jede Kiste fasst 1.000 einer Materialsorte. Das Firmenlager wächst über gekaufte Kisten (Laptop): 1. Kiste $100, 2. $500, 3. $1.000, danach jeweils × 1,5; Hochregale mit 4 Paletten übereinander, ~30 Regale (128 Plätze). Ersetzt die Lager-Upgrades (D-022/D-036). Der Ofen hat ein Eingangs- und ein Ausgangslager mit je 4 Hochregalen (16 Kisten) und je ein Förderband (Lager → Eingang, Ausgang → Lager). Ein großes Lager hinter der Halle folgt später.
+**Affected systems:** Storage, Smelter, Conveyors, Offline, Trade, Laptop, Data (v9)
+

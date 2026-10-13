@@ -213,6 +213,12 @@ Strings.Laptop = table.freeze({
 	UpgradeButton = "UPGRADE %s",
 	MaxLevel = "MAX LEVEL",
 	MaxLevelSub = "Fully upgraded.",
+	-- Lager-Kisten (D-037)
+	CratesTitle = "PALLET CRATES",
+	CratesLine = "%d used · %d owned · max %d",
+	CrateSizeLine = "Each crate holds %s of one material.",
+	CratesMax = "All rack places are filled.",
+	BuyCrate = "BUY CRATE %s",
 
 	-- Drills (Phase 5b)
 	DrillStatus = { Running = "Running", OutputFull = "Output Full", Idle = "Idle" },
@@ -294,8 +300,8 @@ Strings.Garage = table.freeze({
 
 Strings.Smelter = table.freeze({
 	Title = "SMELTER",
-	Input = "Hopper %s / %s",
-	Output = "Bars %s / %s",
+	Input = "Input %s ore · %d / %d crates",
+	Output = "Output %s bars · %d / %d crates",
 	Status = { Running = "Running", WaitingForInput = "Waiting for input", OutputFull = "Output full – collect bars", Idle = "Idle" },
 	Recipe = "Smelting: %s → %s",
 	Feed = "FEED",

@@ -23,6 +23,7 @@ local CompanyIdentity = require(Shared.Definitions.CompanyIdentity)
 local Types = require(Shared.Types)
 local NumberFormat = require(Shared.Util.NumberFormat)
 local PrestigeLogic = require(Shared.Util.PrestigeLogic)
+local CrateLogic = require(Shared.Util.CrateLogic)
 
 local Net = require(script.Parent.Parent.Net)
 local Create = require(script.Parent.Parent.UI.Create)
@@ -411,6 +412,38 @@ local function upgradeCard(order: number, kind: Upgrades.UpgradeKind, capacity: 
 	end)
 end
 
+-- Kisten-Karte (D-037): belegte/gekaufte Kisten, nächste Kiste kaufen. Server prüft alles erneut.
+local function crateCard(order: number, snapshot: Types.StateSnapshot)
+	local cfg = BalanceConfig.Storage
+	local crates = snapshot.StorageCrates
+	local usedCrates = CrateLogic.used(snapshot.StorageItems)
+	local box = card(order, 120)
+	cardText(box, TEXT.CratesTitle, 0, 14, UITheme.Colors.TextSecondary, true)
+	cardText(box, string.format(TEXT.CratesLine, usedCrates, crates, cfg.MaxCrates), 26, 18, UITheme.Colors.TextPrimary, true)
+	cardText(box, string.format(TEXT.CrateSizeLine, NumberFormat.withSeparators(cfg.CrateSize)), 54, 14, UITheme.Colors.TextSecondary)
+	if crates >= cfg.MaxCrates then
+		cardText(box, TEXT.CratesMax, 80, 16, UITheme.Colors.Positive, true)
+		return
+	end
+	local price = CrateLogic.price(crates + 1)
+	local affordable = snapshot.Cash >= price
+	cardText(box, `{TEXT.Cost}: {NumberFormat.cash(price)}`, 80, 15, if affordable then UITheme.Colors.TextPrimary else UITheme.Colors.Negative)
+	local button: TextButton = Create("TextButton", {
+		AnchorPoint = Vector2.new(1, 1),
+		Position = UDim2.fromScale(1, 1),
+		Size = UDim2.fromOffset(190, 40),
+		BackgroundColor3 = if affordable then accent(snapshot) else UITheme.Colors.SurfaceRaised,
+		Font = UITheme.FontBold,
+		TextSize = 15,
+		TextColor3 = if affordable then Color3.fromRGB(20, 24, 28) else UITheme.Colors.TextPrimary,
+		Text = string.format(TEXT.BuyCrate, NumberFormat.cash(price)),
+		Parent = box,
+	}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
+	button.Activated:Connect(function()
+		call("BuyStorageCrate", { Price = price })
+	end)
+end
+
 -- DASHBOARD: schneller Firmenüberblick, keine Tabelle (docs/09 §24)
 local function renderDashboard(snapshot: Types.StateSnapshot)
 	label(TEXT.Dashboard, 24, UITheme.Colors.TextPrimary, 1, true)
@@ -511,7 +544,7 @@ local function renderStorage(snapshot: Types.StateSnapshot)
 		cardText(row, if ore then ore.DisplayName else id, 0, 16, UITheme.Colors.TextPrimary)
 		cardText(row, NumberFormat.withSeparators(snapshot.StorageItems[id]), 0, 16, UITheme.Colors.TextPrimary, true, Enum.TextXAlignment.Right)
 	end
-	upgradeCard(100, "storage", snapshot.StorageCapacity, snapshot)
+	crateCard(100, snapshot)
 end
 
 -- ELEVATOR: Kapazität, Takt, Status, Upgrade (docs/09 §31)
@@ -522,7 +555,7 @@ local function renderElevator(snapshot: Types.StateSnapshot)
 		return
 	end
 	local load = sumItems(snapshot.ElevatorBuffer)
-	local storageFull = snapshot.Buildings.build_storage == true and sumItems(snapshot.StorageItems) >= snapshot.StorageCapacity
+	local storageFull = snapshot.Buildings.build_storage == true and CrateLogic.isFull(snapshot.StorageItems, snapshot.StorageCrates)
 	local status = if load > 0 and storageFull then "StorageFull" elseif load > 0 then "Transporting" else "Idle"
 	local statusColor = if status == "StorageFull" then UITheme.Colors.Negative elseif status == "Transporting" then UITheme.Colors.Positive else UITheme.Colors.TextSecondary
 
@@ -548,7 +581,7 @@ local function renderProduction(snapshot: Types.StateSnapshot)
 		cardText(box, TEXT.SmelterCard, 0, 17, UITheme.Colors.TextPrimary, true)
 		cardText(box, Strings.Smelter.Status[status] or status, 0, 14, if status == "Running" then UITheme.Colors.Positive elseif status == "OutputFull" then UITheme.Colors.Negative else UITheme.Colors.Warning, true, Enum.TextXAlignment.Right)
 		local cfg = BalanceConfig.Smelter
-		cardText(box, `{string.format(Strings.Smelter.Input, NumberFormat.withSeparators(SmelterLogic.Sum(state.Input)), NumberFormat.withSeparators(cfg.InputCapacity))} · {string.format(Strings.Smelter.Output, NumberFormat.withSeparators(SmelterLogic.Sum(state.Output)), NumberFormat.withSeparators(cfg.OutputCapacity))}`, 24, 14, UITheme.Colors.TextSecondary)
+		cardText(box, `{string.format(Strings.Smelter.Input, NumberFormat.withSeparators(SmelterLogic.Sum(state.Input)), CrateLogic.used(state.Input), cfg.InputCrates)} · {string.format(Strings.Smelter.Output, NumberFormat.withSeparators(SmelterLogic.Sum(state.Output)), CrateLogic.used(state.Output), cfg.OutputCrates)}`, 24, 14, UITheme.Colors.TextSecondary)
 		local preferred = if state.Priority ~= "" then Materials.Get(state.Priority) else nil
 		cardText(box, `{Strings.Smelter.Priority}: {if preferred then preferred.DisplayName else Strings.Smelter.Auto}`, 44, 14, UITheme.Colors.TextSecondary)
 	end

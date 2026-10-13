@@ -19,6 +19,8 @@ local Types = require(Shared.Types)
 local Result = require(Shared.Util.Result)
 local NumberFormat = require(Shared.Util.NumberFormat)
 local Log = require(Shared.Util.Log)
+local CrateLogic = require(Shared.Util.CrateLogic)
+local BalanceConfig = require(Shared.Config.BalanceConfig)
 
 local HallTemplates = require(script.Parent.Parent.World.HallTemplates)
 local DataService = require(script.Parent.DataService)
@@ -44,8 +46,9 @@ local function backpackFree(data: Types.PlayerData): number
 	return math.max(0, (if def then def.Capacity else 0) - sum(data.Backpack))
 end
 
-local function storageFree(data: Types.PlayerData): number
-	return math.max(0, data.Storage.Capacity - sum(data.Storage.Items))
+-- Platz für eine Sorte (Kisten: eine Sorte je Kiste, D-037)
+local function storageFreeFor(data: Types.PlayerData, id: string): number
+	return CrateLogic.freeFor(data.Storage.Items, data.Storage.Crates, id)
 end
 
 -- Erze in fester Reihenfolge (Tier), damit Teilmengen deterministisch verschoben werden
@@ -68,7 +71,7 @@ local function updateDisplay(player: Player)
 	local model = BuildingService.GetModel(player, STORAGE_STEP)
 	if data and model then
 		local used = sum(data.Storage.Items)
-		HallTemplates.setStorageDisplay(model, used, data.Storage.Capacity, `{NumberFormat.withSeparators(used)} / {NumberFormat.withSeparators(data.Storage.Capacity)}`)
+		HallTemplates.setStorageDisplay(model, data.Storage, `{NumberFormat.withSeparators(used)} / {NumberFormat.withSeparators(data.Storage.Capacity)}`)
 	end
 end
 
@@ -106,17 +109,12 @@ local function deposit(player: Player)
 	if sum(data.Backpack) <= 0 then
 		return Result.err(Result.Codes.NOTHING_TO_SELL)
 	end
-	local free = storageFree(data)
-	if free <= 0 then
-		return Result.err(Result.Codes.STORAGE_FULL)
-	end
-
 	local moved = 0
 	DataService.Mutate(player, function(d)
 		for _, oreId in sortedOreIds(d.Backpack) do
-			local take = math.min(d.Backpack[oreId], free - moved)
+			local take = math.min(d.Backpack[oreId], storageFreeFor(d, oreId))
 			if take <= 0 then
-				break
+				continue
 			end
 			d.Backpack[oreId] -= take
 			if d.Backpack[oreId] <= 0 then
@@ -126,8 +124,11 @@ local function deposit(player: Player)
 			moved += take
 		end
 	end)
+	if moved <= 0 then
+		return Result.err(Result.Codes.STORAGE_FULL)
+	end
 	Log.debug(TAG, `{player.Name} lädt {moved} ins Lager`)
-	return Result.ok({ Moved = moved, Full = storageFree(data) <= 0 })
+	return Result.ok({ Moved = moved, Full = CrateLogic.isFull(data.Storage.Items, data.Storage.Crates) or sum(data.Backpack) > 0 })
 end
 
 -- Material aus dem Lager in den Rucksack (für den Verkauf am Tresen, D-004)
@@ -162,7 +163,36 @@ local function withdraw(player: Player, oreId: unknown, amount: unknown)
 	return Result.ok({ Moved = take })
 end
 
+-- Nächste Lagerkiste kaufen (Laptop, D-037)
+local function buyCrate(player: Player)
+	local data = DataService.Get(player)
+	if not data then
+		return Result.err(Result.Codes.DATA_NOT_LOADED)
+	end
+	if not data.Buildings[STORAGE_STEP] then
+		return Result.err(Result.Codes.STORAGE_REQUIRED)
+	end
+	local cfg = BalanceConfig.Storage
+	if data.Storage.Crates >= cfg.MaxCrates then
+		return Result.err(Result.Codes.ALREADY_DONE)
+	end
+	local price = CrateLogic.price(data.Storage.Crates + 1)
+	if data.Cash < price then
+		return Result.err(Result.Codes.NOT_ENOUGH_MONEY)
+	end
+	-- Prüfung oben und Änderung hier ohne Yield → atomar
+	DataService.Mutate(player, function(d)
+		d.Cash -= price
+		d.Storage.Crates += 1
+		d.Storage.Capacity = d.Storage.Crates * cfg.CrateSize
+	end)
+	DataService.RequestSave(player)
+	Log.debug(TAG, `{player.Name} kauft Kiste {data.Storage.Crates} für {price}`)
+	return Result.ok({ Crates = data.Storage.Crates, Price = price })
+end
+
 function StorageService.Init()
+	RemoteService.OnInvoke("BuyStorageCrate", buyCrate)
 	RemoteService.OnInvoke("StorageDeposit", deposit)
 	RemoteService.OnInvoke("StorageWithdraw", withdraw)
 end
@@ -191,10 +221,10 @@ function StorageService.Start()
 	end
 end
 
--- Freie Lagerkapazität (für Worker/Elevator in 4b)
-function StorageService.GetFree(player: Player): number
+-- Freier Platz für eine Sorte (Kisten-Logik, D-037)
+function StorageService.GetFree(player: Player, id: string): number
 	local data = DataService.Get(player)
-	return if data and data.Buildings[STORAGE_STEP] then storageFree(data) else 0
+	return if data and data.Buildings[STORAGE_STEP] then storageFreeFor(data, id) else 0
 end
 
 -- Fügt bis zur Kapazität hinzu und gibt die tatsächlich aufgenommene Menge zurück.
@@ -204,7 +234,7 @@ function StorageService.Add(player: Player, oreId: string, amount: number): numb
 	if not data or not data.Buildings[STORAGE_STEP] or amount <= 0 then
 		return 0
 	end
-	local take = math.min(amount, storageFree(data))
+	local take = math.min(amount, storageFreeFor(data, oreId))
 	if take <= 0 then
 		return 0
 	end

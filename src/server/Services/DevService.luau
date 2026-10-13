@@ -10,6 +10,7 @@ local ServerStorage = game:GetService("ServerStorage")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Log = require(ReplicatedStorage:WaitForChild("Shared").Util.Log)
+local BalanceConfig = require(ReplicatedStorage:WaitForChild("Shared").Config.BalanceConfig)
 
 local DataSchema = require(script.Parent.Parent.Data.DataSchema)
 local DataService = require(script.Parent.DataService)
@@ -94,12 +95,15 @@ function DevService.Init()
 	setLevel.Parent = folder
 
 	-- Lager- und Elevator-Kapazität setzen (zum Testen der Upgrades):
-	--   game.ServerStorage.DevTools.SetCapacities:Invoke(game.Players:GetPlayers()[1], 1000, 100)
+	-- storage = Lagerkapazität, wird auf ganze Kisten (D-037) aufgerundet:
+	--   game.ServerStorage.DevTools.SetCapacities:Invoke(game.Players:GetPlayers()[1], 5000, 100)
 	local setCapacities = Instance.new("BindableFunction")
 	setCapacities.Name = "SetCapacities"
 	setCapacities.OnInvoke = function(player: Player, storage: number, elevator: number): string
 		local ok = DataService.Mutate(player, function(data)
-			data.Storage.Capacity = math.max(1, math.floor(storage))
+			local size = BalanceConfig.Storage.CrateSize
+			data.Storage.Crates = math.clamp(math.ceil(storage / size), 0, BalanceConfig.Storage.MaxCrates)
+			data.Storage.Capacity = data.Storage.Crates * size
 			data.Production.ElevatorCapacity = math.max(1, math.floor(elevator))
 		end)
 		return if ok then "ok" else "Profil nicht geladen"

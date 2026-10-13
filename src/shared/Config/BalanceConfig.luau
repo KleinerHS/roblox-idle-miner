@@ -39,8 +39,10 @@ local BalanceConfig = {
 	Smelter = {
 		OrePerBar = 2, -- Felix (D-028)
 		SecondsPerBar = 3, -- Felix (D-028)
-		InputCapacity = 200, -- Felix (D-028) Erz im Einfülltrichter
-		OutputCapacity = 100, -- Felix (D-028) Barren in der Ablage
+		-- Eingangs- und Ausgangslager des Ofens: je 4 Hochregale × 4 Paletten (Felix D-037),
+		-- Kisten wie im Firmenlager (eine Sorte je Kiste, CrateSize Einheiten)
+		InputCrates = 16, -- Felix (D-037)
+		OutputCrates = 16, -- Felix (D-037)
 	},
 
 	-- Freischaltung der Minen über das Level (docs/12 §22). Mine 001 ist immer frei.
@@ -58,21 +60,19 @@ local BalanceConfig = {
 	} :: { [string]: { RequiredLevel: number } },
 
 	-- Firmenlager (docs/06 §14): Startkapazität 1.000 über alle Materialien (fest).
+	-- Firmenlager aus Palettenboxen (Phase 13b-2, Felix D-037): jede Kiste fasst CrateSize einer
+	-- Materialsorte; Kisten werden am Laptop gekauft (ersetzt die Kapazitäts-Upgrades D-022/D-036).
 	Storage = {
-		StartCapacity = 1000,
-		-- Kapazitätsstufen über die Storage-App im Laptop (docs/09 §29–30). Jede Stufe setzt
-		-- die Gesamtkapazität auf Capacity. Werte von Felix bestätigt (D-022).
-		Upgrades = {
-			{ Capacity = 2500, Cost = 3000, RequiredLevel = 5 }, -- Felix (D-022)
-			{ Capacity = 5000, Cost = 8000, RequiredLevel = 6 }, -- Felix (D-022)
-			{ Capacity = 10000, Cost = 20000, RequiredLevel = 8 }, -- Felix (D-022)
-			{ Capacity = 25000, Cost = 50000, RequiredLevel = 10 }, -- Felix (D-022)
-			-- Phase 12b (Startwert D-036): Kosten ≈ 15.000 × Erzwert auf diesem Level
-			{ Capacity = 50000, Cost = 200000, RequiredLevel = 20 }, -- Startwert (D-036)
-			{ Capacity = 100000, Cost = 13000000, RequiredLevel = 35 }, -- Startwert (D-036)
-			{ Capacity = 250000, Cost = 360000000, RequiredLevel = 55 }, -- Startwert (D-036)
-			{ Capacity = 500000, Cost = 18000000000, RequiredLevel = 80 }, -- Startwert (D-036)
-		},
+		CrateSize = 1000, -- Felix (D-037)
+		-- Plätze in den Hochregalen der Halle (32 Regale × 4 Paletten übereinander)
+		MaxCrates = 128, -- Felix (D-037: ~30 Regale × 4)
+		-- Kisten eines neuen Profils (die erste Kiste wird gekauft)
+		StartCrates = 0, -- Felix (D-037: Startkiste kostet $100)
+		-- Preis der 1., 2., 3. Kiste, danach jeweils × CrateGrowth
+		CratePrices = { 100, 500, 1000 }, -- Felix (D-037)
+		CrateGrowth = 1.5, -- Felix (D-037), TODO_BALANCE: späte Kisten sehr teuer (Kiste 50 ≈ $1,9 Bio.)
+		-- keine Kapazitätsstufen mehr (Lager wächst über Kisten)
+		Upgrades = {} :: { { Capacity: number, Cost: number, RequiredLevel: number } },
 	},
 
 	-- Worker (docs/05 §5–9). Werte von Felix bestätigt (D-021).

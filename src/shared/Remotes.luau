@@ -29,6 +29,9 @@ local Remotes: { [string]: RemoteDefinition } = {
 	-- Prestige ausführen (docs/12 §50–64): () -> Result<{ Count }>; Bestätigung macht der Client
 	Prestige = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 2, Window = 10 } },
 
+	-- Lager-Kiste kaufen (Laptop STORAGE, D-037): () -> Result<{ Crates, Price }>
+	BuyStorageCrate = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
+
 	-- Offline-Zusammenfassung nach dem Login (OfflineSimulation.Summary, docs/14 §15)
 	OfflineSummary = { Kind = "Event", Direction = "ServerToClient" },
 

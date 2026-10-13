@@ -11,6 +11,7 @@ local Shared = ReplicatedStorage:WaitForChild("Shared")
 local BalanceConfig = require(Shared.Config.BalanceConfig)
 local Recipes = require(Shared.Definitions.Recipes)
 local Types = require(Shared.Types)
+local CrateLogic = require(Shared.Util.CrateLogic)
 
 export type SmelterStatus = "Running" | "WaitingForInput" | "OutputFull" | "Idle"
 
@@ -51,11 +52,16 @@ function SmelterLogic.PickRecipe(state: Types.SmelterState): Recipes.RecipeDefin
 end
 
 function SmelterLogic.Status(state: Types.SmelterState): SmelterStatus
-	if sum(state.Output) >= BalanceConfig.Smelter.OutputCapacity then
-		return "OutputFull"
-	end
-	if SmelterLogic.PickRecipe(state) then
+	local recipe = SmelterLogic.PickRecipe(state)
+	if recipe then
+		-- Ausgangslager aus Kisten (D-037): Platz für genau diese Barrensorte?
+		if CrateLogic.freeFor(state.Output, BalanceConfig.Smelter.OutputCrates, recipe.BarId) <= 0 then
+			return "OutputFull"
+		end
 		return "Running"
+	end
+	if CrateLogic.isFull(state.Output, BalanceConfig.Smelter.OutputCrates) then
+		return "OutputFull"
 	end
 	return if sum(state.Input) > 0 then "WaitingForInput" else "Idle"
 end

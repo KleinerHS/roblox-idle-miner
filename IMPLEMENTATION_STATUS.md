@@ -451,6 +451,15 @@ Teilschritte: 13b-1 Halle/Grundriss/Außenbereich · 13b-2 Kisten-Logik und Kauf
 
 Selbsttest 13b-1 (2026-10-13): Vorschau gebaut, Draufsicht ohne Dach mit dem Referenzbild verglichen; keine Überschneidung zwischen Außenbereich und Halle, Hallenbauten untereinander nur gewollte Berührungen (Feuerlöscher an Stütze, Glastor im Torrahmen).
 
+| 13b-2 | Dateien | Status |
+|---|---|---|
+| Kisten-Logik: jede Kiste 1.000 einer Sorte; Platz je Sorte = freie Kisten; gilt für Lager, Ofen-Eingang (16 Kisten) und Ofen-Ausgang (16 Kisten) – Rucksack abladen, Elevator, Förderbänder, Ofen befüllen/abholen, Offline-Rechnung, Handel | `src/shared/Util/CrateLogic.luau`, `StorageService`, `ConveyorService`, `SmelterService`, `SmelterLogic`, `OfflineSimulation`, `TradeService` | TESTING_REQUIRED |
+| Datenschema v9: `Storage.Crates` (Capacity = Kisten × 1.000); Migration übernimmt die alte Kapazität als Kisten (mindestens so viele, wie der Bestand belegt) | `DataSchema`, `Types`, `DataService` | TESTING_REQUIRED |
+| Kisten kaufen am Laptop (STORAGE → PALLET CRATES): 1. $100, 2. $500, 3. $1.000, danach × 1,5; max. 128 (32 Regale × 4); ersetzt die Lager-Upgrades; neues Profil startet mit 0 Kisten | Remote `BuyStorageCrate`, `LaptopController`, `BalanceConfig.Storage` | TESTING_REQUIRED |
+| Ofen-Anzeigen in Kisten („Input … · 2 / 16 crates“), DevTool `SetCapacities` rundet auf Kisten | `SmelterController`, `LaptopController`, `DevService` | TESTING_REQUIRED |
+
+Selbsttest 13b-2 (2026-10-13): Felix' Profil v8 → v9 migriert (6.000 → 6 Kisten); Kauf Kiste 7 für $5.063 (Geld danach erstattet, Kiste 7 behalten, weil der Elevator sie sofort belegt hat); Kisten-Regeln mit Testdaten geprüft (Platz je Sorte, Gesamtbelegung, voll); Offline-Rechnung mit Kisten (Zinn bleibt im Elevator, wenn alle Kisten belegt sind); Laptop zeigt „7 used · 6 owned · max 128“ und den Kaufknopf.
+
 ## Phase 12 – Content Expansion – Details
 
 Schritte: 12a alle Minen/Erze/Barren über zentrale Kurven · 12b weitere Spitzhacken, Rucksäcke, Drills, Fahrzeuge, Ausbaustufen (offen).

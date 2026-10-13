@@ -18,6 +18,7 @@ local GameConfig = require(Shared.Config.GameConfig)
 local Materials = require(Shared.Definitions.Materials)
 local Types = require(Shared.Types)
 local Result = require(Shared.Util.Result)
+local CrateLogic = require(Shared.Util.CrateLogic)
 local Log = require(Shared.Util.Log)
 
 local DataService = require(script.Parent.DataService)
@@ -136,12 +137,16 @@ local function sumMaterials(m: { [string]: number }): number
 	return total
 end
 
-local function storageFree(data: Types.PlayerData): number
-	local used = 0
-	for _, n in data.Storage.Items do
-		used += n
+-- Passt der Tausch ins Kisten-Lager des Empfängers (D-037)? Abgaben werden zuerst abgezogen.
+local function fitsAfterTrade(data: Types.PlayerData, giving: { [string]: number }, receiving: { [string]: number }): boolean
+	local items: { [string]: number } = table.clone(data.Storage.Items)
+	for id, n in giving do
+		items[id] = (items[id] or 0) - n
+		if items[id] <= 0 then
+			items[id] = nil
+		end
 	end
-	return data.Storage.Capacity - used
+	return CrateLogic.fits(items, data.Storage.Crates, receiving)
 end
 
 -- Atomarer Tausch (§8, §20): alles erneut prüfen, dann beide Profile ohne Yield ändern
@@ -163,10 +168,10 @@ local function execute(session: Session): (boolean, string?)
 	end
 	-- Empfänger braucht ein Lager mit Platz für die Materialien
 	local toB, toA = sumMaterials(session.offers[a].Materials), sumMaterials(session.offers[b].Materials)
-	if toB > 0 and (not dataB.Buildings.build_storage or storageFree(dataB) + toA < toB) then
+	if toB > 0 and (not dataB.Buildings.build_storage or not fitsAfterTrade(dataB, session.offers[b].Materials, session.offers[a].Materials)) then
 		return false, Result.Codes.STORAGE_FULL
 	end
-	if toA > 0 and (not dataA.Buildings.build_storage or storageFree(dataA) + toB < toA) then
+	if toA > 0 and (not dataA.Buildings.build_storage or not fitsAfterTrade(dataA, session.offers[a].Materials, session.offers[b].Materials)) then
 		return false, Result.Codes.STORAGE_FULL
 	end
 

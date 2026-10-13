@@ -13,6 +13,7 @@ local UITheme = require(Shared.Config.UITheme)
 local BalanceConfig = require(Shared.Config.BalanceConfig)
 local Materials = require(Shared.Definitions.Materials)
 local SmelterLogic = require(Shared.Util.SmelterLogic)
+local CrateLogic = require(Shared.Util.CrateLogic)
 local NumberFormat = require(Shared.Util.NumberFormat)
 
 local Net = require(script.Parent.Parent.Net)
@@ -97,8 +98,8 @@ local function render()
 	local ore = recipe and Materials.Get(recipe.OreId)
 	local bar = recipe and Materials.Get(recipe.BarId)
 	recipeLabel.Text = if ore and bar then string.format(TEXT.Recipe, ore.DisplayName, bar.DisplayName) else ""
-	inputLabel.Text = string.format(TEXT.Input, NumberFormat.withSeparators(SmelterLogic.Sum(state.Input)), NumberFormat.withSeparators(cfg.InputCapacity))
-	outputLabel.Text = string.format(TEXT.Output, NumberFormat.withSeparators(SmelterLogic.Sum(state.Output)), NumberFormat.withSeparators(cfg.OutputCapacity))
+	inputLabel.Text = string.format(TEXT.Input, NumberFormat.withSeparators(SmelterLogic.Sum(state.Input)), CrateLogic.used(state.Input), cfg.InputCrates)
+	outputLabel.Text = string.format(TEXT.Output, NumberFormat.withSeparators(SmelterLogic.Sum(state.Output)), CrateLogic.used(state.Output), cfg.OutputCrates)
 
 	-- Priorität: AUTO
 	local autoRow = Create("Frame", { Size = UDim2.new(1, -8, 0, 34), BackgroundTransparency = 1, LayoutOrder = 0, Parent = list }, {

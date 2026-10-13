@@ -17,6 +17,8 @@ local Shared = ReplicatedStorage:WaitForChild("Shared")
 local LayoutConfig = require(Shared.Config.LayoutConfig)
 local Conveyors = require(Shared.Definitions.Conveyors)
 local Materials = require(Shared.Definitions.Materials)
+local CrateLogic = require(Shared.Util.CrateLogic)
+local BalanceConfig = require(Shared.Config.BalanceConfig)
 local Types = require(Shared.Types)
 local Result = require(Shared.Util.Result)
 local SmelterLogic = require(Shared.Util.SmelterLogic)
@@ -237,7 +239,7 @@ local function tickPlayer(player: Player)
 		local moved = 0
 		local color: Color3? = nil
 		if slot == "StorageToSmelter" then
-			local free = math.min(budget, SmelterService.InputFree(data))
+			local free = budget
 			-- bevorzugtes Erz zuerst, sonst wertvollstes (D-011)
 			local ids = {}
 			for id, n in data.Storage.Items do
@@ -255,9 +257,11 @@ local function tickPlayer(player: Player)
 				return ((mx and mx.SellValue or 0) :: number) > ((my and my.SellValue or 0) :: number)
 			end)
 			local plan: { [string]: number } = {}
+			local inputPlan: { [string]: number } = table.clone(data.Smelter.Input)
 			for _, id in ids do
-				local take = math.min(data.Storage.Items[id], free - moved)
+				local take = math.min(data.Storage.Items[id], free - moved, CrateLogic.freeFor(inputPlan, BalanceConfig.Smelter.InputCrates, id))
 				if take > 0 then
+					inputPlan[id] = (inputPlan[id] or 0) + take
 					plan[id] = take
 					moved += take
 					color = color or (Materials.Get(id) and (Materials.Get(id) :: any).Color)
@@ -275,11 +279,13 @@ local function tickPlayer(player: Player)
 				end)
 			end
 		else
-			local free = math.min(budget, data.Storage.Capacity - sum(data.Storage.Items))
+			local free = budget
 			local plan: { [string]: number } = {}
+			local storagePlan: { [string]: number } = table.clone(data.Storage.Items)
 			for id, n in data.Smelter.Output do
-				local take = math.min(n, free - moved)
+				local take = math.min(n, free - moved, CrateLogic.freeFor(storagePlan, data.Storage.Crates, id))
 				if take > 0 then
+					storagePlan[id] = (storagePlan[id] or 0) + take
 					plan[id] = take
 					moved += take
 					color = color or (Materials.Get(id) and (Materials.Get(id) :: any).Color)

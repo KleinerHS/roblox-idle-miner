@@ -268,7 +268,11 @@ function HallTemplates.buildStorage(plotCFrame: CFrame): Model
 end
 
 -- Füllanzeige aktualisieren
-function HallTemplates.setStorageDisplay(storageModel: Model, used: number, capacity: number, text: string)
+function HallTemplates.setStorageDisplay(storageModel: Model, storage: { Crates: number, Capacity: number, Items: { [string]: number } }, text: string)
+	local used, capacity = 0, storage.Capacity
+	for _, n in storage.Items do
+		used += n
+	end
 	local display = storageModel:FindFirstChild("StorageDisplay")
 	local gui = display and display:FindFirstChild("Display")
 	if not gui then

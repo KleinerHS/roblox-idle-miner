@@ -87,6 +87,8 @@ export type PlayerData = {
 
 	-- Firmenlager (ab DataVersion 2): Gesamtkapazität und Bestand je Material
 	Storage: {
+		-- gekaufte Kisten (ab DataVersion 9); Capacity = Crates × CrateSize (abgeleitet)
+		Crates: number,
 		Capacity: number,
 		Items: ItemCounts,
 	},
@@ -152,6 +154,7 @@ export type StateSnapshot = {
 	Backpack: ItemCounts,
 	BackpackCapacity: number,
 	StorageCapacity: number,
+	StorageCrates: number,
 	StorageItems: ItemCounts,
 	Workers: { [string]: WorkerRecord },
 	Drills: { [string]: DrillRecord },

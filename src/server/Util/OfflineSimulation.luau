@@ -28,6 +28,7 @@ local Materials = require(Shared.Definitions.Materials)
 local WorkerRoles = require(Shared.Definitions.WorkerRoles)
 local SmelterLogic = require(Shared.Util.SmelterLogic)
 local Types = require(Shared.Types)
+local CrateLogic = require(Shared.Util.CrateLogic)
 
 local STEP_SECONDS = BalanceConfig.Elevator.CycleSeconds
 local PAYROLL_SECONDS = BalanceConfig.Workers.PayrollSeconds
@@ -127,8 +128,9 @@ function OfflineSimulation.run(data: Types.PlayerData, seconds: number): Summary
 	local accToSmelter, accToStorage, accSmelt = 0, 0, 0
 	local paid: { [string]: boolean } = {}
 
-	local function storageFree(): number
-		return data.Storage.Capacity - sum(data.Storage.Items)
+	-- Kisten-Logik (D-037): Platz je Sorte
+	local function storageFree(id: string): number
+		return CrateLogic.freeFor(data.Storage.Items, data.Storage.Crates, id)
 	end
 
 	for step = 0, steps - 1 do
@@ -234,9 +236,9 @@ function OfflineSimulation.run(data: Types.PlayerData, seconds: number): Summary
 			return (if oa then oa.Tier else 999) < (if ob then ob.Tier else 999)
 		end)
 		for _, oreId in ids do
-			local n = math.min(load, production.ElevatorBuffer[oreId], storageFree())
+			local n = math.min(load, production.ElevatorBuffer[oreId], storageFree(oreId))
 			if n <= 0 then
-				break
+				continue
 			end
 			take(production.ElevatorBuffer, oreId, n)
 			data.Storage.Items[oreId] = (data.Storage.Items[oreId] or 0) + n
@@ -248,7 +250,7 @@ function OfflineSimulation.run(data: Types.PlayerData, seconds: number): Summary
 			-- Förderband Lager → Schmelzer (bevorzugtes Erz zuerst, sonst wertvollstes)
 			if toSmelterRate > 0 then
 				local a = accToSmelter + toSmelterRate * STEP_SECONDS
-				local budget = math.min(math.floor(a), BalanceConfig.Smelter.InputCapacity - sum(data.Smelter.Input))
+				local budget = math.floor(a)
 				local smeltable = {}
 				for id, n in data.Storage.Items do
 					if n > 0 and SmelterLogic.IsSmeltable(id) then
@@ -266,7 +268,7 @@ function OfflineSimulation.run(data: Types.PlayerData, seconds: number): Summary
 				end)
 				local moved = 0
 				for _, id in smeltable do
-					local n = math.min(data.Storage.Items[id], budget - moved)
+					local n = math.min(data.Storage.Items[id], budget - moved, CrateLogic.freeFor(data.Smelter.Input, BalanceConfig.Smelter.InputCrates, id))
 					if n > 0 then
 						take(data.Storage.Items, id, n)
 						data.Smelter.Input[id] = (data.Smelter.Input[id] or 0) + n
@@ -296,7 +298,7 @@ function OfflineSimulation.run(data: Types.PlayerData, seconds: number): Summary
 			-- Förderband Schmelzer → Lager
 			if toStorageRate > 0 then
 				local a = accToStorage + toStorageRate * STEP_SECONDS
-				local budget = math.min(math.floor(a), storageFree())
+				local budget = math.floor(a)
 				local moved = 0
 				local barIds = {}
 				for id in data.Smelter.Output do
@@ -304,7 +306,7 @@ function OfflineSimulation.run(data: Types.PlayerData, seconds: number): Summary
 				end
 				table.sort(barIds)
 				for _, id in barIds do
-					local n = math.min(data.Smelter.Output[id], budget - moved)
+					local n = math.min(data.Smelter.Output[id], budget - moved, storageFree(id))
 					if n > 0 then
 						take(data.Smelter.Output, id, n)
 						data.Storage.Items[id] = (data.Storage.Items[id] or 0) + n
@@ -316,7 +318,7 @@ function OfflineSimulation.run(data: Types.PlayerData, seconds: number): Summary
 			end
 		end
 
-		if summary.StorageFullAfter == nil and storageFree() <= 0 then
+		if summary.StorageFullAfter == nil and CrateLogic.isFull(data.Storage.Items, data.Storage.Crates) then
 			summary.StorageFullAfter = t + STEP_SECONDS
 		end
 	end

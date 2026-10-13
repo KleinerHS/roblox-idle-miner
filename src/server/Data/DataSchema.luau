@@ -1,5 +1,5 @@
 --!strict
--- Datenschema v8: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
+-- Datenschema v9: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
 -- Regeln:
 --  * Defaults gibt es nur hier.
 --  * Jede Strukturänderung erhöht CURRENT_VERSION und bekommt eine Migration
@@ -15,7 +15,7 @@ local Backpacks = require(Shared.Definitions.Backpacks)
 local Mines = require(Shared.Definitions.Mines)
 local Types = require(Shared.Types)
 
-local CURRENT_VERSION = 8
+local CURRENT_VERSION = 9
 
 local DataSchema = {
 	CurrentVersion = CURRENT_VERSION,
@@ -55,7 +55,8 @@ local TEMPLATE: Types.PlayerData = {
 
 	-- Firmenlager (v2): ein gemeinsamer Bestand über alle Materialien (docs/06 §13–14)
 	Storage = {
-		Capacity = BalanceConfig.Storage.StartCapacity,
+		Crates = BalanceConfig.Storage.StartCrates,
+		Capacity = BalanceConfig.Storage.StartCrates * BalanceConfig.Storage.CrateSize,
 		Items = {},
 	},
 
@@ -125,7 +126,7 @@ local MIGRATIONS: { [number]: (data: { [string]: any }) -> () } = {
 	-- v1 → v2: Firmenlager ergänzt (Phase 4)
 	[1] = function(data)
 		if typeof(data.Storage) ~= "table" then
-			data.Storage = { Capacity = BalanceConfig.Storage.StartCapacity, Items = {} }
+			data.Storage = { Capacity = 1000, Items = {} } -- damaliger Startwert (docs/06 §14)
 		end
 	end,
 	-- v2 → v3: Worker und Produktionspuffer ergänzt (Phase 4b)
@@ -169,6 +170,22 @@ local MIGRATIONS: { [number]: (data: { [string]: any }) -> () } = {
 		if typeof(data.Settings) ~= "table" then
 			data.Settings = { TradeRequests = true }
 		end
+	end,
+	-- v8 → v9: Lager aus Kisten (D-037). Bisherige Kapazität bleibt als Kistenzahl erhalten,
+	-- mindestens so viele Kisten, wie der vorhandene Bestand belegt.
+	[8] = function(data)
+		local size = BalanceConfig.Storage.CrateSize
+		local storage = data.Storage
+		local crates = math.ceil((storage.Capacity or 0) / size)
+		local used = 0
+		for _, n in storage.Items or {} do
+			if n > 0 then
+				used += math.ceil(n / size)
+			end
+		end
+		crates = math.clamp(math.max(crates, used), 0, BalanceConfig.Storage.MaxCrates)
+		storage.Crates = crates
+		storage.Capacity = crates * size
 	end,
 }
 

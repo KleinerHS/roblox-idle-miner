@@ -16,6 +16,7 @@ local Materials = require(Shared.Definitions.Materials)
 local Types = require(Shared.Types)
 local Result = require(Shared.Util.Result)
 local SmelterLogic = require(Shared.Util.SmelterLogic)
+local CrateLogic = require(Shared.Util.CrateLogic)
 local NumberFormat = require(Shared.Util.NumberFormat)
 local Log = require(Shared.Util.Log)
 
@@ -61,14 +62,14 @@ local function updateVisual(player: Player)
 	local state = data.Smelter
 	local status = SmelterLogic.Status(state)
 	local cfg = BalanceConfig.Smelter
-	local inputText = `IN  {NumberFormat.withSeparators(sum(state.Input))} / {NumberFormat.withSeparators(cfg.InputCapacity)}`
-	local outputText = `OUT {NumberFormat.withSeparators(sum(state.Output))} / {NumberFormat.withSeparators(cfg.OutputCapacity)}`
+	local inputText = `IN  {CrateLogic.used(state.Input)} / {cfg.InputCrates} crates`
+	local outputText = `OUT {CrateLogic.used(state.Output)} / {cfg.OutputCrates} crates`
 	local key = `{status}|{inputText}|{outputText}`
 	if lastVisual[player] == key then
 		return
 	end
 	lastVisual[player] = key
-	SmelterTemplate.setStatus(model, status, inputText, outputText, sum(state.Output) / cfg.OutputCapacity)
+	SmelterTemplate.setStatus(model, status, inputText, outputText, CrateLogic.used(state.Output) / cfg.OutputCrates)
 end
 
 local function tickPlayer(player: Player)
@@ -120,10 +121,7 @@ local function feed(player: Player, oreId: unknown, amount: unknown)
 	if not nearTerminal(player) then
 		return Result.err(Result.Codes.TOO_FAR)
 	end
-	local free = BalanceConfig.Smelter.InputCapacity - sum(data.Smelter.Input)
-	if free <= 0 then
-		return Result.err(Result.Codes.SMELTER_FULL)
-	end
+	local free = math.huge
 	local ids: { string } = {}
 	if oreId then
 		table.insert(ids, oreId :: string)
@@ -144,15 +142,17 @@ local function feed(player: Player, oreId: unknown, amount: unknown)
 	local plan: { [string]: number } = {}
 	local total = 0
 	local limit = if amount then math.min(free, amount :: number) else free
+	local inputPlan: { [string]: number } = table.clone(data.Smelter.Input)
 	for _, id in ids do
-		local take = math.min(data.Storage.Items[id] or 0, limit - total)
+		local take = math.min(data.Storage.Items[id] or 0, limit - total, CrateLogic.freeFor(inputPlan, BalanceConfig.Smelter.InputCrates, id))
 		if take > 0 then
+			inputPlan[id] = (inputPlan[id] or 0) + take
 			plan[id] = take
 			total += take
 		end
 	end
 	if total <= 0 then
-		return Result.err(Result.Codes.NOTHING_TO_LOAD)
+		return Result.err(if next(data.Storage.Items) then Result.Codes.SMELTER_FULL else Result.Codes.NOTHING_TO_LOAD)
 	end
 	DataService.Mutate(player, function(d)
 		for id, n in plan do
@@ -180,10 +180,7 @@ local function collect(player: Player)
 	if not nearTerminal(player) then
 		return Result.err(Result.Codes.TOO_FAR)
 	end
-	local free = data.Storage.Capacity - sum(data.Storage.Items)
-	if free <= 0 then
-		return Result.err(Result.Codes.STORAGE_FULL)
-	end
+	local free = math.huge
 	local ids = {}
 	for id, n in data.Smelter.Output do
 		if n > 0 then
@@ -192,16 +189,18 @@ local function collect(player: Player)
 	end
 	Materials.SortIds(ids)
 	local plan: { [string]: number } = {}
+	local storagePlan: { [string]: number } = table.clone(data.Storage.Items)
 	local total = 0
 	for _, id in ids do
-		local take = math.min(data.Smelter.Output[id], free - total)
+		local take = math.min(data.Smelter.Output[id], free - total, CrateLogic.freeFor(storagePlan, data.Storage.Crates, id))
 		if take > 0 then
+			storagePlan[id] = (storagePlan[id] or 0) + take
 			plan[id] = take
 			total += take
 		end
 	end
 	if total <= 0 then
-		return Result.err(Result.Codes.NOTHING_TO_SELL)
+		return Result.err(if next(data.Smelter.Output) then Result.Codes.STORAGE_FULL else Result.Codes.NOTHING_TO_SELL)
 	end
 	DataService.Mutate(player, function(d)
 		for id, n in plan do
@@ -276,8 +275,8 @@ function SmelterService.Start()
 end
 
 -- Für Förderbänder (Phase 7b): freie Trichtermenge und Barren in der Ablage
-function SmelterService.InputFree(data: Types.PlayerData): number
-	return BalanceConfig.Smelter.InputCapacity - sum(data.Smelter.Input)
+function SmelterService.InputFree(data: Types.PlayerData, id: string): number
+	return CrateLogic.freeFor(data.Smelter.Input, BalanceConfig.Smelter.InputCrates, id)
 end
 
 function SmelterService.RefreshVisual(player: Player)
