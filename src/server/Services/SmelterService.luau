@@ -62,8 +62,8 @@ local function updateVisual(player: Player)
 	local state = data.Smelter
 	local status = SmelterLogic.Status(state)
 	local cfg = BalanceConfig.Smelter
-	local inputText = `IN  {CrateLogic.used(state.Input)} / {cfg.InputCrates} crates`
-	local outputText = `OUT {CrateLogic.used(state.Output)} / {cfg.OutputCrates} crates`
+	local inputText = `Ore: {CrateLogic.used(state.Input)} of {cfg.InputCrates} crates`
+	local outputText = `Bars: {CrateLogic.used(state.Output)} of {cfg.OutputCrates} crates`
 	-- Kistenbelegung als Schlüssel, damit nur bei Änderungen neu gezeichnet wird
 	local parts = {}
 	for id, n in state.Input do

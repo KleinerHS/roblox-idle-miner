@@ -14,6 +14,7 @@ local Shared = ReplicatedStorage:WaitForChild("Shared")
 local LayoutConfig = require(Shared.Config.LayoutConfig)
 
 local ElevatorCageBuilder = require(script.Parent.ElevatorCageBuilder)
+local HallLayout = require(script.Parent.HallLayout)
 local HallTemplates = require(script.Parent.HallTemplates)
 local GarageTemplate = require(script.Parent.GarageTemplate)
 local SmelterTemplate = require(script.Parent.SmelterTemplate)
@@ -183,7 +184,8 @@ function BuildTemplates.build(stepId: string, plotCFrame: CFrame): Model?
 	if not builder then
 		return nil
 	end
-	local model = builder(plotCFrame)
+	-- von Hand angepasstes Layout (Workspace.HallLayout) hat Vorrang vor dem Code-Bau
+	local model = HallLayout.cloneStep(stepId, plotCFrame) or builder(plotCFrame)
 	model:SetAttribute("BuildStepId", stepId)
 	return model
 end

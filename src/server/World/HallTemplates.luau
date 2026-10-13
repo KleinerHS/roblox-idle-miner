@@ -12,6 +12,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LayoutConfig = require(ReplicatedStorage:WaitForChild("Shared").Config.LayoutConfig)
 local BalanceConfig = require(ReplicatedStorage:WaitForChild("Shared").Config.BalanceConfig)
 local CrateRackBuilder = require(script.Parent.CrateRackBuilder)
+local FloatingText = require(script.Parent.FloatingText)
 
 local HallTemplates = {}
 
@@ -145,7 +146,6 @@ function HallTemplates.buildRoof(plotCFrame: CFrame): Model
 	return model
 end
 
--- Regal mit Kisten (Stahlrahmen orange wie im Masterplan)
 -- Hochregallager (Phase 13b-3, Felix D-037): 32 große Regale in vier Reihen (eine Doppelreihe),
 -- je 4 Palettenboxen übereinander (CrateRackBuilder). Vorne: Anzeige und Terminal.
 -- 12 Regale je Reihe bis zur Bereichsmarkierung rechts (Felix 2026-10-13), Block nach rechts versetzt
@@ -154,9 +154,16 @@ local RACK_SHIFT_X = -18
 local STORAGE_ROWS = {
 	{ Z = -9, Face = -1 },
 	{ Z = 15, Face = -1 },
-	{ Z = 23.5, Face = 1 },
+	{ Z = 24.2, Face = 1 },
 	{ Z = 47, Face = -1 },
 }
+
+local function group(parent: Instance, name: string): Model
+	local m = Instance.new("Model")
+	m.Name = name
+	m.Parent = parent
+	return m
+end
 
 function HallTemplates.buildStorage(plotCFrame: CFrame): Model
 	local model = Instance.new("Model")
@@ -165,94 +172,51 @@ function HallTemplates.buildStorage(plotCFrame: CFrame): Model
 	local o = plotCFrame * CFrame.new(zone.Center.X, LayoutConfig.HallFloorTop, zone.Center.Y)
 	local hw, hd = zone.Size.X / 2, zone.Size.Y / 2
 
-	CrateRackBuilder.build(model, o * CFrame.new(RACK_SHIFT_X, 0, 0), STORAGE_ROWS, RACKS_PER_ROW)
+	-- Regale (jedes ein eigenes Model in "Racks")
+	local racks = group(model, "Racks")
+	CrateRackBuilder.build(racks, o * CFrame.new(RACK_SHIFT_X, 0, 0), STORAGE_ROWS, RACKS_PER_ROW)
 
-	-- Fahrwege: gelbe Linien vor den Reihen, Gabelstapler und lose Paletten links
-	for i, z in { 35.25, 3 } do
-		local lane = part(model, `LaneLine{i}`, Vector3.new(RACKS_PER_ROW * CrateRackBuilder.Bay + 8, 0.06, 0.5), o * CFrame.new(RACK_SHIFT_X, 0.03, z), YELLOW, Enum.Material.SmoothPlastic)
+	-- Fahrwege: gelbe Linien vor den Reihen
+	local lanes = group(model, "Lanes")
+	for i, z in { 35.25, 3, -18 } do
+		local lane = part(lanes, `LaneLine{i}`, Vector3.new(RACKS_PER_ROW * CrateRackBuilder.Bay + 8, 0.06, 0.5), o * CFrame.new(RACK_SHIFT_X, 0.03, z), YELLOW, Enum.Material.SmoothPlastic)
 		lane.CanCollide = false
 	end
-	local frontLane = part(model, "LaneFront", Vector3.new(RACKS_PER_ROW * CrateRackBuilder.Bay + 8, 0.06, 0.5), o * CFrame.new(RACK_SHIFT_X, 0.03, -18), YELLOW, Enum.Material.SmoothPlastic)
-	frontLane.CanCollide = false
+	-- Gabelstapler und lose Paletten links vorne
+	local forklift = group(model, "Forklift")
 	local fork = o * CFrame.new(hw - 18, 0, -20) * CFrame.Angles(0, math.rad(-20), 0)
-	part(model, "ForkliftBody", Vector3.new(4, 2.4, 6), fork * CFrame.new(0, 2.2, 0), YELLOW, Enum.Material.SmoothPlastic)
-	part(model, "ForkliftWeight", Vector3.new(4, 2.2, 1.4), fork * CFrame.new(0, 2.3, 3.4), STEEL, Enum.Material.Metal)
-	part(model, "ForkliftRoof", Vector3.new(4, 0.25, 4.6), fork * CFrame.new(0, 7.9, 0.2), STEEL, Enum.Material.Metal)
+	part(forklift, "ForkliftBody", Vector3.new(4, 2.4, 6), fork * CFrame.new(0, 2.2, 0), YELLOW, Enum.Material.SmoothPlastic)
+	part(forklift, "ForkliftWeight", Vector3.new(4, 2.2, 1.4), fork * CFrame.new(0, 2.3, 3.4), STEEL, Enum.Material.Metal)
+	part(forklift, "ForkliftRoof", Vector3.new(4, 0.25, 4.6), fork * CFrame.new(0, 7.9, 0.2), STEEL, Enum.Material.Metal)
 	for _, dx in { -1.8, 1.8 } do
-		part(model, `ForkliftPost{dx}`, Vector3.new(0.25, 4.6, 0.25), fork * CFrame.new(dx, 5.6, 2.4), STEEL, Enum.Material.Metal)
-		part(model, `ForkliftMast{dx}`, Vector3.new(0.4, 7, 0.4), fork * CFrame.new(dx * 0.8, 4.4, -3.2), STEEL, Enum.Material.Metal)
-		part(model, `ForkliftFork{dx}`, Vector3.new(0.4, 0.2, 3.4), fork * CFrame.new(dx * 0.6, 1.3, -4.9), STEEL, Enum.Material.Metal)
+		part(forklift, `ForkliftPost{dx}`, Vector3.new(0.25, 4.6, 0.25), fork * CFrame.new(dx, 5.6, 2.4), STEEL, Enum.Material.Metal)
+		part(forklift, `ForkliftMast{dx}`, Vector3.new(0.4, 7, 0.4), fork * CFrame.new(dx * 0.8, 4.4, -3.2), STEEL, Enum.Material.Metal)
+		part(forklift, `ForkliftFork{dx}`, Vector3.new(0.4, 0.2, 3.4), fork * CFrame.new(dx * 0.6, 1.3, -4.9), STEEL, Enum.Material.Metal)
 		for _, dz in { -1.8, 1.8 } do
-			local w = part(model, `ForkliftWheel{dx}_{dz}`, Vector3.new(0.8, 1.8, 1.8), fork * CFrame.new(dx * 1.1, 0.9, dz), Color3.fromRGB(30, 30, 32), Enum.Material.Rubber)
+			local w = part(forklift, `ForkliftWheel{dx}_{dz}`, Vector3.new(0.8, 1.8, 1.8), fork * CFrame.new(dx * 1.1, 0.9, dz), Color3.fromRGB(30, 30, 32), Enum.Material.Rubber)
 			w.Shape = Enum.PartType.Cylinder
 		end
 	end
+	local spare = group(model, "SparePallets")
 	for i = 1, 3 do
-		part(model, `SparePallet{i}`, Vector3.new(6.2, 0.5, 6.2), o * CFrame.new(hw - 10, 0.25 + (i - 1) * 0.5, -40) * CFrame.Angles(0, math.rad(i * 3), 0), CRATE_DARK, Enum.Material.WoodPlanks)
+		part(spare, `SparePallet{i}`, Vector3.new(6.2, 0.5, 6.2), o * CFrame.new(hw - 10, 0.25 + (i - 1) * 0.5, -40) * CFrame.Angles(0, math.rad(i * 3), 0), CRATE_DARK, Enum.Material.WoodPlanks)
 	end
 
-	-- Anzeige vorne (aus normaler Entfernung lesbar, docs/06 §16): Bestand und Kisten
-	local displayCF = o * CFrame.new(0, 0, -hd + 6)
-	for _, dx in { -5, 5 } do
-		part(model, `DisplayPost{dx}`, Vector3.new(0.6, 9, 0.6), displayCF * CFrame.new(dx, 4.5, 0.3), STEEL, Enum.Material.Metal)
-	end
-	local display = part(model, "StorageDisplay", Vector3.new(12, 5, 0.3), displayCF * CFrame.new(0, 10, 0), Color3.fromRGB(24, 27, 33), Enum.Material.SmoothPlastic)
-	local gui = Instance.new("SurfaceGui")
-	gui.Name = "Display"
-	gui.Face = Enum.NormalId.Front
-	gui.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
-	gui.PixelsPerStud = 50
-	gui.LightInfluence = 0
-	gui.Parent = display
-	local title = Instance.new("TextLabel")
-	title.Name = "Title"
-	title.Size = UDim2.new(1, 0, 0.26, 0)
-	title.BackgroundTransparency = 1
-	title.Font = Enum.Font.GothamBold
-	title.TextScaled = true
-	title.TextColor3 = Color3.fromRGB(165, 172, 184)
-	title.Text = "STORAGE"
-	title.Parent = gui
-	local amount = Instance.new("TextLabel")
-	amount.Name = "Amount"
-	amount.Position = UDim2.fromScale(0, 0.26)
-	amount.Size = UDim2.new(1, 0, 0.34, 0)
-	amount.BackgroundTransparency = 1
-	amount.Font = Enum.Font.GothamBlack
-	amount.TextScaled = true
-	amount.TextColor3 = Color3.fromRGB(240, 242, 245)
-	amount.Text = "0 / 0"
-	amount.Parent = gui
-	local crates = Instance.new("TextLabel")
-	crates.Name = "Crates"
-	crates.Position = UDim2.fromScale(0, 0.6)
-	crates.Size = UDim2.new(1, 0, 0.18, 0)
-	crates.BackgroundTransparency = 1
-	crates.Font = Enum.Font.GothamBold
-	crates.TextScaled = true
-	crates.TextColor3 = Color3.fromRGB(200, 205, 214)
-	crates.Text = ""
-	crates.Parent = gui
-	local barBack = Instance.new("Frame")
-	barBack.Name = "Bar"
-	barBack.Position = UDim2.fromScale(0.06, 0.82)
-	barBack.Size = UDim2.fromScale(0.88, 0.12)
-	barBack.BackgroundColor3 = Color3.fromRGB(48, 53, 63)
-	barBack.BorderSizePixel = 0
-	barBack.Parent = gui
-	local fill = Instance.new("Frame")
-	fill.Name = "Fill"
-	fill.Size = UDim2.fromScale(0, 1)
-	fill.BackgroundColor3 = Color3.fromRGB(88, 196, 120)
-	fill.BorderSizePixel = 0
-	fill.Parent = barBack
+	-- Schwebende Info-Schrift vorne über dem Lager (Felix: keine Tafeln, freundliche Schrift)
+	FloatingText.create(model, "StorageDisplay", o * CFrame.new(RACK_SHIFT_X, 36, -hd + 30), 22, {
+		{ Name = "Title", Text = "Storage", Size = 2.6, Color = Color3.fromRGB(255, 214, 120) },
+		{ Name = "Amount", Text = "0 / 0", Size = 3.4 },
+		{ Name = "Crates", Text = "", Size = 2 },
+	}, 220)
 
 	-- Terminal vorne links im Lagerbereich: Rucksack abladen / Material entnehmen
+	local terminal = group(model, "Terminal")
 	local terminalCF = o * CFrame.new(hw - 30, 0, -hd + 8)
-	part(model, "TerminalPost", Vector3.new(1.4, 3.6, 1.4), terminalCF * CFrame.new(0, 1.8, 0), STEEL, Enum.Material.Metal)
-	local screen = part(model, "TerminalScreen", Vector3.new(3, 2, 0.4), terminalCF * CFrame.new(0, 4.2, 0) * CFrame.Angles(math.rad(-15), 0, 0), Color3.fromRGB(90, 170, 255), Enum.Material.Neon)
+	part(terminal, "TerminalPost", Vector3.new(1.4, 3.6, 1.4), terminalCF * CFrame.new(0, 1.8, 0), STEEL, Enum.Material.Metal)
+	local screen = part(terminal, "TerminalScreen", Vector3.new(3, 2, 0.4), terminalCF * CFrame.new(0, 4.2, 0) * CFrame.Angles(math.rad(-15), 0, 0), Color3.fromRGB(90, 170, 255), Enum.Material.Neon)
 	screen.Transparency = 0.1
-	local promptPart = part(model, "StorageTerminalPart", Vector3.new(3, 4, 3), terminalCF * CFrame.new(0, 3, -1.5), WALL, Enum.Material.SmoothPlastic)
+	FloatingText.title(terminal, "TerminalLabel", terminalCF * CFrame.new(0, 7.5, 0), "Unload & take ore", 1.3)
+	local promptPart = part(terminal, "StorageTerminalPart", Vector3.new(3, 4, 3), terminalCF * CFrame.new(0, 3, -1.5), WALL, Enum.Material.SmoothPlastic)
 	promptPart.Transparency = 1
 	promptPart.CanCollide = false
 	promptPart.CanQuery = false
@@ -272,10 +236,6 @@ end
 -- Anzeige und Regalbelegung aktualisieren: gekaufte Kisten sichtbar, Sorten der Reihe nach
 -- (Stufe), jede Sorte belegt ceil(Menge / Kistengröße) Kisten, Füllhöhe zeigt die Menge.
 function HallTemplates.setStorageDisplay(storageModel: Model, storage: { Crates: number, Capacity: number, Items: { [string]: number } }, text: string)
-	local used, capacity = 0, storage.Capacity
-	for _, n in storage.Items do
-		used += n
-	end
 	local display = storageModel:FindFirstChild("StorageDisplay", true)
 	local gui = display and display:FindFirstChild("Display")
 	if gui then
@@ -292,22 +252,11 @@ function HallTemplates.setStorageDisplay(storageModel: Model, storage: { Crates:
 		end
 		local cratesLabel = gui:FindFirstChild("Crates")
 		if cratesLabel and cratesLabel:IsA("TextLabel") then
-			cratesLabel.Text = `{usedCrates} / {storage.Crates} crates`
-		end
-		local bar = gui:FindFirstChild("Bar")
-		local fill = bar and bar:FindFirstChild("Fill")
-		if fill and fill:IsA("Frame") then
-			local ratio = if storage.Crates > 0 then math.clamp(usedCrates / storage.Crates, 0, 1) else 0
-			fill.Size = UDim2.fromScale(ratio, 1)
-			fill.BackgroundColor3 = if ratio >= 1 then Color3.fromRGB(226, 92, 92) elseif ratio >= 0.8 then Color3.fromRGB(240, 180, 70) else Color3.fromRGB(88, 196, 120)
+			cratesLabel.Text = `{usedCrates} of {storage.Crates} crates in use`
+			cratesLabel.TextColor3 = if storage.Crates > 0 and usedCrates >= storage.Crates then Color3.fromRGB(255, 140, 120) else Color3.fromRGB(220, 230, 240)
 		end
 	end
-
-	-- Kisten im Regal
-	local slots = storageModel:FindFirstChild("Crates")
-	if slots then
-		CrateRackBuilder.update(slots, storage.Items, storage.Crates)
-	end
+	CrateRackBuilder.update(storageModel, storage.Items, storage.Crates)
 end
 
 return table.freeze(HallTemplates)

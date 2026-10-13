@@ -236,3 +236,8 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Decision:** Jede Kiste fasst 1.000 einer Materialsorte. Das Firmenlager wächst über gekaufte Kisten (Laptop): 1. Kiste $100, 2. $500, 3. $1.000, danach jeweils × 1,5; Hochregale mit 4 Paletten übereinander, ~30 Regale (128 Plätze). Ersetzt die Lager-Upgrades (D-022/D-036). Der Ofen hat ein Eingangs- und ein Ausgangslager mit je 4 Hochregalen (16 Kisten) und je ein Förderband (Lager → Eingang, Ausgang → Lager). Ein großes Lager hinter der Halle folgt später.
 **Affected systems:** Storage, Smelter, Conveyors, Offline, Trade, Laptop, Data (v9)
 
+## D-038 – Hallen-Layout von Hand, schwebende Schrift statt Schilder
+
+**Source:** Felix, 2026-10-13
+**Decision:** Alle Objekte der Halle sind einzeln gruppiert. Die Place-Datei enthält `Workspace.HallLayout` (Ausbau von Plot 1); Felix verschiebt darin frei, der Server übernimmt das Layout für alle Plots. Funktionsteile behalten ihre Namen. Förderband-Strecken und Fahrzeug-Stellplätze bleiben in `LayoutConfig`. Info-Anzeigen sind schwebende, freundliche Schrift statt Schilder.
+**Affected systems:** World-Builder, Plot, Building, Storage, Smelter, Garage

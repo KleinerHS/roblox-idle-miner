@@ -14,6 +14,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local LayoutConfig = require(ReplicatedStorage:WaitForChild("Shared").Config.LayoutConfig)
+local FloatingText = require(script.Parent.FloatingText)
 
 local GarageTemplate = {}
 
@@ -201,21 +202,7 @@ local function tower(model: Model, o: CFrame)
 	drop.Shape = Enum.PartType.Cylinder
 	local intake = part(model, "TowerIntake", Vector3.new(3, 3, 3), t * CFrame.new(0, 1.5, 4 + pipeLen), STEEL)
 	intake.CastShadow = true
-	local intakeSign = part(model, "TowerIntakeSign", Vector3.new(2.6, 0.9, 0.1), t * CFrame.new(0, 2, 4 + pipeLen + 1.55), STEEL_DARK, Enum.Material.SmoothPlastic)
-	local intakeGui = Instance.new("SurfaceGui")
-	intakeGui.Face = Enum.NormalId.Back
-	intakeGui.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
-	intakeGui.PixelsPerStud = 40
-	intakeGui.LightInfluence = 0
-	intakeGui.Parent = intakeSign
-	local intakeLabel = Instance.new("TextLabel")
-	intakeLabel.Size = UDim2.fromScale(1, 1)
-	intakeLabel.BackgroundTransparency = 1
-	intakeLabel.Font = Enum.Font.GothamBlack
-	intakeLabel.TextScaled = true
-	intakeLabel.TextColor3 = YELLOW
-	intakeLabel.Text = "FROM STORAGE"
-	intakeLabel.Parent = intakeGui
+	FloatingText.title(model, "TowerIntakeLabel", t * CFrame.new(0, 6, 4 + pipeLen - 2), "From storage", 1.4)
 
 	-- Ausleger nach vorn und Querträger über den Stellplätzen
 	local armZ = cfg.Bays[1].Y + cfg.BaySize.Y / 2 - 3 -- über dem Heck der Fahrzeuge
@@ -232,22 +219,7 @@ local function tower(model: Model, o: CFrame)
 		part(model, `TowerCrossbeamPost{i}`, Vector3.new(0.9, BOOM_Y, 0.9), t * CFrame.new(x, BOOM_Y / 2 + 0.4, -armLen), STEEL)
 		part(model, `TowerCrossbeamPostStripe{i}`, Vector3.new(0.95, 2, 0.95), t * CFrame.new(x, 1.4, -armLen), YELLOW, Enum.Material.SmoothPlastic)
 	end
-	-- Schild "LOADING" über dem Querträger
-	local sign = part(model, "TowerSign", Vector3.new(10, 2, 0.2), t * CFrame.new((x1 + x2) / 2, BOOM_Y + 2, -armLen - 0.5), STEEL_DARK, Enum.Material.SmoothPlastic)
-	local gui = Instance.new("SurfaceGui")
-	gui.Face = Enum.NormalId.Front
-	gui.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
-	gui.PixelsPerStud = 40
-	gui.LightInfluence = 0
-	gui.Parent = sign
-	local label = Instance.new("TextLabel")
-	label.Size = UDim2.fromScale(1, 1)
-	label.BackgroundTransparency = 1
-	label.Font = Enum.Font.GothamBlack
-	label.TextScaled = true
-	label.TextColor3 = YELLOW
-	label.Text = "LOADING"
-	label.Parent = gui
+	FloatingText.title(model, "TowerLabel", t * CFrame.new((x1 + x2) / 2, BOOM_Y + 4, -armLen), "Loading", 2.4, YELLOW)
 
 	-- Je Stellplatz: Laufkatze, Schurrenhülse, Teleskoprohr, Düse, Lampe, Anzeige vorne
 	for i, x in { x1, x2 } do
@@ -272,29 +244,10 @@ local function tower(model: Model, o: CFrame)
 		-- Anzeige vorne am Stellplatz, zum Fahrer gedreht (schaut zur Hallenrückseite)
 		local bayCenter = cfg.Bays[i]
 		local displayCF = o * CFrame.new(bayCenter.X, 14.5, bayCenter.Y - cfg.BaySize.Y / 2 - 1) * CFrame.Angles(0, math.rad(180), 0)
-		part(model, `BayDisplayPost{i}`, Vector3.new(0.5, 16, 0.5), o * CFrame.new(bayCenter.X + cfg.BaySize.X / 2 + 0.6, 8, bayCenter.Y - cfg.BaySize.Y / 2 - 1), STEEL_DARK)
-		part(model, `BayDisplayArm{i}`, Vector3.new(cfg.BaySize.X / 2 + 0.6, 0.4, 0.4), o * CFrame.new(bayCenter.X + cfg.BaySize.X / 4 + 0.3, 15.9, bayCenter.Y - cfg.BaySize.Y / 2 - 1), STEEL_DARK)
-		local display = part(model, `BayDisplay{i}`, Vector3.new(6, 2.4, 0.3), displayCF, Color3.fromRGB(24, 27, 33), Enum.Material.SmoothPlastic)
-		display.CanCollide = false
-		local dgui = Instance.new("SurfaceGui")
-		dgui.Name = "Display"
-		dgui.Face = Enum.NormalId.Front
-		dgui.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
-		dgui.PixelsPerStud = 50
-		dgui.LightInfluence = 0
-		dgui.Parent = display
-		for j, name in { "Title", "Value" } do
-			local l = Instance.new("TextLabel")
-			l.Name = name
-			l.Position = UDim2.fromScale(0.04, if j == 1 then 0.06 else 0.48)
-			l.Size = UDim2.fromScale(0.92, if j == 1 then 0.38 else 0.46)
-			l.BackgroundTransparency = 1
-			l.Font = Enum.Font.GothamBlack
-			l.TextScaled = true
-			l.TextColor3 = if j == 1 then Color3.fromRGB(165, 172, 184) else Color3.fromRGB(240, 242, 245)
-			l.Text = if j == 1 then `BAY {i}` else "READY"
-			l.Parent = dgui
-		end
+		FloatingText.create(model, `BayDisplay{i}`, displayCF, 7, {
+			{ Name = "Title", Text = `Bay {i}`, Size = 1.4, Color = Color3.fromRGB(200, 208, 220) },
+			{ Name = "Value", Text = "Ready", Size = 1.8 },
+		})
 	end
 end
 

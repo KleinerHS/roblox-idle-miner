@@ -155,13 +155,14 @@ local function tickPlayer(player: Player)
 		-- Anzeige
 		local record = new.vehicleId and data.Vehicles.Owned[new.vehicleId]
 		local def = record and Vehicles.Get(record.Type)
-		local title = if def then `BAY {bay} · {string.upper(def.DisplayName)}` else `BAY {bay}`
-		local value = "READY"
+		-- freundliche, schwebende Schrift (Felix 2026-10-13): normale Groß-/Kleinschreibung
+		local title = if def then `Bay {bay} · {def.DisplayName}` else `Bay {bay}`
+		local value = "Ready"
 		if record and def then
 			local fill = `{NumberFormat.withSeparators(sum(record.Cargo))} / {NumberFormat.withSeparators(def.Capacity)}`
-			value = if new.state == "Full" then `FULL · {fill}`
-				elseif new.state == "NoStock" then "STORAGE EMPTY"
-				elseif new.state == "Parked" then `GET IN TO LOAD · {fill}`
+			value = if new.state == "Full" then `Full · {fill}`
+				elseif new.state == "NoStock" then "Storage is empty"
+				elseif new.state == "Parked" then `Hop in to load · {fill}`
 				else fill
 		end
 		GarageTemplate.setBayState(garage, bay, new.state, title, value)

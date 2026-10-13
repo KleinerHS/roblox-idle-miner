@@ -35,6 +35,13 @@ local button = toolbar:CreateButton(
 	"World Preview"
 )
 button.ClickableWhenViewportHidden = true
+local layoutButton = toolbar:CreateButton(
+	"IdleMinerHallLayout",
+	"Legt Workspace.HallLayout an: die Halle von Plot 1 zum freien Verschieben (wird gespeichert und im Spiel übernommen)",
+	"",
+	"Hall Layout"
+)
+layoutButton.ClickableWhenViewportHidden = true
 
 local function existing(): Instance?
 	return workspace:FindFirstChild(PREVIEW_NAME)
@@ -69,7 +76,15 @@ local function build(folder: Folder, world: Instance, shared: Instance)
 		if plotId == SHOWCASE_PLOT then
 			PlotBuilder.setSign(plot, "⛏", `Plot {plotId}\nPreview Mining Co.`, nil)
 			local buildings = plot:FindFirstChild("Buildings") or plot
-			for _, step in BuildSteps.List do
+			-- Mit Workspace.HallLayout zeigt Plot 1 die Halle aus dem Layout (nicht doppelt bauen)
+			local hasLayout = workspace:FindFirstChild("HallLayout") ~= nil
+			if hasLayout then
+				local exterior = plot:FindFirstChild("Exterior")
+				if exterior then
+					exterior:Destroy()
+				end
+			end
+			for _, step in (if hasLayout then {} else BuildSteps.List) do
 				local model = BuildTemplates.build(step.Id, PlotBuilder.getPlotCFrame(plotId))
 				if model then
 					model.Parent = buildings
@@ -104,16 +119,13 @@ local function build(folder: Folder, world: Instance, shared: Instance)
 	end
 end
 
-local function create()
+-- Führt `fn(worldClone, sharedClone)` mit frischen Modul-Klonen aus (siehe Kopfkommentar)
+local function withModules(fn: (Instance, Instance) -> ()): (boolean, any)
 	local world = ServerScriptService:FindFirstChild("World")
 	local original = ReplicatedStorage:FindFirstChild("Shared")
 	if not (world and original) then
-		warn("[Idle Miner Preview] ServerScriptService.World oder ReplicatedStorage.Shared fehlt – ist Rojo verbunden?")
-		return
+		return false, "ServerScriptService.World oder ReplicatedStorage.Shared fehlt – ist Rojo verbunden?"
 	end
-
-	local folder = Instance.new("Folder")
-	folder.Name = PREVIEW_NAME
 
 	-- Klone für frische Module (siehe Kopfkommentar). Das Original wird NICHT umgehängt (das
 	-- störte die Rojo-Synchronisierung): Der Shared-Klon liegt in ServerStorage, und in den
@@ -132,11 +144,19 @@ local function create()
 	end
 	sharedClone.Parent = game:GetService("ServerStorage")
 	holder.Parent = game:GetService("ServerStorage")
-
-	local recording = ChangeHistoryService:TryBeginRecording("Idle Miner World Preview")
-	local ok, err = pcall(build, folder, worldClone, sharedClone)
+	local ok, err = pcall(fn, worldClone, sharedClone)
 	sharedClone:Destroy()
 	holder:Destroy()
+	return ok, err
+end
+
+local function create()
+	local folder = Instance.new("Folder")
+	folder.Name = PREVIEW_NAME
+	local recording = ChangeHistoryService:TryBeginRecording("Idle Miner World Preview")
+	local ok, err = withModules(function(worldClone, sharedClone)
+		build(folder, worldClone, sharedClone)
+	end)
 
 	if ok then
 		makeNonArchivable(folder)
@@ -171,6 +191,55 @@ button.Click:Connect(function()
 		create()
 	end
 	refreshButton()
+end)
+
+-- Hallen-Layout anlegen: kompletter Ausbau von Plot 1 (je Bauschritt ein Model, Außenbereich als
+-- Folder "Exterior") in Workspace.HallLayout, speicherbar. Im Spiel übernimmt der Server dieses
+-- Layout für alle Plots (World/HallLayout). Gibt es schon eins, wird es NICHT überschrieben.
+local function createLayout()
+	if workspace:FindFirstChild("HallLayout") then
+		warn("[Idle Miner] Workspace.HallLayout gibt es schon – zum Neuaufbau erst löschen")
+		return
+	end
+	local layout = Instance.new("Model")
+	layout.Name = "HallLayout"
+	local recording = ChangeHistoryService:TryBeginRecording("Idle Miner Hall Layout")
+	local ok, err = withModules(function(worldClone, sharedClone)
+		local BuildSteps = require(sharedClone:FindFirstChild("Definitions"):FindFirstChild("BuildSteps") :: ModuleScript) :: any
+		local PlotBuilder = require(worldClone:FindFirstChild("PlotBuilder") :: ModuleScript) :: any
+		local BuildTemplates = require(worldClone:FindFirstChild("BuildTemplates") :: ModuleScript) :: any
+		local PlotExterior = require(worldClone:FindFirstChild("PlotExterior") :: ModuleScript) :: any
+		local origin = PlotBuilder.getPlotCFrame(SHOWCASE_PLOT)
+		layout:SetAttribute("Origin", origin)
+		for _, step in BuildSteps.List do
+			local model = BuildTemplates.build(step.Id, origin)
+			if model then
+				model.Parent = layout
+			end
+		end
+		local holder = Instance.new("Model")
+		PlotExterior.build(holder, origin)
+		local exterior = holder:FindFirstChild("Exterior")
+		if exterior then
+			exterior.Parent = layout
+		end
+		holder:Destroy()
+	end)
+	if ok then
+		layout.Parent = workspace
+		print("[Idle Miner] Workspace.HallLayout angelegt – Objekte verschieben und Place speichern")
+	else
+		layout:Destroy()
+		warn(`[Idle Miner] Hallen-Layout fehlgeschlagen: {err}`)
+	end
+	if recording then
+		ChangeHistoryService:FinishRecording(recording, Enum.FinishRecordingOperation.Commit)
+	end
+end
+
+layoutButton.Click:Connect(function()
+	createLayout()
+	layoutButton:SetActive(false)
 end)
 
 workspace.ChildAdded:Connect(refreshButton)

@@ -1,13 +1,17 @@
 --!strict
--- Hochregal-Blöcke mit Palettenboxen (Phase 13b, Felix D-037): gemeinsam genutzt vom Firmenlager
--- und den beiden Ofen-Lagern. Ein Regal hat 4 Paletten übereinander; jeder Platz ist eine Kiste
--- (CrateSize einer Sorte). Gekaufte/vorhandene Kisten stehen als Gitterboxen im Regal, das Erz
--- ist in Farbe und Füllhöhe sichtbar; nicht vorhandene Plätze bleiben leer.
+-- Hochregale mit Palettenboxen (Phase 13b, Felix D-037): gemeinsam genutzt vom Firmenlager und den
+-- beiden Ofen-Lagern. Ein Regal hat 4 Paletten übereinander; jeder Platz ist eine Kiste
+-- (CrateSize einer Sorte). Vorhandene Kisten stehen als Gitterboxen im Regal, das Erz ist in Farbe
+-- und Füllhöhe sichtbar; nicht vorhandene Plätze bleiben leer.
 --
--- build(parent, origin, rows, racksPerRow) → Folder "Racks" + Folder "Crates" (Slot1..SlotN)
---   origin: Mitte des Blocks auf Bodenhöhe, rows: { { Z = lokal, Face = -1 | 1 } } (Face = Seite
---   zum Fahrweg), Reihenfolge der Plätze = Reihenfolge der rows, je Reihe links → rechts, unten → oben.
--- update(cratesFolder, items, owned) → Kisten anzeigen (Sorten nach Stufe, je Sorte ceil(n/Size))
+-- Jedes Regal ist ein eigenes Model "Rack{n}" (eigene Stützen, Träger, Verbände, Plätze), damit es
+-- in Studio einzeln verschoben werden kann. Plätze heißen "Slot{i}" (fortlaufend über den Block) und
+-- werden von update() rekursiv gesucht.
+--
+-- build(parent, origin, rows, racksPerRow): origin = Mitte des Blocks auf Bodenhöhe, rows =
+--   { { Z = lokal, Face = -1 | 1 } } (Face = Seite zum Fahrweg). Reihenfolge der Plätze: Reihen in
+--   der angegebenen Reihenfolge, je Reihe links → rechts, unten → oben.
+-- update(container, items, owned)
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -53,68 +57,70 @@ end
 
 export type Row = { Z: number, Face: number }
 
-function CrateRackBuilder.build(parent: Instance, origin: CFrame, rows: { Row }, racksPerRow: number): (Folder, Folder)
-	local o = origin
-	local racks = Instance.new("Folder")
-	racks.Name = "Racks"
-	racks.Parent = parent
-	local length = racksPerRow * RACK_BAY
-	for r, row in rows do
-		local z = row.Z
-		for k = 0, racksPerRow do
-			local x = length / 2 - k * RACK_BAY
-			for _, dz in { -RACK_DEPTH / 2, RACK_DEPTH / 2 } do
-				part(racks, `Upright{r}_{k}_{dz}`, Vector3.new(0.5, RACK_HEIGHT, 0.5), o * CFrame.new(x, RACK_HEIGHT / 2, z + dz), UPRIGHT, Enum.Material.Metal)
-			end
-			for level = 1, #LEVEL_Y - 1 do
-				local y0, y1 = LEVEL_Y[level] + 1, LEVEL_Y[level + 1] + 1
-				local h = y1 - y0
-				local len = math.sqrt(h * h + RACK_DEPTH * RACK_DEPTH)
-				part(racks, `Brace{r}_{k}_{level}`, Vector3.new(0.2, 0.2, len), o * CFrame.new(x, (y0 + y1) / 2, z) * CFrame.Angles(math.atan2(h, RACK_DEPTH) * (if level % 2 == 0 then 1 else -1), 0, 0), UPRIGHT, Enum.Material.Metal)
-			end
+-- Ein Regal (lokal: Mitte unten, Fächer zur Seite `face`) mit 4 Plätzen ab `firstSlot`
+local function rack(parent: Instance, name: string, base: CFrame, face: number, firstSlot: number, endLeft: boolean, endRight: boolean)
+	local m = Instance.new("Model")
+	m.Name = name
+	-- Stützen leicht eingerückt: jedes Regal hat eigene Rahmen, die nicht mit dem Nachbarn kollidieren
+	local hw, hd = RACK_BAY / 2 - 0.35, RACK_DEPTH / 2
+	for _, x in { -hw, hw } do
+		for _, z in { -hd, hd } do
+			part(m, `Upright{x}_{z}`, Vector3.new(0.5, RACK_HEIGHT, 0.5), base * CFrame.new(x, RACK_HEIGHT / 2, z), UPRIGHT, Enum.Material.Metal)
 		end
-		for level = 2, #LEVEL_Y do
-			for _, dz in { -RACK_DEPTH / 2, RACK_DEPTH / 2 } do
-				part(racks, `Beam{r}_{level}_{dz}`, Vector3.new(length + 0.5, 0.45, 0.3), o * CFrame.new(0, LEVEL_Y[level] - 0.25, z + dz), BEAM, Enum.Material.Metal)
-			end
-		end
-		for _, dz in { -RACK_DEPTH / 2, RACK_DEPTH / 2 } do
-			part(racks, `TopBeam{r}_{dz}`, Vector3.new(length + 0.5, 0.45, 0.3), o * CFrame.new(0, RACK_HEIGHT - 0.3, z + dz), BEAM, Enum.Material.Metal)
-		end
-		for _, sx in { -1, 1 } do
-			part(racks, `Guard{r}_{sx}`, Vector3.new(0.6, 1.2, RACK_DEPTH + 1), o * CFrame.new(sx * (length / 2 + 0.6), 0.6, z), YELLOW, Enum.Material.SmoothPlastic)
+		for level = 1, #LEVEL_Y - 1 do
+			local y0, y1 = LEVEL_Y[level] + 1, LEVEL_Y[level + 1] + 1
+			local h = y1 - y0
+			local len = math.sqrt(h * h + RACK_DEPTH * RACK_DEPTH)
+			part(m, `Brace{x}_{level}`, Vector3.new(0.2, 0.2, len), base * CFrame.new(x, (y0 + y1) / 2, 0) * CFrame.Angles(math.atan2(h, RACK_DEPTH) * (if level % 2 == 0 then 1 else -1), 0, 0), UPRIGHT, Enum.Material.Metal)
 		end
 	end
-
-	local crates = Instance.new("Folder")
-	crates.Name = "Crates"
-	crates.Parent = parent
-	local index = 0
-	for _, row in rows do
-		for rack = 0, racksPerRow - 1 do
-			for level = 1, #LEVEL_Y do
-				index += 1
-				local x = (racksPerRow / 2 - rack - 0.5) * RACK_BAY
-				local base = o * CFrame.new(x, LEVEL_Y[level], row.Z)
-				local slot = Instance.new("Model")
-				slot.Name = `Slot{index}`
-				part(slot, "Pallet", Vector3.new(BOX + 0.2, 0.5, BOX + 0.2), base * CFrame.new(0, 0.25, 0), PALLET, Enum.Material.WoodPlanks)
-				part(slot, "Floor", Vector3.new(BOX, 0.2, BOX), base * CFrame.new(0, 0.6, 0), STEEL, Enum.Material.Metal)
-				for _, side in { -1, 1 } do
-					part(slot, `WallX{side}`, Vector3.new(0.15, BOX_H, BOX), base * CFrame.new(side * (BOX / 2 - 0.075), 0.7 + BOX_H / 2, 0), MESH, Enum.Material.DiamondPlate)
-					local h = if side == row.Face then BOX_FRONT_H else BOX_H
-					part(slot, `WallZ{side}`, Vector3.new(BOX - 0.3, h, 0.15), base * CFrame.new(0, 0.7 + h / 2, side * (BOX / 2 - 0.075)), MESH, Enum.Material.DiamondPlate)
-				end
-				local fill = part(slot, "Fill", Vector3.new(BOX - 0.4, 0.2, BOX - 0.4), base * CFrame.new(0, 0.8, 0), Color3.new(0.2, 0.2, 0.2), Enum.Material.Slate)
-				fill.CanCollide = false
-				slot.Parent = crates
-			end
+	for level = 2, #LEVEL_Y do
+		for _, z in { -hd, hd } do
+			part(m, `Beam{level}_{z}`, Vector3.new(hw * 2 - 0.5, 0.45, 0.3), base * CFrame.new(0, LEVEL_Y[level] - 0.25, z), BEAM, Enum.Material.Metal)
 		end
 	end
-	return racks, crates
+	for _, z in { -hd, hd } do
+		part(m, `TopBeam{z}`, Vector3.new(hw * 2 - 0.5, 0.45, 0.3), base * CFrame.new(0, RACK_HEIGHT - 0.3, z), BEAM, Enum.Material.Metal)
+	end
+	if endLeft then
+		part(m, "GuardLeft", Vector3.new(0.6, 1.2, RACK_DEPTH + 1), base * CFrame.new(hw + 0.55, 0.6, 0), YELLOW, Enum.Material.SmoothPlastic)
+	end
+	if endRight then
+		part(m, "GuardRight", Vector3.new(0.6, 1.2, RACK_DEPTH + 1), base * CFrame.new(-hw - 0.55, 0.6, 0), YELLOW, Enum.Material.SmoothPlastic)
+	end
+	for level = 1, #LEVEL_Y do
+		local slotBase = base * CFrame.new(0, LEVEL_Y[level], 0)
+		local slot = Instance.new("Model")
+		slot.Name = `Slot{firstSlot + level - 1}`
+		part(slot, "Pallet", Vector3.new(BOX + 0.2, 0.5, BOX + 0.2), slotBase * CFrame.new(0, 0.25, 0), PALLET, Enum.Material.WoodPlanks)
+		part(slot, "Floor", Vector3.new(BOX, 0.2, BOX), slotBase * CFrame.new(0, 0.6, 0), STEEL, Enum.Material.Metal)
+		for _, side in { -1, 1 } do
+			part(slot, `WallX{side}`, Vector3.new(0.15, BOX_H, BOX), slotBase * CFrame.new(side * (BOX / 2 - 0.075), 0.7 + BOX_H / 2, 0), MESH, Enum.Material.DiamondPlate)
+			local h = if side == face then BOX_FRONT_H else BOX_H
+			part(slot, `WallZ{side}`, Vector3.new(BOX - 0.3, h, 0.15), slotBase * CFrame.new(0, 0.7 + h / 2, side * (BOX / 2 - 0.075)), MESH, Enum.Material.DiamondPlate)
+		end
+		local fill = part(slot, "Fill", Vector3.new(BOX - 0.4, 0.2, BOX - 0.4), slotBase * CFrame.new(0, 0.8, 0), Color3.new(0.2, 0.2, 0.2), Enum.Material.Slate)
+		fill.CanCollide = false
+		slot.Parent = m
+	end
+	m.Parent = parent
 end
 
-function CrateRackBuilder.update(crates: Instance, items: { [string]: number }, owned: number)
+function CrateRackBuilder.build(parent: Instance, origin: CFrame, rows: { Row }, racksPerRow: number)
+	local index = 0
+	local n = 0
+	for _, row in rows do
+		for k = 0, racksPerRow - 1 do
+			n += 1
+			local x = (racksPerRow / 2 - k - 0.5) * RACK_BAY
+			rack(parent, `Rack{n}`, origin * CFrame.new(x, 0, row.Z), row.Face, index + 1, k == 0, k == racksPerRow - 1)
+			index += #LEVEL_Y
+		end
+	end
+end
+
+-- Kisten anzeigen: Sorten nach Stufe, je Sorte ceil(n / CrateSize) Kisten, Füllhöhe zeigt die Menge
+function CrateRackBuilder.update(container: Instance, items: { [string]: number }, owned: number)
 	local size = BalanceConfig.Storage.CrateSize
 	local ids = {}
 	for id, n in items do
@@ -132,8 +138,14 @@ function CrateRackBuilder.update(crates: Instance, items: { [string]: number }, 
 			n -= size
 		end
 	end
-	for _, slot in crates:GetChildren() do
-		local index = tonumber(slot.Name:match("%d+")) or 0
+	for _, slot in container:GetDescendants() do
+		if not slot:IsA("Model") then
+			continue
+		end
+		local index = tonumber(slot.Name:match("^Slot(%d+)$"))
+		if not index then
+			continue
+		end
 		local present = index <= owned
 		local entry = if present then plan[index] else nil
 		local pallet = slot:FindFirstChild("Pallet")

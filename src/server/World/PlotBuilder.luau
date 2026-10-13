@@ -17,6 +17,7 @@ local GameConfig = require(Shared.Config.GameConfig)
 local LayoutConfig = require(Shared.Config.LayoutConfig)
 
 local PlotExterior = require(script.Parent.PlotExterior)
+local HallLayout = require(script.Parent.HallLayout)
 
 local PlotBuilder = {}
 
@@ -177,7 +178,12 @@ function PlotBuilder.build(parent: Instance, plotId: number): Model
 
 	buildMarkings(model, origin)
 	-- Zaun und Außenbereich wie im Referenzbild (Phase 13b-1)
-	PlotExterior.build(model, origin)
+	local exterior = HallLayout.cloneExterior(origin)
+	if exterior then
+		exterior.Parent = model
+	else
+		PlotExterior.build(model, origin)
+	end
 	buildSign(model, origin, plotId)
 	buildRoad(model, origin)
 

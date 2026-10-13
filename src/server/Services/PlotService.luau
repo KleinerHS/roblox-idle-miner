@@ -14,6 +14,7 @@ local Log = require(Shared.Util.Log)
 
 local PlotBuilder = require(script.Parent.Parent.World.PlotBuilder)
 local EnvironmentBuilder = require(script.Parent.Parent.World.EnvironmentBuilder)
+local HallLayout = require(script.Parent.Parent.World.HallLayout)
 local RemoteService = require(script.Parent.RemoteService)
 
 local TAG = "PlotService"
@@ -91,6 +92,8 @@ local function release(player: Player)
 end
 
 function PlotService.Init()
+	-- von Hand angepasstes Hallen-Layout aus der Place-Datei übernehmen (vor dem Bau der Plots)
+	HallLayout.init()
 	local folder = PlotBuilder.buildAll()
 	-- Umgebung (Wiese, Wald, Berge, Seen, Straßendetails, Platz) – reine Optik (Phase 13a)
 	local oldEnvironment = workspace:FindFirstChild("Environment")

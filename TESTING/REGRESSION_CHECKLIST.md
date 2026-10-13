@@ -39,3 +39,5 @@ Nach Änderungen an Economy, Inventory, Save, Trading oder Prestige die betroffe
 - [ ] Phase 10: Offline max. 1 h, nur Material (Geld nur minus Lohn), Kapazitäten halten, kein Fenster unter 60 s (Test 10.1–10.7)
 - [ ] Phase 9: Handel nur nach Annahme, Änderung setzt Sperren zurück, atomarer Tausch, Abbruch bei Disconnect (Test 9.1–9.7)
 - [ ] Phase 9: Fremde Bedienelemente gesperrt, Spieler blockieren sich nicht (Test 2a.9, 2b.7, 9.9)
+- [ ] 0.24.0: Workspace.HallLayout wird im Spiel übernommen (verschobenes Objekt steht auf allen Plots an der neuen Stelle); ohne HallLayout baut der Code wie bisher
+- [ ] 0.24.0: Lager-, Ofen- und Stellplatz-Anzeigen als schwebende Schrift aktualisieren sich

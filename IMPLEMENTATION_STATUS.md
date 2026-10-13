@@ -476,6 +476,16 @@ Selbsttest 13b-3 (2026-10-13): Vorschau mit 20 Kisten und sechs Sorten – Boxen
 
 Selbsttest 13b-4 (2026-10-13): Vorschau im Betrieb (Glut, heiße Zone, Partikel) und Draufsicht ohne Dach mit dem Referenzbild verglichen; keine ungewollten Überschneidungen (nur Bodenplatte, Leitungen in die Wand, Tankbeine auf Kies); Play mit Felix' Profil ohne Fehler, Lager zeigt 7 Kisten, Ofen-Anzeige läuft, Förderbänder vorhanden.
 
+| 13b-5 (Version 0.24.0) | Dateien | Status |
+|---|---|---|
+| Lager: 12 Regale je Reihe bis zur gelben Bodenmarkierung (48 Regale, 192 Plätze); jedes Regal ein eigenes Model mit eigenen Rahmen (keine doppelten Stützen mehr), Doppelreihe mit Spalt | `CrateRackBuilder.luau`, `HallTemplates.luau`, `BalanceConfig.Storage.MaxCrates` | TESTING_REQUIRED |
+| Ofen näher am Bild: gelbes Stahlgerüst hinter/über dem Ofenende mit Kreuzverstrebungen, Laufrost, Geländer, Treppe, Aufgabebehälter, Maschinen auf dem Rost, Schaltschränke darunter; Ofen in Abschnitten (Glocke, Hals, Trommel, Konus) mit Flanschen; Schnecke im gelben Käfig mit Trichter (Spitzdach) zum Ausgangslager; Zuführband vom Eingangslager auf den Rost | `SmelterTemplate.luau` | TESTING_REQUIRED |
+| Mehr Industrie-Details: schwarze Rippenschläuche auf gelben Böcken, Anlagen mit gelbem Käfig, orange Maschinen mit Geländern, gelbe Bodenleitungen, kleine Zäune zur Hallenmitte, Poller, Kabeltrasse, Schaltkästen, Feuerlöscher | `SmelterTemplate.luau` | TESTING_REQUIRED |
+| Schilder ersetzt durch schwebende, freundliche Schrift (runde Schrift, weiche Kontur, ohne Tafel): Lager, Ofen-Status, Ofen-Lager, Garage-Stellplätze, Turm | `src/server/World/FloatingText.luau`, `HallTemplates`, `SmelterTemplate`, `GarageTemplate`, `LoadingService`, `SmelterService` | TESTING_REQUIRED |
+| Hallen-Layout zum Selbst-Verschieben: `Workspace.HallLayout` (je Gebäude ein Model, darin jedes Objekt einzeln gruppiert, plus Außenbereich). Der Server übernimmt es beim Start für alle Plots; fehlende Teile werden per Code gebaut. Plugin-Knopf „Hall Layout“ legt es neu an | `src/server/World/HallLayout.luau`, `BuildTemplates`, `PlotBuilder`, `PlotService`, `plugin/EditPreview.server.luau` | TESTING_REQUIRED |
+
+Selbsttest 13b-5 (2026-10-13): Überschneidungsprüfung Ofen/Lager/Halle – nur gewollte Berührungen (Fallrohr in die Ofenglocke, Tankleitungen in die Wand, Feuerlöscherhalter an Stütze); Screenshots mit dem Referenzbild verglichen; HallLayout angelegt (7 Gebäude + Außenbereich); Play mit Felix' Profil: Server übernimmt HallLayout, alle 6 Plots korrekt versetzt/gedreht, Lager zeigt 8 von 8 Kisten, Ofen- und Stellplatz-Anzeigen laufen, Förderbänder vorhanden, keine Fehler.
+
 ## Phase 12 – Content Expansion – Details
 
 Schritte: 12a alle Minen/Erze/Barren über zentrale Kurven · 12b weitere Spitzhacken, Rucksäcke, Drills, Fahrzeuge, Ausbaustufen (offen).
