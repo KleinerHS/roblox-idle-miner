@@ -279,12 +279,34 @@ function AmbientProps.palletTruck(parent: Instance, name: string, cf: CFrame)
 	-- Deichsel mit Tropfengriff und Hebel
 	local d0, d1 = Vector3.new(0, 2.15, 2.95), Vector3.new(0, 4.5, 3.55)
 	rod("Drawbar", d0, d1, 0.24, BLACK)
-	local l0, l1, top = Vector3.new(-0.42, 5.05, 3.7), Vector3.new(0.42, 5.05, 3.7), Vector3.new(0, 5.3, 3.76)
-	rod("LoopLeft", d1, l0, 0.18, BLACK)
-	rod("LoopRight", d1, l1, 0.18, BLACK)
-	rod("LoopTopLeft", l0, top, 0.18, BLACK)
-	rod("LoopTopRight", l1, top, 0.18, BLACK)
-	rod("Lever", d1 + Vector3.new(0, 0.1, 0.02), Vector3.new(0.12, 4.95, 3.66), 0.08, STEEL_LIGHT)
+	-- Schlaufengriff: runde Tropfenform in der Ebene der Deichsel (unten schmal, oben breit),
+	-- aus kurzen Segmenten mit verrundeten Gelenken; innen der Hebel zum Heben/Senken
+	local dir = (d1 - d0).Unit
+	local function loopPoint(u: number, v: number): Vector3
+		return d1 + Vector3.xAxis * u + dir * v
+	end
+	local segments = 18
+	local points = {}
+	for i = 0, segments - 1 do
+		local t = i / segments * math.pi * 2
+		local pinch = 0.5 + 0.5 * (1 - math.cos(t)) / 2
+		table.insert(points, loopPoint(0.45 * math.sin(t) * pinch, 0.72 - 0.6 * math.cos(t)))
+	end
+	for i, p in points do
+		local q = points[i % segments + 1]
+		rod(`Loop{i}`, p, q, 0.17, BLACK)
+		local joint = part(m, `LoopJoint{i}`, Vector3.new(0.17, 0.17, 0.17), cf * CFrame.new(p), BLACK, Enum.Material.Metal)
+		joint.Shape = Enum.PartType.Ball
+		joint.CanCollide = false
+	end
+	rod("LoopNeck", d1, points[1], 0.2, BLACK)
+	-- Hebel: dünner, leicht gebogener Bügel innen, mit rotem Knopf
+	local h0, h1, h2 = loopPoint(0.04, 0.3), loopPoint(0.16, 0.7), loopPoint(0.1, 1.0)
+	rod("Lever1", h0, h1, 0.07, STEEL_LIGHT)
+	rod("Lever2", h1, h2, 0.07, STEEL_LIGHT)
+	local knob = part(m, "LeverKnob", Vector3.new(0.13, 0.13, 0.13), cf * CFrame.new(h2), Color3.fromRGB(200, 40, 36), Enum.Material.SmoothPlastic)
+	knob.Shape = Enum.PartType.Ball
+	knob.CanCollide = false
 	return m
 end
 
