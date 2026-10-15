@@ -239,11 +239,6 @@ function AmbientProps.palletTruck(parent: Instance, name: string, cf: CFrame)
 		w.Material = Enum.Material.SmoothPlastic
 		w.Parent = m
 	end
-	local function rod(n: string, a: Vector3, b: Vector3, thickness: number, color: Color3)
-		local wa, wb = cf:PointToWorldSpace(a), cf:PointToWorldSpace(b)
-		local p = part(m, n, Vector3.new(thickness, thickness, (wb - wa).Magnitude), CFrame.lookAt((wa + wb) / 2, wb), color, Enum.Material.Metal)
-		p.CanCollide = false
-	end
 	-- Gabeln mit schrägen Spitzen, Rollenfenstern und Tandemrollen
 	local forkLen, forkY = 4.6, 0.33
 	for _, sx in { -1, 1 } do
@@ -276,17 +271,24 @@ function AmbientProps.palletTruck(parent: Instance, name: string, cf: CFrame)
 		cylinder(m, `Spring{k}`, 0.05, 0.62, cf * CFrame.new(0, 1.3 + k * 0.22, 2.9) * CFrame.Angles(0, 0, math.rad(90)), STEEL_LIGHT, Enum.Material.Metal).CanCollide = false
 	end
 	cylinder(m, "PumpCap", 0.12, 0.6, cf * CFrame.new(0, 2.14, 2.9) * CFrame.Angles(0, 0, math.rad(90)), BLACK, Enum.Material.Metal).CanCollide = false
-	-- Deichsel und Griff wie im Detailfoto (Felix 2026-10-15): Vierkant-Deichsel läuft mittig durch
-	-- die Schlaufe bis zu ihrem oberen Bogen; große birnenförmige Rohrschlaufe (oben breit und rund,
-	-- unten zur Deichsel zusammenlaufend); flacher Hebel mit Griffmulden seitlich aus der Deichsel;
-	-- gelber Warnaufkleber
+	local function cylinderBetween(parent: Instance, n: string, wa: Vector3, wb: Vector3, d: number, color: Color3): Part
+		local p = part(parent, n, Vector3.new((wb - wa).Magnitude, d, d), CFrame.lookAt((wa + wb) / 2, wb) * CFrame.Angles(0, math.rad(90), 0), color, Enum.Material.Metal)
+		p.Shape = Enum.PartType.Cylinder
+		return p
+	end
+	-- Deichsel und Griff exakt nach Felix' Detailfoto (2026-10-15):
+	--   * Deichsel: schwarzes Vierkantrohr, läuft gerade durch die Mitte der Schlaufe bis zum oberen
+	--     Bogen und ist dort verschweißt
+	--   * Schlaufe: dickes rundes Rohr, breiter ovaler Bügel (≈ 1,6 × so breit wie hoch), oben
+	--     gleichmäßig rund, links schräg nach unten zur Deichsel, rechts unten waagrecht hinein
+	--   * innen rechts ein flacher Hebel mit Fingerrillen aus einem Schlitz der Deichsel, kleine
+	--     Feder darüber; gelber Warnaufkleber vorne auf der Deichsel
 	local d0, d1 = Vector3.new(0, 2.15, 2.95), Vector3.new(0, 3.75, 3.4)
 	local dir = (d1 - d0).Unit
-	local normal = Vector3.xAxis:Cross(dir).Unit -- zeigt zum Bediener (hinten)
+	local normal = Vector3.xAxis:Cross(dir).Unit -- Vorderseite (zum Bediener)
 	local function loopPoint(u: number, v: number): Vector3
 		return d1 + Vector3.xAxis * u + dir * v
 	end
-	local loopTop = 1.75
 	local function box(n: string, a: Vector3, b: Vector3, width: number, thick: number, color: Color3, material: Enum.Material?): Part
 		local wa, wb = cf:PointToWorldSpace(a), cf:PointToWorldSpace(b)
 		local up = cf:VectorToWorldSpace(normal)
@@ -294,35 +296,77 @@ function AmbientProps.palletTruck(parent: Instance, name: string, cf: CFrame)
 		p.CanCollide = false
 		return p
 	end
-	-- Vierkant-Deichsel bis zum oberen Bogen, Schweißkappe oben
-	box("Drawbar", d0, loopPoint(0, loopTop), 0.26, 0.26, BLACK)
-	box("DrawbarCap", loopPoint(0, loopTop - 0.06), loopPoint(0, loopTop + 0.06), 0.34, 0.3, BLACK)
-	-- Schlaufe: Rohr aus kurzen Segmenten mit runden Gelenken
-	local segments = 28
-	local points = {}
-	for i = 0, segments - 1 do
-		local t = i / segments * math.pi * 2
-		local pinch = ((1 - math.cos(t)) / 2) ^ 0.45
-		table.insert(points, loopPoint(0.85 * math.sin(t) * pinch, 0.97 - 0.78 * math.cos(t)))
+	local TUBE = 0.13
+	-- Mittellinie der Schlaufe direkt aus dem Foto (Pixel, Deichselmitte x = 710, rechter Anschluss
+	-- y = 850), geglättet mit Catmull-Rom-Kurve → viele kurze Segmente ohne Kanten
+	local PX, SV = 0.00194, 0.9
+	local photo = {
+		{ 785, 850 }, { 950, 845 }, { 1080, 830 }, { 1180, 790 }, { 1235, 700 }, { 1250, 560 },
+		{ 1230, 420 }, { 1170, 300 }, { 1060, 210 }, { 900, 150 }, { 710, 125 }, { 560, 130 },
+		{ 430, 150 }, { 330, 195 }, { 275, 270 }, { 280, 360 }, { 320, 440 }, { 420, 560 },
+		{ 520, 680 }, { 610, 770 }, { 670, 820 },
+	}
+	local function fromPhoto(x: number, y: number): Vector3
+		return loopPoint((x - 710) * PX, 0.35 + (850 - y) * PX * SV)
 	end
-	for i, p in points do
-		local q = points[i % segments + 1]
-		rod(`Loop{i}`, p, q, 0.17, BLACK)
-		local joint = part(m, `LoopJoint{i}`, Vector3.new(0.17, 0.17, 0.17), cf * CFrame.new(p), BLACK, Enum.Material.Metal)
+	local ctrl = {}
+	for _, xy in photo do
+		table.insert(ctrl, fromPhoto(xy[1], xy[2]))
+	end
+	local points = {}
+	for i = 1, #ctrl - 1 do
+		local p0, p1, p2, p3 = ctrl[math.max(1, i - 1)], ctrl[i], ctrl[i + 1], ctrl[math.min(#ctrl, i + 2)]
+		for k = 0, 2 do
+			local t = k / 3
+			local t2, t3 = t * t, t * t * t
+			table.insert(points, 0.5 * ((2 * p1) + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3))
+		end
+	end
+	table.insert(points, ctrl[#ctrl])
+	table.insert(points, 1, loopPoint(0.1, 0.35)) -- Anschluss rechts unten an der Deichsel
+	table.insert(points, loopPoint(0.08, 0.35 + 30 * PX * SV)) -- Anschluss links unten an der Deichsel
+	for i = 1, #points - 1 do
+		local p, q = points[i], points[i + 1]
+		local wa, wb = cf:PointToWorldSpace(p), cf:PointToWorldSpace(q)
+		local seg = cylinderBetween(m, `Loop{i}`, wa, wb, TUBE, BLACK)
+		seg.CanCollide = false
+		local joint = part(m, `LoopJoint{i}`, Vector3.new(TUBE, TUBE, TUBE), CFrame.new(wa), BLACK, Enum.Material.Metal)
 		joint.Shape = Enum.PartType.Ball
 		joint.CanCollide = false
 	end
-	-- Hebel: Lagerbock an der Deichsel, flacher Hebel nach außen, leicht abgewinkelt, Griffmulden
-	box("LeverBracket", loopPoint(0.13, 0.75), loopPoint(0.13, 1.2), 0.1, 0.24, BLACK)
-	box("Lever", loopPoint(0.15, 1.02), loopPoint(0.6, 0.95), 0.2, 0.09, Color3.fromRGB(46, 48, 52))
-	box("LeverTip", loopPoint(0.58, 0.95), loopPoint(0.82, 0.86), 0.17, 0.09, Color3.fromRGB(46, 48, 52))
-	for k = 0, 2 do
-		local u = 0.32 + k * 0.08
-		box(`LeverGroove{k}`, loopPoint(u, 0.89), loopPoint(u + 0.04, 0.89), 0.06, 0.1, BLACK)
+	-- Vierkant-Deichsel bis zum oberen Bogen, kleine Schweißnaht oben
+	local topV = 0.35 + (850 - 125) * PX * SV
+	box("Drawbar", d0, loopPoint(0, topV), 0.26, 0.26, BLACK)
+	box("WeldTop", loopPoint(0, topV - 0.02), loopPoint(0, topV + 0.04), 0.3, 0.28, Color3.fromRGB(44, 44, 48))
+	-- Schlitz rechts in der Deichsel, Feder darüber, flacher Hebel mit Fingerrillen (Unterkante)
+	local function pv(x: number, y: number): (number, number)
+		return (x - 710) * PX, 0.35 + (850 - y) * PX * SV
 	end
-	-- gelber Warnaufkleber auf der Deichsel (Seite zum Bediener)
-	local sticker = box("Sticker", loopPoint(0, 0.45) + normal * 0.135, loopPoint(0, 0.9) + normal * 0.135, 0.2, 0.01, Color3.fromRGB(240, 200, 40), Enum.Material.SmoothPlastic)
-	sticker.Name = "WarningSticker"
+	local _, sv0 = pv(790, 545)
+	local _, sv1 = pv(790, 345)
+	box("LeverSlot", loopPoint(0.132, sv0), loopPoint(0.132, sv1), 0.02, 0.14, Color3.fromRGB(10, 10, 12))
+	local lever = Color3.fromRGB(52, 54, 58)
+	local la, lb, lc, ld = Vector3.new(pv(790, 430)), Vector3.new(pv(930, 462)), Vector3.new(pv(1010, 495)), Vector3.new(pv(1065, 535))
+	box("Lever", loopPoint(0.12, la.Y), loopPoint(lb.X, lb.Y), 0.2, 0.08, lever)
+	box("LeverMid", loopPoint(lb.X - 0.01, lb.Y), loopPoint(lc.X, lc.Y), 0.18, 0.08, lever)
+	box("LeverTip", loopPoint(lc.X - 0.01, lc.Y), loopPoint(ld.X, ld.Y), 0.15, 0.08, lever)
+	for k = 0, 3 do
+		local gu, gv = pv(835 + k * 30, 470 + k * 6)
+		local g = part(m, `FingerGroove{k}`, Vector3.new(0.05, 0.05, 0.1), cf * CFrame.new(loopPoint(gu, gv)), Color3.fromRGB(20, 20, 22), Enum.Material.Metal)
+		g.Shape = Enum.PartType.Ball
+		g.CanCollide = false
+	end
+	local _, spring0 = pv(775, 395)
+	for k = 0, 4 do
+		local at = loopPoint(0.15, spring0 + k * 0.03)
+		local coil = part(m, `Spring{k}`, Vector3.new(0.025, 0.08, 0.08), cf * CFrame.lookAt(at, at + dir) * CFrame.Angles(0, math.rad(90), 0), STEEL_LIGHT, Enum.Material.Metal)
+		coil.Shape = Enum.PartType.Cylinder
+		coil.CanCollide = false
+	end
+	-- gelber Warnaufkleber vorne auf der Deichsel (Höhe wie im Foto)
+	local _, st0 = pv(0, 555)
+	local _, st1 = pv(0, 365)
+	box("WarningSticker", loopPoint(0, st0) + normal * 0.135, loopPoint(0, st1) + normal * 0.135, 0.2, 0.01, Color3.fromRGB(240, 200, 40), Enum.Material.SmoothPlastic)
 	return m
 end
 
