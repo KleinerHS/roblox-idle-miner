@@ -529,18 +529,183 @@ function SmelterTemplate.build(plotCFrame: CFrame): Model
 		cratePallet(pallets, `PalletStack{i}`, at(p.X, 0, p.Y))
 	end
 
-	-- Bedienterminal mit schwebender Anzeige (zur Hallenmitte)
+	-- Bedienpult (Felix 2026-10-15: wie ein mobiles Steuerpult, schwarz mit gelben Elementen):
+	-- fahrbarer Fuß mit Lenkrollen und großen Hinterrädern, geneigter Korpus mit eingelassener
+	-- Frontplatte, schräges Bedienfeld mit Joysticks, Not-Aus, Leuchttastern und Display, seitlicher
+	-- Griff, Monitor am Mast. Vorderseite (Bediener) = lokal -Z, zur Hallenmitte.
 	local terminal = group(model, "Terminal")
-	local terminalCF = CFrame.lookAt(pos(kilnX + 20, 0, frontZ - 8), pos(0, 0, frontZ - 8))
-	part(terminal, "TerminalPost", Vector3.new(1.2, 3.6, 1.2), terminalCF * CFrame.new(0, 1.8, 0), STEEL_DARK)
-	local screen = part(terminal, "TerminalScreen", Vector3.new(2.6, 1.8, 0.3), terminalCF * CFrame.new(0, 4.1, 0) * CFrame.Angles(math.rad(-15), 0, 0), Color3.fromRGB(90, 170, 255), Enum.Material.Neon)
-	screen.Transparency = 0.1
-	FloatingText.create(terminal, "SmelterDisplay", terminalCF * CFrame.new(0, 8.5, 0), 9, {
+	local c = CFrame.lookAt(pos(kilnX + 20, 0, frontZ - 8), pos(0, 0, frontZ - 8))
+	local BODY = Color3.fromRGB(26, 27, 30)
+	local PANEL = Color3.fromRGB(46, 48, 54)
+	local RUBBER = Color3.fromRGB(18, 18, 20)
+	local function wedge(name: string, size: Vector3, cf: CFrame, color: Color3): WedgePart
+		local w = Instance.new("WedgePart")
+		w.Name = name
+		w.Anchored = true
+		w.CanTouch = false
+		w.Size = size
+		w.CFrame = cf
+		w.Color = color
+		w.Material = Enum.Material.SmoothPlastic
+		w.Parent = terminal
+		return w
+	end
+	-- Fuß: Sockel, abgeschrägte Front, gelbe Kante, Schriftzug an den Seiten
+	local baseBlock = part(terminal, "Base", Vector3.new(3.4, 0.7, 3.4), c * CFrame.new(0, 0.75, 0.4), BODY, Enum.Material.SmoothPlastic)
+	wedge("BaseNose", Vector3.new(3.4, 0.7, 0.9), c * CFrame.new(0, 0.75, -1.75), BODY)
+	for _, sx in { -1, 1 } do
+		part(terminal, `BaseTrimX{sx}`, Vector3.new(0.16, 0.12, 3.46), c * CFrame.new(sx * 1.65, 1.12, 0.4), YELLOW, Enum.Material.SmoothPlastic)
+		part(terminal, `BaseTrimZ{sx}`, Vector3.new(3.46, 0.12, 0.16), c * CFrame.new(0, 1.12, 0.4 + sx * 1.65), YELLOW, Enum.Material.SmoothPlastic)
+	end
+	for _, face in { Enum.NormalId.Left, Enum.NormalId.Right } do
+		local gui = Instance.new("SurfaceGui")
+		gui.Face = face
+		gui.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
+		gui.PixelsPerStud = 50
+		gui.LightInfluence = 1
+		gui.Parent = baseBlock
+		local label = Instance.new("TextLabel")
+		label.Size = UDim2.fromScale(1, 1)
+		label.BackgroundTransparency = 1
+		label.Font = Enum.Font.GothamBlack
+		label.TextScaled = true
+		label.TextColor3 = YELLOW
+		label.Text = "SMELTER"
+		label.Parent = gui
+		local pad = Instance.new("UIPadding")
+		pad.PaddingTop = UDim.new(0.18, 0)
+		pad.PaddingBottom = UDim.new(0.18, 0)
+		pad.PaddingLeft = UDim.new(0.15, 0)
+		pad.PaddingRight = UDim.new(0.15, 0)
+		pad.Parent = label
+	end
+	-- Lenkrollen vorne (Gabel + Rad), große Räder hinten
+	for _, sx in { -1, 1 } do
+		part(terminal, `CasterFork{sx}`, Vector3.new(0.18, 0.25, 0.4), c * CFrame.new(sx * 1.25, 0.28, -1.3), STEEL, Enum.Material.Metal)
+		cylinder(terminal, `CasterWheel{sx}`, 0.2, 0.4, c * CFrame.new(sx * 1.25, 0.2, -1.3), RUBBER, Enum.Material.Rubber)
+		cylinder(terminal, `RearWheel{sx}`, 0.32, 0.9, c * CFrame.new(sx * 1.88, 0.45, 1.6), RUBBER, Enum.Material.Rubber)
+		cylinder(terminal, `RearHub{sx}`, 0.36, 0.4, c * CFrame.new(sx * 1.88, 0.45, 1.6), YELLOW, Enum.Material.Metal)
+	end
+	-- Korpus, leicht nach hinten geneigt, mit eingelassener Frontplatte und gelben Kanten
+	local bodyCF = c * CFrame.new(0, 2.65, 0.55) * CFrame.Angles(math.rad(6), 0, 0)
+	part(terminal, "Body", Vector3.new(2.3, 3.1, 1.5), bodyCF, BODY, Enum.Material.SmoothPlastic)
+	part(terminal, "FrontRecess", Vector3.new(1.5, 1.9, 0.08), bodyCF * CFrame.new(0, -0.25, -0.77), PANEL, Enum.Material.SmoothPlastic)
+	part(terminal, "RecessFrameTop", Vector3.new(1.7, 0.1, 0.1), bodyCF * CFrame.new(0, 0.75, -0.78), YELLOW, Enum.Material.SmoothPlastic)
+	for _, sx in { -1, 1 } do
+		part(terminal, `BodyEdge{sx}`, Vector3.new(0.12, 3.1, 0.12), bodyCF * CFrame.new(sx * 1.12, 0, -0.72), YELLOW, Enum.Material.SmoothPlastic)
+		part(terminal, `Vent{sx}`, Vector3.new(0.06, 0.8, 0.8), bodyCF * CFrame.new(sx * 1.17, 0.6, 0.2), PANEL, Enum.Material.DiamondPlate)
+	end
+	-- Pultkopf mit schrägem Bedienfeld
+	local headCF = c * CFrame.new(0, 4.55, 0.1) * CFrame.Angles(math.rad(-16), 0, 0)
+	part(terminal, "Head", Vector3.new(3.2, 0.9, 2.2), headCF, BODY, Enum.Material.SmoothPlastic)
+	part(terminal, "ControlPlate", Vector3.new(2.9, 0.06, 1.9), headCF * CFrame.new(0, 0.48, 0), PANEL, Enum.Material.SmoothPlastic)
+	part(terminal, "FrontLip", Vector3.new(3.3, 0.3, 0.35), headCF * CFrame.new(0, 0.12, -1.2), YELLOW, Enum.Material.SmoothPlastic)
+	part(terminal, "ArmPad", Vector3.new(3.1, 0.2, 0.45), headCF * CFrame.new(0, -0.1, -1.55), RUBBER, Enum.Material.Rubber)
+	local top = headCF * CFrame.new(0, 0.51, 0)
+	-- vier Joysticks (Gummimanschette, Hebel, gelber Knauf)
+	for i, x in { -1.2, -0.85, -0.5, -0.15 } do
+		cylinder(terminal, `JoyBoot{i}`, 0.16, 0.36, top * CFrame.new(x, 0.08, 0.05) * CFrame.Angles(0, 0, math.rad(90)), RUBBER, Enum.Material.Rubber)
+		part(terminal, `JoyStick{i}`, Vector3.new(0.12, 0.6, 0.12), top * CFrame.new(x, 0.45, 0.05) * CFrame.Angles(math.rad(if i % 2 == 0 then 8 else -6), 0, 0), RUBBER, Enum.Material.SmoothPlastic).CanCollide = false
+		local knob = part(terminal, `JoyKnob{i}`, Vector3.new(0.22, 0.3, 0.22), top * CFrame.new(x, 0.85, 0.05 + (if i % 2 == 0 then 0.06 else -0.05)), YELLOW, Enum.Material.SmoothPlastic)
+		knob.CanCollide = false
+	end
+	-- Not-Aus (roter Pilz auf gelbem Ring), Leuchttaster, kleines Display
+	cylinder(terminal, "EStopCollar", 0.08, 0.6, top * CFrame.new(0.75, 0.04, -0.1) * CFrame.Angles(0, 0, math.rad(90)), YELLOW, Enum.Material.SmoothPlastic)
+	cylinder(terminal, "EStop", 0.22, 0.42, top * CFrame.new(0.75, 0.18, -0.1) * CFrame.Angles(0, 0, math.rad(90)), Color3.fromRGB(210, 30, 30), Enum.Material.SmoothPlastic)
+	for i, b in { { 1.15, -0.25, YELLOW }, { 1.15, 0.15, Color3.fromRGB(70, 210, 90) }, { 0.75, 0.35, Color3.fromRGB(210, 30, 30) } } do
+		local btn = cylinder(terminal, `Button{i}`, 0.1, 0.24, top * CFrame.new(b[1] :: number, 0.05, b[2] :: number) * CFrame.Angles(0, 0, math.rad(90)), b[3] :: Color3, Enum.Material.Neon)
+		btn.CanCollide = false
+	end
+	local lcd = part(terminal, "MiniDisplay", Vector3.new(0.8, 0.04, 0.45), top * CFrame.new(1.0, 0.03, 0.62), Color3.fromRGB(90, 200, 255), Enum.Material.Neon)
+	lcd.CanCollide = false
+	local led = part(terminal, "Led", Vector3.new(0.12, 0.05, 0.12), top * CFrame.new(-1.3, 0.03, 0.75), Color3.fromRGB(90, 220, 110), Enum.Material.Neon)
+	led.CanCollide = false
+	AmbientProps.blink(led)
+	-- Griff an der Seite (schwarz, gelbe Griffzone)
+	local hx = -1.85
+	for i, y in { 0.35, -0.55 } do
+		part(terminal, `HandleArm{i}`, Vector3.new(0.5, 0.18, 0.18), headCF * CFrame.new(hx + 0.2, y, -0.3), BODY, Enum.Material.SmoothPlastic)
+	end
+	part(terminal, "HandleBar", Vector3.new(0.22, 1.2, 0.22), headCF * CFrame.new(hx - 0.05, -0.1, -0.3), BODY, Enum.Material.SmoothPlastic)
+	part(terminal, "HandleGrip", Vector3.new(0.26, 0.6, 0.26), headCF * CFrame.new(hx - 0.05, -0.1, -0.3), YELLOW, Enum.Material.Rubber)
+	-- Monitor am Mast
+	local mastBase = (headCF * CFrame.new(0, 0.45, 0.85)).Position
+	local monitorCF = c * CFrame.new(0, 6.55, 0.85) * CFrame.Angles(math.rad(-6), 0, 0)
+	local mastTop = (monitorCF * CFrame.new(0, -0.6, 0.25)).Position
+	local mast = part(terminal, "MonitorMast", Vector3.new(0.34, (mastTop - mastBase).Magnitude, 0.34), CFrame.lookAt((mastBase + mastTop) / 2, mastTop) * CFrame.Angles(math.rad(90), 0, 0), BODY, Enum.Material.Metal)
+	mast.CanCollide = false
+	part(terminal, "MastCollar", Vector3.new(0.5, 0.2, 0.5), CFrame.new(mastBase + Vector3.new(0, 0.1, 0)), YELLOW, Enum.Material.SmoothPlastic)
+	part(terminal, "MonitorFrame", Vector3.new(3, 1.9, 0.25), monitorCF, BODY, Enum.Material.SmoothPlastic)
+	part(terminal, "MonitorTrim", Vector3.new(3, 0.1, 0.27), monitorCF * CFrame.new(0, -0.98, 0), YELLOW, Enum.Material.SmoothPlastic)
+	local screen = part(terminal, "TerminalScreen", Vector3.new(2.7, 1.6, 0.06), monitorCF * CFrame.new(0, 0.02, -0.14), Color3.fromRGB(14, 20, 28), Enum.Material.SmoothPlastic)
+	screen.CanCollide = false
+	-- Bildschirm: Ofen-Bedienoberfläche (Titel, Temperatur- und Durchsatzbalken, Kennzahlen)
+	local ui = Instance.new("SurfaceGui")
+	ui.Name = "ScreenUI"
+	ui.Face = Enum.NormalId.Front
+	ui.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
+	ui.PixelsPerStud = 120
+	ui.LightInfluence = 0
+	ui.Brightness = 1.4
+	ui.Parent = screen
+	local bg = Instance.new("Frame")
+	bg.Size = UDim2.fromScale(1, 1)
+	bg.BackgroundColor3 = Color3.fromRGB(16, 24, 34)
+	bg.BorderSizePixel = 0
+	bg.Parent = ui
+	local function label(text: string, y: number, h: number, color: Color3, xAlign: Enum.TextXAlignment?)
+		local t = Instance.new("TextLabel")
+		t.BackgroundTransparency = 1
+		t.Position = UDim2.fromScale(0.06, y)
+		t.Size = UDim2.fromScale(0.88, h)
+		t.Font = Enum.Font.GothamBold
+		t.TextScaled = true
+		t.TextColor3 = color
+		t.TextXAlignment = xAlign or Enum.TextXAlignment.Left
+		t.Text = text
+		t.Parent = bg
+	end
+	local function bar(y: number, fill: number, color: Color3)
+		local track = Instance.new("Frame")
+		track.Position = UDim2.fromScale(0.06, y)
+		track.Size = UDim2.fromScale(0.88, 0.09)
+		track.BackgroundColor3 = Color3.fromRGB(40, 50, 64)
+		track.BorderSizePixel = 0
+		track.Parent = bg
+		local f = Instance.new("Frame")
+		f.Size = UDim2.fromScale(fill, 1)
+		f.BackgroundColor3 = color
+		f.BorderSizePixel = 0
+		f.Parent = track
+	end
+	local header = Instance.new("Frame")
+	header.Size = UDim2.fromScale(1, 0.16)
+	header.BackgroundColor3 = YELLOW
+	header.BorderSizePixel = 0
+	header.Parent = bg
+	local title = Instance.new("TextLabel")
+	title.BackgroundTransparency = 1
+	title.Size = UDim2.fromScale(1, 1)
+	title.Font = Enum.Font.GothamBlack
+	title.TextScaled = true
+	title.TextColor3 = Color3.fromRGB(26, 27, 30)
+	title.Text = "  FURNACE CONTROL"
+	title.TextXAlignment = Enum.TextXAlignment.Left
+	title.Parent = header
+	label("Kiln temperature", 0.22, 0.1, Color3.fromRGB(200, 208, 220))
+	bar(0.34, 0.78, Color3.fromRGB(255, 130, 40))
+	label("Throughput", 0.48, 0.1, Color3.fromRGB(200, 208, 220))
+	bar(0.6, 0.55, Color3.fromRGB(80, 200, 110))
+	label("Drum  3.2 rpm    Feed  ON    Gas  OK", 0.76, 0.12, Color3.fromRGB(150, 200, 255))
+	-- Kabel vom Pult zum Ofen
+	part(terminal, "CableDrop", Vector3.new(0.22, 0.6, 0.22), c * CFrame.new(0, 0.7, 2.15), RUBBER, Enum.Material.Rubber)
+	part(terminal, "CableFloor", Vector3.new(0.22, 0.18, 1.6), c * CFrame.new(0, 0.09, 2.95), RUBBER, Enum.Material.Rubber).CanCollide = false
+	FloatingText.create(terminal, "SmelterDisplay", c * CFrame.new(0, 9, 0), 9, {
 		{ Name = "Status", Text = "Idle", Size = 1.6, Color = LAMP_IDLE },
 		{ Name = "Input", Text = "", Size = 1.1 },
 		{ Name = "Output", Text = "", Size = 1.1 },
 	})
-	local promptPart = part(terminal, "SmelterTerminalPart", Vector3.new(3, 4, 3), terminalCF * CFrame.new(0, 3, -1.5), STEEL, Enum.Material.SmoothPlastic)
+	local promptPart = part(terminal, "SmelterTerminalPart", Vector3.new(3, 4, 3), c * CFrame.new(0, 3, -1.5), STEEL, Enum.Material.SmoothPlastic)
 	promptPart.Transparency = 1
 	promptPart.CanCollide = false
 	promptPart.CanQuery = false

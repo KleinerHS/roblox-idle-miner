@@ -517,6 +517,12 @@ Selbsttest 13b-8 (2026-10-13): Überschneidungsprüfung (nur Zuführrohr ins Sil
 
 Selbsttest 13b-9 (2026-10-15): Felix' Layout geprüft (keine eigenen Verschiebungen) und in seiner Drehung/Lage neu erzeugt; Prüfliste: alle Sammlungen enthalten nur Einzelobjekte; Außen-Stapler ohne Überschneidung; Play: Gebäude als Models, Hütte an (127, 92), 8 Kisten, Ofen-Anzeige, Spawn vorhanden, keine Fehler. Rojo war nicht verbunden – Skripte direkt in Studio übertragen (identisch mit den Dateien).
 
+| 13b-10 Ofen-Bedienpult | Dateien | Status |
+|---|---|---|
+| Bedienpult vor der Schmelze nach Felix' Vorlage (mobiles Steuerpult), schwarz mit gelben Elementen: Fuß mit Lenkrollen, großen Hinterrädern, gelber Kante und Schriftzug, geneigter Korpus mit eingelassener Frontplatte und gelben Kanten, schräges Bedienfeld mit 4 Joysticks (gelbe Knäufe), Not-Aus, Leuchttastern, Mini-Display und LED, gelbe Vorderkante, Armauflage, Seitengriff, Monitor am Mast mit Ofen-Oberfläche (Temperatur, Durchsatz), Kabel; Prompt und schwebende Anzeige unverändert | `SmelterTemplate` (Terminal) | TESTING_REQUIRED |
+
+Selbsttest 13b-10 (2026-10-15): Sichtprüfung vorn/seitlich; keine Überschneidung; im HallLayout nur das Terminal an Felix' Stelle getauscht; Play: Prompt vorhanden, Anzeige läuft, keine Fehler.
+
 ## Phase 12 – Content Expansion – Details
 
 Schritte: 12a alle Minen/Erze/Barren über zentrale Kurven · 12b weitere Spitzhacken, Rucksäcke, Drills, Fahrzeuge, Ausbaustufen (offen).
