@@ -98,6 +98,24 @@ local function doorText(p: BasePart, face: Enum.NormalId)
 	label.Parent = gui
 end
 
+-- Dach eines geschlossenen Laderaums mit offener Ladeluke (Verladeturm, Felix 2026-10-13: kein
+-- Clipping mit dem Dach). Dach von z0 bis z1 (lokal) auf Höhe y, Luke (Seitenlänge hatch) bei hz.
+local function roofWithHatch(ctx: Ctx, prefix: string, width: number, y: number, z0: number, z1: number, hz: number, hatch: number, color: Color3)
+	local h = hatch / 2
+	local t = 0.3
+	box(ctx, `{prefix}RoofFront`, Vector3.new(width, t, (hz - h) - z0), 0, y, (z0 + hz - h) / 2, color, Enum.Material.SmoothPlastic)
+	box(ctx, `{prefix}RoofBack`, Vector3.new(width, t, z1 - (hz + h)), 0, y, (hz + h + z1) / 2, color, Enum.Material.SmoothPlastic)
+	local sideW = (width - hatch) / 2
+	for _, side in { -1, 1 } do
+		box(ctx, `{prefix}RoofSide{side}`, Vector3.new(sideW, t, hatch), side * (h + sideW / 2), y, hz, color, Enum.Material.SmoothPlastic)
+		-- Lukenrand (Süll) rundum
+		box(ctx, `HatchCoamingX{side}`, Vector3.new(0.2, 0.4, hatch + 0.4), side * (h + 0.1), y + 0.35, hz, TRIM)
+		box(ctx, `HatchCoamingZ{side}`, Vector3.new(hatch, 0.4, 0.2), 0, y + 0.35, hz + side * (h + 0.1), TRIM)
+	end
+	-- geöffneter Deckel liegt nach hinten geklappt auf dem Dach
+	box(ctx, "HatchLid", Vector3.new(hatch, 0.15, hatch), 0, y + 0.25, hz + hatch + 0.3, TRIM, Enum.Material.DiamondPlate)
+end
+
 local function buildPickup(ctx: Ctx, spec: Spec)
 	local paint = ctx.def.PaintColor
 	local hw = spec.width / 2
@@ -135,7 +153,14 @@ local function buildVan(ctx: Ctx, spec: Spec)
 	local hw = spec.width / 2
 	local floorY = spec.r + 0.8
 	box(ctx, "Nose", Vector3.new(spec.width, 2.2, 2.6), 0, floorY + 1.1, -7.5, paint, Enum.Material.SmoothPlastic)
-	local body = box(ctx, "Body", Vector3.new(spec.width, 5.6, 14.6), 0, floorY + 2.8, 1.1, paint, Enum.Material.SmoothPlastic)
+	-- Fahrerraum geschlossen, Laderaum hohl mit Dachluke über der Ladung
+	local body = box(ctx, "Body", Vector3.new(spec.width, 5.6, 5.7), 0, floorY + 2.8, -3.35, paint, Enum.Material.SmoothPlastic)
+	for _, side in { -1, 1 } do
+		box(ctx, `CargoWall{side}`, Vector3.new(0.3, 5.6, 8.9), side * (hw - 0.15), floorY + 2.8, 3.95, paint, Enum.Material.SmoothPlastic)
+	end
+	box(ctx, "CargoFloor", Vector3.new(spec.width - 0.6, 0.2, 8.9), 0, floorY + 0.1, 3.95, TRIM)
+	box(ctx, "RearDoors", Vector3.new(spec.width, 5.6, 0.3), 0, floorY + 2.8, 8.25, paint, Enum.Material.SmoothPlastic)
+	roofWithHatch(ctx, "Cargo", spec.width, floorY + 5.45, -0.5, 8.4, 3.5, 3.4, paint)
 	box(ctx, "Windshield", Vector3.new(spec.width - 0.6, 2.6, 0.2), 0, floorY + 3.6, -6.2, GLASS, Enum.Material.Glass, CFrame.Angles(math.rad(-25), 0, 0)).Transparency = 0.35
 	for _, side in { -1, 1 } do
 		box(ctx, `SideWindow{side}`, Vector3.new(0.12, 1.8, 2.6), side * (hw + 0.01), floorY + 3.9, -4.4, GLASS, Enum.Material.Glass).Transparency = 0.3
@@ -146,7 +171,7 @@ local function buildVan(ctx: Ctx, spec: Spec)
 	doorText(body, Enum.NormalId.Left)
 	box(ctx, "RearDoorSeam", Vector3.new(0.1, 5, 0.06), 0, floorY + 2.8, 8.42, TRIM)
 	box(ctx, "Grille", Vector3.new(3.6, 1, 0.15), 0, floorY + 0.8, -8.85, TRIM)
-	box(ctx, "RoofRack", Vector3.new(spec.width - 1.4, 0.25, 9), 0, floorY + 5.75, 2, CHROME)
+	box(ctx, "RoofRack", Vector3.new(spec.width - 1.4, 0.25, 4.6), 0, floorY + 5.75, -3.4, CHROME)
 	local cargo = box(ctx, "CargoFill", Vector3.new(spec.width - 1, 1, 8), 0, floorY + 0.7, 3.5, CARGO, Enum.Material.Slate)
 	cargo.Transparency = 1
 	cargo.CanCollide = false
@@ -173,7 +198,15 @@ local function buildBoxTruck(ctx: Ctx, spec: Spec)
 	box(ctx, "Grille", Vector3.new(4.4, 1.8, 0.2), 0, floorY + 1.2, -11.4, TRIM)
 	box(ctx, "Frame", Vector3.new(4.6, 0.8, 20), 0, spec.r + 0.6, 1, TRIM)
 	-- Kofferaufbau mit Firmenstreifen
-	local cargoBox = box(ctx, "CargoBox", Vector3.new(spec.width + 0.4, 8, 15.4), 0, floorY + 4.6, 3.8, Color3.fromRGB(238, 238, 234), Enum.Material.SmoothPlastic)
+	-- Kofferaufbau hohl mit Dachluke über der Ladung (Wände, Boden, Stirnwand, Rückwand)
+	local white = Color3.fromRGB(238, 238, 234)
+	local bw = spec.width + 0.4
+	local cargoBox = box(ctx, "CargoBox", Vector3.new(0.3, 8, 15.4), -(bw / 2 - 0.15), floorY + 4.6, 3.8, white, Enum.Material.SmoothPlastic)
+	box(ctx, "CargoBoxR", Vector3.new(0.3, 8, 15.4), bw / 2 - 0.15, floorY + 4.6, 3.8, white, Enum.Material.SmoothPlastic)
+	box(ctx, "CargoBoxFront", Vector3.new(bw - 0.6, 8, 0.3), 0, floorY + 4.6, -3.75, white, Enum.Material.SmoothPlastic)
+	box(ctx, "CargoBoxRear", Vector3.new(bw - 0.6, 8, 0.3), 0, floorY + 4.6, 11.35, white, Enum.Material.SmoothPlastic)
+	box(ctx, "CargoBoxFloor", Vector3.new(bw - 0.6, 0.3, 14.8), 0, floorY + 0.75, 3.8, TRIM)
+	roofWithHatch(ctx, "Box", bw, floorY + 8.45, -3.9, 11.5, 4, 3.6, white)
 	for _, side in { -1, 1 } do
 		local stripe = box(ctx, `AccentStripe{side}`, Vector3.new(0.06, 1, 15.4), side * (hw + 0.23), floorY + 2.4, 3.8, ACCENT_DEFAULT)
 		accentPart(stripe)
