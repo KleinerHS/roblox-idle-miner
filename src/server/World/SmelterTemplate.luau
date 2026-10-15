@@ -72,6 +72,14 @@ local function cylinder(parent: Instance, name: string, length: number, diameter
 	return p
 end
 
+-- Sammlung mehrerer Einzelobjekte: Folder (in Studio wählt ein Klick das einzelne Objekt)
+local function collection(parent: Instance, name: string): Folder
+	local f = Instance.new("Folder")
+	f.Name = name
+	f.Parent = parent
+	return f
+end
+
 local function group(parent: Instance, name: string): Model
 	local m = Instance.new("Model")
 	m.Name = name
@@ -197,8 +205,8 @@ local function bollard(parent: Instance, name: string, cf: CFrame)
 end
 
 -- Hochregal-Block (4 Regale) mit schwebendem Titel
-local function store(parent: Instance, name: string, origin: CFrame, face: number, title: string): Model
-	local block = group(parent, name)
+local function store(parent: Instance, name: string, origin: CFrame, face: number, title: string): Folder
+	local block = collection(parent, name)
 	CrateRackBuilder.build(block, origin, { { Z = 0, Face = face } }, 4)
 	FloatingText.title(block, `{name}Label`, origin * CFrame.new(0, 34, face * (CrateRackBuilder.Depth / 2 + 1)), title, 2.4, YELLOW)
 	return block
@@ -431,9 +439,10 @@ function SmelterTemplate.build(plotCFrame: CFrame): Model
 	smoke.Parent = smokeAttachment
 
 	-- Statuslampe an der Spitze
-	local lamp = part(model, "StatusLight", Vector3.new(1.2, 1.2, 1.2), at(kilnX + 6, kilnY + 6, frontZ + 3), LAMP_IDLE, Enum.Material.Neon)
+	local statusLamp = group(model, "StatusLamp")
+	local lamp = part(statusLamp, "StatusLight", Vector3.new(1.2, 1.2, 1.2), at(kilnX + 6, kilnY + 6, frontZ + 3), LAMP_IDLE, Enum.Material.Neon)
 	lamp.Shape = Enum.PartType.Ball
-	part(model, "StatusLightPost", Vector3.new(0.4, kilnY + 5.4, 0.4), at(kilnX + 6, (kilnY + 5.4) / 2, frontZ + 3), STEEL_DARK)
+	part(statusLamp, "StatusLightPost", Vector3.new(0.4, kilnY + 5.4, 0.4), at(kilnX + 6, (kilnY + 5.4) / 2, frontZ + 3), STEEL_DARK)
 	local lampLight = Instance.new("PointLight")
 	lampLight.Name = "Glow"
 	lampLight.Color = LAMP_IDLE
@@ -480,14 +489,14 @@ function SmelterTemplate.build(plotCFrame: CFrame): Model
 	port(model, "ConveyorOutPort", at(outputX + 20, 0.6, outputZ + 8))
 
 	-- Orange Maschinen am Boden (wie im Bild verteilt) mit kleinen Geländern
-	local machines = group(model, "Machines")
+	local machines = collection(model, "Machines")
 	machine(machines, "MachineA", at(zLeft - 12, 0, zz + 30) * CFrame.Angles(0, math.rad(90), 0), Vector3.new(6, 5, 5))
 	machine(machines, "MachineB", at(zLeft - 12, 0, zz + 6) * CFrame.Angles(0, math.rad(90), 0), Vector3.new(5, 4, 4))
 	machine(machines, "MachineC", at(zLeft - 30, 0, zz - 14), Vector3.new(5, 4.5, 4))
 	machine(machines, "MachineD", at(zRight + 8, 0, zz - 26) * CFrame.Angles(0, math.rad(-90), 0), Vector3.new(4, 4, 4))
 
 	-- Gelbe Rohrleitungen am Boden: von den Tanks (Wand) zum Ofen und zu den Maschinen
-	local pipes = group(model, "FloorPipes")
+	local pipes = collection(model, "FloorPipes")
 	local py = 1.6
 	local route = {
 		pos(zRight + 1.5, py, zz + 48), pos(kilnX - 9, py, zz + 48), pos(kilnX - 9, py, zz + 10),
@@ -499,22 +508,23 @@ function SmelterTemplate.build(plotCFrame: CFrame): Model
 		pos(kilnX + 9, py, zz + 50), pos(zLeft - 18, py, zz + 50), pos(zLeft - 18, py, zz + 6),
 	}
 	for r, points in { route, route2, route3 } do
+		local routeModel = group(pipes, `PipeRoute{r}`)
 		for i = 1, #points - 1 do
-			pipe(pipes, `Pipe{r}_{i}`, points[i], points[i + 1], 0.9, YELLOW)
+			pipe(routeModel, `Pipe{r}_{i}`, points[i], points[i + 1], 0.9, YELLOW)
 		end
 		for i, p in points do
-			part(pipes, `Support{r}_{i}`, Vector3.new(1.4, p.Y - (plotCFrame.Position.Y + floorY), 1.4), CFrame.new(p.X, (p.Y + plotCFrame.Position.Y + floorY) / 2, p.Z), STEEL_DARK, Enum.Material.Metal)
+			part(routeModel, `Support{r}_{i}`, Vector3.new(1.4, p.Y - (plotCFrame.Position.Y + floorY), 1.4), CFrame.new(p.X, (p.Y + plotCFrame.Position.Y + floorY) / 2, p.Z), STEEL_DARK, Enum.Material.Metal)
 		end
 	end
 
 	-- Kleine Geländer entlang des Ofens (Gehweg-Abgrenzung)
-	local rails = group(model, "KilnRailings")
+	local rails = collection(model, "KilnRailings")
 	railing(rails, "RailLeftA", pos(kilnX + 15, 0, backZ - 14), pos(kilnX + 15, 0, backZ - 30))
 	railing(rails, "RailLeftB", pos(kilnX + 15, 0, backZ - 38), pos(kilnX + 15, 0, frontZ + 4))
 	railing(rails, "RailFront", pos(kilnX + 15, 0, frontZ + 4), pos(kilnX + 8, 0, frontZ + 4))
 
 	-- Kistenpaletten vorne rechts (wie im Bild)
-	local pallets = group(model, "CratePallets")
+	local pallets = collection(model, "CratePallets")
 	for i, p in { Vector2.new(zRight + 6, zFront + 8), Vector2.new(zRight + 13, zFront + 8), Vector2.new(zRight + 6, zFront + 15) } do
 		cratePallet(pallets, `PalletStack{i}`, at(p.X, 0, p.Y))
 	end
@@ -562,43 +572,47 @@ function SmelterTemplate.build(plotCFrame: CFrame): Model
 	hose(model, "HoseB", at, zLeft - 53, zLeft - 13, zz - 80)
 
 	-- Anlagen mit gelbem Käfig
-	local units = group(model, "CagedUnits")
+	local units = collection(model, "CagedUnits")
 	cagedUnit(units, "UnitA", at(zLeft - 48, 0, zz + 37), Vector3.new(6, 5, 6))
 	cagedUnit(units, "UnitB", at(zLeft - 48, 0, zz + 20), Vector3.new(6, 5, 6))
 	cagedUnit(units, "UnitC", at(zLeft - 33, 0, zz - 63), Vector3.new(8, 5, 6))
 	-- Schaltschränke unter dem Laufrost
-	local cabinets = group(model, "DeckCabinets")
+	local cabinets = collection(model, "DeckCabinets")
 	for i, x in { zRight + 9, zRight + 21, zRight + 32 } do
-		local c = part(cabinets, `Cabinet{i}`, Vector3.new(6, 7, 4), at(x, 3.5, zBack - 9), ORANGE, Enum.Material.Metal)
-		part(cabinets, `CabinetDoor{i}`, Vector3.new(5, 6, 0.15), c.CFrame * CFrame.new(0, 0, -2.07), ORANGE_DARK, Enum.Material.Metal).CanCollide = false
-		local led = part(cabinets, `CabinetLed{i}`, Vector3.new(0.4, 0.4, 0.12), c.CFrame * CFrame.new(1.8, 2.4, -2.2), Color3.fromRGB(90, 220, 110), Enum.Material.Neon)
+		local cab = group(cabinets, `Cabinet{i}`)
+		local c = part(cab, "Body", Vector3.new(6, 7, 4), at(x, 3.5, zBack - 9), ORANGE, Enum.Material.Metal)
+		part(cab, `CabinetDoor{i}`, Vector3.new(5, 6, 0.15), c.CFrame * CFrame.new(0, 0, -2.07), ORANGE_DARK, Enum.Material.Metal).CanCollide = false
+		local led = part(cab, `CabinetLed{i}`, Vector3.new(0.4, 0.4, 0.12), c.CFrame * CFrame.new(1.8, 2.4, -2.2), Color3.fromRGB(90, 220, 110), Enum.Material.Neon)
 		led.CanCollide = false
 	end
 
 	-- Kleine Zäune zur Hallenmitte (mit Durchgang in der Mitte), Poller an Lager und Kistenplatz
-	local fences = group(model, "ZoneFences")
+	local fences = collection(model, "ZoneFences")
 	railing(fences, "FenceBack", pos(zLeft - 3, 0, zz + 42), pos(zLeft - 3, 0, zz + 72))
 	railing(fences, "FenceFront", pos(zLeft - 3, 0, zFront + 6), pos(zLeft - 3, 0, zz - 58))
-	local bollards = group(model, "Bollards")
+	local bollards = collection(model, "Bollards")
 	for i, p in { Vector2.new(zRight + 10, zFront + 44), Vector2.new(zRight + 10, zFront + 29), Vector2.new(zRight + 50, zFront + 29) } do
 		bollard(bollards, `Bollard{i}`, at(p.X, 0, p.Y))
 	end
 
 	-- Wand rechts innen: Kabeltrasse, Schaltkästen, Feuerlöscher
-	local wall = group(model, "WallDetails")
+	local wall = collection(model, "WallDetails")
 	local wx = hallRight + 2.8
-	part(wall, "CableTray", Vector3.new(1.2, 0.3, zone.Size.Y - 10), at(wx, 14, zz), STEEL_LIGHT, Enum.Material.DiamondPlate)
-	part(wall, "Cables", Vector3.new(0.8, 0.4, zone.Size.Y - 10), at(wx, 14.3, zz), BLACK, Enum.Material.Fabric)
+	local tray = group(wall, "CableTray")
+	part(tray, "Tray", Vector3.new(1.2, 0.3, zone.Size.Y - 10), at(wx, 14, zz), STEEL_LIGHT, Enum.Material.DiamondPlate)
+	part(tray, "Cables", Vector3.new(0.8, 0.4, zone.Size.Y - 10), at(wx, 14.3, zz), BLACK, Enum.Material.Fabric)
 	for z = zFront + 13, zBack - 9, 20 do
-		part(wall, `TrayBracket{z}`, Vector3.new(2.2, 0.25, 0.4), at(hallRight + 1.9, 13.8, z), STEEL, Enum.Material.Metal)
+		part(tray, `TrayBracket{z}`, Vector3.new(2.2, 0.25, 0.4), at(hallRight + 1.9, 13.8, z), STEEL, Enum.Material.Metal)
 	end
 	for i, z in { zz - 32, zz - 10 } do
-		local box = part(wall, `ElectricBox{i}`, Vector3.new(1.2, 6, 4), at(hallRight + 2.6, 4.5, z), Color3.fromRGB(150, 160, 170), Enum.Material.Metal)
-		part(wall, `ElectricSign{i}`, Vector3.new(0.12, 0.8, 0.8), box.CFrame * CFrame.new(0.66, 1.8, 0), YELLOW, Enum.Material.SmoothPlastic).CanCollide = false
+		local eb = group(wall, `ElectricBox{i}`)
+		local box = part(eb, "Box", Vector3.new(1.2, 6, 4), at(hallRight + 2.6, 4.5, z), Color3.fromRGB(150, 160, 170), Enum.Material.Metal)
+		part(eb, "Sign", Vector3.new(0.12, 0.8, 0.8), box.CFrame * CFrame.new(0.66, 1.8, 0), YELLOW, Enum.Material.SmoothPlastic).CanCollide = false
 	end
 	for i, z in { zz - 48, zz + 32 } do
-		cylinder(wall, `Extinguisher{i}`, 2.2, 0.8, at(hallRight + 1.65, 2.5, z) * CFrame.Angles(0, 0, math.rad(90)), Color3.fromRGB(200, 30, 30), Enum.Material.SmoothPlastic)
-		part(wall, `ExtinguisherSign{i}`, Vector3.new(0.12, 1.2, 1.2), at(hallRight + 0.9, 5, z), Color3.fromRGB(200, 30, 30), Enum.Material.SmoothPlastic).CanCollide = false
+		local ex = group(wall, `Extinguisher{i}`)
+		cylinder(ex, "Body", 2.2, 0.8, at(hallRight + 1.65, 2.5, z) * CFrame.Angles(0, 0, math.rad(90)), Color3.fromRGB(200, 30, 30), Enum.Material.SmoothPlastic)
+		part(ex, "Sign", Vector3.new(0.12, 1.2, 1.2), at(hallRight + 0.9, 5, z), Color3.fromRGB(200, 30, 30), Enum.Material.SmoothPlastic).CanCollide = false
 	end
 
 	-- Leben: Rundumleuchten im Betrieb, Arbeiter auf dem Gehweg, blinkende Kontroll-LEDs

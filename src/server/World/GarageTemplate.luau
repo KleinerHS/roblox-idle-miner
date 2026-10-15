@@ -76,7 +76,11 @@ local function floorText(parent: Instance, name: string, text: string, size: Vec
 end
 
 -- Stellplatz: gelbe Umrandung, Nummer, Radstopper hinten, unsichtbarer Spawnpunkt
-local function bay(model: Model, index: number, o: CFrame)
+local function bay(garage: Model, index: number, o: CFrame)
+	-- jeder Stellplatz ist ein eigenes Model (Markierung, Nummer, Radstopper, Spawnpunkt)
+	local model = Instance.new("Model")
+	model.Name = `Bay{index}`
+	model.Parent = garage
 	local cfg = LayoutConfig.Garage
 	local c = cfg.Bays[index]
 	local w, l = cfg.BaySize.X, cfg.BaySize.Y
@@ -104,7 +108,10 @@ local function bay(model: Model, index: number, o: CFrame)
 end
 
 -- Leuchtring zur Fahrzeugauswahl mit Schrift "VEHICLES"
-local function ring(model: Model, o: CFrame)
+local function ring(garage: Model, o: CFrame)
+	local model = Instance.new("Model")
+	model.Name = "VehicleRing"
+	model.Parent = garage
 	local cfg = LayoutConfig.Garage
 	local center = o * CFrame.new(cfg.Ring.X, 0, cfg.Ring.Y)
 	local r = cfg.RingRadius
@@ -532,6 +539,10 @@ local RACK_BEAM = Color3.fromRGB(222, 120, 40)
 
 -- Europalette (Unterkante = cf), 4 × 0.5 × 3.4
 local function pallet(parent: Instance, name: string, cf: CFrame)
+	local obj = Instance.new("Model")
+	obj.Name = name
+	obj.Parent = parent
+	parent = obj
 	part(parent, `{name}Deck`, Vector3.new(4, 0.15, 3.4), cf * CFrame.new(0, 0.425, 0), PALLET_WOOD, Enum.Material.WoodPlanks)
 	for _, dz in { -1.4, 0, 1.4 } do
 		part(parent, `{name}Runner{dz}`, Vector3.new(4, 0.35, 0.5), cf * CFrame.new(0, 0.175, dz), PALLET_WOOD:Lerp(Color3.new(0, 0, 0), 0.15), Enum.Material.WoodPlanks)
@@ -540,6 +551,10 @@ end
 
 -- Palette mit 2 × 2 Kartonstapeln (zufällige Höhe bis maxLayers)
 local function cartonPallet(parent: Instance, name: string, cf: CFrame, rng: Random, maxLayers: number)
+	local obj = Instance.new("Model")
+	obj.Name = name
+	obj.Parent = parent
+	parent = obj
 	pallet(parent, name, cf)
 	for ix, dx in { -0.95, 0.95 } do
 		for iz, dz in { -0.8, 0.8 } do
@@ -559,6 +574,10 @@ end
 -- Hochregal: Länge entlang lokal X, Front zu lokal +Z, Unterkante = cf. bays Fächer à 6 Studs,
 -- drei Ebenen (Boden, 4.6, 9.2) mit Kartonpaletten; Stapelhöhe bleibt unter dem nächsten Träger.
 local function highRack(parent: Instance, name: string, cf: CFrame, bays: number, rng: Random)
+	local obj = Instance.new("Model")
+	obj.Name = name
+	obj.Parent = parent
+	parent = obj
 	local length = bays * 6
 	for i = 0, bays do
 		local x = -length / 2 + i * 6
@@ -585,6 +604,10 @@ local function highRack(parent: Instance, name: string, cf: CFrame, bays: number
 end
 
 local function drum(parent: Instance, name: string, cf: CFrame, color: Color3)
+	local obj = Instance.new("Model")
+	obj.Name = name
+	obj.Parent = parent
+	parent = obj
 	local d = part(parent, name, Vector3.new(2.6, 1.6, 1.6), cf * CFrame.new(0, 1.3, 0) * CFrame.Angles(0, 0, math.rad(90)), color)
 	d.Shape = Enum.PartType.Cylinder
 	local lid = part(parent, `{name}Lid`, Vector3.new(0.06, 1.3, 1.3), cf * CFrame.new(0, 2.62, 0) * CFrame.Angles(0, 0, math.rad(90)), color:Lerp(Color3.new(0, 0, 0), 0.25))
@@ -607,14 +630,20 @@ local function props(model: Model, o: CFrame)
 
 	-- Ölfässer auf Auffangwanne und eine Palette mit Fässern
 	local spill = o * CFrame.new(144, 0, -36)
-	part(deco, "SpillPallet", Vector3.new(4.4, 0.4, 4.4), spill * CFrame.new(0, 0.2, 0), YELLOW, Enum.Material.SmoothPlastic)
+	local spillGroup = Instance.new("Model")
+	spillGroup.Name = "SpillPallet"
+	spillGroup.Parent = deco
+	part(spillGroup, "SpillPallet", Vector3.new(4.4, 0.4, 4.4), spill * CFrame.new(0, 0.2, 0), YELLOW, Enum.Material.SmoothPlastic)
 	for i, p in { Vector2.new(-0.95, -0.95), Vector2.new(0.95, -0.95), Vector2.new(0, 1) } do
-		drum(deco, `SpillDrum{i}`, spill * CFrame.new(p.X, 0.4, p.Y), if i == 3 then RED else BLUE)
+		drum(spillGroup, `SpillDrum{i}`, spill * CFrame.new(p.X, 0.4, p.Y), if i == 3 then RED else BLUE)
 	end
 	local drumPallet = o * CFrame.new(144.5, 0, -53)
-	pallet(deco, "DrumPallet", drumPallet)
+	local drumGroup = Instance.new("Model")
+	drumGroup.Name = "DrumPallet"
+	drumGroup.Parent = deco
+	pallet(drumGroup, "DrumPallet", drumPallet)
 	for i, p in { Vector2.new(-0.95, -0.8), Vector2.new(0.95, -0.8), Vector2.new(-0.95, 0.8), Vector2.new(0.95, 0.8) } do
-		drum(deco, `PalletDrum{i}`, drumPallet * CFrame.new(p.X, 0.5, p.Y), if i == 2 then GREEN else BLUE)
+		drum(drumGroup, `PalletDrum{i}`, drumPallet * CFrame.new(p.X, 0.5, p.Y), if i == 2 then GREEN else BLUE)
 	end
 	drum(deco, "LooseDrum1", o * CFrame.new(140.5, 0, -51.5), RED)
 	drum(deco, "LooseDrum2", o * CFrame.new(141, 0, -54.6), BLUE)
@@ -629,12 +658,15 @@ local function props(model: Model, o: CFrame)
 
 	-- Feuerlöscher an der Hallenstütze
 	local ext = o * CFrame.new(147.7, 3, -62)
-	local extBody = part(deco, "Extinguisher", Vector3.new(1.2, 0.5, 0.5), ext * CFrame.Angles(0, 0, math.rad(90)), Color3.fromRGB(200, 40, 40), Enum.Material.SmoothPlastic)
+	local extGroup = Instance.new("Model")
+	extGroup.Name = "Extinguisher"
+	extGroup.Parent = deco
+	local extBody = part(extGroup, "Extinguisher", Vector3.new(1.2, 0.5, 0.5), ext * CFrame.Angles(0, 0, math.rad(90)), Color3.fromRGB(200, 40, 40), Enum.Material.SmoothPlastic)
 	extBody.Shape = Enum.PartType.Cylinder
-	part(deco, "ExtinguisherBracket", Vector3.new(0.5, 0.2, 0.4), ext * CFrame.new(0.25, 0.3, 0), STEEL_DARK)
+	part(extGroup, "ExtinguisherBracket", Vector3.new(0.5, 0.2, 0.4), ext * CFrame.new(0.25, 0.3, 0), STEEL_DARK)
 
 	-- Werkstattecke rechts vom Tor (Felix: „nicht so leer und tot“) mit einem Arbeiter
-	local shop = Instance.new("Model")
+	local shop = Instance.new("Folder")
 	shop.Name = "Workshop"
 	shop.Parent = model
 	AmbientProps.workbench(shop, "Workbench", o * CFrame.new(-28, 0, -78.5) * CFrame.Angles(0, math.rad(180), 0))

@@ -13,6 +13,11 @@
 -- sich von hier eine Kopie, versetzt auf den jeweiligen Plot. Fehlt ein Teil im Layout, wird es wie
 -- bisher per Code gebaut (Rückfall). Funktionsteile werden über ihre Namen gefunden, deshalb
 -- Namen nicht ändern.
+--
+-- Damit in Studio ein Klick genau ein Objekt auswählt (Felix 2026-10-15: „jedes Hochregal einzeln
+-- verschiebbar“), sind HallLayout selbst und die Gebäude im Layout Folder (Studio wählt beim Klick
+-- das oberste Model; Folder zählen nicht). Im Spiel werden die Gebäude wieder zu Models.
+-- Ausnahme: der Elevator bleibt ein Ganzes (Model), weil Korb und Schacht zusammengehören.
 
 local ServerStorage = game:GetService("ServerStorage")
 
@@ -36,7 +41,7 @@ function HallLayout.makeOrigin(parent: Instance, cf: CFrame): Part
 	return p
 end
 
-local layout: Model? = nil
+local layout: Instance? = nil
 local origin: CFrame? = nil
 
 -- Einmal beim Serverstart (vor dem Bau der Plots)
@@ -47,7 +52,7 @@ function HallLayout.init()
 	end
 	local marker = found:FindFirstChild(HallLayout.OriginName)
 	local o: any = if marker and marker:IsA("BasePart") then marker.CFrame else found:GetAttribute("Origin")
-	if not found:IsA("Model") or typeof(o) ~= "CFrame" then
+	if not (found:IsA("Model") or found:IsA("Folder")) or typeof(o) ~= "CFrame" then
 		warn("[HallLayout] Workspace.HallLayout ohne LayoutOrigin/Origin – wird ignoriert")
 		return
 	end
@@ -75,14 +80,48 @@ local function copyFor(source: Instance, plotCFrame: CFrame): Instance
 	return copy
 end
 
+-- Gebäude für das Layout: Folder statt Model (gleiche Attribute, gleiche Kinder)
+function HallLayout.toLayoutForm(building: Model): Instance
+	if building:GetAttribute("BuildStepId") == "build_elevator" then
+		return building
+	end
+	local folder = Instance.new("Folder")
+	folder.Name = building.Name
+	for key, value in building:GetAttributes() do
+		folder:SetAttribute(key, value)
+	end
+	for _, child in building:GetChildren() do
+		child.Parent = folder
+	end
+	building:Destroy()
+	return folder
+end
+
+-- Layout-Form zurück zum Gebäude-Model (für das Spiel)
+local function toModel(inst: Instance): Model
+	if inst:IsA("Model") then
+		return inst
+	end
+	local m = Instance.new("Model")
+	m.Name = inst.Name
+	for key, value in inst:GetAttributes() do
+		m:SetAttribute(key, value)
+	end
+	for _, child in inst:GetChildren() do
+		child.Parent = m
+	end
+	inst:Destroy()
+	return m
+end
+
 -- Kopie des Gebäudes eines Bauschritts für den Plot, oder nil (dann per Code bauen)
 function HallLayout.cloneStep(stepId: string, plotCFrame: CFrame): Model?
 	if not layout then
 		return nil
 	end
 	for _, child in layout:GetChildren() do
-		if child:IsA("Model") and child:GetAttribute("BuildStepId") == stepId then
-			return copyFor(child, plotCFrame) :: Model
+		if (child:IsA("Model") or child:IsA("Folder")) and child:GetAttribute("BuildStepId") == stepId then
+			return toModel(copyFor(child, plotCFrame))
 		end
 	end
 	return nil

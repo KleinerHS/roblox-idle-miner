@@ -201,7 +201,8 @@ local function createLayout()
 		warn("[Idle Miner] Workspace.HallLayout gibt es schon – zum Neuaufbau erst löschen")
 		return
 	end
-	local layout = Instance.new("Model")
+	-- Folder: in Studio wählt ein Klick dann das einzelne Objekt statt der ganzen Halle
+	local layout = Instance.new("Folder")
 	layout.Name = "HallLayout"
 	local recording = ChangeHistoryService:TryBeginRecording("Idle Miner Hall Layout")
 	local ok, err = withModules(function(worldClone, sharedClone)
@@ -216,7 +217,7 @@ local function createLayout()
 		for _, step in BuildSteps.List do
 			local model = BuildTemplates.build(step.Id, origin)
 			if model then
-				model.Parent = layout
+				HallLayout.toLayoutForm(model).Parent = layout
 			end
 		end
 		local holder = Instance.new("Model")

@@ -13,6 +13,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LayoutConfig = require(ReplicatedStorage:WaitForChild("Shared").Config.LayoutConfig)
 
 local EnvironmentBuilder = require(script.Parent.EnvironmentBuilder)
+local ForkliftBuilder = require(script.Parent.ForkliftBuilder)
 
 local PlotExterior = {}
 
@@ -64,6 +65,10 @@ end
 
 -- Holzzaun: Pfosten mit zwei Querlatten, von a nach b (lokal, X/Z)
 local function fence(parent: Instance, name: string, o: CFrame, a: Vector2, b: Vector2)
+	local obj = Instance.new("Model")
+	obj.Name = name
+	obj.Parent = parent
+	parent = obj
 	local dir = b - a
 	local length = dir.Magnitude
 	if length < 0.5 then
@@ -84,6 +89,10 @@ end
 
 -- Kiste auf einer Palette (Erz-/Warenkiste wie im Bild)
 local function crate(parent: Instance, name: string, cf: CFrame, size: number)
+	local obj = Instance.new("Model")
+	obj.Name = name
+	obj.Parent = parent
+	parent = obj
 	part(parent, `{name}Pallet`, Vector3.new(size + 0.4, 0.4, size + 0.4), cf * CFrame.new(0, 0.2, 0), FENCE_DARK, Enum.Material.WoodPlanks)
 	local box = part(parent, name, Vector3.new(size, size * 0.8, size), cf * CFrame.new(0, 0.4 + size * 0.4, 0), CRATE, Enum.Material.WoodPlanks)
 	for _, dx in { -1, 1 } do
@@ -93,6 +102,10 @@ end
 
 -- Hochregal (orange) mit Kisten auf zwei Ebenen, Länge entlang lokal X
 local function rack(parent: Instance, name: string, cf: CFrame, bays: number)
+	local obj = Instance.new("Model")
+	obj.Name = name
+	obj.Parent = parent
+	parent = obj
 	local bayW = 5
 	local length = bays * bayW
 	for i = 0, bays do
@@ -113,6 +126,10 @@ local function rack(parent: Instance, name: string, cf: CFrame, bays: number)
 end
 
 local function tireStack(parent: Instance, name: string, cf: CFrame, count: number)
+	local obj = Instance.new("Model")
+	obj.Name = name
+	obj.Parent = parent
+	parent = obj
 	for i = 1, count do
 		local tire = part(parent, `{name}{i}`, Vector3.new(1.1, 3.4, 3.4), cf * CFrame.new(0, 0.55 + (i - 1) * 1.15, 0) * CFrame.Angles(0, 0, math.rad(90)), TIRE, Enum.Material.Rubber, Enum.PartType.Cylinder)
 		tire.CanCollide = true
@@ -120,11 +137,19 @@ local function tireStack(parent: Instance, name: string, cf: CFrame, count: numb
 end
 
 local function barrel(parent: Instance, name: string, cf: CFrame, color: Color3)
+	local obj = Instance.new("Model")
+	obj.Name = name
+	obj.Parent = parent
+	parent = obj
 	part(parent, name, Vector3.new(2.8, 1.8, 1.8), cf * CFrame.new(0, 1.4, 0) * CFrame.Angles(0, 0, math.rad(90)), color, Enum.Material.Metal, Enum.PartType.Cylinder)
 end
 
 -- Beet mit Bordstein, Erde, Bäumen und Büschen
 local function bed(parent: Instance, name: string, o: CFrame, x1: number, x2: number, z1: number, z2: number, trees: { Vector2 }, rng: Random)
+	local obj = Instance.new("Model")
+	obj.Name = name
+	obj.Parent = parent
+	parent = obj
 	slab(parent, `{name}Curb`, o, x1 - 0.5, x2 + 0.5, z1 - 0.5, z2 + 0.5, GROUND + 0.5, 0.6, CURB, Enum.Material.Concrete)
 	slab(parent, `{name}Soil`, o, x1, x2, z1, z2, GROUND + 0.6, 0.6, GRASS, Enum.Material.Grass)
 	for i, t in trees do
@@ -141,6 +166,10 @@ end
 
 -- Pförtnerhäuschen (grün, Glasfenster, Flachdach)
 local function guardBooth(parent: Instance, cf: CFrame)
+	local obj = Instance.new("Model")
+	obj.Name = "GuardBooth"
+	obj.Parent = parent
+	parent = obj
 	part(parent, "BoothBase", Vector3.new(11, 0.6, 9), cf * CFrame.new(0, 0.3, 0), CURB, Enum.Material.Concrete)
 	part(parent, "BoothBody", Vector3.new(10, 8, 8), cf * CFrame.new(0, 4.6, 0), GREEN_BOOTH, Enum.Material.Metal)
 	part(parent, "BoothRoof", Vector3.new(11.4, 0.6, 9.4), cf * CFrame.new(0, 8.9, 0), STEEL, Enum.Material.Metal)
@@ -155,24 +184,17 @@ local function guardBooth(parent: Instance, cf: CFrame)
 	light.CanCollide = false
 end
 
--- Gabelstapler (gelb, stehend)
+-- Gabelstapler (gleiches realistisches Modell wie in der Halle, ohne Fahrer)
 local function forklift(parent: Instance, cf: CFrame)
-	part(parent, "ForkliftBody", Vector3.new(4, 2.4, 6), cf * CFrame.new(0, 2.2, 0), YELLOW, Enum.Material.SmoothPlastic)
-	part(parent, "ForkliftWeight", Vector3.new(4, 2.2, 1.4), cf * CFrame.new(0, 2.3, 3.4), STEEL, Enum.Material.Metal)
-	part(parent, "ForkliftSeat", Vector3.new(1.8, 0.6, 1.8), cf * CFrame.new(0, 3.7, 0.8), STEEL, Enum.Material.Fabric)
-	for _, dx in { -1.8, 1.8 } do
-		part(parent, `ForkliftPost{dx}`, Vector3.new(0.25, 4.6, 0.25), cf * CFrame.new(dx, 5.6, 2.4), STEEL, Enum.Material.Metal)
-		part(parent, `ForkliftMast{dx}`, Vector3.new(0.4, 7, 0.4), cf * CFrame.new(dx * 0.8, 4.4, -3.2), STEEL, Enum.Material.Metal)
-		part(parent, `ForkliftFork{dx}`, Vector3.new(0.4, 0.2, 3.4), cf * CFrame.new(dx * 0.6, 1.3, -4.9), STEEL, Enum.Material.Metal)
-		for _, dz in { -1.8, 1.8 } do
-			part(parent, `ForkliftWheel{dx}_{dz}`, Vector3.new(0.8, 1.8, 1.8), cf * CFrame.new(dx * 1.1, 0.9, dz), TIRE, Enum.Material.Rubber, Enum.PartType.Cylinder)
-		end
-	end
-	part(parent, "ForkliftRoof", Vector3.new(4, 0.25, 4.6), cf * CFrame.new(0, 7.9, 0.2), STEEL, Enum.Material.Metal)
+	ForkliftBuilder.build(parent, "Forklift", cf, false)
 end
 
 -- Seecontainer (grün, mit Sicken)
 local function container(parent: Instance, cf: CFrame)
+	local obj = Instance.new("Model")
+	obj.Name = "ShippingContainer"
+	obj.Parent = parent
+	parent = obj
 	local box = part(parent, "Container", Vector3.new(24, 9, 9.6), cf * CFrame.new(0, 4.5, 0), CONTAINER, Enum.Material.Metal)
 	for i = -5, 5 do
 		part(parent, `ContainerRib{i}`, Vector3.new(0.5, 8.6, 9.8), box.CFrame * CFrame.new(i * 2.2, 0, 0), CONTAINER:Lerp(Color3.new(0, 0, 0), 0.15), Enum.Material.Metal)
@@ -182,6 +204,10 @@ end
 
 -- Klimagerät / Kompressor (hinter der Halle)
 local function acUnit(parent: Instance, name: string, cf: CFrame)
+	local obj = Instance.new("Model")
+	obj.Name = name
+	obj.Parent = parent
+	parent = obj
 	part(parent, name, Vector3.new(6, 4, 4), cf * CFrame.new(0, 2, 0), Color3.fromRGB(196, 198, 200), Enum.Material.Metal)
 	local fan = part(parent, `{name}Fan`, Vector3.new(0.2, 3, 3), cf * CFrame.new(0, 4.05, 0) * CFrame.Angles(0, 0, math.rad(90)), STEEL, Enum.Material.Metal, Enum.PartType.Cylinder)
 	fan.CanCollide = false

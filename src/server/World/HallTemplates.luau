@@ -52,7 +52,11 @@ local function hall(): (number, number, number, number, number)
 end
 
 -- Wandstück mit Sockel, Hauptfläche, Fensterband und Attika (von unten nach oben)
-local function wallSegment(parent: Instance, name: string, length: number, cf: CFrame, thickness: number, height: number)
+local function wallSegment(parentIn: Instance, name: string, length: number, cf: CFrame, thickness: number, height: number)
+	-- jedes Wandstück ist ein eigenes Model (in Studio einzeln verschiebbar)
+	local parent = Instance.new("Model")
+	parent.Name = `Wall{name}`
+	parent.Parent = parentIn
 	local band0, band1 = height - 13, height - 9
 	part(parent, name .. "_Base", Vector3.new(length, 3, thickness + 0.2), cf * CFrame.new(0, 1.5, 0), CONCRETE, Enum.Material.Concrete)
 	part(parent, name .. "_Main", Vector3.new(length, band0 - 3, thickness), cf * CFrame.new(0, 3 + (band0 - 3) / 2, 0), WALL, Enum.Material.Metal)
@@ -79,14 +83,17 @@ function HallTemplates.buildWalls(plotCFrame: CFrame): Model
 	local rightStart, rightEnd = -hx - t / 2, doorX - doorW / 2
 	wallSegment(model, "FrontLeft", leftEnd - leftStart, base * CFrame.new((leftStart + leftEnd) / 2, 0, -hz), t, H)
 	wallSegment(model, "FrontRight", rightEnd - rightStart, base * CFrame.new((rightStart + rightEnd) / 2, 0, -hz), t, H)
-	part(model, "DoorLintel", Vector3.new(doorW, H - doorH, t), base * CFrame.new(doorX, doorH + (H - doorH) / 2, -hz), WALL, Enum.Material.Metal)
+	local doorFrame = Instance.new("Model")
+	doorFrame.Name = "DoorFrame"
+	doorFrame.Parent = model
+	part(doorFrame, "DoorLintel", Vector3.new(doorW, H - doorH, t), base * CFrame.new(doorX, doorH + (H - doorH) / 2, -hz), WALL, Enum.Material.Metal)
 	-- Rolltor (offen): Rollkasten oben, Führungsschienen, Glaslamellen als Andeutung
-	part(model, "DoorHousing", Vector3.new(doorW + 2, 2.4, 2.4), base * CFrame.new(doorX, doorH + 1.2, -hz - 1.3), WALL_DARK, Enum.Material.Metal)
+	part(doorFrame, "DoorHousing", Vector3.new(doorW + 2, 2.4, 2.4), base * CFrame.new(doorX, doorH + 1.2, -hz - 1.3), WALL_DARK, Enum.Material.Metal)
 	for _, side in { 1, -1 } do
-		part(model, `DoorRail{side}`, Vector3.new(0.8, doorH, 0.8), base * CFrame.new(doorX + side * (doorW / 2 + 0.4), doorH / 2, -hz - 0.9), STEEL, Enum.Material.Metal)
-		part(model, `DoorStripe{side}`, Vector3.new(0.9, doorH, 0.2), base * CFrame.new(doorX + side * (doorW / 2 + 0.4), doorH / 2, -hz - 1.35), YELLOW, Enum.Material.SmoothPlastic)
+		part(doorFrame, `DoorRail{side}`, Vector3.new(0.8, doorH, 0.8), base * CFrame.new(doorX + side * (doorW / 2 + 0.4), doorH / 2, -hz - 0.9), STEEL, Enum.Material.Metal)
+		part(doorFrame, `DoorStripe{side}`, Vector3.new(0.9, doorH, 0.2), base * CFrame.new(doorX + side * (doorW / 2 + 0.4), doorH / 2, -hz - 1.35), YELLOW, Enum.Material.SmoothPlastic)
 	end
-	local slats = part(model, "DoorSlats", Vector3.new(doorW, 1.2, 0.3), base * CFrame.new(doorX, doorH - 0.6, -hz - 0.6), GLASS, Enum.Material.Glass)
+	local slats = part(doorFrame, "DoorSlats", Vector3.new(doorW, 1.2, 0.3), base * CFrame.new(doorX, doorH - 0.6, -hz - 0.6), GLASS, Enum.Material.Glass)
 	slats.Transparency = 0.3
 
 	-- Stahlstützen innen entlang der Wände
@@ -99,7 +106,7 @@ function HallTemplates.buildWalls(plotCFrame: CFrame): Model
 	end
 	-- Wandlüfter (drehen sich im Spiel) zwischen den Stützen: rechts über der Schmelze, links über
 	-- der Garage, vorne rechts neben dem Tor
-	local fans = Instance.new("Model")
+	local fans = Instance.new("Folder")
 	fans.Name = "WallFans"
 	fans.Parent = model
 	for i, z in { -70, -30, 10 } do
@@ -149,8 +156,11 @@ function HallTemplates.buildRoof(plotCFrame: CFrame): Model
 	-- Hallenleuchten (hängend)
 	for lx = -hx + 30, hx - 30, 45 do
 		for lz = -hz + 30, hz - 30, 40 do
-			local lamp = part(model, `Lamp{lx}_{lz}`, Vector3.new(5, 0.4, 1.4), base * CFrame.new(lx, -3, lz), LIGHT, Enum.Material.Neon)
-			part(model, `LampRod{lx}_{lz}`, Vector3.new(0.2, 2.8, 0.2), base * CFrame.new(lx, -1.4, lz), STEEL, Enum.Material.Metal)
+			local fixture = Instance.new("Model")
+			fixture.Name = `HallLamp{lx}_{lz}`
+			fixture.Parent = model
+			local lamp = part(fixture, "Lamp", Vector3.new(5, 0.4, 1.4), base * CFrame.new(lx, -3, lz), LIGHT, Enum.Material.Neon)
+			part(fixture, "LampRod", Vector3.new(0.2, 2.8, 0.2), base * CFrame.new(lx, -1.4, lz), STEEL, Enum.Material.Metal)
 			local light = Instance.new("PointLight")
 			light.Range = 40
 			light.Brightness = 1.2
@@ -181,6 +191,14 @@ local function group(parent: Instance, name: string): Model
 	return m
 end
 
+-- Sammlung mehrerer Einzelobjekte: Folder (in Studio wählt ein Klick dann das Objekt, nicht alles)
+local function collection(parent: Instance, name: string): Folder
+	local f = Instance.new("Folder")
+	f.Name = name
+	f.Parent = parent
+	return f
+end
+
 function HallTemplates.buildStorage(plotCFrame: CFrame): Model
 	local model = Instance.new("Model")
 	model.Name = "Storage"
@@ -189,18 +207,18 @@ function HallTemplates.buildStorage(plotCFrame: CFrame): Model
 	local hw, hd = zone.Size.X / 2, zone.Size.Y / 2
 
 	-- Regale (jedes ein eigenes Model in "Racks")
-	local racks = group(model, "Racks")
+	local racks = collection(model, "Racks")
 	CrateRackBuilder.build(racks, o * CFrame.new(RACK_SHIFT_X, 0, 0), STORAGE_ROWS, RACKS_PER_ROW)
 
 	-- Fahrwege: gelbe Linien vor den Reihen
-	local lanes = group(model, "Lanes")
+	local lanes = collection(model, "Lanes")
 	for i, z in { 35.25, 3, -18 } do
 		local lane = part(lanes, `LaneLine{i}`, Vector3.new(RACKS_PER_ROW * CrateRackBuilder.Bay + 8, 0.06, 0.5), o * CFrame.new(RACK_SHIFT_X, 0.03, z), YELLOW, Enum.Material.SmoothPlastic)
 		lane.CanCollide = false
 	end
-	-- Großer, realistischer Stapler mit Kiste fährt auf dem vorderen Fahrweg hin und her
-	local truck = ForkliftBuilder.build(model, "ForkliftLarge", o * CFrame.new(hw - 32, 0, -18) * CFrame.Angles(0, math.rad(90), 0), true)
-	AmbientProps.shuttle(truck, Vector3.new(0, 0, -78), 5, 4)
+	-- Großer, realistischer Stapler mit Kiste steht auf dem vorderen Fahrweg (ohne Fahrer, fährt
+	-- nicht von selbst – Felix 2026-10-15)
+	ForkliftBuilder.build(model, "ForkliftLarge", o * CFrame.new(hw - 32, 0, -18) * CFrame.Angles(0, math.rad(90), 0), true)
 	-- Zweiter Stapler (gleiches Modell, ohne Last) steht geparkt vorne mitte, daneben lose Paletten
 	ForkliftBuilder.build(model, "Forklift", o * CFrame.new(25, 0, -40) * CFrame.Angles(0, math.rad(8), 0), false)
 	local spare = group(model, "SparePallets")
@@ -209,7 +227,7 @@ function HallTemplates.buildStorage(plotCFrame: CFrame): Model
 	end
 
 	-- Packplatz vorne: Packtisch, gewickelte Paletten, Hubwagen, Hütchen am Ende des Fahrwegs
-	local work = group(model, "PackingArea")
+	local work = collection(model, "PackingArea")
 	AmbientProps.workbench(work, "PackingTable", o * CFrame.new(-10, 0, -48))
 	AmbientProps.cartonPallet(work, "WrappedPallet1", o * CFrame.new(-30, 0, -46), 3, true)
 	AmbientProps.cartonPallet(work, "WrappedPallet2", o * CFrame.new(-38, 0, -46), 2, true)
@@ -217,7 +235,7 @@ function HallTemplates.buildStorage(plotCFrame: CFrame): Model
 	AmbientProps.palletTruck(work, "PalletTruck", o * CFrame.new(2, 0, -42) * CFrame.Angles(0, math.rad(35), 0))
 	AmbientProps.cones(work, "LaneCones", o * CFrame.new(-50, 0, -18) * CFrame.Angles(0, math.rad(90), 0), 3, 2.5)
 	-- Pausenecke rechts vorne (zur Hütte hin)
-	local rest = group(model, "BreakArea")
+	local rest = collection(model, "BreakArea")
 	AmbientProps.breakTable(rest, "BreakTable", o * CFrame.new(hw - 11, 0, -26))
 	AmbientProps.lockers(rest, "Lockers", o * CFrame.new(hw - 2, 0, -30) * CFrame.Angles(0, math.rad(90), 0), 4)
 	AmbientProps.vending(rest, "VendingMachine", o * CFrame.new(hw - 2.5, 0, -20) * CFrame.Angles(0, math.rad(90), 0))

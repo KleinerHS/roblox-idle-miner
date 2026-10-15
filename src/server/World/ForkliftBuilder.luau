@@ -3,7 +3,7 @@
 -- Halle“). Frontstapler mit Gasflasche: Fahrgestell, Gegengewicht, große Vorder- und kleine
 -- Hinterräder mit Felgen, Fahrerschutzdach auf vier Pfosten, Sitz, Lenkrad, Hebel, Duplex-Mast
 -- mit Ketten und Hubzylinder, Neigezylinder, Gabelträger mit Lastschutzgitter, zwei Gabeln,
--- Scheinwerfer, Rückleuchten, Warnleuchte, Fahrer und optional eine Holzkiste auf den Gabeln.
+-- Scheinwerfer, Rückleuchten, Warnleuchte (ohne Fahrer, Felix 2026-10-15) und optional eine Holzkiste auf den Gabeln.
 --
 -- build(parent, name, cf, withLoad?): cf = Mitte unter dem Fahrzeug auf Bodenhöhe, Gabeln
 -- zeigen nach -Z. PrimaryPart = "Chassis".
@@ -21,10 +21,6 @@ local TIRE = Color3.fromRGB(28, 28, 30)
 local RIM = Color3.fromRGB(196, 198, 200)
 local SEAT = Color3.fromRGB(34, 34, 36)
 local TANK = Color3.fromRGB(226, 228, 230)
-local SKIN = Color3.fromRGB(204, 150, 110)
-local VEST = Color3.fromRGB(236, 120, 30)
-local PANTS = Color3.fromRGB(44, 58, 90)
-local HELMET = Color3.fromRGB(240, 240, 240)
 
 local function part(parent: Instance, name: string, size: Vector3, cf: CFrame, color: Color3, material: Enum.Material?): Part
 	local p = Instance.new("Part")
@@ -163,25 +159,6 @@ function ForkliftBuilder.build(parent: Instance, name: string, cf: CFrame, withL
 		part(m, `ForkShank{sx}`, Vector3.new(0.5, 2.2, 0.25), cf * CFrame.new(sx * 1.15, 1.25, carZ - 0.28), STEEL, Enum.Material.Metal)
 		part(m, `ForkBlade{sx}`, Vector3.new(0.55, 0.2, forkLen), cf * CFrame.new(sx * 1.15, 0.25, carZ - 0.4 - forkLen / 2), STEEL, Enum.Material.Metal)
 		part(m, `ForkTip{sx}`, Vector3.new(0.55, 0.1, 0.4), cf * CFrame.new(sx * 1.15, 0.2, carZ - 0.4 - forkLen - 0.2), STEEL, Enum.Material.Metal)
-	end
-
-	-- Fahrer
-	local driver = Instance.new("Model")
-	driver.Name = "Driver"
-	driver.Parent = m
-	part(driver, "Torso", Vector3.new(1.8, 1.9, 0.95), cf * CFrame.new(0, 5.4, 1.75) * CFrame.Angles(math.rad(-6), 0, 0), VEST)
-	part(driver, "Head", Vector3.new(1.15, 1.15, 1.15), cf * CFrame.new(0, 6.95, 1.65), SKIN)
-	part(driver, "Helmet", Vector3.new(1.35, 0.5, 1.35), cf * CFrame.new(0, 7.6, 1.65), HELMET)
-	for _, sx in { -1, 1 } do
-		rod(driver, `UpperArm{sx}`, cf, Vector3.new(sx * 1.2, 6.0, 1.6), Vector3.new(sx * 1.0, 5.2, 0.6), 0.75, VEST)
-		rod(driver, `ForeArm{sx}`, cf, Vector3.new(sx * 1.0, 5.2, 0.6), Vector3.new(sx * 0.55, 5.45, -0.35), 0.65, SKIN)
-		part(driver, `Thigh{sx}`, Vector3.new(0.85, 0.85, 2), cf * CFrame.new(sx * 0.48, 4.75, 0.7), PANTS)
-		part(driver, `Shin{sx}`, Vector3.new(0.8, 1.2, 0.8), cf * CFrame.new(sx * 0.48, 4.3, -0.3), PANTS)
-	end
-	for _, d in driver:GetDescendants() do
-		if d:IsA("BasePart") then
-			d.CanCollide = false
-		end
 	end
 
 	-- Ladung: Holzkiste auf den Gabeln
