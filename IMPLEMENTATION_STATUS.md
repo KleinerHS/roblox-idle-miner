@@ -523,6 +523,10 @@ Selbsttest 13b-9 (2026-10-15): Felix' Layout geprüft (keine eigenen Verschiebun
 
 Selbsttest 13b-10 (2026-10-15): Sichtprüfung vorn/seitlich; keine Überschneidung; im HallLayout nur das Terminal an Felix' Stelle getauscht; Play: Prompt vorhanden, Anzeige läuft, keine Fehler.
 
+| 13b-11 Gabelhubwagen | Dateien | Status |
+|---|---|---|
+| Hubwagen nach Felix' Vorlage: gelbes Gestell mit hohem Rahmen und dreieckigen Seitenblechen, Gabeln mit schrägen Spitzen, Rollenfenstern, Tandem-Lastrollen und Schubstangen, großes Lenkrad mit Gabel, Hydraulikpumpe mit Feder, schwarze Deichsel mit Tropfengriff und Hebel; beide Hubwagen (Packplatz, Werkstatt) im HallLayout an ihrer Stelle getauscht | `AmbientProps.palletTruck` | TESTING_REQUIRED |
+
 ## Phase 12 – Content Expansion – Details
 
 Schritte: 12a alle Minen/Erze/Barren über zentrale Kurven · 12b weitere Spitzhacken, Rucksäcke, Drills, Fahrzeuge, Ausbaustufen (offen).

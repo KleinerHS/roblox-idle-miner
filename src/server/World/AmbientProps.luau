@@ -220,15 +220,71 @@ function AmbientProps.cartonPallet(parent: Instance, name: string, cf: CFrame, l
 	return m
 end
 
+-- Gabelhubwagen nach Felix' Vorlage (2026-10-15): gelbes Gestell mit hohem Rahmen und dreieckigen
+-- Seitenblechen, zwei Gabeln mit schrägen Spitzen, Rollenfenstern und Tandem-Lastrollen, großes
+-- schwarzes Lenkrad, Hydraulikpumpe mit Feder, schwarze Deichsel mit Tropfengriff und Hebel.
+-- Gabeln zeigen nach -Z, Deichsel hinten (+Z).
 function AmbientProps.palletTruck(parent: Instance, name: string, cf: CFrame)
 	local m = model(parent, name)
-	for _, sx in { -1, 1 } do
-		part(m, `Fork{sx}`, Vector3.new(0.8, 0.35, 5), cf * CFrame.new(sx * 0.9, 0.3, 0), ORANGE, Enum.Material.Metal)
-		cylinder(m, `Wheel{sx}`, 0.3, 0.5, cf * CFrame.new(sx * 0.9, 0.25, -2.2) * CFrame.Angles(0, 0, 0), RUBBER, Enum.Material.Rubber)
+	local PAINT = Color3.fromRGB(240, 172, 20)
+	local BLACK = Color3.fromRGB(24, 24, 26)
+	local function wedge(n: string, size: Vector3, wcf: CFrame, color: Color3)
+		local w = Instance.new("WedgePart")
+		w.Name = n
+		w.Anchored = true
+		w.CanTouch = false
+		w.Size = size
+		w.CFrame = wcf
+		w.Color = color
+		w.Material = Enum.Material.SmoothPlastic
+		w.Parent = m
 	end
-	part(m, "Body", Vector3.new(2.6, 1.4, 1), cf * CFrame.new(0, 0.9, 2.9), ORANGE, Enum.Material.Metal)
-	part(m, "Handle", Vector3.new(0.25, 3.6, 0.25), cf * CFrame.new(0, 2.6, 3.5) * CFrame.Angles(math.rad(-18), 0, 0), STEEL_DARK, Enum.Material.Metal)
-	part(m, "Grip", Vector3.new(1.4, 0.3, 0.3), cf * CFrame.new(0, 4.3, 4.05), RUBBER, Enum.Material.Rubber)
+	local function rod(n: string, a: Vector3, b: Vector3, thickness: number, color: Color3)
+		local wa, wb = cf:PointToWorldSpace(a), cf:PointToWorldSpace(b)
+		local p = part(m, n, Vector3.new(thickness, thickness, (wb - wa).Magnitude), CFrame.lookAt((wa + wb) / 2, wb), color, Enum.Material.Metal)
+		p.CanCollide = false
+	end
+	-- Gabeln mit schrägen Spitzen, Rollenfenstern und Tandemrollen
+	local forkLen, forkY = 4.6, 0.33
+	for _, sx in { -1, 1 } do
+		local x = sx * 0.85
+		part(m, `Fork{sx}`, Vector3.new(0.75, 0.35, forkLen), cf * CFrame.new(x, forkY, -0.7), PAINT, Enum.Material.SmoothPlastic)
+		wedge(`ForkTip{sx}`, Vector3.new(0.75, 0.35, 0.55), cf * CFrame.new(x, forkY, -0.7 - forkLen / 2 - 0.275), PAINT)
+		part(m, `RollerWindow{sx}`, Vector3.new(0.45, 0.03, 0.75), cf * CFrame.new(x, forkY + 0.18, -2.35), BLACK, Enum.Material.SmoothPlastic).CanCollide = false
+		for k, z in { -2.55, -2.15 } do
+			cylinder(m, `LoadRoller{sx}_{k}`, 0.3, 0.3, cf * CFrame.new(x, 0.15, z), BLACK, Enum.Material.Rubber).CanCollide = false
+		end
+		part(m, `PushRod{sx}`, Vector3.new(0.1, 0.1, 3.4), cf * CFrame.new(x, 0.2, -0.5), STEEL_DARK, Enum.Material.Metal).CanCollide = false
+	end
+	-- Querträger, hoher Rahmen, dreieckige Seitenbleche, Bolzen
+	part(m, "CrossMember", Vector3.new(2.45, 0.35, 0.6), cf * CFrame.new(0, forkY, 1.85), PAINT, Enum.Material.SmoothPlastic)
+	part(m, "Frame", Vector3.new(2.45, 0.8, 0.5), cf * CFrame.new(0, 0.9, 2.35), PAINT, Enum.Material.SmoothPlastic)
+	part(m, "FrameTop", Vector3.new(1.3, 0.12, 0.55), cf * CFrame.new(0, 1.36, 2.35), PAINT, Enum.Material.SmoothPlastic)
+	for _, sx in { -1, 1 } do
+		wedge(`Gusset{sx}`, Vector3.new(0.7, 0.8, 1.5), cf * CFrame.new(sx * 0.85, 0.9, 1.35), PAINT)
+		cylinder(m, `Pin{sx}`, 0.06, 0.18, cf * CFrame.new(sx * 1.25, 0.45, 1.95), STEEL_DARK, Enum.Material.Metal).CanCollide = false
+	end
+	-- Lenkrad mit Gabel, Hydraulikpumpe mit Feder
+	cylinder(m, "SteerWheel", 0.35, 0.95, cf * CFrame.new(0, 0.48, 2.95), BLACK, Enum.Material.Rubber)
+	cylinder(m, "SteerHub", 0.4, 0.35, cf * CFrame.new(0, 0.48, 2.95), STEEL_LIGHT, Enum.Material.Metal)
+	for _, sx in { -1, 1 } do
+		part(m, `WheelFork{sx}`, Vector3.new(0.08, 0.9, 0.5), cf * CFrame.new(sx * 0.24, 0.8, 2.95), BLACK, Enum.Material.Metal)
+	end
+	local pump = cylinder(m, "Pump", 0.9, 0.5, cf * CFrame.new(0, 1.65, 2.9) * CFrame.Angles(0, 0, math.rad(90)), BLACK, Enum.Material.Metal)
+	pump.CanCollide = false
+	for k = 0, 3 do
+		cylinder(m, `Spring{k}`, 0.05, 0.62, cf * CFrame.new(0, 1.3 + k * 0.22, 2.9) * CFrame.Angles(0, 0, math.rad(90)), STEEL_LIGHT, Enum.Material.Metal).CanCollide = false
+	end
+	cylinder(m, "PumpCap", 0.12, 0.6, cf * CFrame.new(0, 2.14, 2.9) * CFrame.Angles(0, 0, math.rad(90)), BLACK, Enum.Material.Metal).CanCollide = false
+	-- Deichsel mit Tropfengriff und Hebel
+	local d0, d1 = Vector3.new(0, 2.15, 2.95), Vector3.new(0, 4.5, 3.55)
+	rod("Drawbar", d0, d1, 0.24, BLACK)
+	local l0, l1, top = Vector3.new(-0.42, 5.05, 3.7), Vector3.new(0.42, 5.05, 3.7), Vector3.new(0, 5.3, 3.76)
+	rod("LoopLeft", d1, l0, 0.18, BLACK)
+	rod("LoopRight", d1, l1, 0.18, BLACK)
+	rod("LoopTopLeft", l0, top, 0.18, BLACK)
+	rod("LoopTopRight", l1, top, 0.18, BLACK)
+	rod("Lever", d1 + Vector3.new(0, 0.1, 0.02), Vector3.new(0.12, 4.95, 3.66), 0.08, STEEL_LIGHT)
 	return m
 end
 
