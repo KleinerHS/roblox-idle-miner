@@ -222,7 +222,7 @@ end
 
 -- Gabelhubwagen nach Felix' Vorlage (2026-10-15): gelbes Gestell mit hohem Rahmen und dreieckigen
 -- Seitenblechen, zwei Gabeln mit schrägen Spitzen, Rollenfenstern und Tandem-Lastrollen, großes
--- schwarzes Lenkrad, Hydraulikpumpe mit Feder, schwarze Deichsel mit Tropfengriff und Hebel.
+-- schwarzes Lenkrad, Hydraulikpumpe mit Feder, schwarze Vierkant-Deichsel mit Rohrschlaufe und Hebel.
 -- Gabeln zeigen nach -Z, Deichsel hinten (+Z).
 function AmbientProps.palletTruck(parent: Instance, name: string, cf: CFrame)
 	local m = model(parent, name)
@@ -276,21 +276,34 @@ function AmbientProps.palletTruck(parent: Instance, name: string, cf: CFrame)
 		cylinder(m, `Spring{k}`, 0.05, 0.62, cf * CFrame.new(0, 1.3 + k * 0.22, 2.9) * CFrame.Angles(0, 0, math.rad(90)), STEEL_LIGHT, Enum.Material.Metal).CanCollide = false
 	end
 	cylinder(m, "PumpCap", 0.12, 0.6, cf * CFrame.new(0, 2.14, 2.9) * CFrame.Angles(0, 0, math.rad(90)), BLACK, Enum.Material.Metal).CanCollide = false
-	-- Deichsel mit Tropfengriff und Hebel
-	local d0, d1 = Vector3.new(0, 2.15, 2.95), Vector3.new(0, 4.5, 3.55)
-	rod("Drawbar", d0, d1, 0.24, BLACK)
-	-- Schlaufengriff: runde Tropfenform in der Ebene der Deichsel (unten schmal, oben breit),
-	-- aus kurzen Segmenten mit verrundeten Gelenken; innen der Hebel zum Heben/Senken
+	-- Deichsel und Griff wie im Detailfoto (Felix 2026-10-15): Vierkant-Deichsel läuft mittig durch
+	-- die Schlaufe bis zu ihrem oberen Bogen; große birnenförmige Rohrschlaufe (oben breit und rund,
+	-- unten zur Deichsel zusammenlaufend); flacher Hebel mit Griffmulden seitlich aus der Deichsel;
+	-- gelber Warnaufkleber
+	local d0, d1 = Vector3.new(0, 2.15, 2.95), Vector3.new(0, 3.75, 3.4)
 	local dir = (d1 - d0).Unit
+	local normal = Vector3.xAxis:Cross(dir).Unit -- zeigt zum Bediener (hinten)
 	local function loopPoint(u: number, v: number): Vector3
 		return d1 + Vector3.xAxis * u + dir * v
 	end
-	local segments = 18
+	local loopTop = 1.75
+	local function box(n: string, a: Vector3, b: Vector3, width: number, thick: number, color: Color3, material: Enum.Material?): Part
+		local wa, wb = cf:PointToWorldSpace(a), cf:PointToWorldSpace(b)
+		local up = cf:VectorToWorldSpace(normal)
+		local p = part(m, n, Vector3.new(width, thick, (wb - wa).Magnitude), CFrame.lookAt((wa + wb) / 2, wb, up), color, material or Enum.Material.Metal)
+		p.CanCollide = false
+		return p
+	end
+	-- Vierkant-Deichsel bis zum oberen Bogen, Schweißkappe oben
+	box("Drawbar", d0, loopPoint(0, loopTop), 0.26, 0.26, BLACK)
+	box("DrawbarCap", loopPoint(0, loopTop - 0.06), loopPoint(0, loopTop + 0.06), 0.34, 0.3, BLACK)
+	-- Schlaufe: Rohr aus kurzen Segmenten mit runden Gelenken
+	local segments = 28
 	local points = {}
 	for i = 0, segments - 1 do
 		local t = i / segments * math.pi * 2
-		local pinch = 0.5 + 0.5 * (1 - math.cos(t)) / 2
-		table.insert(points, loopPoint(0.45 * math.sin(t) * pinch, 0.72 - 0.6 * math.cos(t)))
+		local pinch = ((1 - math.cos(t)) / 2) ^ 0.45
+		table.insert(points, loopPoint(0.85 * math.sin(t) * pinch, 0.97 - 0.78 * math.cos(t)))
 	end
 	for i, p in points do
 		local q = points[i % segments + 1]
@@ -299,14 +312,17 @@ function AmbientProps.palletTruck(parent: Instance, name: string, cf: CFrame)
 		joint.Shape = Enum.PartType.Ball
 		joint.CanCollide = false
 	end
-	rod("LoopNeck", d1, points[1], 0.2, BLACK)
-	-- Hebel: dünner, leicht gebogener Bügel innen, mit rotem Knopf
-	local h0, h1, h2 = loopPoint(0.04, 0.3), loopPoint(0.16, 0.7), loopPoint(0.1, 1.0)
-	rod("Lever1", h0, h1, 0.07, STEEL_LIGHT)
-	rod("Lever2", h1, h2, 0.07, STEEL_LIGHT)
-	local knob = part(m, "LeverKnob", Vector3.new(0.13, 0.13, 0.13), cf * CFrame.new(h2), Color3.fromRGB(200, 40, 36), Enum.Material.SmoothPlastic)
-	knob.Shape = Enum.PartType.Ball
-	knob.CanCollide = false
+	-- Hebel: Lagerbock an der Deichsel, flacher Hebel nach außen, leicht abgewinkelt, Griffmulden
+	box("LeverBracket", loopPoint(0.13, 0.75), loopPoint(0.13, 1.2), 0.1, 0.24, BLACK)
+	box("Lever", loopPoint(0.15, 1.02), loopPoint(0.6, 0.95), 0.2, 0.09, Color3.fromRGB(46, 48, 52))
+	box("LeverTip", loopPoint(0.58, 0.95), loopPoint(0.82, 0.86), 0.17, 0.09, Color3.fromRGB(46, 48, 52))
+	for k = 0, 2 do
+		local u = 0.32 + k * 0.08
+		box(`LeverGroove{k}`, loopPoint(u, 0.89), loopPoint(u + 0.04, 0.89), 0.06, 0.1, BLACK)
+	end
+	-- gelber Warnaufkleber auf der Deichsel (Seite zum Bediener)
+	local sticker = box("Sticker", loopPoint(0, 0.45) + normal * 0.135, loopPoint(0, 0.9) + normal * 0.135, 0.2, 0.01, Color3.fromRGB(240, 200, 40), Enum.Material.SmoothPlastic)
+	sticker.Name = "WarningSticker"
 	return m
 end
 
