@@ -510,6 +510,13 @@ Selbsttest 13b-7 (2026-10-13): Layout neu erzeugt in Felix' Drehung/Lage; Play: 
 
 Selbsttest 13b-8 (2026-10-13): Überschneidungsprüfung (nur Zuführrohr ins Silodach, gewollt); Sichtprüfung; Garage im HallLayout ersetzt (Felix' Drehung bleibt, keine eigenen Änderungen in der Garage); Play: LoadPoint bei (28, −56), Rüssel fährt bis auf Zielhöhe aus, keine Fehler. Beladen mit echtem Fahrzeug von Felix zu testen.
 
+| 13b-9 Einzelgruppierung (Version 0.28.0) | Dateien | Status |
+|---|---|---|
+| Fahrer aus allen Staplern entfernt; großer Stapler steht still (fährt ohne Fahrer nicht); alter Stapler im Außenbereich durch das realistische Modell ersetzt | `ForkliftBuilder`, `HallTemplates`, `PlotExterior` | TESTING_REQUIRED |
+| Alles einzeln verschiebbar: HallLayout und Gebäude im Layout sind Folder (ein Klick wählt das Objekt, nicht die Halle); Sammlungen (Regale, Fahrwege, Maschinen, Zäune, Poller, Schränke, Leitungen, Werkstatt, Lüfter …) sind Folder, jedes Objekt ein Model (jedes Hochregal, jedes Wandstück, jede Hallenlampe, jeder Stellplatz, Fahrzeugring, Tor, Hütte/Schreibtisch/Stuhl/Bett/Regal, Paletten/Fässer/Regale der Garagen-Deko, Zaunabschnitte, Kisten, Beete, Container, Pförtnerhaus …); Elevator bleibt ein Ganzes; im Spiel werden die Gebäude wieder zu Models | `HallLayout.luau`, `HallTemplates`, `SmelterTemplate`, `GarageTemplate`, `BuildTemplates`, `PlotExterior`, Plugin | TESTING_REQUIRED |
+
+Selbsttest 13b-9 (2026-10-15): Felix' Layout geprüft (keine eigenen Verschiebungen) und in seiner Drehung/Lage neu erzeugt; Prüfliste: alle Sammlungen enthalten nur Einzelobjekte; Außen-Stapler ohne Überschneidung; Play: Gebäude als Models, Hütte an (127, 92), 8 Kisten, Ofen-Anzeige, Spawn vorhanden, keine Fehler. Rojo war nicht verbunden – Skripte direkt in Studio übertragen (identisch mit den Dateien).
+
 ## Phase 12 – Content Expansion – Details
 
 Schritte: 12a alle Minen/Erze/Barren über zentrale Kurven · 12b weitere Spitzhacken, Rucksäcke, Drills, Fahrzeuge, Ausbaustufen (offen).
