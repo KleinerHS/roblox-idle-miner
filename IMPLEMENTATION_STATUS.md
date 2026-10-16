@@ -535,6 +535,14 @@ Selbsttest 13b-10 (2026-10-15): Sichtprüfung vorn/seitlich; keine Überschneidu
 |---|---|---|
 | Verteilband vom Lager-Förderband-Anschluss vor den Eingangsregalen mit Abschiebern und Rutschen, Becherwerk (Einlauftrichter, Revisionsklappen, Steigleiter mit Rückenschutz, Kopf mit Antrieb, Strebe zum Gerüst), Förderschnecke zum Aufgabebehälter mit Fallrohr; altes Zuführband entfernt; gemeinsamer Förderband-Baustein `conveyorLine` für Ein- und Ausgang | `SmelterTemplate.buildOreLine` | TESTING_REQUIRED |
 
+| 13b-14 Verladeturm: Teleskop-Rüssel (Version 0.29.0) | Dateien | Status |
+|---|---|---|
+| Rüssel aus 3 Teleskoprohren fährt bis 0,6 über die Ladung bzw. die leere Ladefläche aus, wächst mit der Ladung mit und fährt danach ein; Beladen erst, wenn die Ladefläche mittig unter dem Rüssel steht (sonst Anzeige „Move forward/back“, „Center in the bay“, gelbe Lampe); Van und Box Truck mit offener Dachluke | `LoadingService`, `GarageTemplate.chuteGoals`, `VehicleModelBuilder` | TESTING_REQUIRED |
+
+Selbsttest 13b-14 (2026-10-16): alle 5 Fahrzeuge auf beiden Stellplätzen geprüft – Ladefläche max. 1 Stud vom Rüssel (seitlich 0), Rüssel leer 0,6 / voll 0,6 über der Ladung, kein Clipping (auch Dach von Van/Box Truck); Play ohne Fehler.
+
+Felix 2026-10-16: „Halle erst mal abschließen … ist schon ganz gut, machen wir erst mal weiter“ → Phase 13b vorläufig freigegeben, Feinschliff später.
+
 ## Phase 12 – Content Expansion – Details
 
 Schritte: 12a alle Minen/Erze/Barren über zentrale Kurven · 12b weitere Spitzhacken, Rucksäcke, Drills, Fahrzeuge, Ausbaustufen (offen).

@@ -29,12 +29,17 @@ local VehicleService = require(script.Parent.VehicleService)
 local RemoteService = require(script.Parent.RemoteService)
 
 local TICK_SECONDS = 0.5
+-- Ladefläche muss so genau unter dem Rüssel stehen (studs, längs / quer), sonst Hinweis
+local ALIGN_ALONG = 2.5
+local ALIGN_SIDE = 2
+-- Rüssel endet so weit über der Ladung bzw. der leeren Ladefläche
+local SPOUT_CLEARANCE = 0.6
 -- Fahrzeug gilt als "steht", wenn es langsamer ist als das (studs/s)
 local STANDSTILL_SPEED = 2
 
 local LoadingService = {}
 
-type BayState = { state: string, vehicleId: string?, extended: boolean }
+type BayState = { state: string, vehicleId: string?, extended: boolean, hint: string?, bottomY: number? }
 -- [player][bay] = letzter Zustand (für Anzeige/Schurre/Meldung nur bei Änderung)
 local bayStates: { [Player]: { [number]: BayState } } = {}
 
@@ -106,6 +111,18 @@ local function tickBay(player: Player, data: Types.PlayerData, garage: Model, ba
 	if free <= 0 then
 		return { state = "Full", vehicleId = vehicleId, extended = false }
 	end
+	-- Ladefläche mittig unter dem Rüssel? Sonst Hinweis zum Rangieren (Felix 2026-10-13)
+	local bed = model:FindFirstChild("CargoFill", true)
+	if bed and bed:IsA("BasePart") then
+		local d = Vector3.new(point.Position.X - bed.Position.X, 0, point.Position.Z - bed.Position.Z)
+		local forward = Vector3.new(bed.CFrame.LookVector.X, 0, bed.CFrame.LookVector.Z).Unit
+		local right = Vector3.new(-forward.Z, 0, forward.X)
+		local along, side = d:Dot(forward), d:Dot(right)
+		if math.abs(along) > ALIGN_ALONG or math.abs(side) > ALIGN_SIDE then
+			local hint = if math.abs(along) > ALIGN_ALONG then (if along > 0 then "Move forward" else "Move back") else "Center in the bay"
+			return { state = "Align", vehicleId = vehicleId, extended = false, hint = hint }
+		end
+	end
 	-- Nur beladen, wenn der Spieler am Steuer sitzt (D-030)
 	if VehicleService.GetDriven(player) ~= vehicleId then
 		return { state = "Parked", vehicleId = vehicleId, extended = false }
@@ -138,7 +155,15 @@ local function tickBay(player: Player, data: Types.PlayerData, garage: Model, ba
 		end
 	end)
 	VehicleService.RefreshCargo(player, id)
-	return { state = "Loading", vehicleId = vehicleId, extended = true }
+	-- Rüssel bis kurz über die Ladung (bzw. die leere Ladefläche), wächst mit der Ladung mit
+	local bottomY: number? = nil
+	local fill = model:FindFirstChild("CargoFill", true)
+	if fill and fill:IsA("BasePart") then
+		local surface = fill.Position.Y - fill.Size.Y / 2
+		local top = if fill.Transparency < 1 then fill.Position.Y + fill.Size.Y / 2 else surface
+		bottomY = top + SPOUT_CLEARANCE
+	end
+	return { state = "Loading", vehicleId = vehicleId, extended = true, bottomY = bottomY }
 end
 
 local function tickPlayer(player: Player)
@@ -163,20 +188,19 @@ local function tickPlayer(player: Player)
 			value = if new.state == "Full" then `Full · {fill}`
 				elseif new.state == "NoStock" then "Storage is empty"
 				elseif new.state == "Parked" then `Hop in to load · {fill}`
+				elseif new.state == "Align" then new.hint or "Center in the bay"
 				else fill
 		end
 		GarageTemplate.setBayState(garage, bay, new.state, title, value)
-		-- Schurre nur bei Zustandswechsel bewegen
-		if not old or old.extended ~= new.extended or old.vehicleId ~= new.vehicleId then
-			local bottomY: number? = nil
-			if new.extended and new.vehicleId then
-				local model = VehicleService.GetModel(player, new.vehicleId)
-				if model then
-					local cf, size = model:GetBoundingBox()
-					bottomY = cf.Position.Y + size.Y / 2
-				end
-			end
-			setChute(garage, bay, bottomY)
+		-- Rüssel nur bei Zustandswechsel oder spürbar höherer Ladung bewegen
+		local moved = not old or old.extended ~= new.extended or old.vehicleId ~= new.vehicleId
+		if not moved and new.extended and old and old.bottomY and new.bottomY then
+			moved = math.abs(old.bottomY - new.bottomY) > 0.3
+		end
+		if moved then
+			setChute(garage, bay, if new.extended then new.bottomY else nil)
+		else
+			new.bottomY = old and old.bottomY or new.bottomY
 		end
 		-- Meldung, wenn ein Fahrzeug voll geworden ist
 		if new.state == "Full" and old and old.state == "Loading" and old.vehicleId == new.vehicleId then

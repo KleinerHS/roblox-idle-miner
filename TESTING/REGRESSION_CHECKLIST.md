@@ -44,3 +44,4 @@ Nach Änderungen an Economy, Inventory, Save, Trading oder Prestige die betroffe
 - [ ] 0.25.0: Stapler, Lüfter, Rundumleuchten, Arbeiter bewegen sich; Ofentrommel/Schnecke nur beim Schmelzen; keine Ruckler mit 6 Plots
 - [ ] 0.26.0: Gekaufte Kisten erscheinen als Holzkisten mit Aufschrift des Inhalts, Füllung passt; nicht gekaufte Plätze leer; HallLayout drehen/verschieben ändert nichts an der Lage im Spiel
 - [ ] 0.27.0: Fahrzeug auf Stellplatz 1/2 → Rüssel fährt über der Ladefläche aus, Beladen läuft, Lampe grün/blau, Anzeige stimmt
+- [ ] 0.29.0: Fahrzeug schief/zu weit vorne → Anzeige „Move forward/back“; mittig → Rüssel fährt bis kurz über die Ladefläche, steigt mit der Ladung, fährt beim Vollwerden/Wegfahren ein

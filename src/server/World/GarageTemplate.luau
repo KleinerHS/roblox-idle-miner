@@ -8,7 +8,8 @@
 --   Part "BaySpawn1"/"BaySpawn2"   – Fahrzeug-Spawn (Bodenmitte, LookVector zum Rolltor)
 --   Part "GarageRing"              – Auslöser der Fahrzeugauswahl (Attribut GarageRing = true)
 --   Part "LoadPoint1"/"LoadPoint2" – Bezugspunkt der Ladeschurre über dem Stellplatz (Attribut Bay)
---   Part "ChuteTube{n}"/"ChuteNozzle{n}", "ChuteLamp{n}", "BayDisplay{n}" – automatisches Beladen
+--   Part "ChuteTube{n}" (+ "ChuteTube{n}Mid"/"Inner", Teleskop), "ChuteNozzle{n}", "ChuteLamp{n}",
+--   "BayDisplay{n}" – automatisches Beladen
 --   Part "GarageDoor"              – Glas-Rolltor in der Hallen-Toröffnung (VehicleService)
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -412,6 +413,12 @@ local function tower(model: Model, o: CFrame)
 		local tubePart = part(station, `ChuteTube{i}`, Vector3.new(1.7, CHUTE_REST, 1.7), at(x, CHUTE_TOP - CHUTE_REST / 2, spoutZ), Color3.fromRGB(40, 40, 42), Enum.Material.Fabric)
 		tubePart:SetAttribute("ChuteTop", pos(x, CHUTE_TOP, spoutZ).Y)
 		tubePart.CanCollide = false
+		-- Teleskop: zwei weitere, schmalere Rohre stecken eingefahren im äußeren
+		for k, n in { "Mid", "Inner" } do
+			local w = 1.7 - k * 0.2
+			local inner = part(station, `ChuteTube{i}{n}`, Vector3.new(w, CHUTE_REST, w), at(x, CHUTE_TOP - CHUTE_REST / 2, spoutZ), Color3.fromRGB(52 + k * 10, 52 + k * 10, 56 + k * 10), Enum.Material.Metal)
+			inner.CanCollide = false
+		end
 		local nozzle = part(station, `ChuteNozzle{i}`, Vector3.new(2.5, 0.8, 2.5), at(x, CHUTE_TOP - CHUTE_REST - 0.4, spoutZ), RUBBER, Enum.Material.Rubber)
 		nozzle.CanCollide = false
 		local lp = part(station, `LoadPoint{i}`, Vector3.new(1, 1, 1), at(x, CHUTE_TOP - 6, spoutZ), WHITE, Enum.Material.SmoothPlastic)
@@ -480,6 +487,7 @@ local BAY_COLORS: { [string]: Color3 } = {
 	Loading = Color3.fromRGB(70, 210, 90),
 	Full = Color3.fromRGB(80, 160, 255),
 	NoStock = Color3.fromRGB(255, 160, 30),
+	Align = Color3.fromRGB(255, 200, 40),
 }
 
 function GarageTemplate.setBayState(model: Model, bay: number, state: string, title: string, value: string)
@@ -524,7 +532,20 @@ function GarageTemplate.chuteGoals(model: Model, bay: number, bottomY: number?):
 	local length = if bottomY then math.clamp(top - bottomY - 0.8, CHUTE_REST, 15) else CHUTE_REST
 	local x, z = tube.Position.X, tube.Position.Z
 	local rot = tube.CFrame - tube.Position
-	goals[tube] = { Size = Vector3.new(tube.Size.X, length, tube.Size.Z), CFrame = CFrame.new(x, top - length / 2, z) * rot }
+	-- Teleskop aus drei Rohren: gleich lang, gleichmäßig überlappend ausgefahren
+	local segments = { tube }
+	for _, n in { "Mid", "Inner" } do
+		local seg = model:FindFirstChild(`ChuteTube{bay}{n}`, true)
+		if seg and seg:IsA("BasePart") then
+			table.insert(segments, seg)
+		end
+	end
+	local count = #segments
+	local segLen = math.min(length, math.max(CHUTE_REST, length / count + 0.4))
+	for k, seg in segments do
+		local segTop = top - (k - 1) * (if count > 1 then (length - segLen) / (count - 1) else 0)
+		goals[seg] = { Size = Vector3.new(seg.Size.X, segLen, seg.Size.Z), CFrame = CFrame.new(x, segTop - segLen / 2, z) * rot }
+	end
 	goals[nozzle] = { CFrame = CFrame.new(x, top - length - 0.4, z) * rot }
 	return goals
 end
