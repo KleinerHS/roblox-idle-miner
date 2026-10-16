@@ -21,7 +21,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 11 | Prestige | TESTING_REQUIRED (Version 0.18.0; Bonus D-034 und Reset-Liste D-033 bestätigt) |
 | 12 | Content Expansion | TESTING_REQUIRED (12a D-035, 12b D-036, 12c Fahrzeuge – Werte Q-028 offen) |
 | 13 | Visual Polish | TESTING_REQUIRED (13a Map & Umgebung, 13b Halle/Lager/Ofen, 13c Mine-Shaft, 13d Licht/Effekte/Sound, 13e UI-Feinschliff; alle Teilschritte warten auf Felix' Test) |
-| 14 | Balance | NOT_STARTED |
+| 14 | Balance | IMPLEMENTED (14a Simulation & Bericht; Entscheidungen Q-029–Q-032 offen) |
 
 ## Setup – Details
 
@@ -586,6 +586,17 @@ Nicht enthalten: Rare-Drop-Effekt (Rare Drops gibt es noch nicht, D-006), Bohrer
 
 Selbsttest 13e (2026-10-17, Play, Fenster 1748×615): 21 eigene ScreenGuis erkannt, 245 Buttons versehen, Faktor 0,8; Geldanzeige und Rucksack bleiben rechts bündig (20 px Rand), XP-Leiste mittig; Laptop und Equipment-Shop per Bildschirmfoto geprüft; Öffnungsanimation läuft; keine Fehler.
 Offen: Icons für Erze/Items (docs/09 §61–62) und finale UI-Referenzbilder (docs/09 §72) – folgen mit Felix' Vorgaben.
+
+## Phase 14 – Balance – Details
+
+### 14a – Simulation (2026-10-17)
+
+| System | Dateien | Status |
+|---|---|---|
+| Balance-Simulator mit echten Spieldaten (Amortisations-Strategie, Manuell + Automation, Zeiten bis Level, Kaufprotokoll) | `tools/BalanceSim.luau` | IMPLEMENTED |
+| Bericht mit Befunden | `BALANCE/14a_SIMULATION.md` | IMPLEMENTED |
+
+Ergebnis: Level 100 nach ~6,5 h aktivem Spiel; Transport begrenzt Automation auf 5 Erz/s je Mine (Drill Mk4–Mk6 nutzlos); feste Preise spät zu billig; späte Level schneller als mittlere. Keine Spielwerte geändert – Entscheidungen Q-029 bis Q-032.
 
 ## Phase 12 – Content Expansion – Details
 
