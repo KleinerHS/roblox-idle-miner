@@ -300,12 +300,16 @@ function AmbientProps.palletTruck(parent: Instance, name: string, cf: CFrame)
 	-- Mittellinie der Schlaufe direkt aus dem Foto (Pixel, Deichselmitte x = 710, rechter Anschluss
 	-- y = 850), geglättet mit Catmull-Rom-Kurve → viele kurze Segmente ohne Kanten
 	local PX, SV = 0.00194, 0.9
-	local photo = {
+	-- rechte Hälfte aus dem Foto; die linke ist ihr Spiegelbild an der Deichsel (Felix 2026-10-16:
+	-- „die rechte Seite ist top, auf die linke kopieren“) – der Hebel bleibt nur rechts
+	local right = {
 		{ 785, 850 }, { 950, 845 }, { 1080, 830 }, { 1180, 790 }, { 1235, 700 }, { 1250, 560 },
-		{ 1230, 420 }, { 1170, 300 }, { 1060, 210 }, { 900, 150 }, { 710, 125 }, { 560, 130 },
-		{ 430, 150 }, { 330, 195 }, { 275, 270 }, { 280, 360 }, { 320, 440 }, { 420, 560 },
-		{ 520, 680 }, { 610, 770 }, { 670, 820 },
+		{ 1230, 420 }, { 1170, 300 }, { 1060, 210 }, { 900, 150 }, { 710, 125 },
 	}
+	local photo = table.clone(right)
+	for i = #right - 1, 1, -1 do
+		table.insert(photo, { 1420 - right[i][1], right[i][2] })
+	end
 	local function fromPhoto(x: number, y: number): Vector3
 		return loopPoint((x - 710) * PX, 0.35 + (850 - y) * PX * SV)
 	end
@@ -324,7 +328,7 @@ function AmbientProps.palletTruck(parent: Instance, name: string, cf: CFrame)
 	end
 	table.insert(points, ctrl[#ctrl])
 	table.insert(points, 1, loopPoint(0.1, 0.35)) -- Anschluss rechts unten an der Deichsel
-	table.insert(points, loopPoint(0.08, 0.35 + 30 * PX * SV)) -- Anschluss links unten an der Deichsel
+	table.insert(points, loopPoint(-0.1, 0.35)) -- Anschluss links unten an der Deichsel
 	for i = 1, #points - 1 do
 		local p, q = points[i], points[i + 1]
 		local wa, wb = cf:PointToWorldSpace(p), cf:PointToWorldSpace(q)
