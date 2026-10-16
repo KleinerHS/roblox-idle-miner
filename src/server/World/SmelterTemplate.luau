@@ -235,7 +235,7 @@ function SmelterTemplate.buildBarLine(parent: Instance, plotCFrame: CFrame, kiln
 	local WATER = Color3.fromRGB(60, 120, 200)
 	local beltY = 2.2 -- Oberkante der Rollen am Boden
 	local function bar(m: Instance, name: string, cf: CFrame, color: Color3, hot: boolean)
-		local b = part(m, name, Vector3.new(1.5, 0.45, 0.7), cf, color, if hot then Enum.Material.Neon else Enum.Material.Metal)
+		local b = part(m, name, Vector3.new(0.7, 0.45, 1.5), cf, color, if hot then Enum.Material.Neon else Enum.Material.Metal) -- längs zur Laufrichtung
 		b.CanCollide = false
 	end
 	-- Stab zwischen zwei Weltpunkten
