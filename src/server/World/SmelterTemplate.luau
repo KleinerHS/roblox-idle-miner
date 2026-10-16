@@ -432,9 +432,8 @@ end
 
 
 -- Erzstrecke ins Ofen-Eingangslager und hoch zum Aufgabebehälter (Felix 2026-10-16: „Input komplett
--- logisch“): das Förderband aus dem Lager endet am Anschlusspunkt (ConveyorInPort); dort beginnt ein
--- Verteilband vor den Eingangsregalen mit Abschiebern und Rutschen in jedes Regal. Am Ende des
--- Bandes hebt ein Becherwerk (Einlauftrichter, Gehäuse mit Revisionsklappen, Steigleiter, Kopf mit
+-- logisch“; Trichter statt Rollband): ein großer Einfülltrichter am Fuß des Becherwerks nimmt das
+-- Erz auf; das Becherwerk (Einlauftrichter, Gehäuse mit Revisionsklappen, Steigleiter, Kopf mit
 -- Antrieb, Strebe zum Gerüst) das Erz nach oben; eine Förderschnecke bringt es zum Aufgabebehälter
 -- und ein Fallrohr in dessen Deckel. Reine Optik, jedes Teil ein eigenes Model im Folder "OreLine".
 -- Alle Koordinaten lokal zur Plotmitte (X, Höhe über Hallenboden, Z).
@@ -452,33 +451,8 @@ function SmelterTemplate.buildOreLine(parent: Instance, plotCFrame: CFrame, rack
 	local line = Instance.new("Folder")
 	line.Name = "OreLine"
 	line.Parent = parent
-	local ORE = Color3.fromRGB(110, 78, 58)
-	local beltY = 2.2
-	local side = if rackFrontZ > inZ then 1 else -1 -- Richtung vom Band zu den Regalen
-
-	-- Verteilband vom Anschlusspunkt bis zum Becherwerk, mit Erzbrocken
-	conveyorLine(line, plotCFrame, "OreDistribution", Vector3.new(inX - 0.6, beltY, inZ), Vector3.new(bootX + 2, beltY, inZ), function(m: Instance, n: string, cf: CFrame)
-		for k, o in { Vector3.new(-0.5, 0.15, -0.3), Vector3.new(0.4, 0.2, 0.25), Vector3.new(0, 0.35, 0) } do
-			local rock = part(m, `{n}_{k}`, Vector3.new(0.8, 0.6, 0.7), cf * CFrame.new(o) * CFrame.Angles(k, k * 0.7, 0), ORE, Enum.Material.Slate)
-			rock.CanCollide = false
-		end
-	end)
-	-- Abschieber und Rutschen in jedes Regal
-	for i, x in rackXs do
-		local pusher = group(line, `InputPusher{i}`)
-		part(pusher, "Body", Vector3.new(1.8, 1.4, 1.2), at(x, beltY + 0.4, inZ - side * 2.5), GREY_BOX, Enum.Material.Metal)
-		cylinder(pusher, "Rod", 1.2, 0.3, at(x, beltY + 0.4, inZ - side * 1.5) * CFrame.Angles(0, math.rad(90), 0), YELLOW, Enum.Material.Metal).CanCollide = false
-		part(pusher, "Plate", Vector3.new(1.6, 0.6, 0.12), at(x, beltY + 0.4, inZ - side * 0.9), STEEL_DARK, Enum.Material.Metal).CanCollide = false
-		part(pusher, "Stand", Vector3.new(0.4, beltY - 0.3, 0.4), at(x, (beltY - 0.3) / 2, inZ - side * 2.5), YELLOW, Enum.Material.Metal)
-		local chute = group(line, `InputChute{i}`)
-		local c0, c1 = at(x, beltY - 0.1, inZ + side * 1.6).Position, at(x, 1.1, rackFrontZ - side * 0.15).Position
-		local cl = (c1 - c0).Magnitude
-		local ccf = CFrame.lookAt((c0 + c1) / 2, c1)
-		part(chute, "Slide", Vector3.new(2.2, 0.15, cl), ccf, STEEL_LIGHT, Enum.Material.DiamondPlate)
-		for _, sx in { -1, 1 } do
-			part(chute, `Side{sx}`, Vector3.new(0.12, 0.4, cl), ccf * CFrame.new(sx * 1.1, 0.2, 0), YELLOW, Enum.Material.Metal)
-		end
-	end
+	local side = if rackFrontZ > inZ then 1 else -1 -- Richtung zu den Regalen (Leiter auf der anderen Seite)
+	local _ = rackXs
 
 	-- Becherwerk
 	local elev = group(line, "BucketElevator")
@@ -487,7 +461,26 @@ function SmelterTemplate.buildOreLine(parent: Instance, plotCFrame: CFrame, rack
 	part(elev, "BootHopper", Vector3.new(3.8, 3, 3.8), at(bootX, 1.5, inZ), GREY_BOX, Enum.Material.Metal)
 	part(elev, "BootBase", Vector3.new(4.4, 0.3, 4.4), at(bootX, 0.15, inZ), STEEL_DARK, Enum.Material.DiamondPlate)
 	local dirIn = if inX > bootX then 1 else -1
-	part(elev, "InletFunnel", Vector3.new(1.2, 0.9, 3), at(bootX + dirIn * 2.3, beltY + 0.2, inZ), STEEL, Enum.Material.Metal)
+	-- großer Einfülltrichter seitlich am Fuß (Felix 2026-10-16: Trichter statt Rollband): oben
+	-- breit mit Gitterrost, nach unten in Stufen schmaler, Rutsche in den Fuß, Stützbeine
+	local hop = group(line, "FeedHopper")
+	local hx = bootX + dirIn * 4.6
+	for k, tier in { { 5.2, 6.4 }, { 4.4, 5.2 }, { 3.6, 4 }, { 2.8, 2.8 } } do
+		part(hop, `Tier{k}`, Vector3.new(tier[2], 0.8, tier[2]), at(hx, tier[1], inZ), GREY_BOX, Enum.Material.Metal)
+	end
+	part(hop, "Rim", Vector3.new(6.7, 0.25, 6.7), at(hx, 5.7, inZ), YELLOW, Enum.Material.Metal)
+	local grate = part(hop, "Grate", Vector3.new(6.2, 0.08, 6.2), at(hx, 5.62, inZ), STEEL_DARK, Enum.Material.DiamondPlate)
+	grate.Transparency = 0.3
+	for _, sx in { -1, 1 } do
+		for _, sz in { -1, 1 } do
+			part(hop, `Leg{sx}_{sz}`, Vector3.new(0.35, 5.6, 0.35), at(hx + sx * 2.9, 2.8, inZ + sz * 2.9), YELLOW, Enum.Material.Metal)
+		end
+	end
+	local c0, c1 = at(hx - dirIn * 1, 2.8, inZ).Position, at(bootX + dirIn * 1.9, 2.2, inZ).Position
+	part(hop, "Chute", Vector3.new(2, 1, (c1 - c0).Magnitude), CFrame.lookAt((c0 + c1) / 2, c1), STEEL, Enum.Material.Metal)
+	for k, o in { Vector3.new(-1, 0.25, 0.8), Vector3.new(0.9, 0.3, -0.6), Vector3.new(0.2, 0.35, 0.3) } do
+		part(hop, `Ore{k}`, Vector3.new(1, 0.6, 0.9), at(hx + o.X, 5.4 + o.Y, inZ + o.Z) * CFrame.Angles(k, k * 0.6, 0), Color3.fromRGB(110, 78, 58), Enum.Material.Slate).CanCollide = false
+	end
 	part(elev, "Casing", Vector3.new(2.6, casingTop - 3, 2.6), at(bootX, 3 + (casingTop - 3) / 2, inZ), GREY_BOX, Enum.Material.Metal)
 	for k = 1, math.floor((casingTop - 4) / 6) do
 		part(elev, `InspectionDoor{k}`, Vector3.new(0.1, 1.2, 1.4), at(bootX + dirIn * 1.33, 3 + k * 6, inZ), STEEL_DARK, Enum.Material.Metal).CanCollide = false
