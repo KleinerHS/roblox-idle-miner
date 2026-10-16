@@ -20,6 +20,23 @@ local UITheme = {
 
 	CornerRadius = UDim.new(0, 10),
 	Padding = 12,
+
+	-- Bedien-Feedback und Animationen (Phase 13e, docs/09 §58/§59)
+	Motion = {
+		Hover = 0.1, -- Sekunden
+		HoverLighten = 0.1, -- Anteil Weiß beim Hover
+		PressScale = 0.96,
+		Press = 0.06,
+		OpenScaleFrom = 0.94,
+		Open = 0.18,
+	},
+
+	-- Responsive Skalierung aller eigenen ScreenGuis (docs/09 §5): Bezugshöhe 1000 px
+	Scale = {
+		ReferenceHeight = 1000,
+		Min = 0.8,
+		Max = 1.15,
+	},
 }
 
 return table.freeze(UITheme)

@@ -20,7 +20,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 10 | Offline Production | TESTING_REQUIRED (Version 0.17.0) |
 | 11 | Prestige | TESTING_REQUIRED (Version 0.18.0; Bonus D-034 und Reset-Liste D-033 bestätigt) |
 | 12 | Content Expansion | TESTING_REQUIRED (12a D-035, 12b D-036, 12c Fahrzeuge – Werte Q-028 offen) |
-| 13 | Visual Polish | TESTING_REQUIRED (13a Map & Umgebung, 13b Halle/Lager/Ofen, 13c Mine-Shaft; weiter: 13d Licht/Effekte/Sound, 13e UI) |
+| 13 | Visual Polish | TESTING_REQUIRED (13a Map & Umgebung, 13b Halle/Lager/Ofen, 13c Mine-Shaft, 13d Licht/Effekte/Sound, 13e UI-Feinschliff; offen: 13d Licht/Effekte/Sound, 13e UI) |
 | 14 | Balance | NOT_STARTED |
 
 ## Setup – Details
@@ -574,6 +574,18 @@ Selbsttest 13c (2026-10-17): Vorschau abseits gebaut, Überlappungsprüfung – 
 
 Selbsttest 13d (2026-10-17, Play): alle 15 Sound-IDs laden; oben Musik 0,12 + Vögel 0,22, Schmelzen-Klang am Ofen; Fahrt in Mine 01 → Motorgeräusch, Höhle 0,30, Vögel 0, Musik 0,06, Hall StoneRoom, warme Tönung; Spitzhacken-Treffer → Staub + Schlaggeräusch am Treffpunkt; keine Fehler im Output.
 Nicht enthalten: Rare-Drop-Effekt (Rare Drops gibt es noch nicht, D-006), Bohrer-Geräusche.
+
+### 13e – UI-Feinschliff (Version 0.32.0)
+
+| System | Dateien | Status |
+|---|---|---|
+| Einheitliches Button-Feedback in allen eigenen Menüs: Hover (leicht heller), Klick (drückt kurz ein), Klick-Sound (13d); Buttons mit eigenem Hover bzw. AutoButtonColor ausgenommen | `UIPolishController`, `UI/Create` (Attribut „GameUI“), `UI/Components/Button` | TESTING_REQUIRED |
+| Menüs öffnen mit kurzer, ruhiger Skalier-Animation (HUD, Meldungen, Überblendung ausgenommen) | `UIPolishController` | TESTING_REQUIRED |
+| Responsive: alle Fenster skalieren nach Bildschirmhöhe (Bezug 1000 px, 0,8–1,15), jeweils um ihren Ankerpunkt – rechts/unten verankerte Anzeigen bleiben an ihrem Platz; vollflächige Ebenen werden nicht skaliert | `UIPolishController`, `UITheme.Scale` | TESTING_REQUIRED |
+| Zentrale Werte für Animation/Feedback | `UITheme.Motion` | TESTING_REQUIRED |
+
+Selbsttest 13e (2026-10-17, Play, Fenster 1748×615): 21 eigene ScreenGuis erkannt, 245 Buttons versehen, Faktor 0,8; Geldanzeige und Rucksack bleiben rechts bündig (20 px Rand), XP-Leiste mittig; Laptop und Equipment-Shop per Bildschirmfoto geprüft; Öffnungsanimation läuft; keine Fehler.
+Offen: Icons für Erze/Items (docs/09 §61–62) und finale UI-Referenzbilder (docs/09 §72) – folgen mit Felix' Vorgaben.
 
 ## Phase 12 – Content Expansion – Details
 

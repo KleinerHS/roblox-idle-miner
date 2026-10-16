@@ -1,8 +1,12 @@
 --!strict
 -- Kleiner Helfer zum Erzeugen von UI-Instanzen: Create("Frame", { Size = ..., Parent = ... }, { children })
+-- Eigene ScreenGuis bekommen das Attribut "GameUI" (UIPolishController: Hover, Klick, Skalierung).
 
 local function Create(className: string, props: { [string]: any }?, children: { Instance }?): any
 	local instance = Instance.new(className)
+	if className == "ScreenGui" then
+		instance:SetAttribute("GameUI", true)
+	end
 	local parent = nil
 	if props then
 		for key, value in props do

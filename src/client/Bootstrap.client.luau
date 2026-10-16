@@ -20,6 +20,7 @@ local CONTROLLER_ORDER = {
 	"StateController",
 	"PlotController",
 	"SoundController",
+	"UIPolishController",
 	"NotificationController",
 	"CompanySetupController",
 	"ElevatorController",

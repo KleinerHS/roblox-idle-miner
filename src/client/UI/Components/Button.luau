@@ -38,8 +38,12 @@ function Button.new(props: { Text: string, Primary: boolean?, Size: UDim2?, Posi
 		AutoButtonColor = false,
 		Parent = props.Parent,
 	}, {
+		Create("UIStroke", { Color = Color3.new(0, 0, 0), Transparency = 0.75, Thickness = 1, ApplyStrokeMode = Enum.ApplyStrokeMode.Border }),
 		Create("UICorner", { CornerRadius = UITheme.CornerRadius }),
 	})
+
+	-- Hover macht die Komponente selbst; Klick-Skalierung kommt vom UIPolishController
+	instance:SetAttribute("OwnHover", true)
 
 	local self = {} :: Button
 	self.Instance = instance
