@@ -74,9 +74,23 @@ local function buildOffice(plotCFrame: CFrame): Model
 	model.PrimaryPart = floor
 
 	-- Wände aus Wellblech
-	part(hut, "Wall_Back", Vector3.new(W, H, t), o * CFrame.new(0, H / 2, D / 2 - t / 2), METAL_SHEET, Enum.Material.Metal)
+	-- Pultdach: Rückwand höher als die Front, Seitenwände mit Giebelkeil, damit das geneigte Dach
+	-- überall aufliegt (Felix 2026-10-16: kein Schlitz unter dem Dach)
+	local Hb = H + 1.6
+	part(hut, "Wall_Back", Vector3.new(W, Hb, t), o * CFrame.new(0, Hb / 2, D / 2 - t / 2), METAL_SHEET, Enum.Material.Metal)
 	part(hut, "Wall_Left", Vector3.new(t, H, D), o * CFrame.new(W / 2 - t / 2, H / 2, 0), METAL_SHEET, Enum.Material.Metal)
 	part(hut, "Wall_Right", Vector3.new(t, H, D), o * CFrame.new(-W / 2 + t / 2, H / 2, 0), METAL_SHEET, Enum.Material.Metal)
+	for _, side in { -1, 1 } do
+		local gable = Instance.new("WedgePart")
+		gable.Name = if side > 0 then "Wall_LeftGable" else "Wall_RightGable"
+		gable.Anchored = true
+		gable.CanTouch = false
+		gable.Size = Vector3.new(t, Hb - H, D)
+		gable.CFrame = o * CFrame.new(side * (W / 2 - t / 2), H + (Hb - H) / 2, 0)
+		gable.Color = METAL_SHEET
+		gable.Material = Enum.Material.Metal
+		gable.Parent = hut
+	end
 
 	-- Vorderwand mit Türöffnung
 	local leftStart, leftEnd = doorX + doorW / 2, W / 2
@@ -92,7 +106,8 @@ local function buildOffice(plotCFrame: CFrame): Model
 	window.Transparency = 0.35
 
 	-- Pultdach, leicht nach hinten geneigt
-	part(hut, "Roof", Vector3.new(W + 2, 0.5, D + 2), o * CFrame.new(0, H + 0.4, 0) * CFrame.Angles(math.rad(-4), 0, 0), METAL_DARK, Enum.Material.Metal)
+	local slope = math.atan2(Hb - H, D)
+	part(hut, "Roof", Vector3.new(W + 2, 0.5, (D + 2) / math.cos(slope)), o * CFrame.new(0, (H + Hb) / 2 + 0.25 / math.cos(slope), 0) * CFrame.Angles(-slope, 0, 0), METAL_DARK, Enum.Material.Metal)
 
 	-- Einrichtung (lokal: hinten links = +X/+Z)
 	local deskModel = sub("Desk")
