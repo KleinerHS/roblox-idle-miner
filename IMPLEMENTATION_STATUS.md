@@ -531,6 +531,10 @@ Selbsttest 13b-10 (2026-10-15): Sichtprüfung vorn/seitlich; keine Überschneidu
 |---|---|---|
 | Kühlstation direkt hinter der Ofenspitze (Einlaufrutsche mit Glut, Kühlband im Gehäuse mit Sichtfenstern, Barren von glühend nach stahlgrau, 2 Lüfter mit Rotor und Dampf, Sprühleitungen, Wassertank, Schaltkasten, Schrift „Cooling“), Rollenförderband bis hinter das Ausgangslager, Verteilband entlang der Regalrückseiten mit Abschiebern und Rutschen in jedes Regal; ersetzt Schnecke und Trichter im Code; im HallLayout passend zu Felix' Regalpositionen eingesetzt | `SmelterTemplate.buildBarLine` | TESTING_REQUIRED |
 
+| 13b-13 Erzstrecke (Ofen-Eingang) | Dateien | Status |
+|---|---|---|
+| Verteilband vom Lager-Förderband-Anschluss vor den Eingangsregalen mit Abschiebern und Rutschen, Becherwerk (Einlauftrichter, Revisionsklappen, Steigleiter mit Rückenschutz, Kopf mit Antrieb, Strebe zum Gerüst), Förderschnecke zum Aufgabebehälter mit Fallrohr; altes Zuführband entfernt; gemeinsamer Förderband-Baustein `conveyorLine` für Ein- und Ausgang | `SmelterTemplate.buildOreLine` | TESTING_REQUIRED |
+
 ## Phase 12 – Content Expansion – Details
 
 Schritte: 12a alle Minen/Erze/Barren über zentrale Kurven · 12b weitere Spitzhacken, Rucksäcke, Drills, Fahrzeuge, Ausbaustufen (offen).

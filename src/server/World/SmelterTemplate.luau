@@ -3,7 +3,8 @@
 -- 2026-10-13 „1:1 wie im Bild“):
 --   * hinten ein gelbes Stahlgerüst mit Kreuzverstrebungen, Laufrost, Geländer, Treppe; darauf
 --     orange Maschinen und der graue Aufgabebehälter über dem Ofenende
---   * Eingangslager hinten links: 4 Hochregale × 4 Paletten (16 Kisten Erz)
+--   * Eingangslager hinten links: 4 Hochregale × 4 Paletten (16 Kisten Erz), davor ein Verteilband
+--     vom Lager-Förderband, Becherwerk und Förderschnecke hoch zum Aufgabebehälter
 --   * Drehrohrofen in Längsrichtung aus Abschnitten (Glocke, Hals, Trommel, Konus) mit Laufringen,
 --     Tragrollen, Zahnkranz und Antrieb; vorne die glühende Spitze (Glut, Funken, Rauch nur im Betrieb)
 --   * darunter die erhöhte Kühlstation und ein Schrägförderband mit Verteilband bis ins Ausgangslager
@@ -213,6 +214,56 @@ local function store(parent: Instance, name: string, origin: CFrame, face: numbe
 	return block
 end
 
+-- Rollenförderband von a nach b (lokal zur Plotmitte: X, Oberkante Rollen über Hallenboden, Z),
+-- auch schräg; Beine stehen senkrecht auf dem Boden. cargo(m, name, cf) legt optional Ladung auf
+-- (cf = Mitte auf der Rollenoberkante, Z längs zur Laufrichtung).
+local function conveyorLine(parent: Instance, plotCFrame: CFrame, name: string, a: Vector3, b: Vector3, cargo: ((Instance, string, CFrame) -> ())?): Model
+	local floorY = LayoutConfig.HallFloorTop
+	local function at(x: number, y: number, z: number): CFrame
+		return plotCFrame * CFrame.new(x, floorY + y, z)
+	end
+	local function strut(m: Instance, n: string, p0: Vector3, p1: Vector3, thick: number, color: Color3)
+		part(m, n, Vector3.new(thick, thick, (p1 - p0).Magnitude), CFrame.lookAt((p0 + p1) / 2, p1), color, Enum.Material.Metal)
+	end
+	local m = group(parent, name)
+	local wa, wb = at(a.X, a.Y, a.Z).Position, at(b.X, b.Y, b.Z).Position
+	local len = (wb - wa).Magnitude
+	local base = CFrame.lookAt((wa + wb) / 2, wb, plotCFrame.UpVector) -- Ursprung = Rollenoberkante Mitte
+	for _, sx in { -1, 1 } do
+		part(m, `SideFrame{sx}`, Vector3.new(0.3, 0.6, len), base * CFrame.new(sx * 1.6, -0.35, 0), STEEL_DARK, Enum.Material.Metal)
+		part(m, `Guide{sx}`, Vector3.new(0.15, 0.15, len), base * CFrame.new(sx * 1.7, 0.45, 0), YELLOW, Enum.Material.Metal)
+	end
+	local rollers = math.floor(len / 1.1)
+	for i = 0, rollers do
+		local z = -len / 2 + 0.3 + i * ((len - 0.6) / rollers)
+		local r = part(m, `Roller{i}`, Vector3.new(3.1, 0.4, 0.4), base * CFrame.new(0, -0.2, z), STEEL_LIGHT, Enum.Material.Metal)
+		r.Shape = Enum.PartType.Cylinder
+	end
+	local flat = Vector3.new(b.X - a.X, 0, b.Z - a.Z).Unit
+	local perp = Vector3.new(-flat.Z, 0, flat.X)
+	local legs = math.max(1, math.floor(len / 4))
+	for i = 0, legs do
+		local t = (0.4 + i * ((len - 0.8) / legs)) / len
+		local p = a:Lerp(b, t)
+		local h = p.Y - 0.65
+		for _, sx in { -1, 1 } do
+			local q = p + perp * (sx * 1.45)
+			part(m, `Leg{i}_{sx}`, Vector3.new(0.3, h, 0.3), at(q.X, h / 2, q.Z), YELLOW, Enum.Material.Metal)
+		end
+		local tieY = math.min(0.5, h - 0.3)
+		strut(m, `LegTie{i}`, at(p.X - perp.X * 1.45, tieY, p.Z - perp.Z * 1.45).Position, at(p.X + perp.X * 1.45, tieY, p.Z + perp.Z * 1.45).Position, 0.2, YELLOW)
+		if h > 3 then
+			strut(m, `LegBrace{i}`, at(p.X - perp.X * 1.45, 0.6, p.Z - perp.Z * 1.45).Position, at(p.X + perp.X * 1.45, h - 0.3, p.Z + perp.Z * 1.45).Position, 0.15, YELLOW)
+		end
+	end
+	if cargo then
+		for i = 1, math.floor(len / 5) do
+			cargo(m, `Cargo{i}`, base * CFrame.new(0, 0.23, -len / 2 + i * 5 - 2))
+		end
+	end
+	return m
+end
+
 -- Barrenstrecke vom Ofen zum Ausgangslager (Felix 2026-10-16): direkt unter der Ofenspitze eine
 -- erhöhte Kühlstation auf langen Beinen mit Kreuzverband (Kühlband im Gehäuse, Barren sichtbar von
 -- glühend nach stahlgrau, Lüfter mit Dampf, Sprühleitungen; Wassertank und Schaltkasten unten am
@@ -243,46 +294,10 @@ function SmelterTemplate.buildBarLine(parent: Instance, plotCFrame: CFrame, kiln
 		part(m, name, Vector3.new(thick, thick, (b - a).Magnitude), CFrame.lookAt((a + b) / 2, b), color, Enum.Material.Metal)
 	end
 
-	-- Rollenförderband von a nach b (lokal: X, Oberkante Rollen über Boden, Z), auch schräg; Beine
-	-- stehen senkrecht auf dem Boden
 	local function rollerConveyor(name: string, a: Vector3, b: Vector3, withBars: boolean): Model
-		local m = group(line, name)
-		local wa, wb = at(a.X, a.Y, a.Z).Position, at(b.X, b.Y, b.Z).Position
-		local len = (wb - wa).Magnitude
-		local base = CFrame.lookAt((wa + wb) / 2, wb, plotCFrame.UpVector) -- Ursprung = Rollenoberkante Mitte
-		for _, sx in { -1, 1 } do
-			part(m, `SideFrame{sx}`, Vector3.new(0.3, 0.6, len), base * CFrame.new(sx * 1.6, -0.35, 0), STEEL_DARK, Enum.Material.Metal)
-			part(m, `Guide{sx}`, Vector3.new(0.15, 0.15, len), base * CFrame.new(sx * 1.7, 0.45, 0), YELLOW, Enum.Material.Metal)
-		end
-		local rollers = math.floor(len / 1.1)
-		for i = 0, rollers do
-			local z = -len / 2 + 0.3 + i * ((len - 0.6) / rollers)
-			local r = part(m, `Roller{i}`, Vector3.new(3.1, 0.4, 0.4), base * CFrame.new(0, -0.2, z), STEEL_LIGHT, Enum.Material.Metal)
-			r.Shape = Enum.PartType.Cylinder
-		end
-		local flat = Vector3.new(b.X - a.X, 0, b.Z - a.Z).Unit
-		local perp = Vector3.new(-flat.Z, 0, flat.X)
-		local legs = math.max(1, math.floor(len / 4))
-		for i = 0, legs do
-			local t = (0.4 + i * ((len - 0.8) / legs)) / len
-			local p = a:Lerp(b, t)
-			local h = p.Y - 0.65
-			for _, sx in { -1, 1 } do
-				local q = p + perp * (sx * 1.45)
-				part(m, `Leg{i}_{sx}`, Vector3.new(0.3, h, 0.3), at(q.X, h / 2, q.Z), YELLOW, Enum.Material.Metal)
-			end
-			local tieY = math.min(0.5, h - 0.3)
-			strut(m, `LegTie{i}`, at(p.X - perp.X * 1.45, tieY, p.Z - perp.Z * 1.45).Position, at(p.X + perp.X * 1.45, tieY, p.Z + perp.Z * 1.45).Position, 0.2, YELLOW)
-			if h > 3 then
-				strut(m, `LegBrace{i}`, at(p.X - perp.X * 1.45, 0.6, p.Z - perp.Z * 1.45).Position, at(p.X + perp.X * 1.45, h - 0.3, p.Z + perp.Z * 1.45).Position, 0.15, YELLOW)
-			end
-		end
-		if withBars then
-			for i = 1, math.floor(len / 5) do
-				bar(m, `Bar{i}`, base * CFrame.new(0, 0.23, -len / 2 + i * 5 - 2), COOL, false)
-			end
-		end
-		return m
+		return conveyorLine(line, plotCFrame, name, a, b, if withBars then function(m: Instance, n: string, cf: CFrame)
+			bar(m, n, cf, COOL, false)
+		end else nil)
 	end
 
 	-- Kühlstation direkt unter/vor der Ofenspitze, angehoben auf langen Beinen
@@ -412,6 +427,119 @@ function SmelterTemplate.buildBarLine(parent: Instance, plotCFrame: CFrame, kiln
 			part(chute, `Side{sx}`, Vector3.new(0.12, 0.4, cl), ccf * CFrame.new(sx * 1.1, 0.2, 0), YELLOW, Enum.Material.Metal)
 		end
 	end
+	return line
+end
+
+
+-- Erzstrecke ins Ofen-Eingangslager und hoch zum Aufgabebehälter (Felix 2026-10-16: „Input komplett
+-- logisch“): das Förderband aus dem Lager endet am Anschlusspunkt (ConveyorInPort); dort beginnt ein
+-- Verteilband vor den Eingangsregalen mit Abschiebern und Rutschen in jedes Regal. Am Ende des
+-- Bandes hebt ein Becherwerk (Einlauftrichter, Gehäuse mit Revisionsklappen, Steigleiter, Kopf mit
+-- Antrieb, Strebe zum Gerüst) das Erz nach oben; eine Förderschnecke bringt es zum Aufgabebehälter
+-- und ein Fallrohr in dessen Deckel. Reine Optik, jedes Teil ein eigenes Model im Folder "OreLine".
+-- Alle Koordinaten lokal zur Plotmitte (X, Höhe über Hallenboden, Z).
+--   rackXs, rackFrontZ: Regalmitten und Z der Regalvorderseite (Fächer zum Band)
+--   inX, inZ: Anschlusspunkt des Lager-Förderbands; bootX: X des Becherwerks
+--   binTop: Mitte der Deckeloberkante des Aufgabebehälters; tieTo: Gerüststütze für die Strebe
+function SmelterTemplate.buildOreLine(parent: Instance, plotCFrame: CFrame, rackXs: { number }, rackFrontZ: number, inX: number, inZ: number, bootX: number, binTop: Vector3, tieTo: Vector3?): Folder
+	local floorY = LayoutConfig.HallFloorTop
+	local function at(x: number, y: number, z: number): CFrame
+		return plotCFrame * CFrame.new(x, floorY + y, z)
+	end
+	local function strut(m: Instance, n: string, a: Vector3, b: Vector3, thick: number, color: Color3)
+		part(m, n, Vector3.new(thick, thick, (b - a).Magnitude), CFrame.lookAt((a + b) / 2, b), color, Enum.Material.Metal)
+	end
+	local line = Instance.new("Folder")
+	line.Name = "OreLine"
+	line.Parent = parent
+	local ORE = Color3.fromRGB(110, 78, 58)
+	local beltY = 2.2
+	local side = if rackFrontZ > inZ then 1 else -1 -- Richtung vom Band zu den Regalen
+
+	-- Verteilband vom Anschlusspunkt bis zum Becherwerk, mit Erzbrocken
+	conveyorLine(line, plotCFrame, "OreDistribution", Vector3.new(inX - 0.6, beltY, inZ), Vector3.new(bootX + 2, beltY, inZ), function(m: Instance, n: string, cf: CFrame)
+		for k, o in { Vector3.new(-0.5, 0.15, -0.3), Vector3.new(0.4, 0.2, 0.25), Vector3.new(0, 0.35, 0) } do
+			local rock = part(m, `{n}_{k}`, Vector3.new(0.8, 0.6, 0.7), cf * CFrame.new(o) * CFrame.Angles(k, k * 0.7, 0), ORE, Enum.Material.Slate)
+			rock.CanCollide = false
+		end
+	end)
+	-- Abschieber und Rutschen in jedes Regal
+	for i, x in rackXs do
+		local pusher = group(line, `InputPusher{i}`)
+		part(pusher, "Body", Vector3.new(1.8, 1.4, 1.2), at(x, beltY + 0.4, inZ - side * 2.5), GREY_BOX, Enum.Material.Metal)
+		cylinder(pusher, "Rod", 1.2, 0.3, at(x, beltY + 0.4, inZ - side * 1.5) * CFrame.Angles(0, math.rad(90), 0), YELLOW, Enum.Material.Metal).CanCollide = false
+		part(pusher, "Plate", Vector3.new(1.6, 0.6, 0.12), at(x, beltY + 0.4, inZ - side * 0.9), STEEL_DARK, Enum.Material.Metal).CanCollide = false
+		part(pusher, "Stand", Vector3.new(0.4, beltY - 0.3, 0.4), at(x, (beltY - 0.3) / 2, inZ - side * 2.5), YELLOW, Enum.Material.Metal)
+		local chute = group(line, `InputChute{i}`)
+		local c0, c1 = at(x, beltY - 0.1, inZ + side * 1.6).Position, at(x, 1.1, rackFrontZ - side * 0.15).Position
+		local cl = (c1 - c0).Magnitude
+		local ccf = CFrame.lookAt((c0 + c1) / 2, c1)
+		part(chute, "Slide", Vector3.new(2.2, 0.15, cl), ccf, STEEL_LIGHT, Enum.Material.DiamondPlate)
+		for _, sx in { -1, 1 } do
+			part(chute, `Side{sx}`, Vector3.new(0.12, 0.4, cl), ccf * CFrame.new(sx * 1.1, 0.2, 0), YELLOW, Enum.Material.Metal)
+		end
+	end
+
+	-- Becherwerk
+	local elev = group(line, "BucketElevator")
+	local headTop = 35
+	local casingTop = headTop - 3
+	part(elev, "BootHopper", Vector3.new(3.8, 3, 3.8), at(bootX, 1.5, inZ), GREY_BOX, Enum.Material.Metal)
+	part(elev, "BootBase", Vector3.new(4.4, 0.3, 4.4), at(bootX, 0.15, inZ), STEEL_DARK, Enum.Material.DiamondPlate)
+	local dirIn = if inX > bootX then 1 else -1
+	part(elev, "InletFunnel", Vector3.new(1.2, 0.9, 3), at(bootX + dirIn * 2.3, beltY + 0.2, inZ), STEEL, Enum.Material.Metal)
+	part(elev, "Casing", Vector3.new(2.6, casingTop - 3, 2.6), at(bootX, 3 + (casingTop - 3) / 2, inZ), GREY_BOX, Enum.Material.Metal)
+	for k = 1, math.floor((casingTop - 4) / 6) do
+		part(elev, `InspectionDoor{k}`, Vector3.new(0.1, 1.2, 1.4), at(bootX + dirIn * 1.33, 3 + k * 6, inZ), STEEL_DARK, Enum.Material.Metal).CanCollide = false
+		part(elev, `Band{k}`, Vector3.new(2.8, 0.25, 2.8), at(bootX, 3 + k * 6 - 1.5, inZ), YELLOW, Enum.Material.Metal)
+	end
+	part(elev, "Head", Vector3.new(3.4, 3, 3.6), at(bootX, casingTop + 1.5, inZ), GREY_BOX, Enum.Material.Metal)
+	part(elev, "HeadCap", Vector3.new(3.6, 0.3, 3.8), at(bootX, headTop + 0.15, inZ), STEEL_DARK, Enum.Material.Metal)
+	part(elev, "Gearbox", Vector3.new(1, 1.2, 1.2), at(bootX + dirIn * 2.2, casingTop + 1.6, inZ), STEEL_DARK, Enum.Material.Metal)
+	part(elev, "DriveMotor", Vector3.new(1.8, 1.4, 1.4), at(bootX + dirIn * 3.6, casingTop + 1.6, inZ), ORANGE, Enum.Material.Metal)
+	-- Steigleiter mit Rückenschutz an der Seite weg von den Regalen
+	local lz = inZ - side * 1.6
+	for _, sx in { -1, 1 } do
+		part(elev, `LadderStile{sx}`, Vector3.new(0.14, casingTop - 0.5, 0.14), at(bootX + sx * 0.6, (casingTop - 0.5) / 2 + 0.3, lz - side * 0.5), YELLOW, Enum.Material.Metal)
+	end
+	for k = 1, math.floor(casingTop - 1) do
+		part(elev, `Rung{k}`, Vector3.new(1.2, 0.1, 0.1), at(bootX, 0.3 + k, lz - side * 0.5), STEEL_LIGHT, Enum.Material.Metal).CanCollide = false
+	end
+	for k = 0, math.floor((casingTop - 8) / 2.5) do
+		local y = 8 + k * 2.5
+		part(elev, `Hoop{k}`, Vector3.new(1.8, 0.12, 0.12), at(bootX, y, lz - side * 1.8), YELLOW, Enum.Material.Metal).CanCollide = false
+		for _, sx in { -1, 1 } do
+			part(elev, `HoopSide{k}_{sx}`, Vector3.new(0.12, 0.12, 1.3), at(bootX + sx * 0.9, y, lz - side * 1.15), YELLOW, Enum.Material.Metal).CanCollide = false
+		end
+	end
+	-- Strebe zum Gerüst auf Rosthöhe
+	if tieTo then
+		strut(elev, "GantryTie", at(bootX, tieTo.Y, inZ).Position, at(tieTo.X, tieTo.Y, tieTo.Z).Position, 0.35, YELLOW)
+	end
+
+	-- Förderschnecke vom Becherwerkkopf zum Aufgabebehälter, Fallrohr in den Deckel
+	local screw = group(line, "FeedScrew")
+	local s0 = at(bootX, casingTop + 1.2, inZ).Position
+	local dropTop = binTop + Vector3.new(0, 1.9, 0)
+	local s1 = at(dropTop.X, dropTop.Y, dropTop.Z).Position
+	local len = (s1 - s0).Magnitude
+	local tube = part(screw, "Tube", Vector3.new(len, 1.1, 1.1), CFrame.lookAt((s0 + s1) / 2, s1) * CFrame.Angles(0, math.rad(90), 0), STEEL_LIGHT, Enum.Material.Metal)
+	tube.Shape = Enum.PartType.Cylinder
+	local dir = (s1 - s0).Unit
+	for k = 1, 4 do
+		local p = s0 + dir * (len * k / 5)
+		local flange = part(screw, `Flange{k}`, Vector3.new(0.25, 1.4, 1.4), CFrame.lookAt(p, p + dir) * CFrame.Angles(0, math.rad(90), 0), STEEL, Enum.Material.Metal)
+		flange.Shape = Enum.PartType.Cylinder
+		-- Abhänger zur Decke
+		if k == 2 or k == 4 then
+			local ceiling = (plotCFrame * CFrame.new(0, floorY + LayoutConfig.HallWallHeight, 0)).Position.Y
+			part(screw, `Hanger{k}`, Vector3.new(0.12, ceiling - p.Y, 0.12), CFrame.new(p.X, (ceiling + p.Y) / 2, p.Z), STEEL_DARK, Enum.Material.Metal).CanCollide = false
+		end
+	end
+	part(screw, "ScrewMotor", Vector3.new(1.2, 1.2, 1.8), CFrame.lookAt(s0 + dir * 1.4 + Vector3.new(0, 1.1, 0), s0 + dir * 3 + Vector3.new(0, 1.1, 0)), ORANGE, Enum.Material.Metal)
+	local drop = at(binTop.X, binTop.Y + 0.95, binTop.Z)
+	local dropPipe = part(screw, "DropPipe", Vector3.new(1.9, 0.9, 0.9), drop * CFrame.Angles(0, 0, math.rad(90)), STEEL_LIGHT, Enum.Material.Metal)
+	dropPipe.Shape = Enum.PartType.Cylinder
 	return line
 end
 
@@ -590,7 +718,7 @@ function SmelterTemplate.build(plotCFrame: CFrame): Model
 	end
 	part(gantry, "Deck", Vector3.new(math.abs(gx2 - gx1), 0.4, gz2 - gz1), at((gx1 + gx2) / 2, gh + 0.6, (gz1 + gz2) / 2), STEEL_LIGHT, Enum.Material.DiamondPlate)
 	railing(gantry, "DeckRailFront", pos(gx1, gh + 0.8, gz1), pos(gx2, gh + 0.8, gz1))
-	railing(gantry, "DeckRailSide", pos(gx2, gh + 0.8, gz1), pos(gx2, gh + 0.8, gz2 - 12)) -- Lücke hinten fürs Zuführband
+	railing(gantry, "DeckRailSide", pos(gx2, gh + 0.8, gz1), pos(gx2, gh + 0.8, gz2))
 	-- Treppe an der linken Seite (zur Hallenmitte)
 	local stairs = group(gantry, "Stairs")
 	local steps = 14
@@ -605,21 +733,8 @@ function SmelterTemplate.build(plotCFrame: CFrame): Model
 	machine(gantry, "DeckMachineA", at(gx1 + 6, gh + 0.8, gz2 - 6), Vector3.new(6, 4, 5))
 	machine(gantry, "DeckMachineB", at((gx1 + gx2) / 2 + 2, gh + 0.8, gz2 - 6), Vector3.new(5, 3.6, 4))
 
-	-- Zuführband vom Eingangslager hoch zum Aufgabebehälter
-	local feed = group(model, "FeedConveyor")
-	local beltFrom = pos(inputX - 19, 2, inputZ - 6)
-	local beltTo = pos(gx2 + 1.5, gh + 1, gz2 - 6)
-	local beltLen = (beltTo - beltFrom).Magnitude
-	local beltCF = CFrame.lookAt((beltFrom + beltTo) / 2, beltTo)
-	part(feed, "Belt", Vector3.new(3, 0.5, beltLen), beltCF, STEEL_DARK, Enum.Material.DiamondPlate)
-	for _, sx in { -1, 1 } do
-		part(feed, `Side{sx}`, Vector3.new(0.3, 1, beltLen), beltCF * CFrame.new(sx * 1.6, 0.5, 0), YELLOW, Enum.Material.Metal)
-	end
-	for i = 1, 4 do
-		local p = beltFrom:Lerp(beltTo, i / 5)
-		local h = p.Y - (plotCFrame.Position.Y + floorY)
-		part(feed, `Leg{i}`, Vector3.new(0.5, h, 0.5), CFrame.new(p.X, p.Y - h / 2, p.Z), YELLOW, Enum.Material.Metal)
-	end
+	-- Erzstrecke: Verteilband vor dem Eingangslager, Becherwerk, Förderschnecke zum Aufgabebehälter
+	SmelterTemplate.buildOreLine(model, plotCFrame, { inputX + 13.5, inputX + 4.5, inputX - 4.5, inputX - 13.5 }, inputZ - CrateRackBuilder.Depth / 2, inputX + 20, inputZ - 8, inputX - 23.5, Vector3.new(kilnX, gh + 11.4, backZ - 3), Vector3.new(gx2, gh - 0.5, (gz1 + gz2) / 2))
 
 	-- Abgaskamin am Konus, Rauch nur im Betrieb
 	local stackH = LayoutConfig.HallWallHeight - kilnY - 7
