@@ -561,6 +561,20 @@ Sicherung Studio-only-Inhalte (2026-10-17): `Workspace.HallLayout` und `ServerSt
 
 Selbsttest 13c (2026-10-17): Vorschau abseits gebaut, Überlappungsprüfung – nur gewollte Verbindungen (Strahlerpfosten auf Geländer, Balkenenden im Wandfels, Felsen untereinander); Ansicht verglichen; Play: alle 6 Räume gebaut, Schild „MINE 01 · COAL“, keine Fehler. Keine Erzhaufen (Felix 2026-10-04).
 
+### 13d – Licht, Atmosphäre, Effekte, Sound (Version 0.31.0)
+
+| System | Dateien | Status |
+|---|---|---|
+| Zentrale Audio-/Licht-Werte (IDs, Lautstärken als TODO_BALANCE, Farbkorrektur, Hall) | `shared/Config/AmbienceConfig.luau` | TESTING_REQUIRED |
+| Musik (ruhige Akustik-Playlist, APM Music; unter Tage halb so laut), Grundgeräusch Vögel/Wind oben und Höhle unten mit Überblendung | `SoundController` | TESTING_REQUIRED |
+| Räumliche Maschinenklänge nur im Betrieb: Schmelze (Brenner), Förderbänder | `SoundController` | TESTING_REQUIRED |
+| Ereignis-Sounds: Spitzhacke auf Fels (räumlich, leicht variierte Tonhöhe), Förderkorb-Motor bei der Fahrt, Button-Klick überall, Level-Up, Verkauf (Kasse), Kauf/Einstellen (Münzen), Warnung (tiefer Klick) | `SoundController`, `MiningController`, `ElevatorController`, `HudController`, `NotificationController` | TESTING_REQUIRED |
+| Unter Tage: Hall „StoneRoom“ und warme Farbkorrektur; oben leicht wärmere, kräftigere Farben | `SoundController` (ColorCorrection „AmbienceGrade“) | TESTING_REQUIRED |
+| Staubwolke beim Mining-Treffer zusätzlich zu den Steinbrocken | `MiningController` | TESTING_REQUIRED |
+
+Selbsttest 13d (2026-10-17, Play): alle 15 Sound-IDs laden; oben Musik 0,12 + Vögel 0,22, Schmelzen-Klang am Ofen; Fahrt in Mine 01 → Motorgeräusch, Höhle 0,30, Vögel 0, Musik 0,06, Hall StoneRoom, warme Tönung; Spitzhacken-Treffer → Staub + Schlaggeräusch am Treffpunkt; keine Fehler im Output.
+Nicht enthalten: Rare-Drop-Effekt (Rare Drops gibt es noch nicht, D-006), Bohrer-Geräusche.
+
 ## Phase 12 – Content Expansion – Details
 
 Schritte: 12a alle Minen/Erze/Barren über zentrale Kurven · 12b weitere Spitzhacken, Rucksäcke, Drills, Fahrzeuge, Ausbaustufen (offen).

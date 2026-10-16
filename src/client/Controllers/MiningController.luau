@@ -22,6 +22,8 @@ local StateController = require(script.Parent.StateController)
 local PlotController = require(script.Parent.PlotController)
 local ElevatorController = require(script.Parent.ElevatorController)
 local NotificationController = require(script.Parent.NotificationController)
+local SoundController = require(script.Parent.SoundController)
+local AmbienceConfig = require(Shared.Config.AmbienceConfig)
 
 local MiningController = {}
 
@@ -93,6 +95,28 @@ local function spawnDebris(at: Vector3, color: Color3)
 		chip.Parent = workspace
 		Debris:AddItem(chip, 1.2)
 	end
+end
+
+-- Staubwolke am Treffpunkt (docs/19 §6)
+local function spawnDust(at: Vector3)
+	local cfg = AmbienceConfig.MineDust
+	local anchor = Instance.new("Attachment")
+	anchor.WorldPosition = at
+	anchor.Parent = workspace.Terrain
+	local dust = Instance.new("ParticleEmitter")
+	dust.Texture = "rbxasset://textures/particles/smoke_main.dds"
+	dust.Color = ColorSequence.new(cfg.Color)
+	dust.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, cfg.Size * 0.5), NumberSequenceKeypoint.new(1, cfg.Size * 1.6) })
+	dust.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.55), NumberSequenceKeypoint.new(1, 1) })
+	dust.Lifetime = NumberRange.new(cfg.Lifetime * 0.7, cfg.Lifetime)
+	dust.Speed = NumberRange.new(2, 5)
+	dust.SpreadAngle = Vector2.new(70, 70)
+	dust.Drag = 3
+	dust.Acceleration = Vector3.new(0, -2, 0)
+	dust.Rate = 0
+	dust.Parent = anchor
+	dust:Emit(cfg.Count)
+	Debris:AddItem(anchor, cfg.Lifetime + 0.5)
 end
 
 local function floatingText(at: Vector3, text: string)
@@ -195,6 +219,8 @@ local function onActivated(tool: Tool)
 		local ore = Ores.Get(value.OreId)
 		local hitAt = if target then target.Position else zone.Position
 		spawnDebris(hitAt, if ore then ore.Color else Color3.new(0.2, 0.2, 0.2))
+		spawnDust(hitAt)
+		SoundController.Play("MineHit", hitAt)
 		floatingText(hitAt, Strings.message("MINED", { Amount = value.Amount, Ore = if ore then ore.DisplayName else "" }))
 		shake()
 	elseif result.code ~= "COOLDOWN" then

@@ -12,6 +12,7 @@ local UITheme = require(Shared.Config.UITheme)
 local Net = require(script.Parent.Parent.Net)
 local Create = require(script.Parent.Parent.UI.Create)
 local Strings = require(script.Parent.Parent.UI.Strings)
+local SoundController = require(script.Parent.SoundController)
 
 local NotificationController = {}
 
@@ -29,12 +30,18 @@ local KIND_COLORS: { [string]: Color3 } = {
 local container: Frame
 local lastShown: { [string]: number } = {}
 
-local function show(kind: string, text: string)
+local function show(kind: string, text: string, code: string?)
 	local now = os.clock()
 	if lastShown[text] and now - lastShown[text] < DEDUPE_SECONDS then
 		return
 	end
 	lastShown[text] = now
+	-- Dezente Töne: Fehler/Warnung, Münzen nur bei Käufen und Einstellungen
+	if kind == "Warning" then
+		SoundController.Play("Error")
+	elseif kind == "Success" and code and (code:find("PURCHASED") or code:find("HIRED")) then
+		SoundController.Play("Success")
+	end
 
 	local toasts = {}
 	for _, child in container:GetChildren() do
@@ -108,13 +115,13 @@ function NotificationController.Init()
 			return
 		end
 		local kind = if typeof(payload.Kind) == "string" then payload.Kind else "Info"
-		show(kind, Strings.message(payload.Code, payload.Args))
+		show(kind, Strings.message(payload.Code, payload.Args), payload.Code)
 	end)
 end
 
 -- Für Client-seitige Meldungen (z. B. Fehler aus einem Result).
 function NotificationController.Show(kind: string, code: string, args: { [string]: any }?)
-	show(kind, Strings.message(code, args))
+	show(kind, Strings.message(code, args), code)
 end
 
 return NotificationController

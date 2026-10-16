@@ -21,6 +21,7 @@ local Create = require(script.Parent.Parent.UI.Create)
 local Strings = require(script.Parent.Parent.UI.Strings)
 local StateController = require(script.Parent.StateController)
 local NotificationController = require(script.Parent.NotificationController)
+local SoundController = require(script.Parent.SoundController)
 
 local TEXT = Strings.Elevator
 local SURFACE = "surface"
@@ -397,6 +398,7 @@ local function playTransition(payload: any)
 	transitionGui.Enabled = true
 	waitingForArrival = true
 	shakeCamera(FADE_IN)
+	SoundController.PlayFor("Elevator", 2.5)
 	tween(blackout, FADE_IN, { BackgroundTransparency = 0 })
 	tween(transitionTitle, FADE_IN, { TextTransparency = 0 })
 	tween(transitionSub, FADE_IN, { TextTransparency = 0 })
@@ -450,6 +452,7 @@ local function onLocation(payload: any)
 	location = payload.Location
 	local mine = Mines.Get(location)
 	applyAmbience(mine ~= nil)
+	SoundController.SetUnderground(mine ~= nil)
 	if mine then
 		local ore = Ores.Get(mine.OreId)
 		locationLabel.Text = string.format("MINE SHAFT %02d  ·  %s", mine.Number, if ore then string.upper(ore.DisplayName) else "")

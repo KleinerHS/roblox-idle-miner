@@ -19,6 +19,7 @@ type Controller = {
 local CONTROLLER_ORDER = {
 	"StateController",
 	"PlotController",
+	"SoundController",
 	"NotificationController",
 	"CompanySetupController",
 	"ElevatorController",

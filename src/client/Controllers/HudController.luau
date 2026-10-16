@@ -18,6 +18,7 @@ local NumberFormat = require(Shared.Util.NumberFormat)
 local Create = require(script.Parent.Parent.UI.Create)
 local Strings = require(script.Parent.Parent.UI.Strings)
 local StateController = require(script.Parent.StateController)
+local SoundController = require(script.Parent.SoundController)
 
 local TEXT = Strings.Hud
 
@@ -99,6 +100,7 @@ local function refresh(snapshot: Types.StateSnapshot)
 				task.wait(waitFor)
 			end
 			showPopup(TEXT.LevelUp, string.format(TEXT.LevelUpSub, level), "", color)
+			SoundController.Play("LevelUp")
 			-- Neu freigeschaltete Minen danach kurz anzeigen (docs/09 §36)
 			for _, mine in Mines.List do
 				if mine.RequiredLevel and mine.RequiredLevel > fromLevel and mine.RequiredLevel <= level then
@@ -241,6 +243,7 @@ end
 -- Verkaufsrückmeldung "SOLD +$X +Y Mining XP" (docs/09 §49)
 function HudController.ShowSold(cash: number, xp: number)
 	soldActiveUntil = os.clock() + 2.4
+	SoundController.Play("Sell")
 	showPopup(Strings.Sell.Sold, `+{NumberFormat.cash(cash)}`, `+{NumberFormat.withSeparators(xp)} Mining XP`, UITheme.Colors.Positive)
 end
 
