@@ -24,6 +24,7 @@ local Mines = require(Shared.Definitions.Mines)
 local Ores = require(Shared.Definitions.Ores)
 
 local ElevatorCageBuilder = require(script.Parent.ElevatorCageBuilder)
+local FloatingText = require(script.Parent.FloatingText)
 
 local MineShaftBuilder = {}
 
@@ -271,7 +272,9 @@ local function buildSlot(model: Model, o: CFrame, slotIndex: number, plotId: num
 	-- Slot verwalten (Drill platzieren/entfernen, docs/05 §25, docs/10 §31–32). Der Prompt
 	-- sitzt an einem kleinen Pfosten im Raum vor dem Slot, nicht an der Wand.
 	local post = part(folder, `SlotPost{slotIndex}`, Vector3.new(0.5, 3.2, 0.5), wallCFrame(o, wall, t0 - 9.5, 1.6, 11), IRON, Enum.Material.Metal)
-	local sign = part(folder, `SlotSign{slotIndex}`, Vector3.new(1.6, 1, 0.15), wallCFrame(o, wall, t0 - 9.5, 3.4, 11), Color3.fromRGB(240, 196, 40), Enum.Material.SmoothPlastic)
+	part(folder, `SlotPostCap{slotIndex}`, Vector3.new(0.8, 0.3, 0.8), wallCFrame(o, wall, t0 - 9.5, 3.35, 11), YELLOW, Enum.Material.SmoothPlastic)
+	-- Beschriftung als schwebende Schrift über dem Stützrahmen statt Schild (wie in der Halle)
+	FloatingText.title(folder, `SlotSign{slotIndex}`, wallCFrame(o, wall, t0, TIMBER_HEIGHT + 4.6, 4), `Mining Slot {slotIndex}`, 1.8, YELLOW).CanQuery = false
 	local promptPart = part(folder, `SlotPromptPart{slotIndex}`, Vector3.new(1, 1, 1), wallCFrame(o, wall, t0 - 9.5, 3, 11), Color3.new(1, 1, 1), Enum.Material.SmoothPlastic)
 	promptPart.Transparency = 1
 	promptPart.CanCollide = false
@@ -287,7 +290,6 @@ local function buildSlot(model: Model, o: CFrame, slotIndex: number, plotId: num
 	prompt:SetAttribute("PlotId", plotId)
 	prompt.Parent = promptPart
 	post.CanTouch = false
-	sign.CanTouch = false
 end
 
 local function buildElevator(model: Model, o: CFrame, plotId: number)
@@ -326,24 +328,37 @@ local function buildElevator(model: Model, o: CFrame, plotId: number)
 		part(folder, `RailPost{i}`, Vector3.new(0.35, 1.8, 0.35), base * CFrame.new(corner.X, podiumH + 0.9, corner.Z), YELLOW, Enum.Material.Metal)
 	end
 
-	-- Schild am Podest neben der Treppe: Shaft-Nummer (docs/12 §25)
-	local sign = part(folder, "ShaftSign", Vector3.new(6.5, 1.6, 0.2), base * CFrame.new(-7.5, podiumH / 2, -halfP - 0.15), Color3.fromRGB(30, 30, 32), Enum.Material.Metal)
-	local gui = Instance.new("SurfaceGui")
-	gui.Name = "SignGui"
-	gui.Face = Enum.NormalId.Front
-	gui.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
-	gui.PixelsPerStud = 50
-	gui.LightInfluence = 0
-	gui.Parent = sign
-	local label = Instance.new("TextLabel")
-	label.Name = "Label"
-	label.Size = UDim2.fromScale(1, 1)
-	label.BackgroundTransparency = 1
-	label.Font = Enum.Font.GothamBold
-	label.TextScaled = true
-	label.TextColor3 = YELLOW
-	label.Text = "MINE"
-	label.Parent = gui
+	-- Shaft-Nummer als schwebende Schrift über dem Förderkorb (docs/12 §25). Part "ShaftSign" mit
+	-- TextLabel "Label", configure() setzt den Text.
+	FloatingText.create(folder, "ShaftSign", base * CFrame.new(0, podiumH + ElevatorCageBuilder.Height + 3, -halfP + 2), 18, {
+		{ Name = "Label", Text = "MINE", Size = 2.2, Color = YELLOW },
+	}, 160).CanQuery = false
+
+	-- Warnstreifen gelb-schwarz an der Podestkante und gelbe Stufenkanten (Referenzbild)
+	local STRIPES = 22
+	for i = 1, STRIPES do
+		local stripe = part(folder, `EdgeStripe{i}`, Vector3.new(P / STRIPES, 0.3, 0.06), base * CFrame.new(-halfP + P / STRIPES * (i - 0.5), podiumH - 0.15, -halfP - 0.23), if i % 2 == 0 then Color3.fromRGB(28, 28, 30) else YELLOW, Enum.Material.SmoothPlastic)
+		stripe.CanCollide = false
+	end
+	for i = 1, 3 do
+		local h = podiumH * i / 4
+		local nosing = part(folder, `StepNosing{i}`, Vector3.new(8, 0.06, 0.35), base * CFrame.new(0, h + 0.03, -halfP - 0.8 - (3 - i) * 1.6 - 0.62), YELLOW, Enum.Material.SmoothPlastic)
+		nosing.CanCollide = false
+	end
+	-- Strahler auf den vorderen Geländerpfosten
+	for _, sx in { -1, 1 } do
+		local postX = sx * (halfP - 0.4)
+		part(folder, `FloodPost{sx}`, Vector3.new(0.3, 3.2, 0.3), base * CFrame.new(postX, podiumH + 1.8 + 1.6, -halfP + 0.4), IRON, Enum.Material.Metal)
+		local flood = part(folder, `Floodlight{sx}`, Vector3.new(1.2, 0.8, 0.6), base * CFrame.new(postX, podiumH + 5.3, -halfP + 0.4) * CFrame.Angles(math.rad(-25), 0, 0), LAMP, Enum.Material.Neon)
+		flood.CanCollide = false
+		local spot = Instance.new("SpotLight")
+		spot.Angle = 80
+		spot.Range = 30
+		spot.Brightness = 1.4
+		spot.Color = LAMP
+		spot.Face = Enum.NormalId.Front
+		spot.Parent = flood
+	end
 
 	-- Kisten auf dem Podest wie im Referenzbild
 	part(folder, "PodiumCrate1", Vector3.new(2.4, 2.4, 2.4), base * CFrame.new(halfP - 1.8, podiumH + 1.2, halfP - 1.8), CRATE, Enum.Material.WoodPlanks)
@@ -394,6 +409,113 @@ local function buildProps(model: Model, o: CFrame, rng: Random)
 	end
 end
 
+-- Atmosphäre (Phase 13c): Deckenbalken mit Hängelampen, Felsnasen an der Decke, Kiesel und
+-- dunklere Flecken am Boden, schwebender Staub. Förderkorb, Abbauplätze und der Mittelgang
+-- bleiben frei.
+local function buildAtmosphere(model: Model, o: CFrame, rng: Random)
+	local size = LayoutConfig.MineShaft.Size
+	local W, H, D = size.X, size.Y, size.Z
+	local c = LayoutConfig.MineShaft.ElevatorCenter
+	local folder = Instance.new("Folder")
+	folder.Name = "Atmosphere"
+	folder.Parent = model
+	local function nearElevator(x: number, z: number, margin: number): boolean
+		return math.abs(x - c.X) < 11 + margin and math.abs(z - c.Y) < 13 + margin
+	end
+
+	-- Deckenbalken quer durch den Raum (vor dem Förderkorb) mit Hängelampen
+	for i, z in { -D / 2 + 12, -6 } do -- = beamZs unten
+		wood(folder, `CeilingBeam{i}`, Vector3.new(W, 1.4, 1.6), o * CFrame.new(0, H - 0.7, z), rng)
+		for j, x in { -W / 4, W / 4 } do
+			part(folder, `LampCord{i}_{j}`, Vector3.new(0.12, 3, 0.12), o * CFrame.new(x, H - 2.9, z), IRON, Enum.Material.Metal).CanCollide = false
+			part(folder, `LampShade{i}_{j}`, Vector3.new(1.6, 0.5, 1.6), o * CFrame.new(x, H - 4.65, z), IRON, Enum.Material.Metal).CanCollide = false
+			local bulb = part(folder, `HangLamp{i}_{j}`, Vector3.new(0.7, 0.7, 0.7), o * CFrame.new(x, H - 5.1, z), LAMP, Enum.Material.Neon)
+			bulb.Shape = Enum.PartType.Ball
+			bulb.CanCollide = false
+			local light = Instance.new("PointLight")
+			light.Range = 22
+			light.Brightness = 1.1
+			light.Color = LAMP
+			light.Shadows = false
+			light.Parent = bulb
+		end
+	end
+
+	-- Felsnasen an der Decke (nicht an den Deckenbalken)
+	local beamZs = { -D / 2 + 12, -6 }
+	for i = 1, 16 do
+		local x, z = rng:NextNumber(-W / 2 + 4, W / 2 - 4), rng:NextNumber(-D / 2 + 4, D / 2 - 4)
+		local onBeam = math.abs(z - beamZs[1]) < 4.5 or math.abs(z - beamZs[2]) < 4.5
+		if not nearElevator(x, z, 3) and not onBeam then
+			local s = rng:NextNumber(2, 4.5)
+			rock(folder, `CeilingRock{i}`, Vector3.new(s, s * 0.8, s), o * CFrame.new(x, H - s * 0.2, z) * CFrame.Angles(rng:NextNumber(0, 3), rng:NextNumber(0, 3), rng:NextNumber(0, 3))).CanCollide = false
+		end
+	end
+
+	-- Kiesel und dunklere Erdflecken am Boden
+	local function free(x: number, z: number): boolean
+		if nearElevator(x, z, 2) then
+			return false
+		end
+		for _, slot in LayoutConfig.MineShaft.Slots do
+			if math.abs(x - slot.X) < 14 and math.abs(z - slot.Y) < 12 then
+				return false
+			end
+		end
+		if math.abs(x) < 6 then
+			return false -- Mittelgang von der Vorderseite zum Förderkorb bleibt frei
+		end
+		-- nicht in Kisten, Fässern, Zaun, Holzverbau oder Felsbrocken
+		local probe = o * Vector3.new(x, 0.4, z)
+		for _, d in model:GetDescendants() do
+			if d:IsA("BasePart") and d.Transparency < 1 and d.Parent ~= folder and d.Name ~= "Floor" then
+				local lp = d.CFrame:PointToObjectSpace(probe)
+				local half = d.Size / 2 + Vector3.new(1.2, 1.2, 1.2)
+				if math.abs(lp.X) < half.X and math.abs(lp.Y) < half.Y and math.abs(lp.Z) < half.Z then
+					return false
+				end
+			end
+		end
+		return true
+	end
+	local pebbles = 0
+	for _ = 1, 90 do
+		local x, z = rng:NextNumber(-W / 2 + 3, W / 2 - 3), rng:NextNumber(-D / 2 + 3, D / 2 - 3)
+		if pebbles < 45 and free(x, z) then
+			pebbles += 1
+			local s = rng:NextNumber(0.5, 1.4)
+			rock(folder, `Pebble{pebbles}`, Vector3.new(s, s * 0.6, s * rng:NextNumber(0.7, 1)), o * CFrame.new(x, s * 0.2, z) * CFrame.Angles(rng:NextNumber(-0.3, 0.3), rng:NextNumber(0, 3), rng:NextNumber(-0.3, 0.3))).CanCollide = false
+		end
+	end
+	for i = 1, 12 do
+		local x, z = rng:NextNumber(-W / 2 + 6, W / 2 - 6), rng:NextNumber(-D / 2 + 6, D / 2 - 6)
+		if not nearElevator(x, z, 0) then
+			local patch = part(folder, `DirtPatch{i}`, Vector3.new(rng:NextNumber(4, 9), 0.05, rng:NextNumber(3, 7)), o * CFrame.new(x, 0.025, z) * CFrame.Angles(0, rng:NextNumber(0, 3), 0), DIRT:Lerp(Color3.new(0, 0, 0), rng:NextNumber(0.15, 0.3)), Enum.Material.Ground)
+			patch.CanCollide = false
+			patch.CanQuery = false
+		end
+	end
+
+	-- Schwebender Staub im Lampenlicht
+	local dustBox = part(folder, "DustVolume", Vector3.new(W - 4, H * 0.6, D - 4), o * CFrame.new(0, H * 0.45, 0), DIRT, Enum.Material.SmoothPlastic)
+	dustBox.Transparency = 1
+	dustBox.CanCollide = false
+	dustBox.CanQuery = false
+	local dust = Instance.new("ParticleEmitter")
+	dust.Name = "Dust"
+	dust.Texture = "rbxasset://textures/particles/sparkles_main.dds"
+	dust.Color = ColorSequence.new(Color3.fromRGB(230, 200, 160))
+	dust.Size = NumberSequence.new(0.12)
+	dust.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(0.3, 0.55), NumberSequenceKeypoint.new(1, 1) })
+	dust.Lifetime = NumberRange.new(6, 10)
+	dust.Rate = 12
+	dust.Speed = NumberRange.new(0.2, 0.6)
+	dust.SpreadAngle = Vector2.new(180, 180)
+	dust.LightEmission = 0.4
+	dust.Shape = Enum.ParticleEmitterShape.Box
+	dust.Parent = dustBox
+end
+
 -- Baut den Raum für einen Plot (einmal beim Serverstart).
 function MineShaftBuilder.build(parent: Instance, plotId: number, plotCFrame: CFrame): Model
 	local model = Instance.new("Model")
@@ -410,6 +532,7 @@ function MineShaftBuilder.build(parent: Instance, plotId: number, plotCFrame: CF
 	end
 	buildElevator(model, o, plotId)
 	buildProps(model, o, rng)
+	buildAtmosphere(model, o, rng)
 
 	model.PrimaryPart = model:FindFirstChild("Floor") :: BasePart
 	model.ModelStreamingMode = Enum.ModelStreamingMode.Atomic

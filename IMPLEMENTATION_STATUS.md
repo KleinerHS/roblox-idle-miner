@@ -20,7 +20,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 10 | Offline Production | TESTING_REQUIRED (Version 0.17.0) |
 | 11 | Prestige | TESTING_REQUIRED (Version 0.18.0; Bonus D-034 und Reset-Liste D-033 bestätigt) |
 | 12 | Content Expansion | TESTING_REQUIRED (12a D-035, 12b D-036, 12c Fahrzeuge – Werte Q-028 offen) |
-| 13 | Visual Polish | TESTING_REQUIRED (13a Map & Umgebung, 13b Halle/Lager/Ofen; weiter: 13c Mine-Shaft, 13d Licht/Effekte/Sound, 13e UI) |
+| 13 | Visual Polish | TESTING_REQUIRED (13a Map & Umgebung, 13b Halle/Lager/Ofen, 13c Mine-Shaft; weiter: 13d Licht/Effekte/Sound, 13e UI) |
 | 14 | Balance | NOT_STARTED |
 
 ## Setup – Details
@@ -548,6 +548,16 @@ Selbsttest Beladen im Play (2026-10-16, Felix' Pickup): alter, zu weit vorne gep
 | Offline-Lohn (D-040) | Dateien | Status |
 |---|---|---|
 | Während der Offline-Zeit wird kein Lohn abgezogen, alle Worker arbeiten weiter; online unverändert | `OfflineSimulation` | TESTING_REQUIRED |
+
+### 13c – Mine-Shaft (Version 0.30.0)
+
+| System | Dateien | Status |
+|---|---|---|
+| Schwebende Schrift statt Schildern: Shaft-Nummer über dem Förderkorb („MINE 01 · COAL“, Name `ShaftSign`/`Label` bleibt), „Mining Slot 1/2“ über den Stützrahmen; gelbe Kappe am Slot-Pfosten | `MineShaftBuilder` | TESTING_REQUIRED |
+| Podest: gelb-schwarze Warnstreifen an der Vorderkante, gelbe Stufenkanten, 2 Strahler (SpotLight) auf den vorderen Geländerpfosten | `MineShaftBuilder.buildElevator` | TESTING_REQUIRED |
+| Atmosphäre: 2 Deckenbalken mit je 2 Hängelampen, Felsnasen an der Decke, 45 Kiesel und dunklere Erdflecken am Boden (Mittelgang, Förderkorb, Slots, Kisten frei), schwebender Staub | `MineShaftBuilder.buildAtmosphere` | TESTING_REQUIRED |
+
+Selbsttest 13c (2026-10-17): Vorschau abseits gebaut, Überlappungsprüfung – nur gewollte Verbindungen (Strahlerpfosten auf Geländer, Balkenenden im Wandfels, Felsen untereinander); Ansicht verglichen; Play: alle 6 Räume gebaut, Schild „MINE 01 · COAL“, keine Fehler. Keine Erzhaufen (Felix 2026-10-04).
 
 ## Phase 12 – Content Expansion – Details
 
