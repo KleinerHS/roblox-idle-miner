@@ -711,7 +711,9 @@ function SmelterTemplate.build(plotCFrame: CFrame): Model
 	end
 	part(gantry, "Deck", Vector3.new(math.abs(gx2 - gx1), 0.4, gz2 - gz1), at((gx1 + gx2) / 2, gh + 0.6, (gz1 + gz2) / 2), STEEL_LIGHT, Enum.Material.DiamondPlate)
 	railing(gantry, "DeckRailFront", pos(gx1, gh + 0.8, gz1), pos(gx2, gh + 0.8, gz1))
-	railing(gantry, "DeckRailSide", pos(gx2, gh + 0.8, gz1), pos(gx2, gh + 0.8, gz2))
+	-- Seitengeländer erst hinter dem Treppenausstieg (Felix 2026-10-16: Treppe muss frei sein)
+	local stairLanding = gz1 + 2 + 14 * 1.3
+	railing(gantry, "DeckRailSide", pos(gx2, gh + 0.8, stairLanding + 1.4), pos(gx2, gh + 0.8, gz2))
 	-- Treppe an der linken Seite (zur Hallenmitte)
 	local stairs = group(gantry, "Stairs")
 	local steps = 14
