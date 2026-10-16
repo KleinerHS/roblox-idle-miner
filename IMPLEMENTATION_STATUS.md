@@ -20,7 +20,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 10 | Offline Production | TESTING_REQUIRED (Version 0.17.0) |
 | 11 | Prestige | TESTING_REQUIRED (Version 0.18.0; Bonus D-034 und Reset-Liste D-033 bestätigt) |
 | 12 | Content Expansion | TESTING_REQUIRED (12a D-035, 12b D-036, 12c Fahrzeuge – Werte Q-028 offen) |
-| 13 | Visual Polish | TESTING_REQUIRED (13a Map & Umgebung, 13b Halle/Lager/Ofen, 13c Mine-Shaft, 13d Licht/Effekte/Sound, 13e UI-Feinschliff; offen: 13d Licht/Effekte/Sound, 13e UI) |
+| 13 | Visual Polish | TESTING_REQUIRED (13a Map & Umgebung, 13b Halle/Lager/Ofen, 13c Mine-Shaft, 13d Licht/Effekte/Sound, 13e UI-Feinschliff; alle Teilschritte warten auf Felix' Test) |
 | 14 | Balance | NOT_STARTED |
 
 ## Setup – Details
