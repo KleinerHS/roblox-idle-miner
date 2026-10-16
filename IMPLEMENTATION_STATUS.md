@@ -549,6 +549,8 @@ Selbsttest Beladen im Play (2026-10-16, Felix' Pickup): alter, zu weit vorne gep
 |---|---|---|
 | Während der Offline-Zeit wird kein Lohn abgezogen, alle Worker arbeiten weiter; online unverändert | `OfflineSimulation` | TESTING_REQUIRED |
 
+Sicherung Studio-only-Inhalte (2026-10-17): `Workspace.HallLayout` und `ServerStorage.Vendor.AChassis` (Kit + 5 Tunes) als `assets/HallLayout.rbxm` / `assets/AChassis.rbxm` im Repo, erzeugt mit `tools/ExportRbxmx.luau`; Rücktest in Studio 0 Abweichungen. Ohne die 8 Unions von Bürostuhl und Bett (Details `assets/README.md`).
+
 ### 13c – Mine-Shaft (Version 0.30.0)
 
 | System | Dateien | Status |
