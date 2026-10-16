@@ -6,7 +6,8 @@
 --   * Eingangslager hinten links: 4 Hochregale × 4 Paletten (16 Kisten Erz)
 --   * Drehrohrofen in Längsrichtung aus Abschnitten (Glocke, Hals, Trommel, Konus) mit Laufringen,
 --     Tragrollen, Zahnkranz und Antrieb; vorne die glühende Spitze (Glut, Funken, Rauch nur im Betrieb)
---   * davor die Schnecke im offenen gelben Rahmen bis zum Ausgangslager (4 Hochregale, 16 Kisten)
+--   * dahinter die Kühlstation und ein Rollenförderband mit Verteilband bis ins Ausgangslager
+--     (4 Hochregale, 16 Kisten)
 --   * gelbe Rohrleitungen am Boden, orange Maschinenkästen mit kleinen Geländern, Kistenpaletten
 --   * außen an der rechten Wand zwei Tanks mit Leitungen in die Halle
 -- Info-Anzeigen als schwebende Schrift (FloatingText). Jedes Objekt ist ein eigenes Model.
@@ -210,6 +211,180 @@ local function store(parent: Instance, name: string, origin: CFrame, face: numbe
 	CrateRackBuilder.build(block, origin, { { Z = 0, Face = face } }, 4)
 	FloatingText.title(block, `{name}Label`, origin * CFrame.new(0, 34, face * (CrateRackBuilder.Depth / 2 + 1)), title, 2.4, YELLOW)
 	return block
+end
+
+-- Barrenstrecke vom Ofen zum Ausgangslager (Felix 2026-10-16): direkt hinter der Ofenspitze eine
+-- Kühlstation (Kühlband im Gehäuse, Barren sichtbar von glühend nach stahlgrau, Lüfter mit Dampf,
+-- Sprühleitungen, Wassertank, Schaltkasten), danach ein Rollenförderband geradeaus bis hinter das
+-- Ausgangslager und dort ein Verteilband entlang der Regalrückseiten mit Abschiebern und Rutschen
+-- in jedes Regal. Reine Optik; jedes Teil ist ein eigenes Model im Folder "BarLine".
+-- rackXs = X-Mitten der Regale (lokal zur Plotmitte), rackBackZ = Z der Regalrückseite.
+function SmelterTemplate.buildBarLine(parent: Instance, plotCFrame: CFrame, kilnX: number, tipZ: number, rackXs: { number }, rackBackZ: number): Folder
+	local floorY = LayoutConfig.HallFloorTop
+	local function at(x: number, y: number, z: number): CFrame
+		return plotCFrame * CFrame.new(x, floorY + y, z)
+	end
+	local line = Instance.new("Folder")
+	line.Name = "BarLine"
+	line.Parent = parent
+	local HOT = Color3.fromRGB(255, 120, 30)
+	local COOL = Color3.fromRGB(150, 154, 160)
+	local WATER = Color3.fromRGB(60, 120, 200)
+	local beltY = 2.2 -- Oberkante der Rollen
+	local function bar(m: Instance, name: string, cf: CFrame, color: Color3, hot: boolean)
+		local b = part(m, name, Vector3.new(1.5, 0.45, 0.7), cf, color, if hot then Enum.Material.Neon else Enum.Material.Metal)
+		b.CanCollide = false
+	end
+
+	-- Rollenförderband zwischen zwei Punkten auf einer Achse (X oder Z)
+	local function rollerConveyor(name: string, a: Vector2, b: Vector2, withBars: boolean): Model
+		local m = group(line, name)
+		local dir = Vector3.new(b.X - a.X, 0, b.Y - a.Y)
+		local len = dir.Magnitude
+		local mid = Vector2.new((a.X + b.X) / 2, (a.Y + b.Y) / 2)
+		local worldDir = plotCFrame:VectorToWorldSpace(dir.Unit)
+		local base = CFrame.lookAt(at(mid.X, 0, mid.Y).Position, at(mid.X, 0, mid.Y).Position + worldDir, plotCFrame.UpVector)
+		for _, sx in { -1, 1 } do
+			part(m, `SideFrame{sx}`, Vector3.new(0.3, 0.6, len), base * CFrame.new(sx * 1.6, beltY - 0.35, 0), STEEL_DARK, Enum.Material.Metal)
+			part(m, `Guide{sx}`, Vector3.new(0.15, 0.15, len), base * CFrame.new(sx * 1.7, beltY + 0.45, 0), YELLOW, Enum.Material.Metal)
+		end
+		local rollers = math.floor(len / 1.1)
+		for i = 0, rollers do
+			local z = -len / 2 + 0.3 + i * ((len - 0.6) / rollers)
+			local r = part(m, `Roller{i}`, Vector3.new(3.1, 0.4, 0.4), base * CFrame.new(0, beltY - 0.2, z), STEEL_LIGHT, Enum.Material.Metal)
+			r.Shape = Enum.PartType.Cylinder
+		end
+		local legs = math.max(1, math.floor(len / 4))
+		for i = 0, legs do
+			local z = -len / 2 + 0.4 + i * ((len - 0.8) / legs)
+			for _, sx in { -1, 1 } do
+				part(m, `Leg{i}_{sx}`, Vector3.new(0.3, beltY - 0.65, 0.3), base * CFrame.new(sx * 1.45, (beltY - 0.65) / 2, z), YELLOW, Enum.Material.Metal)
+			end
+			part(m, `LegTie{i}`, Vector3.new(2.9, 0.2, 0.2), base * CFrame.new(0, 0.5, z), YELLOW, Enum.Material.Metal)
+		end
+		if withBars then
+			for i = 1, math.floor(len / 5) do
+				bar(m, `Bar{i}`, base * CFrame.new(0, beltY + 0.23, -len / 2 + i * 5 - 2), COOL, false)
+			end
+		end
+		return m
+	end
+
+	-- Kühlstation direkt hinter der Ofenspitze
+	local z1 = tipZ - 1.4
+	local z0 = z1 - 11
+	local zc = (z0 + z1) / 2
+	local cool = group(line, "CoolingStation")
+	local W, Hh = 9, 5
+	for _, sx in { -1, 1 } do
+		for _, sz in { -1, 1 } do
+			part(cool, `Leg{sx}_{sz}`, Vector3.new(0.5, 1, 0.5), at(kilnX + sx * (W / 2 - 0.3), 0.5, zc + sz * 5.2), YELLOW, Enum.Material.Metal)
+		end
+		-- Seitenwände mit Sichtfenster und Rippen
+		part(cool, `WallLow{sx}`, Vector3.new(0.3, 1.6, 11), at(kilnX + sx * W / 2, 1.8, zc), GREY_BOX, Enum.Material.Metal)
+		part(cool, `WallHigh{sx}`, Vector3.new(0.3, 1.6, 11), at(kilnX + sx * W / 2, 5.2, zc), GREY_BOX, Enum.Material.Metal)
+		local glass = part(cool, `Window{sx}`, Vector3.new(0.12, 1.8, 11), at(kilnX + sx * W / 2, 3.5, zc), Color3.fromRGB(60, 70, 80), Enum.Material.Glass)
+		glass.Transparency = 0.45
+		for i = 0, 7 do
+			part(cool, `Rib{sx}_{i}`, Vector3.new(0.18, Hh, 0.18), at(kilnX + sx * (W / 2 + 0.12), 1 + Hh / 2, z0 + 0.2 + i * 1.51), STEEL_DARK, Enum.Material.Metal)
+		end
+	end
+	part(cool, "Floor", Vector3.new(W, 0.3, 11), at(kilnX, 1.15, zc), STEEL_DARK, Enum.Material.DiamondPlate)
+	part(cool, "Roof", Vector3.new(W + 0.4, 0.35, 11.4), at(kilnX, 1 + Hh + 0.17, zc), GREY_BOX, Enum.Material.Metal)
+	part(cool, "InletWall", Vector3.new(W, Hh, 0.3), at(kilnX, 1 + Hh / 2, z1 - 0.15), GREY_BOX, Enum.Material.Metal)
+	part(cool, "OutletHood", Vector3.new(W, 1.6, 0.3), at(kilnX, 1 + Hh - 0.8, z0 + 0.15), GREY_BOX, Enum.Material.Metal)
+	part(cool, "CoolBelt", Vector3.new(3.4, 0.2, 11), at(kilnX, beltY - 0.1, zc), Color3.fromRGB(34, 36, 40), Enum.Material.DiamondPlate)
+	-- Barren im Kühlband: vom Eingang (glühend) zum Ausgang (abgekühlt)
+	for i = 0, 6 do
+		local f = i / 6
+		bar(cool, `CoolingBar{i}`, at(kilnX, beltY + 0.23, z1 - 1 - i * 1.5), HOT:Lerp(COOL, f), f < 0.5)
+	end
+	local heat = Instance.new("PointLight")
+	heat.Name = "Heat"
+	heat.Color = HOT
+	heat.Range = 10
+	heat.Brightness = 1.2
+	heat.Parent = cool:FindFirstChild("CoolingBar0")
+	-- Einlaufrutsche von der glühenden Ofenspitze in die Kühlstation
+	local chuteTop, chuteBottom = at(kilnX, 8.2, tipZ - 0.6).Position, at(kilnX, 1 + Hh + 0.4, z1 - 1.2).Position
+	local chuteLen = (chuteTop - chuteBottom).Magnitude
+	local chuteCF = CFrame.lookAt((chuteTop + chuteBottom) / 2, chuteBottom)
+	part(cool, "InletChute", Vector3.new(2.4, 0.25, chuteLen), chuteCF, STEEL_DARK, Enum.Material.Metal)
+	part(cool, "InletGlow", Vector3.new(1.6, 0.05, chuteLen - 0.4), chuteCF * CFrame.new(0, 0.15, 0), HOT, Enum.Material.Neon).CanCollide = false
+	for _, sx in { -1, 1 } do
+		part(cool, `InletSide{sx}`, Vector3.new(0.2, 0.8, chuteLen), chuteCF * CFrame.new(sx * 1.2, 0.35, 0), STEEL, Enum.Material.Metal)
+	end
+	-- Lüfter mit drehendem Rotor und Dampf, Sprühleitungen, Wassertank, Schaltkasten
+	for i, z in { zc + 2.6, zc - 2.6 } do
+		local roofY = 1 + Hh + 0.35
+		cylinder(cool, `FanHousing{i}`, 1.2, 2.8, at(kilnX, roofY + 0.6, z) * CFrame.Angles(0, 0, math.rad(90)), STEEL, Enum.Material.Metal)
+		local rotor = group(cool, `FanRotor{i}`)
+		local hub = part(rotor, "Hub", Vector3.new(0.6, 0.3, 0.6), at(kilnX, roofY + 1.3, z), STEEL_DARK, Enum.Material.Metal)
+		rotor.PrimaryPart = hub
+		for k = 0, 3 do
+			part(rotor, `Blade{k}`, Vector3.new(1.1, 0.08, 0.4), at(kilnX, roofY + 1.3, z) * CFrame.Angles(0, math.rad(k * 90), 0) * CFrame.new(0.65, 0, 0) * CFrame.Angles(math.rad(18), 0, 0), STEEL_LIGHT, Enum.Material.Metal).CanCollide = false
+		end
+		AmbientProps.spin(rotor, "Y", 320)
+		local steamAt = Instance.new("Attachment")
+		steamAt.Name = "Steam"
+		steamAt.Parent = hub
+		local steam = Instance.new("ParticleEmitter")
+		steam.Name = "Steam"
+		steam.Texture = "rbxasset://textures/particles/smoke_main.dds"
+		steam.Color = ColorSequence.new(Color3.fromRGB(235, 238, 240))
+		steam.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.8), NumberSequenceKeypoint.new(1, 3.2) })
+		steam.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.55), NumberSequenceKeypoint.new(1, 1) })
+		steam.Lifetime = NumberRange.new(1.2, 2)
+		steam.Rate = 6
+		steam.Speed = NumberRange.new(2.5, 4)
+		steam.EmissionDirection = Enum.NormalId.Top
+		steam.Parent = steamAt
+	end
+	for _, sx in { -1, 1 } do
+		cylinder(cool, `SprayPipe{sx}`, 10.4, 0.35, at(kilnX + sx * (W / 2 - 0.8), 1 + Hh + 0.6, zc) * CFrame.Angles(0, math.rad(90), 0), WATER, Enum.Material.Metal)
+		for k = 0, 4 do
+			part(cool, `Nozzle{sx}_{k}`, Vector3.new(0.2, 0.3, 0.2), at(kilnX + sx * (W / 2 - 0.8), 1 + Hh + 0.3, z0 + 1.2 + k * 2.2), STEEL_DARK, Enum.Material.Metal).CanCollide = false
+		end
+	end
+	local tankX = kilnX + W / 2 + 1.8
+	cylinder(cool, "WaterTank", 3.4, 2.4, at(tankX, 1.7, z0 + 2) * CFrame.Angles(0, 0, math.rad(90)), WATER, Enum.Material.SmoothPlastic)
+	cylinder(cool, "WaterTankCap", 0.2, 2.5, at(tankX, 3.5, z0 + 2) * CFrame.Angles(0, 0, math.rad(90)), STEEL_DARK, Enum.Material.Metal)
+	part(cool, "WaterRiser", Vector3.new(0.3, Hh - 1.2, 0.3), at(tankX, 3.5 + (Hh - 1.2) / 2, z0 + 2), WATER, Enum.Material.Metal)
+	part(cool, "WaterFeed", Vector3.new(tankX - (kilnX + W / 2 - 0.8), 0.3, 0.3), at((tankX + kilnX + W / 2 - 0.8) / 2, 1 + Hh + 0.6, z0 + 2), WATER, Enum.Material.Metal)
+	local box = part(cool, "ControlBox", Vector3.new(0.8, 1.6, 1.4), at(tankX - 0.6, 2.2, z1 - 2.5), ORANGE, Enum.Material.Metal)
+	local led = part(cool, "Led", Vector3.new(0.12, 0.25, 0.25), box.CFrame * CFrame.new(0.45, 0.4, 0), Color3.fromRGB(90, 220, 110), Enum.Material.Neon)
+	led.CanCollide = false
+	AmbientProps.blink(led)
+	FloatingText.title(cool, "CoolingLabel", at(kilnX, 10.5, zc), "Cooling", 1.8, YELLOW)
+
+	-- Förderband geradeaus bis hinter das Ausgangslager
+	local crossZ = rackBackZ + 2.6
+	rollerConveyor("BarConveyor", Vector2.new(kilnX, z0 - 0.1), Vector2.new(kilnX, crossZ + 1.7), true)
+	-- Verteilband entlang der Regalrückseiten, Abschieber und Rutschen in jedes Regal
+	local minX, maxX = math.huge, -math.huge
+	for _, x in rackXs do
+		minX = math.min(minX, x)
+		maxX = math.max(maxX, x)
+	end
+	rollerConveyor("DistributionConveyor", Vector2.new(maxX + 4.7, crossZ), Vector2.new(minX - 4.7, crossZ), true)
+	for i, x0 in rackXs do
+		-- nicht genau auf die Einmündung des Hauptbands setzen
+		local x = if math.abs(x0 - kilnX) < 2.5 then x0 + (if x0 >= kilnX then 2.6 else -2.6) else x0
+		local pusher = group(line, `Pusher{i}`)
+		part(pusher, "Body", Vector3.new(1.8, 1.4, 1.2), at(x, beltY + 0.4, crossZ + 2.5), GREY_BOX, Enum.Material.Metal)
+		cylinder(pusher, "Rod", 1.2, 0.3, at(x, beltY + 0.4, crossZ + 1.5) * CFrame.Angles(0, math.rad(90), 0), YELLOW, Enum.Material.Metal).CanCollide = false
+		part(pusher, "Plate", Vector3.new(1.6, 0.6, 0.12), at(x, beltY + 0.4, crossZ + 0.9), STEEL_DARK, Enum.Material.Metal).CanCollide = false
+		part(pusher, "Stand", Vector3.new(0.4, beltY - 0.3, 0.4), at(x, (beltY - 0.3) / 2, crossZ + 2.5), YELLOW, Enum.Material.Metal)
+		local chute = group(line, `RackChute{i}`)
+		local c0, c1 = at(x, beltY - 0.1, crossZ - 1.6).Position, at(x, 1.1, rackBackZ + 0.15).Position
+		local cl = (c1 - c0).Magnitude
+		local ccf = CFrame.lookAt((c0 + c1) / 2, c1)
+		part(chute, "Slide", Vector3.new(2.2, 0.15, cl), ccf, STEEL_LIGHT, Enum.Material.DiamondPlate)
+		for _, sx in { -1, 1 } do
+			part(chute, `Side{sx}`, Vector3.new(0.12, 0.4, cl), ccf * CFrame.new(sx * 1.1, 0.2, 0), YELLOW, Enum.Material.Metal)
+		end
+	end
+	return line
 end
 
 function SmelterTemplate.build(plotCFrame: CFrame): Model
@@ -449,40 +624,9 @@ function SmelterTemplate.build(plotCFrame: CFrame): Model
 	lampLight.Range = 10
 	lampLight.Parent = lamp
 
-	-- Schnecke im offenen gelben Rahmen von der Spitze zum Ausgangslager
-	local screw = group(model, "Screw")
+	-- Barrenstrecke: Kühlstation hinter der Ofenspitze, Förderband zum Ausgangslager, Verteilband
 	local outputX, outputZ = zRight + 30, zFront + 37
-	local sFrom = pos(kilnX, 4, frontZ - 3)
-	local sTo = pos(kilnX, 6, outputZ + CrateRackBuilder.Depth / 2 + 2)
-	local sLen = (sTo - sFrom).Magnitude
-	local sCF = CFrame.lookAt((sFrom + sTo) / 2, sTo)
-	local screwSpin = group(screw, "ScrewSpin")
-	local core = part(screwSpin, "Core", Vector3.new(1.2, 1.2, sLen), sCF, STEEL_DARK, Enum.Material.Metal)
-	core.CanCollide = false
-	screwSpin.PrimaryPart = core
-	local turns = math.floor(sLen / 1.2)
-	for i = 1, turns do
-		local flight = part(screwSpin, `Flight{i}`, Vector3.new(4.2, 0.25, 1), sCF * CFrame.new(0, 0, -sLen / 2 + i * 1.2) * CFrame.Angles(0, 0, math.rad(i * 30)), SHELL_LIGHT, Enum.Material.Metal)
-		flight.CanCollide = false
-	end
-	for _, sx in { -1, 1 } do
-		for _, sy in { -1, 1 } do
-			part(screw, `Rail{sx}_{sy}`, Vector3.new(0.35, 0.35, sLen), sCF * CFrame.new(sx * 2.6, sy * 2.6, 0), YELLOW, Enum.Material.Metal)
-		end
-	end
-	AmbientProps.spin(screwSpin, "Z", 120, true)
-	local frames = math.floor(sLen / 5)
-	for i = 0, frames do
-		local f = sCF * CFrame.new(0, 0, -sLen / 2 + i * (sLen / frames))
-		for _, sx in { -1, 1 } do
-			part(screw, `Hoop{i}_{sx}`, Vector3.new(0.3, 5.5, 0.3), f * CFrame.new(sx * 2.6, 0, 0), YELLOW, Enum.Material.Metal)
-		end
-		part(screw, `HoopTop{i}`, Vector3.new(5.5, 0.3, 0.3), f * CFrame.new(0, 2.6, 0), YELLOW, Enum.Material.Metal)
-		local legH = f.Position.Y - 2.6 - (plotCFrame.Position.Y + floorY)
-		for _, sx in { -1, 1 } do
-			part(screw, `Leg{i}_{sx}`, Vector3.new(0.35, legH, 0.35), CFrame.new((f * CFrame.new(sx * 2.6, -2.6 - legH / 2, 0)).Position), YELLOW, Enum.Material.Metal)
-		end
-	end
+	SmelterTemplate.buildBarLine(model, plotCFrame, kilnX, frontZ - 1.2, { outputX + 13.5, outputX + 4.5, outputX - 4.5, outputX - 13.5 }, outputZ + CrateRackBuilder.Depth / 2)
 
 	-- Ausgangslager vorne (4 Hochregale, Fächer nach vorne zur Garage)
 	store(model, "OutputStore", at(outputX, 0, outputZ), -1, "Bar Output")
@@ -719,19 +863,6 @@ function SmelterTemplate.build(plotCFrame: CFrame): Model
 	prompt:SetAttribute("SmelterTerminal", true)
 	prompt.Parent = promptPart
 
-	-- Trichter über dem Ende der Schnecke (quadratischer Kasten mit Spitzdach wie im Bild)
-	local hopper = group(model, "Hopper")
-	local hz = zFront + 51
-	for _, sx in { -1, 1 } do
-		for _, sz in { -1, 1 } do
-			part(hopper, `Leg{sx}_{sz}`, Vector3.new(0.5, 9.2, 0.5), at(kilnX + sx * 4.5, 4.6, hz + sz * 4.5), YELLOW, Enum.Material.Metal)
-		end
-	end
-	part(hopper, "Box", Vector3.new(9.6, 3.2, 9.6), at(kilnX, 9.2 + 1.6, hz), STEEL, Enum.Material.Metal)
-	part(hopper, "Roof1", Vector3.new(7.2, 1.2, 7.2), at(kilnX, 9.2 + 3.8, hz), STEEL_LIGHT, Enum.Material.DiamondPlate)
-	part(hopper, "Roof2", Vector3.new(4.4, 1, 4.4), at(kilnX, 9.2 + 4.9, hz), STEEL_LIGHT, Enum.Material.DiamondPlate)
-	part(hopper, "Roof3", Vector3.new(1.6, 1, 1.6), at(kilnX, 9.2 + 5.9, hz), STEEL_DARK, Enum.Material.Metal)
-
 	-- Schwarze Rippenschläuche (Abluft) links im Ofenbereich, wie im Bild
 	hose(model, "HoseA", at, zLeft - 53, zLeft - 13, zz - 40)
 	hose(model, "HoseB", at, zLeft - 53, zLeft - 13, zz - 80)
@@ -782,7 +913,6 @@ function SmelterTemplate.build(plotCFrame: CFrame): Model
 
 	-- Leben: Rundumleuchten im Betrieb, Arbeiter auf dem Gehweg, blinkende Kontroll-LEDs
 	AmbientProps.beacon(model, "BeaconFeedBin", at(kilnX + 4, gh + 11.4, backZ - 3), true)
-	AmbientProps.beacon(model, "BeaconHopper", at(kilnX + 4.3, 12.4, hz - 4.3), true)
 	AmbientProps.staffPath(model, "StaffKiln", { pos(kilnX + 24, 0, frontZ - 16), pos(kilnX + 24, 0, frontZ + 20), pos(kilnX + 22, 0, frontZ + 40) })
 	AmbientProps.staffPath(model, "StaffOutput", { pos(outputX + 19, 0, outputZ - 11), pos(outputX - 13, 0, outputZ - 11) })
 	for _, d in model:GetDescendants() do

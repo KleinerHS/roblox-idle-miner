@@ -527,6 +527,10 @@ Selbsttest 13b-10 (2026-10-15): Sichtprüfung vorn/seitlich; keine Überschneidu
 |---|---|---|
 | Hubwagen nach Felix' Vorlage: gelbes Gestell mit hohem Rahmen und dreieckigen Seitenblechen, Gabeln mit schrägen Spitzen, Rollenfenstern, Tandem-Lastrollen und Schubstangen, großes Lenkrad mit Gabel, Hydraulikpumpe mit Feder, schwarze Deichsel mit Tropfengriff und Hebel; beide Hubwagen (Packplatz, Werkstatt) im HallLayout an ihrer Stelle getauscht | `AmbientProps.palletTruck` | TESTING_REQUIRED |
 
+| 13b-12 Barrenstrecke | Dateien | Status |
+|---|---|---|
+| Kühlstation direkt hinter der Ofenspitze (Einlaufrutsche mit Glut, Kühlband im Gehäuse mit Sichtfenstern, Barren von glühend nach stahlgrau, 2 Lüfter mit Rotor und Dampf, Sprühleitungen, Wassertank, Schaltkasten, Schrift „Cooling“), Rollenförderband bis hinter das Ausgangslager, Verteilband entlang der Regalrückseiten mit Abschiebern und Rutschen in jedes Regal; ersetzt Schnecke und Trichter im Code; im HallLayout passend zu Felix' Regalpositionen eingesetzt | `SmelterTemplate.buildBarLine` | TESTING_REQUIRED |
+
 ## Phase 12 – Content Expansion – Details
 
 Schritte: 12a alle Minen/Erze/Barren über zentrale Kurven · 12b weitere Spitzhacken, Rucksäcke, Drills, Fahrzeuge, Ausbaustufen (offen).
