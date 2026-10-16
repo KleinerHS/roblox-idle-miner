@@ -543,6 +543,12 @@ Selbsttest 13b-14 (2026-10-16): alle 5 Fahrzeuge auf beiden Stellplätzen geprü
 
 Felix 2026-10-16: „Halle erst mal abschließen … ist schon ganz gut, machen wir erst mal weiter“ → Phase 13b vorläufig freigegeben, Feinschliff später.
 
+Selbsttest Beladen im Play (2026-10-16, Felix' Pickup): alter, zu weit vorne geparkter Pickup → Anzeige „Move back“, kein Beladen; frisch ausgeparkt steht die Ladefläche 0,2 vom Rüssel → Beladen startet, Teleskop fährt in ~0,6 s aus, Düse 2,2 über der Ladefläche (0,6 über der sichtbaren Ladung), Anzeige zählt 50er-Schritte, bei 1.000/1.000 „Full“, Lampe blau, Rüssel fährt ein. Dev-Werkzeug `UnloadVehicle` (Ladung zurück ins Lager) ergänzt.
+
+| Offline-Lohn (D-040) | Dateien | Status |
+|---|---|---|
+| Während der Offline-Zeit wird kein Lohn abgezogen, alle Worker arbeiten weiter; online unverändert | `OfflineSimulation` | TESTING_REQUIRED |
+
 ## Phase 12 – Content Expansion – Details
 
 Schritte: 12a alle Minen/Erze/Barren über zentrale Kurven · 12b weitere Spitzhacken, Rucksäcke, Drills, Fahrzeuge, Ausbaustufen (offen).

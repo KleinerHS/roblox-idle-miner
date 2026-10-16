@@ -247,3 +247,9 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Source:** Felix, 2026-10-13 („es soll nicht so leer und tot wirken“)
 **Decision:** Bewegung (Stapler, Lüfter, Rundumleuchten, Ofentrommel, Schnecke, LEDs) und dekorative Arbeiter laufen nur auf dem Client über Tags (AmbientTags), ohne Spiellogik und nur in Kameranähe. Die Objekte stecken in den Gebäuden und sind wie alles andere im HallLayout verschiebbar (Laufwege = unsichtbare Punkte P1…Pn).
 **Affected systems:** World-Builder, Client
+
+## D-040 – Kein Lohn während der Offline-Zeit
+
+**Source:** Felix, 2026-10-16
+**Decision:** Während der Offline-Zeit (max. 1 h) wird kein Worker-Lohn abgezogen; alle Worker arbeiten weiter. Online gilt der Lohn unverändert (jede Minute). Ändert D-032 (dort: Lohn auch offline).
+**Affected systems:** OfflineSimulation, Offline-Fenster (Lohnzeile entfällt, da 0)

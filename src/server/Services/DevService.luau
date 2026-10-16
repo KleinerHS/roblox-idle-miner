@@ -165,6 +165,27 @@ function DevService.Init()
 	end
 	addStorage.Parent = folder
 
+	-- Ladung eines Fahrzeugs zurück ins Lager legen (zum Testen des Verladeturms):
+	--   game.ServerStorage.DevTools.UnloadVehicle:Invoke(game.Players:GetPlayers()[1], "v4")
+	local unload = Instance.new("BindableFunction")
+	unload.Name = "UnloadVehicle"
+	unload.OnInvoke = function(player: Player, vehicleId: string): string
+		local moved = 0
+		local ok = DataService.Mutate(player, function(data)
+			local record = data.Vehicles.Owned[vehicleId]
+			if not record then
+				return
+			end
+			for material, n in record.Cargo do
+				data.Storage.Items[material] = (data.Storage.Items[material] or 0) + n
+				moved += n
+			end
+			record.Cargo = {}
+		end)
+		return if ok then `ok ({moved} zurück ins Lager)` else "Profil nicht geladen"
+	end
+	unload.Parent = folder
+
 	-- Gekaufte Mine setzen/entfernen (ab Mine 03):
 	--   game.ServerStorage.DevTools.SetMineUnlocked:Invoke(game.Players:GetPlayers()[1], "mine_003", false)
 	local setMine = Instance.new("BindableFunction")

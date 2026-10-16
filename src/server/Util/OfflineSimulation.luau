@@ -5,7 +5,7 @@
 -- Verfahren (D-032): Die Zeit wird in Abschnitte zu STEP_SECONDS (= eine Elevator-Fahrt)
 -- geteilt, höchstens 3600 / 10 = 360 Abschnitte. Je Abschnitt laufen dieselben Regeln wie
 -- online, nur mit Raten × Abschnittsdauer:
---   Lohn (jede volle Minute, Einstellungsreihenfolge, unbezahlte Worker pausieren)
+--   kein Lohn offline (D-040): alle Worker arbeiten
 --   → Mining-Worker/Drills füllen den Slot-Puffer (bis Kapazität)
 --   → Transport-Worker bringen Erz zum Elevator (bis Elevator-Kapazität)
 --   → Elevator-Fahrt ins Lager (bis Lagerkapazität, niedrigste Erz-Stufe zuerst)
@@ -25,7 +25,6 @@ local Drills = require(Shared.Definitions.Drills)
 local Ores = require(Shared.Definitions.Ores)
 local Conveyors = require(Shared.Definitions.Conveyors)
 local Materials = require(Shared.Definitions.Materials)
-local WorkerRoles = require(Shared.Definitions.WorkerRoles)
 local SmelterLogic = require(Shared.Util.SmelterLogic)
 local Types = require(Shared.Types)
 local CrateLogic = require(Shared.Util.CrateLogic)
@@ -136,19 +135,12 @@ function OfflineSimulation.run(data: Types.PlayerData, seconds: number): Summary
 	for step = 0, steps - 1 do
 		local t = step * STEP_SECONDS
 
-		-- Lohn zu Beginn jeder Minute (docs/05 §6, docs/14 §10)
+		-- Offline wird kein Lohn bezahlt (Felix 2026-10-16, D-040): alle Worker arbeiten, das
+		-- Geld bleibt unverändert. Online gilt der Lohn weiter (WorkerService).
 		if t % PAYROLL_SECONDS == 0 then
 			paid = {}
 			for _, worker in workers do
-				local role = WorkerRoles.Get(worker.Role)
-				local wage = if role then role.WagePerMinute else 0
-				if data.Cash >= wage then
-					data.Cash -= wage
-					summary.WagesPaid += wage
-					paid[worker.Id] = true
-				else
-					summary.UnpaidMinutes += 1
-				end
+				paid[worker.Id] = true
 			end
 		end
 
