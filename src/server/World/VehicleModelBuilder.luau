@@ -20,6 +20,73 @@ local Vehicles = require(ReplicatedStorage:WaitForChild("Shared").Definitions.Ve
 
 local VehicleModelBuilder = {}
 
+-- Karosserie-Vorlagen aus der Place (Felix' Fahrzeugmodelle, 2026-10-18): ServerStorage.Vendor.
+-- VehicleBodies.<VehicleId>. Aufbau (vorbereitet mit tools/PrepareVehicleBodies.luau):
+--   Pivot = Boden unter der Achsmitte, -Z = Fahrtrichtung
+--   Attribute WheelRadius, WheelWidth, Track, FrontZ, RearZ
+--   Model "Body" (Optik), Models "WheelFL/FR/RL/RR" (Radoptik, um die Radmitte),
+--   Part "CargoFill" (Ladung; Attribut CargoHidden = geschlossener Aufbau, Beladen übers Dach),
+--   Part "SeatMarker" (Fahrersitz)
+-- Ohne Vorlage baut der Builder wie bisher eigene Karosserien.
+local function bodyTemplate(defId: string): Model?
+	local vendor = game:GetService("ServerStorage"):FindFirstChild("Vendor")
+	local bodies = vendor and vendor:FindFirstChild("VehicleBodies")
+	local t = bodies and bodies:FindFirstChild(defId)
+	return if t and t:IsA("Model") then t else nil
+end
+
+type TemplateSpec = { r: number, w: number, track: number, front: number, rear: number }
+local function templateSpec(t: Model): TemplateSpec
+	return {
+		r = t:GetAttribute("WheelRadius") :: number,
+		w = t:GetAttribute("WheelWidth") :: number,
+		track = t:GetAttribute("Track") :: number,
+		front = t:GetAttribute("FrontZ") :: number,
+		rear = t:GetAttribute("RearZ") :: number,
+	}
+end
+
+-- Teile einer Vorlage an `cf` versetzen (relativ zum Vorlagen-Pivot)
+local function placeFromTemplate(t: Model, inst: Instance, cf: CFrame, parent: Instance, anchored: boolean)
+	local clone = inst:Clone()
+	local origin = t:GetPivot()
+	local parts: { BasePart } = {}
+	if clone:IsA("BasePart") then
+		table.insert(parts, clone)
+	end
+	for _, d in clone:GetDescendants() do
+		if d:IsA("BasePart") then
+			table.insert(parts, d)
+		end
+	end
+	for _, p in parts do
+		p.CFrame = cf * origin:ToObjectSpace(p.CFrame)
+		p.Anchored = anchored
+		p.CanTouch = false
+		if not anchored then
+			p.Massless = true
+		end
+	end
+	clone.Parent = parent
+	return clone
+end
+
+-- Ausstellungs-/Garagenbau aus einer Vorlage (alles verankert)
+local function buildFromTemplate(def: Vehicles.VehicleDefinition, t: Model, cf: CFrame): Model
+	local model = Instance.new("Model")
+	model.Name = def.Id
+	model:SetAttribute("VehicleType", def.Id)
+	for _, child in t:GetChildren() do
+		if child.Name ~= "SeatMarker" then
+			local c = placeFromTemplate(t, child, cf, model, true)
+			if c:IsA("BasePart") and c.Name == "CargoFill" then
+				c.Transparency = 1
+			end
+		end
+	end
+	return model
+end
+
 local GLASS = Color3.fromRGB(120, 160, 185)
 local TRIM = Color3.fromRGB(36, 38, 42)
 local CHROME = Color3.fromRGB(196, 200, 206)
@@ -346,6 +413,10 @@ end
 
 -- Baut ein Fahrzeug. drivable = false: Ausstellungsstück (verankert, ohne Sitz/Gelenke).
 function VehicleModelBuilder.build(def: Vehicles.VehicleDefinition, cf: CFrame, drivable: boolean): Model
+	local template = bodyTemplate(def.Id)
+	if template and not drivable then
+		return buildFromTemplate(def, template, cf)
+	end
 	local spec = SPECS[def.Style]
 	local model = Instance.new("Model")
 	model.Name = def.Id
@@ -494,7 +565,8 @@ function VehicleModelBuilder.buildAChassis(def: Vehicles.VehicleDefinition, cf: 
 	if not (kit and kit:IsA("Model") and tuneTemplate) then
 		return nil
 	end
-	local spec = SPECS[def.Style]
+	local template = bodyTemplate(def.Id)
+	local spec: any = if template then templateSpec(template) else SPECS[def.Style]
 	local car = kit:Clone()
 	car.Name = def.Id
 	car:SetAttribute("VehicleType", def.Id)
@@ -539,7 +611,12 @@ function VehicleModelBuilder.buildAChassis(def: Vehicles.VehicleDefinition, cf: 
 			wheel.Material = Enum.Material.Rubber
 			wheel.Transparency = 0
 			local parts = wheel:FindFirstChild("Parts")
-			if parts then
+			local visual = template and template:FindFirstChild(`Wheel{name}`)
+			if parts and visual then
+				-- Radoptik aus der Vorlage dreht mit dem Rad (A-Chassis verschweißt "Parts")
+				wheel.Transparency = 1
+				placeFromTemplate(template :: Model, visual, cf, parts, true)
+			elseif parts then
 				local rim = Instance.new("Part")
 				rim.Name = "Rim"
 				rim.Shape = Enum.PartType.Cylinder
@@ -555,19 +632,38 @@ function VehicleModelBuilder.buildAChassis(def: Vehicles.VehicleDefinition, cf: 
 		end
 	end
 
-	-- Unsere Karosserie (Ausstellungs-Bau) übernehmen: ohne eigenes Chassis, Sitz und Räder
-	local display = VehicleModelBuilder.build(def, cf, false)
-	local seatPart = display:FindFirstChild("DriverSeat")
-	local seatCF = if seatPart and seatPart:IsA("BasePart") then seatPart.CFrame else cf * CFrame.new(-1.5, spec.r + 1.5, -2)
-	for _, child in display:GetChildren() do
-		local n = child.Name
-		if n == "Chassis" or n == "DriverSeat" or n:sub(1, 5) == "Wheel" then
-			child:Destroy()
-		elseif child:IsA("BasePart") then
-			child.Parent = body
+	local seatCF: CFrame
+	if template then
+		-- Karosserie aus der Vorlage (Felix' Modelle)
+		local marker = template:FindFirstChild("SeatMarker")
+		seatCF = if marker and marker:IsA("BasePart") then cf * template:GetPivot():ToObjectSpace(marker.CFrame) else cf * CFrame.new(-1.5, spec.r + 1.5, -2)
+		local tBody = template:FindFirstChild("Body")
+		if tBody then
+			for _, child in tBody:GetChildren() do
+				placeFromTemplate(template, child, cf, body, true)
+			end
 		end
+		local fill = template:FindFirstChild("CargoFill")
+		if fill then
+			local c = placeFromTemplate(template, fill, cf, body, true) :: BasePart
+			c.Transparency = 1
+			c.CanCollide = false
+		end
+	else
+		-- Unsere Karosserie (Ausstellungs-Bau) übernehmen: ohne eigenes Chassis, Sitz und Räder
+		local display = VehicleModelBuilder.build(def, cf, false)
+		local seatPart = display:FindFirstChild("DriverSeat")
+		seatCF = if seatPart and seatPart:IsA("BasePart") then seatPart.CFrame else cf * CFrame.new(-1.5, spec.r + 1.5, -2)
+		for _, child in display:GetChildren() do
+			local n = child.Name
+			if n == "Chassis" or n == "DriverSeat" or n:sub(1, 5) == "Wheel" then
+				child:Destroy()
+			elseif child:IsA("BasePart") then
+				child.Parent = body
+			end
+		end
+		display:Destroy()
 	end
-	display:Destroy()
 	-- Fahrersitz an unsere Position (Blickrichtung = Fahrtrichtung)
 	seat.CFrame = seatCF
 	seat.Color = SEAT
@@ -601,7 +697,8 @@ end
 function VehicleModelBuilder.setCargoVisual(model: Model, fraction: number)
 	local cargo = model:FindFirstChild("CargoFill", true)
 	if cargo and cargo:IsA("BasePart") then
-		cargo.Transparency = if fraction > 0 then 0 else 1
+		-- Geschlossener Aufbau: Ladung bleibt unsichtbar (Beladen übers Dach)
+		cargo.Transparency = if fraction > 0 and not cargo:GetAttribute("CargoHidden") then 0 else 1
 	end
 end
 

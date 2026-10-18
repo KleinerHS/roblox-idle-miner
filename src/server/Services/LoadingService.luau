@@ -162,7 +162,8 @@ local function tickBay(player: Player, data: Types.PlayerData, garage: Model, ba
 	local fill = model:FindFirstChild("CargoFill", true)
 	if fill and fill:IsA("BasePart") then
 		local surface = fill.Position.Y - fill.Size.Y / 2
-		local top = if fill.Transparency < 1 then fill.Position.Y + fill.Size.Y / 2 else surface
+		-- Geschlossener Aufbau (CargoHidden): Rüssel stoppt über dem Dach (Oberkante CargoFill)
+		local top = if fill.Transparency < 1 or fill:GetAttribute("CargoHidden") then fill.Position.Y + fill.Size.Y / 2 else surface
 		bottomY = top + SPOUT_CLEARANCE
 	end
 	return { state = "Loading", vehicleId = vehicleId, extended = true, bottomY = bottomY }
