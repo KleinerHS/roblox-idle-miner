@@ -111,7 +111,7 @@ local BalanceConfig = {
 	--   Kosten Level n → n+1 = Drill-Preis × UpgradeCostShare × UpgradeCostGrowth^(n − 1)
 	Drills = {
 		MaxLevel = 10, -- Felix (D-043: „lvl 1-10“)
-		ProductionBonusPerLevel = 0.10, -- TODO_BALANCE (Startwert, Lv 10 = +90 %)
+		ProductionBonusPerLevel = 0.05, -- Felix 2026-10-18 (Lv 10 = +45 %)
 		UpgradeCostShare = 0.2, -- TODO_BALANCE
 		UpgradeCostGrowth = 1.35, -- TODO_BALANCE
 	},
