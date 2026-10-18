@@ -64,12 +64,25 @@ local list: { DrillDefinition } = {
 		BodyColor = Color3.fromRGB(60, 120, 190),
 		PersistenceClass = "Progression",
 	},
-	-- MK4–MK6 (Phase 12b, Startwert D-036): Preis ≈ 25.000 × Erzwert auf diesem Level (wie MK3),
-	-- Puffer = 5 Minuten Produktion. Modellgröße wie MK3 (passt in jeden Mining-Slot).
+	-- Weitere Stufen (Phase 12b D-036, Phase 14c D-044): Preis ≈ 25.000 × Erzwert auf diesem Level
+	-- (wie MK3), Puffer = 5 Minuten Produktion. Modellgröße wie MK3 (passt in jeden Mining-Slot).
+	-- Anzeige-Nummer = Reihenfolge; die IDs bleiben stabil (drill_mk4 heißt seit D-044 „MK5“ usw.).
 	{
-		Id = "drill_mk4",
+		Id = "drill_mk7",
 		DisplayName = "Drill MK4",
 		Tier = 4,
+		RequiredLevel = 18, -- Startwert (D-044)
+		Price = 200000, -- Startwert (D-044): ≈ 25.000 × Erzwert auf diesem Level
+		OrePerCycle = 40, -- Startwert (D-044) → 800 Erz/Min
+		CycleSeconds = 3,
+		OutputCapacity = 4000, -- 5 Minuten Produktion
+		BodyColor = Color3.fromRGB(150, 110, 60),
+		PersistenceClass = "Progression",
+	},
+	{
+		Id = "drill_mk4",
+		DisplayName = "Drill MK5",
+		Tier = 5,
 		RequiredLevel = 25, -- Startwert (D-036)
 		Price = 1300000, -- Startwert (D-036)
 		OrePerCycle = 60, -- Startwert (D-036) → 1.200 Erz/Min
@@ -79,9 +92,21 @@ local list: { DrillDefinition } = {
 		PersistenceClass = "Progression",
 	},
 	{
+		Id = "drill_mk8",
+		DisplayName = "Drill MK6",
+		Tier = 6,
+		RequiredLevel = 35, -- Startwert (D-044)
+		Price = 22000000, -- Startwert (D-044): ≈ 25.000 × Erzwert auf diesem Level
+		OrePerCycle = 95, -- Startwert (D-044) → 1,900 Erz/Min
+		CycleSeconds = 3,
+		OutputCapacity = 9500, -- 5 Minuten Produktion
+		BodyColor = Color3.fromRGB(90, 60, 140),
+		PersistenceClass = "Progression",
+	},
+	{
 		Id = "drill_mk5",
-		DisplayName = "Drill MK5",
-		Tier = 5,
+		DisplayName = "Drill MK7",
+		Tier = 7,
 		RequiredLevel = 45, -- Startwert (D-036)
 		Price = 98000000, -- Startwert (D-036)
 		OrePerCycle = 150, -- Startwert (D-036) → 3.000 Erz/Min
@@ -91,15 +116,63 @@ local list: { DrillDefinition } = {
 		PersistenceClass = "Progression",
 	},
 	{
+		Id = "drill_mk9",
+		DisplayName = "Drill MK8",
+		Tier = 8,
+		RequiredLevel = 58, -- Startwert (D-044)
+		Price = 800000000, -- Startwert (D-044): ≈ 25.000 × Erzwert auf diesem Level
+		OrePerCycle = 240, -- Startwert (D-044) → 4,800 Erz/Min
+		CycleSeconds = 3,
+		OutputCapacity = 24000, -- 5 Minuten Produktion
+		BodyColor = Color3.fromRGB(170, 140, 60),
+		PersistenceClass = "Progression",
+	},
+	{
 		Id = "drill_mk6",
-		DisplayName = "Drill MK6",
-		Tier = 6,
+		DisplayName = "Drill MK9",
+		Tier = 9,
 		RequiredLevel = 70, -- Startwert (D-036)
 		Price = 6500000000, -- Startwert (D-036)
 		OrePerCycle = 375, -- Startwert (D-036) → 7.500 Erz/Min
 		CycleSeconds = 3,
 		OutputCapacity = 37500, -- Startwert (D-036)
 		BodyColor = Color3.fromRGB(40, 40, 46),
+		PersistenceClass = "Progression",
+	},
+	{
+		Id = "drill_mk10",
+		DisplayName = "Drill MK10",
+		Tier = 10,
+		RequiredLevel = 80, -- Startwert (D-044)
+		Price = 30000000000, -- Startwert (D-044): ≈ 25.000 × Erzwert auf diesem Level
+		OrePerCycle = 600, -- Startwert (D-044) → 12,000 Erz/Min
+		CycleSeconds = 3,
+		OutputCapacity = 60000, -- 5 Minuten Produktion
+		BodyColor = Color3.fromRGB(200, 200, 210),
+		PersistenceClass = "Progression",
+	},
+	{
+		Id = "drill_mk11",
+		DisplayName = "Drill MK11",
+		Tier = 11,
+		RequiredLevel = 90, -- Startwert (D-044)
+		Price = 180000000000, -- Startwert (D-044): ≈ 25.000 × Erzwert auf diesem Level
+		OrePerCycle = 900, -- Startwert (D-044) → 18,000 Erz/Min
+		CycleSeconds = 3,
+		OutputCapacity = 90000, -- 5 Minuten Produktion
+		BodyColor = Color3.fromRGB(210, 170, 60),
+		PersistenceClass = "Progression",
+	},
+	{
+		Id = "drill_mk12",
+		DisplayName = "Drill MK12",
+		Tier = 12,
+		RequiredLevel = 100, -- Startwert (D-044)
+		Price = 800000000000, -- Startwert (D-044): ≈ 25.000 × Erzwert auf diesem Level
+		OrePerCycle = 1350, -- Startwert (D-044) → 27,000 Erz/Min
+		CycleSeconds = 3,
+		OutputCapacity = 135000, -- 5 Minuten Produktion
+		BodyColor = Color3.fromRGB(100, 220, 230),
 		PersistenceClass = "Progression",
 	},
 }

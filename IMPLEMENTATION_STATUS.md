@@ -21,7 +21,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 11 | Prestige | TESTING_REQUIRED (Version 0.18.0; Bonus D-034 und Reset-Liste D-033 bestätigt) |
 | 12 | Content Expansion | TESTING_REQUIRED (12a D-035, 12b D-036, 12c Fahrzeuge – Werte Q-028 offen) |
 | 13 | Visual Polish | TESTING_REQUIRED (13a Map & Umgebung, 13b Halle/Lager/Ofen, 13c Mine-Shaft, 13d Licht/Effekte/Sound, 13e UI-Feinschliff; alle Teilschritte warten auf Felix' Test) |
-| 14 | Balance | TESTING_REQUIRED (14a Simulation & Bericht, 14b Umsetzung D-041–D-043) |
+| 14 | Balance | TESTING_REQUIRED (14a Simulation & Bericht, 14b Umsetzung D-041–D-043, 14c Drill-Stufen D-044) |
 
 ## Setup – Details
 
@@ -610,6 +610,14 @@ Ergebnis: Level 100 nach ~6,5 h aktivem Spiel; Transport begrenzt Automation auf
 
 Simulation mit den neuen Werten (aktives Dauerspiel): L10 1 h 08 min · L25 4 h 50 min · L50 18 h 00 min · L100 52 h 36 min (Ziel 1 / 5 / 20 / 50 h).
 Selbsttest (Play, Felix' Profil): Migration v9 → v10, 6 Transport-Worker entlassen, +$9.000 erstattet; XP-Bedarf L17 = 36.313; UpgradeDrill ohne Laptop-Nähe → TOO_FAR; Transport-Worker einstellen → NOT_AVAILABLE; keine Fehler. Direkt-Fluss nicht sichtbar prüfbar, weil Felix' Lager voll ist (Elevator 350/350 Kupfer wartet auf eine freie Kupfer-Kiste).
+
+### 14c – Mehr Drill-Stufen (Version 0.34.0, 2026-10-18)
+
+| System | Dateien | Status |
+|---|---|---|
+| 12 Drill-Stufen statt 6: neu bei Level 18, 35, 58, 80, 90, 100 (Preis ≈ 25.000 × Erzwert, Puffer 5 min), Anzeige MK1–MK12 nach Reihenfolge, IDs stabil; Upgrade am Laptop Stufe für Stufe (D-044) | `shared/Definitions/Drills.luau` | TESTING_REQUIRED |
+
+Selbsttest (Play): 12 Stufen in richtiger Reihenfolge geladen, Machine-Shop zeigt die neuen Drills (MK4 „Requires Mining Level 18“), keine Fehler.
 
 ## Phase 12 – Content Expansion – Details
 

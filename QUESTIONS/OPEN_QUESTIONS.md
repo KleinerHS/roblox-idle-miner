@@ -16,7 +16,7 @@ Q-026 ist beantwortet (D-035).
 
 Q-027 ist beantwortet (D-036).
 
-Q-029 bis Q-032 sind beantwortet (D-041, D-042, D-043; Felix 2026-10-18). Offen: Rückfrage „später mehr Drills“ (mehr Stufen oder mehr Plätze pro Mine).
+Q-029 bis Q-032 sind beantwortet (D-041, D-042, D-043; Felix 2026-10-18). Rückfrage „später mehr Drills“: mehr Stufen (D-044).
 
 ## Q-028 – Neue Fahrzeuge (Phase 12c)
 

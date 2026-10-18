@@ -271,3 +271,9 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Source:** Felix, 2026-10-18 (Q-032: „man soll Drills auch upgraden können auf dem Laptop“)
 **Decision:** Ein platzierter Drill lässt sich am Laptop (Employees, Slot-Karte) auf die nächste Stufe aufwerten, sofern das Level reicht. Kosten = Preisdifferenz der Stufen × `BalanceConfig.Drills.UpgradeCostFactor` (Startwert 1). Der Drill bleibt am Slot.
 **Affected systems:** DrillService, Drills, Laptop, Remotes
+
+## D-044 – Mehr Drill-Stufen
+
+**Source:** Felix, 2026-10-18 (Rückfrage „später mehr Drills“: „A“ = mehr Drill-Stufen; Upgrade am Laptop wie D-043)
+**Decision:** Sechs neue Stufen (Level 18, 35, 58, 80, 90, 100) schließen die Lücken zwischen MK3–MK6 und reichen bis Level 100: insgesamt 12 Stufen. Preis ≈ 25.000 × Erzwert auf dem Level (Regel aus D-036), Leistung geometrisch zwischen den Nachbarn, Puffer = 5 Minuten Produktion (Startwerte). Die Anzeige-Nummer folgt der Reihenfolge (MK1–MK12); die IDs bleiben stabil (z. B. `drill_mk4` heißt jetzt „Drill MK5“). Jede Stufe ist am Laptop auf die nächste aufwertbar.
+**Affected systems:** Drills, Machine-Shop, Laptop
