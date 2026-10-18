@@ -605,7 +605,7 @@ Ergebnis: Level 100 nach ~6,5 h aktivem Spiel; Transport begrenzt Automation auf
 | Erz geht direkt in den Elevator (Worker und Drills), keine Transport-Worker mehr; Einstellen von Transport-Workern gesperrt (D-041) | `ProductionService`, `OfflineSimulation`, `WorkerService`, `WorkerRoles` | TESTING_REQUIRED |
 | Migration v9 → v10: vorhandene Transport-Worker entlassen, Einstellungskosten voll erstattet | `DataSchema` | TESTING_REQUIRED |
 | Abschnittsweise XP-Kurve nach Zielzeiten (Exponenten 1,5 / 4,6 / 5,3 / 0 / 2 bis L10 / L25 / L50 / L100 / danach); Erz-XP an feste Bezugskurve gekoppelt und dadurch unverändert (D-042) | `BalanceConfig.Leveling`, `Leveling`, `ContentCurve` | TESTING_REQUIRED |
-| Drill-Upgrade am Laptop (Employees → Slot-Karte, Button UPGRADE $X / LEVEL n / MAX), Kosten = Preisdifferenz × Faktor (D-043) | `DrillService`, `Drills`, `LaptopController`, `Remotes`, `BalanceConfig.Drills` | TESTING_REQUIRED |
+| ~~Drill-Upgrade auf die nächste MK-Stufe~~ → ersetzt durch Drill-Level 1–10 (14d) | `DrillService`, `Drills`, `LaptopController`, `Remotes`, `BalanceConfig.Drills` | TESTING_REQUIRED |
 | Simulator: ohne Transport, Drill-Upgrade-Kosten, Elevator+Fahrzeug als Paket, XP-Kurven zum Ausprobieren | `tools/BalanceSim.luau` | IMPLEMENTED |
 
 Simulation mit den neuen Werten (aktives Dauerspiel): L10 1 h 08 min · L25 4 h 50 min · L50 18 h 00 min · L100 52 h 36 min (Ziel 1 / 5 / 20 / 50 h).
@@ -615,9 +615,18 @@ Selbsttest (Play, Felix' Profil): Migration v9 → v10, 6 Transport-Worker entla
 
 | System | Dateien | Status |
 |---|---|---|
-| 12 Drill-Stufen statt 6: neu bei Level 18, 35, 58, 80, 90, 100 (Preis ≈ 25.000 × Erzwert, Puffer 5 min), Anzeige MK1–MK12 nach Reihenfolge, IDs stabil; Upgrade am Laptop Stufe für Stufe (D-044) | `shared/Definitions/Drills.luau` | TESTING_REQUIRED |
+| 12 Drill-Stufen statt 6: neu bei Level 18, 35, 58, 80, 90, 100 (Preis ≈ 25.000 × Erzwert, Puffer 5 min), Anzeige MK1–MK12 nach Reihenfolge, IDs stabil; neue MK-Stufe nur per Kauf (D-044) | `shared/Definitions/Drills.luau` | TESTING_REQUIRED |
 
 Selbsttest (Play): 12 Stufen in richtiger Reihenfolge geladen, Machine-Shop zeigt die neuen Drills (MK4 „Requires Mining Level 18“), keine Fehler.
+
+### 14d – Drill-Level 1–10 am Laptop (Version 0.35.0, 2026-10-18)
+
+| System | Dateien | Status |
+|---|---|---|
+| Jeder Drill hat ein Level 1–10 (im DrillRecord), am Laptop Stufe für Stufe kaufbar: Button „LV n → n+1 $X“ / „MAX LEVEL“; +10 % Produktion je Level (kürzerer Zyklus), Puffer wächst mit; Kosten Preis × 0,2 × 1,35^(n−1) (D-043, TODO_BALANCE) | `BalanceConfig.Drills`, `Drills`, `DrillService`, `ProductionService`, `OfflineSimulation`, `TradeService`, `LaptopController`, `DrillSlotController`, `Types` | TESTING_REQUIRED |
+| MK-Stufen-Upgrade aus 14b entfernt (neue MK-Stufe nur per Kauf) | `Drills`, `DrillService`, `tools/BalanceSim.luau` | TESTING_REQUIRED |
+
+Selbsttest (Play, Felix' Profil): am Laptop Drill d7 (MK1, Mine 01) Level 1 → 2 für $1.600, Typ bleibt drill_mk1; Laptop Employees zeigt „Drill MK1 · Lv 2 · 66 ore / min“ und Button „LV 2 → 3 $2.16K“ (Bildschirmfoto); keine Fehler.
 
 ## Phase 12 – Content Expansion – Details
 

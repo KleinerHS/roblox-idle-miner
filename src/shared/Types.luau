@@ -20,6 +20,8 @@ export type DrillRecord = {
 	Type: string,
 	MineId: string?,
 	Slot: number?,
+	-- Upgrade-Level am Laptop (D-043), nil = 1
+	Level: number?,
 }
 
 -- Gekauftes Förderband (docs/10 §38–39): Slot gesetzt = eingesetzt, nil = im Inventar

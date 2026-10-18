@@ -63,7 +63,7 @@ local MESSAGES: { [string]: string } = {
 	CONVEYOR_PURCHASED = "{Name} purchased! Install it at a conveyor spot in your hall.",
 	CONVEYOR_PLACED = "{Name} installed!",
 	DRILL_REMOVED = "{Name} moved back to your inventory.",
-	DRILL_UPGRADED = "Drill upgraded to {Name}!",
+	DRILL_UPGRADED = "{Name} upgraded to level {Level}!",
 	NOT_OWNED = "You don't own this item yet.",
 
 	-- Worker
@@ -225,9 +225,9 @@ Strings.Laptop = table.freeze({
 	DrillStatus = { Running = "Running", OutputFull = "Output Full", Idle = "Idle" },
 	DrillRate = "%s ore / min",
 	RemoveDrill = "REMOVE",
-	UpgradeDrill = "UPGRADE %s",
-	UpgradeDrillLevel = "LEVEL %d",
-	UpgradeDrillMax = "MAX",
+	UpgradeDrill = "LV %d → %d  %s",
+	UpgradeDrillMax = "MAX LEVEL",
+	DrillLevel = "%s · Lv %d",
 	ProductionTitle = "PRODUCTION",
 	SmelterCard = "Smelter",
 	CompanyTitle = "COMPANY",

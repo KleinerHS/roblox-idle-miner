@@ -353,10 +353,8 @@ local function offers(st: State): { Offer }
 						a.slots[i][s] = target
 						if target == "worker" then
 							cost += W.Mining.HireCost
-						elseif cur ~= nil and cur ~= "worker" then
-							-- Upgrade am Laptop: Preisdifferenz × Faktor
-							cost += Drills.UpgradeCost(Drills.List[cur], Drills.List[target])
 						else
+							-- neue MK-Stufe nur per Kauf (D-043); Drill-Level 1–10 simuliert das Modell nicht
 							cost += Drills.List[target].Price
 						end
 						return cost

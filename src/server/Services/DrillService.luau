@@ -146,7 +146,7 @@ local function remove(player: Player, drillId: unknown)
 	return Result.ok(drillId)
 end
 
--- Upgrade am Laptop: platzierter Drill wird zur nächsten Stufe (bleibt am Slot)
+-- Drill-Level am Laptop (D-043): platzierter Drill steigt ein Level (1…MaxLevel), MK-Stufe bleibt
 local function upgrade(player: Player, drillId: unknown)
 	if typeof(drillId) ~= "string" then
 		return Result.err(Result.Codes.INVALID_ARGUMENT)
@@ -165,28 +165,28 @@ local function upgrade(player: Player, drillId: unknown)
 	if not WorkerService.IsNearLaptop(player) then
 		return Result.err(Result.Codes.TOO_FAR)
 	end
-	local current = Drills.Get(drill.Type)
-	local nextDef = current and Drills.Next(current.Id)
-	if not current or not nextDef then
+	local def = Drills.Get(drill.Type)
+	if not def then
+		return Result.err(Result.Codes.INVALID_ARGUMENT)
+	end
+	local level = Drills.LevelOf(drill)
+	local cost = Drills.LevelUpCost(def, level)
+	if not cost then
 		return Result.err(Result.Codes.ALREADY_DONE)
 	end
-	if data.MiningLevel < nextDef.RequiredLevel then
-		return Result.err(Result.Codes.LEVEL_TOO_LOW)
-	end
-	local cost = Drills.UpgradeCost(current, nextDef)
 	if data.Cash < cost then
 		return Result.err(Result.Codes.NOT_ENOUGH_MONEY)
 	end
 	-- Prüfung und Änderung ohne Yield dazwischen
 	DataService.Mutate(player, function(d)
 		d.Cash -= cost
-		d.Machines.Drills[drillId :: string].Type = nextDef.Id
+		d.Machines.Drills[drillId :: string].Level = level + 1
 	end)
 	DataService.RequestSave(player)
-	Log.debug(TAG, `{player.Name} wertet {drill.Type} → {nextDef.Id} auf ({drillId}, ${cost})`)
+	Log.debug(TAG, `{player.Name} wertet {drill.Type} ({drillId}) auf Level {level + 1} auf (${cost})`)
 	DrillService.DrillsChanged:Fire(player)
-	RemoteService.FireClient("Notify", player, { Kind = "Success", Code = "DRILL_UPGRADED", Args = { Name = nextDef.DisplayName } })
-	return Result.ok(nextDef.Id)
+	RemoteService.FireClient("Notify", player, { Kind = "Success", Code = "DRILL_UPGRADED", Args = { Name = def.DisplayName, Level = level + 1 } })
+	return Result.ok(level + 1)
 end
 
 function DrillService.Init()

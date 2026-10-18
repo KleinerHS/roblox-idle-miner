@@ -105,10 +105,15 @@ local BalanceConfig = {
 		FireRefund = 0, -- Felix (D-021)
 	},
 
-	-- Drill-Upgrade am Laptop (Felix 2026-10-18): platzierter Drill → nächste Stufe.
-	-- Kosten = (Preis neue Stufe − Preis alte Stufe) × Faktor.
+	-- Drill-Level am Laptop (Felix 2026-10-18, D-043): jeder Drill hat eigene Upgrade-Level
+	-- 1…MaxLevel, unabhängig von der MK-Stufe (neue MK-Stufe nur per Kauf).
+	--   Produktion × (1 + (Level − 1) × ProductionBonusPerLevel), Puffer wächst mit
+	--   Kosten Level n → n+1 = Drill-Preis × UpgradeCostShare × UpgradeCostGrowth^(n − 1)
 	Drills = {
-		UpgradeCostFactor = 1, -- TODO_BALANCE
+		MaxLevel = 10, -- Felix (D-043: „lvl 1-10“)
+		ProductionBonusPerLevel = 0.10, -- TODO_BALANCE (Startwert, Lv 10 = +90 %)
+		UpgradeCostShare = 0.2, -- TODO_BALANCE
+		UpgradeCostGrowth = 1.35, -- TODO_BALANCE
 	},
 
 	-- Elevator-Materialtransport (docs/06 §9–11).

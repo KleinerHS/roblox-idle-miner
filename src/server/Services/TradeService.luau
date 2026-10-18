@@ -178,7 +178,7 @@ local function execute(session: Session): (boolean, string?)
 	local log = { TradeId = session.id, A = a.UserId, B = b.UserId, Time = os.time(), FromA = {}, FromB = {} }
 	local function transfer(from: Player, to: Player, offer: Offer, entry: { [string]: any })
 		-- Drills behalten ihren Typ, bekommen beim Empfänger eine neue, dort eindeutige Instanz-ID
-		local moved: { { Type: string } } = {}
+		local moved: { { Type: string, Level: number? } } = {}
 		DataService.Mutate(from, function(d)
 			for id, n in offer.Materials do
 				d.Storage.Items[id] -= n
@@ -187,7 +187,7 @@ local function execute(session: Session): (boolean, string?)
 				end
 			end
 			for id in offer.Drills do
-				table.insert(moved, { Type = d.Machines.Drills[id].Type })
+				table.insert(moved, { Type = d.Machines.Drills[id].Type, Level = d.Machines.Drills[id].Level })
 				table.insert(entry, `drill {id} ({d.Machines.Drills[id].Type})`)
 				d.Machines.Drills[id] = nil
 			end
@@ -200,7 +200,7 @@ local function execute(session: Session): (boolean, string?)
 			for _, m in moved do
 				d.Machines.Seq += 1
 				local newId = `d{d.Machines.Seq}`
-				d.Machines.Drills[newId] = { Id = newId, Type = m.Type }
+				d.Machines.Drills[newId] = { Id = newId, Type = m.Type, Level = m.Level }
 			end
 		end)
 	end

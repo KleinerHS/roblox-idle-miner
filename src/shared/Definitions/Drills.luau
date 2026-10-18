@@ -193,28 +193,39 @@ function Drills.Scale(def: DrillDefinition): number
 	return 1 + (math.min(def.Tier, 3) - 1) * 0.25
 end
 
--- Nächste Drill-Stufe (für das Upgrade am Laptop) oder nil bei der höchsten Stufe
-function Drills.Next(id: string): DrillDefinition?
-	for i, def in Drills.List do
-		if def.Id == id then
-			return Drills.List[i + 1]
-		end
-	end
-	return nil
+-- Drill-Level (D-043): eigene Upgrade-Stufe 1…MaxLevel je Drill, gespeichert im DrillRecord
+Drills.MaxLevel = BalanceConfig.Drills.MaxLevel
+
+function Drills.LevelOf(record: { Level: number? }): number
+	return math.clamp(math.floor(record.Level or 1), 1, Drills.MaxLevel)
 end
 
--- Upgrade-Kosten von `from` auf die nächste Stufe (BalanceConfig.Drills)
-function Drills.UpgradeCost(from: DrillDefinition, to: DrillDefinition): number
-	return math.max(0, math.floor((to.Price - from.Price) * BalanceConfig.Drills.UpgradeCostFactor + 0.5))
+-- Produktionsfaktor eines Levels
+function Drills.Multiplier(level: number?): number
+	return 1 + (math.max(level or 1, 1) - 1) * BalanceConfig.Drills.ProductionBonusPerLevel
+end
+
+-- Puffer am Slot wächst mit dem Level (bleibt ~5 Minuten Produktion)
+function Drills.OutputCapacity(def: DrillDefinition, level: number?): number
+	return math.floor(def.OutputCapacity * Drills.Multiplier(level))
+end
+
+-- Kosten von `level` auf `level + 1` (nil bei MaxLevel)
+function Drills.LevelUpCost(def: DrillDefinition, level: number): number?
+	if level >= Drills.MaxLevel then
+		return nil
+	end
+	local cfg = BalanceConfig.Drills
+	return math.floor(def.Price * cfg.UpgradeCostShare * cfg.UpgradeCostGrowth ^ (level - 1) + 0.5)
 end
 
 function Drills.Get(id: string): DrillDefinition?
 	return byId[id]
 end
 
--- Erz pro Minute (für Anzeige und Produktion)
-function Drills.OrePerMinute(def: DrillDefinition): number
-	return def.OrePerCycle * 60 / def.CycleSeconds
+-- Erz pro Minute (für Anzeige und Produktion), optional mit Drill-Level
+function Drills.OrePerMinute(def: DrillDefinition, level: number?): number
+	return math.floor(def.OrePerCycle * 60 / def.CycleSeconds * Drills.Multiplier(level) + 0.5)
 end
 
 return table.freeze(Drills)

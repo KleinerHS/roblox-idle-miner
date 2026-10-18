@@ -179,7 +179,7 @@ function OfflineSimulation.run(data: Types.PlayerData, seconds: number): Summary
 			local cap = cfg.SlotBuffer * g.mining
 			for _, drill in g.drills do
 				local def = Drills.Get(drill.Type)
-				cap += if def then def.OutputCapacity else 0
+				cap += if def then Drills.OutputCapacity(def, drill.Level) else 0
 			end
 			cap = math.max(cap, cfg.SlotBuffer)
 
@@ -187,7 +187,7 @@ function OfflineSimulation.run(data: Types.PlayerData, seconds: number): Summary
 			for _, drill in g.drills do
 				local def = Drills.Get(drill.Type)
 				if def then
-					rate += def.OrePerCycle / def.CycleSeconds
+					rate += def.OrePerCycle / def.CycleSeconds * Drills.Multiplier(drill.Level)
 				end
 			end
 			if rate > 0 then

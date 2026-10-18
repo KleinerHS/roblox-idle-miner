@@ -152,11 +152,11 @@ local function render()
 	if placed then
 		local def = Drills.Get(placed.Type)
 		local box = card(1, 92)
-		textLabel(box, if def then def.DisplayName else placed.Type, 0, 20, UITheme.Colors.TextPrimary, true)
+		textLabel(box, `{if def then def.DisplayName else placed.Type} · Lv {Drills.LevelOf(placed)}`, 0, 20, UITheme.Colors.TextPrimary, true)
 		local text, color = statusText(StateController.GetStatus(placed.Id))
 		textLabel(box, text, 28, 15, color, true)
 		if def then
-			textLabel(box, string.format(TEXT.PerMinute, NumberFormat.withSeparators(Drills.OrePerMinute(def))), 50, 14, UITheme.Colors.TextSecondary)
+			textLabel(box, string.format(TEXT.PerMinute, NumberFormat.withSeparators(Drills.OrePerMinute(def, Drills.LevelOf(placed)))), 50, 14, UITheme.Colors.TextSecondary)
 		end
 		local id = placed.Id
 		actionButton(box, TEXT.Remove, UITheme.Colors.SurfaceRaised, function()

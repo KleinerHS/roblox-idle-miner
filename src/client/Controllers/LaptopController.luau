@@ -197,7 +197,8 @@ local function drillSlotCard(order: number, title: string, drill: Types.DrillRec
 		Parent = card,
 	})
 	local statusText, statusColor = drillStatus(drill.Id)
-	local rate = if def then string.format(TEXT.DrillRate, NumberFormat.withSeparators(Drills.OrePerMinute(def))) else ""
+	local level = Drills.LevelOf(drill)
+	local rate = if def then string.format(TEXT.DrillRate, NumberFormat.withSeparators(Drills.OrePerMinute(def, level))) else ""
 	Create("TextLabel", {
 		Position = UDim2.fromOffset(0, 34),
 		Size = UDim2.new(1, -320, 0, 18),
@@ -207,7 +208,7 @@ local function drillSlotCard(order: number, title: string, drill: Types.DrillRec
 		TextSize = 14,
 		TextColor3 = statusColor,
 		TextXAlignment = Enum.TextXAlignment.Left,
-		Text = `{if def then def.DisplayName else drill.Type} · {statusText} · {rate}`,
+		Text = `{string.format(TEXT.DrillLevel, if def then def.DisplayName else drill.Type, level)} · {statusText} · {rate}`,
 		Parent = card,
 	})
 	local button: TextButton = Create("TextButton", {
@@ -226,15 +227,10 @@ local function drillSlotCard(order: number, title: string, drill: Types.DrillRec
 		call("RemoveDrill", nil, id)
 	end)
 
-	-- Upgrade auf die nächste Stufe (Felix 2026-10-18)
-	local nextDef = def and Drills.Next(def.Id)
-	local snapshot = StateController.Get()
-	local level = if snapshot then snapshot.MiningLevel else 0
-	local cost = if def and nextDef then Drills.UpgradeCost(def, nextDef) else 0
-	local canUpgrade = nextDef ~= nil and level >= (nextDef :: any).RequiredLevel
-	local upgradeText = if not nextDef then TEXT.UpgradeDrillMax
-		elseif not canUpgrade then string.format(TEXT.UpgradeDrillLevel, (nextDef :: any).RequiredLevel)
-		else string.format(TEXT.UpgradeDrill, NumberFormat.cash(cost))
+	-- Drill-Level 1–10 (D-043); die MK-Stufe ändert sich nur per Kauf
+	local cost = if def then Drills.LevelUpCost(def, level) else nil
+	local canUpgrade = cost ~= nil
+	local upgradeText = if cost then string.format(TEXT.UpgradeDrill, level, level + 1, NumberFormat.cash(cost)) else TEXT.UpgradeDrillMax
 	local upgradeButton: TextButton = Create("TextButton", {
 		AnchorPoint = Vector2.new(1, 0.5),
 		Position = UDim2.new(1, -140, 0.5, 0),
@@ -249,8 +245,8 @@ local function drillSlotCard(order: number, title: string, drill: Types.DrillRec
 		Parent = card,
 	}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
 	upgradeButton.Activated:Connect(function()
-		if canUpgrade and nextDef then
-			call("UpgradeDrill", { Price = NumberFormat.cash(cost), Level = (nextDef :: any).RequiredLevel }, id)
+		if cost then
+			call("UpgradeDrill", { Price = NumberFormat.cash(cost) }, id)
 		end
 	end)
 end
@@ -535,7 +531,7 @@ local function renderDashboard(snapshot: Types.StateSnapshot)
 	for _, drill in snapshot.Drills do
 		local def = Drills.Get(drill.Type)
 		if def and drill.MineId and statuses[drill.Id] == "Running" then
-			rate += Drills.OrePerMinute(def)
+			rate += Drills.OrePerMinute(def, Drills.LevelOf(drill))
 		end
 	end
 	local load = sumItems(snapshot.ElevatorBuffer)
@@ -643,8 +639,8 @@ local function renderProduction(snapshot: Types.StateSnapshot)
 		local box = card(10 + i, 64)
 		cardText(box, `{if def then def.DisplayName else drill.Type} – {if mine then Mines.Label(mine) else ""} · {string.format(TEXT.MiningSlot, drill.Slot or 0)}`, 0, 17, UITheme.Colors.TextPrimary, true)
 		local statusText, statusColor = drillStatus(drill.Id)
-		local rate = if def then string.format(TEXT.DrillRate, NumberFormat.withSeparators(Drills.OrePerMinute(def))) else ""
-		cardText(box, `{statusText} · {rate}`, 24, 14, statusColor)
+		local rate = if def then string.format(TEXT.DrillRate, NumberFormat.withSeparators(Drills.OrePerMinute(def, Drills.LevelOf(drill)))) else ""
+		cardText(box, `Lv {Drills.LevelOf(drill)} · {statusText} · {rate}`, 24, 14, statusColor)
 		local button: TextButton = Create("TextButton", {
 			AnchorPoint = Vector2.new(1, 0.5),
 			Position = UDim2.fromScale(1, 0.5),

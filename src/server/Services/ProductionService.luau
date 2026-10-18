@@ -132,7 +132,7 @@ local function tickPlayer(player: Player)
 			local cap = cfg.SlotBuffer * #group.mining
 			for _, drill in group.drills do
 				local def = Drills.Get(drill.Type)
-				cap += if def then def.OutputCapacity else 0
+				cap += if def then Drills.OutputCapacity(def, drill.Level) else 0
 			end
 			cap = math.max(cap, cfg.SlotBuffer)
 
@@ -162,12 +162,14 @@ local function tickPlayer(player: Player)
 					status[drill.Id] = "OutputFull"
 					continue
 				end
+				-- Drill-Level (D-043) verkürzt den Zyklus
+				local cycle = def.CycleSeconds / Drills.Multiplier(drill.Level)
 				local t = (acc.drill[drill.Id] or 0) + TICK_SECONDS
-				if t >= def.CycleSeconds then
+				if t >= cycle then
 					local add = math.min(def.OrePerCycle, cap - buffer)
 					buffer += add
 					mined[mineId] = true
-					t -= def.CycleSeconds
+					t -= cycle
 				end
 				acc.drill[drill.Id] = t
 				status[drill.Id] = if buffer >= cap then "OutputFull" else "Running"

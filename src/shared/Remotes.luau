@@ -94,7 +94,7 @@ local Remotes: { [string]: RemoteDefinition } = {
 	PlaceDrill = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
 	-- Drill entfernen (in der Mine oder am Laptop): (drillId: string) -> Result<drillId>
 	RemoveDrill = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
-	-- Platzierten Drill auf die nächste Stufe aufwerten (Laptop, Felix 2026-10-18): (drillId: string) -> Result<newTypeId>
+	-- Platzierten Drill ein Level aufwerten (Laptop, D-043: Level 1–10, MK bleibt): (drillId: string) -> Result<newLevel>
 	UpgradeDrill = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
 	-- Garage (Phase 6): Server öffnet die Fahrzeugauswahl nach Betreten des Leuchtrings
 	OpenGarage = { Kind = "Event", Direction = "ServerToClient" },
