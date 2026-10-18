@@ -261,7 +261,9 @@ end
 
 _G.__export = _G.__export or {}
 local results = {}
-for name, root in { HallLayout = workspace.HallLayout, AChassis = game.ServerStorage.Vendor.AChassis } do
+-- Wurzeln: _G.__exportRoots = { Name = Instanz } oder Standard (Halle + A-Chassis)
+local roots = (_G :: any).__exportRoots or { HallLayout = workspace.HallLayout, AChassis = game.ServerStorage.Vendor.AChassis }
+for name, root in roots do
 	local xml, notes = export(root)
 	_G.__export[name] = b64(xml)
 	table.insert(results, `{name}: {#xml} Bytes XML, base64 {#_G.__export[name]}, übersprungen: {table.concat(notes, "; ")}`)

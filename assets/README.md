@@ -7,16 +7,18 @@ Sie werden **nicht** von Rojo synchronisiert.
 |---|---|---|
 | `HallLayout.rbxm` | `Workspace.HallLayout` – Felix' Hallen-Anordnung (Gebäude, Regale, Büro mit Laptop, Schrank, Bett, Stuhl, `LayoutOrigin`) | 2026-10-17 |
 | `AChassis.rbxm` | `ServerStorage.Vendor.AChassis` – A-Chassis-Kit 1.7.2 (MPL-2.0, siehe `licenses/`) und die Abstimmungen `Tunes/vehicle_pickup`, `vehicle_van`, `vehicle_boxtruck`, `vehicle_truck`, `vehicle_hauler` | 2026-10-17 |
+| `WorkspaceExtras.rbxm` | Folder `WorkspaceExtras` mit allen losen Objekten direkt im Workspace (außerhalb HallLayout, von Felix absichtlich platziert): 3× Rack2, Zaun-, Rohr-/Aufhänger-Gruppen, LaneCones, Bollards, Railing – 15 Objekte | 2026-10-18 |
 
 ## Wiederherstellen
 
 In Studio: Rechtsklick auf `Workspace` bzw. `ServerStorage.Vendor` → **Insert from File…** → Datei wählen.
+Bei `WorkspaceExtras.rbxm` die Objekte nach dem Einfügen aus dem Folder direkt in den Workspace ziehen.
 Vorher das vorhandene Objekt gleichen Namens löschen oder umbenennen.
 
 ## Einschränkung
 
 Erzeugt per Skript (`tools/ExportRbxmx.luau`), weil Studio keinen Export per Skript erlaubt.
-Rücktest: beide Dateien in Studio geladen und mit dem Original verglichen (Name, Klasse, CFrame,
+Rücktest: alle Dateien in Studio geladen und mit dem Original verglichen (Name, Klasse, CFrame,
 Größe, Farbe, Material, Transparenz, Kollision, Werte, Texte, Licht, Mesh/Textur, Skript-Quelltext,
 Verknüpfungen, Attribute, Tags, Pivots) – 0 Abweichungen.
 
