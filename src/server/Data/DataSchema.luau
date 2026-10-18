@@ -1,5 +1,5 @@
 --!strict
--- Datenschema v9: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
+-- Datenschema v10: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
 -- Regeln:
 --  * Defaults gibt es nur hier.
 --  * Jede Strukturänderung erhöht CURRENT_VERSION und bekommt eine Migration
@@ -15,7 +15,7 @@ local Backpacks = require(Shared.Definitions.Backpacks)
 local Mines = require(Shared.Definitions.Mines)
 local Types = require(Shared.Types)
 
-local CURRENT_VERSION = 9
+local CURRENT_VERSION = 10
 
 local DataSchema = {
 	CurrentVersion = CURRENT_VERSION,
@@ -186,6 +186,18 @@ local MIGRATIONS: { [number]: (data: { [string]: any }) -> () } = {
 		crates = math.clamp(math.max(crates, used), 0, BalanceConfig.Storage.MaxCrates)
 		storage.Crates = crates
 		storage.Capacity = crates * size
+	end,
+	-- v9 → v10: Transport-Worker entfallen (Felix 2026-10-18, D-041). Vorhandene werden entlassen,
+	-- die Einstellungskosten gibt es voll zurück.
+	[9] = function(data)
+		local refund = 0
+		for id, worker in data.Workers or {} do
+			if worker.Role == "Transport" then
+				data.Workers[id] = nil
+				refund += BalanceConfig.Workers.Transport.HireCost
+			end
+		end
+		data.Cash = (data.Cash or 0) + refund
 	end,
 }
 

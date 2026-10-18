@@ -90,6 +90,10 @@ local function hire(player: Player, mineId: unknown, role: unknown, slot: unknow
 	if not mine or not roleDef or slot % 1 ~= 0 or slot < 1 or slot > roleDef.Slots then
 		return Result.err(Result.Codes.INVALID_ARGUMENT)
 	end
+	-- Nur einstellbare Rollen (D-041: keine Transport-Worker mehr)
+	if not table.find(WorkerRoles.Order, roleDef.Id) then
+		return Result.err(Result.Codes.NOT_AVAILABLE)
+	end
 	local data = DataService.Get(player)
 	if not data then
 		return Result.err(Result.Codes.DATA_NOT_LOADED)

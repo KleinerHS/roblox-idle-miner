@@ -6,11 +6,19 @@ local BalanceConfig = {
 	-- Startgeld eines neuen Spielers. Festgelegt durch D-003.
 	StartCash = 800,
 
-	-- XP-Kurve: XPRequired(level) = floor(BaseXP * level ^ Exponent)  (docs/11 §40)
-	-- Muss Level 1000+ erlauben, deshalb kein Exponentialwachstum.
+	-- XP-Kurve (docs/11 §40, D-042): abschnittsweise Potenzkurve, stetig zusammengesetzt.
+	-- XPRequired(L) = BaseXP × Π (Abschnittsende / Abschnittsanfang)^Exponent, ab Level 1.
+	-- Kein Exponentialwachstum, damit Level 1000+ möglich bleibt. Exponenten per Simulation
+	-- (tools/BalanceSim.luau) auf Felix' Zielzeiten eingestellt: L10 1 h, L25 5 h, L50 20 h, L100 50 h.
 	Leveling = {
-		BaseXP = 100, -- TODO_BALANCE
-		Exponent = 1.5, -- TODO_BALANCE
+		BaseXP = 100,
+		Segments = {
+			{ UpTo = 10, Exponent = 1.5 }, -- unverändert (Frühphase passte)
+			{ UpTo = 25, Exponent = 4.6 }, -- per Simulation (D-042): L25 ≈ 5 h
+			{ UpTo = 50, Exponent = 5.3 }, -- per Simulation (D-042): L50 ≈ 18 h
+			{ UpTo = 100, Exponent = 0 }, -- per Simulation (D-042): gleicher Bedarf je Level, L100 ≈ 53 h
+			{ UpTo = math.huge, Exponent = 2 }, -- nach Prestige-Level weiter steigend (Level 1000+ möglich), TODO_BALANCE
+		},
 	},
 
 	-- Verkaufswert und Mining-XP je Erz, getrennt konfiguriert (docs/03 §11).
@@ -97,6 +105,12 @@ local BalanceConfig = {
 		FireRefund = 0, -- Felix (D-021)
 	},
 
+	-- Drill-Upgrade am Laptop (Felix 2026-10-18): platzierter Drill → nächste Stufe.
+	-- Kosten = (Preis neue Stufe − Preis alte Stufe) × Faktor.
+	Drills = {
+		UpgradeCostFactor = 1, -- TODO_BALANCE
+	},
+
 	-- Elevator-Materialtransport (docs/06 §9–11).
 	Elevator = {
 		StartCapacity = 100, -- Felix (D-021) Erz pro Fahrt
@@ -138,8 +152,11 @@ local BalanceConfig = {
 		OreValueGrowthEarly = 1.6, -- Startwert (D-035) bis Tier EarlyUntilTier
 		EarlyUntilTier = 15, -- Startwert (D-035)
 		OreValueGrowthLate = 1.35, -- Startwert (D-035) danach
-		-- Erz-XP = XP-Bedarf (Level der ersten Mine) / XPDivisor, mindestens +1 je Tier
+		-- Erz-XP = Bezugs-XP (Level der ersten Mine) / XPDivisor, mindestens +1 je Tier.
+		-- Bezugskurve fest = alte Level-Kurve (D-042), damit die Erz-XP unverändert bleiben.
 		XPDivisor = 2000, -- Startwert (D-035)
+		XPReferenceBase = 100, -- D-042 (= Level-Kurve bis 2026-10-18)
+		XPReferenceExponent = 1.5, -- D-042
 		-- Barren: Wert und XP der eingesetzten Erze × Faktor (Copper–Iron: ~1.4 / ~1.25)
 		BarValueFactor = 1.4, -- Startwert (D-035)
 		BarXPFactor = 1.25, -- Startwert (D-035)

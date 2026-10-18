@@ -21,7 +21,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 11 | Prestige | TESTING_REQUIRED (Version 0.18.0; Bonus D-034 und Reset-Liste D-033 bestätigt) |
 | 12 | Content Expansion | TESTING_REQUIRED (12a D-035, 12b D-036, 12c Fahrzeuge – Werte Q-028 offen) |
 | 13 | Visual Polish | TESTING_REQUIRED (13a Map & Umgebung, 13b Halle/Lager/Ofen, 13c Mine-Shaft, 13d Licht/Effekte/Sound, 13e UI-Feinschliff; alle Teilschritte warten auf Felix' Test) |
-| 14 | Balance | IMPLEMENTED (14a Simulation & Bericht; Entscheidungen Q-029–Q-032 offen) |
+| 14 | Balance | TESTING_REQUIRED (14a Simulation & Bericht, 14b Umsetzung D-041–D-043) |
 
 ## Setup – Details
 
@@ -597,6 +597,19 @@ Offen: Icons für Erze/Items (docs/09 §61–62) und finale UI-Referenzbilder (d
 | Bericht mit Befunden | `BALANCE/14a_SIMULATION.md` | IMPLEMENTED |
 
 Ergebnis: Level 100 nach ~6,5 h aktivem Spiel; Transport begrenzt Automation auf 5 Erz/s je Mine (Drill Mk4–Mk6 nutzlos); feste Preise spät zu billig; späte Level schneller als mittlere. Keine Spielwerte geändert – Entscheidungen Q-029 bis Q-032.
+
+### 14b – Umsetzung von Felix' Antworten (Version 0.33.0, 2026-10-18)
+
+| System | Dateien | Status |
+|---|---|---|
+| Erz geht direkt in den Elevator (Worker und Drills), keine Transport-Worker mehr; Einstellen von Transport-Workern gesperrt (D-041) | `ProductionService`, `OfflineSimulation`, `WorkerService`, `WorkerRoles` | TESTING_REQUIRED |
+| Migration v9 → v10: vorhandene Transport-Worker entlassen, Einstellungskosten voll erstattet | `DataSchema` | TESTING_REQUIRED |
+| Abschnittsweise XP-Kurve nach Zielzeiten (Exponenten 1,5 / 4,6 / 5,3 / 0 / 2 bis L10 / L25 / L50 / L100 / danach); Erz-XP an feste Bezugskurve gekoppelt und dadurch unverändert (D-042) | `BalanceConfig.Leveling`, `Leveling`, `ContentCurve` | TESTING_REQUIRED |
+| Drill-Upgrade am Laptop (Employees → Slot-Karte, Button UPGRADE $X / LEVEL n / MAX), Kosten = Preisdifferenz × Faktor (D-043) | `DrillService`, `Drills`, `LaptopController`, `Remotes`, `BalanceConfig.Drills` | TESTING_REQUIRED |
+| Simulator: ohne Transport, Drill-Upgrade-Kosten, Elevator+Fahrzeug als Paket, XP-Kurven zum Ausprobieren | `tools/BalanceSim.luau` | IMPLEMENTED |
+
+Simulation mit den neuen Werten (aktives Dauerspiel): L10 1 h 08 min · L25 4 h 50 min · L50 18 h 00 min · L100 52 h 36 min (Ziel 1 / 5 / 20 / 50 h).
+Selbsttest (Play, Felix' Profil): Migration v9 → v10, 6 Transport-Worker entlassen, +$9.000 erstattet; XP-Bedarf L17 = 36.313; UpgradeDrill ohne Laptop-Nähe → TOO_FAR; Transport-Worker einstellen → NOT_AVAILABLE; keine Fehler. Direkt-Fluss nicht sichtbar prüfbar, weil Felix' Lager voll ist (Elevator 350/350 Kupfer wartet auf eine freie Kupfer-Kiste).
 
 ## Phase 12 – Content Expansion – Details
 

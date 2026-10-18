@@ -40,3 +40,24 @@ Am Ende verdient der Spieler etwa **$3,7 Mio. pro Minute** (je etwa zur Hälfte 
 - Elevator nur bis Stufe 3 (500), Fahrzeug nur bis Box Truck
 
 Vollständiges Protokoll: `tools/BalanceSim.luau` in Studio ausführen.
+
+---
+
+# Phase 14b – nach Felix' Antworten (2026-10-18)
+
+Umgesetzt: Erz direkt in den Elevator (D-041), abschnittsweise XP-Kurve (D-042), Drill-Upgrade am Laptop (D-043).
+
+| Level | Ziel | Simulation |
+|---|---|---|
+| 10 | 1 h | 1 h 08 min |
+| 25 | 5 h | 4 h 50 min |
+| 50 | 20 h | 18 h 00 min |
+| 100 | 50 h | 52 h 36 min |
+
+XP-Bedarf je Level: L10 3.162 · L25 214.000 · L50 ≈ 12,6 Mio. · L50–L100 gleich · danach wieder steigend.
+
+## Neue Befunde
+
+1. **Der Verkauf ist jetzt der Engpass der Automation.** Ohne Transport-Worker produzieren Drills spät über 13.000 Erz/s. Verkauft wird aber nur, was ein Fahrzeug wegfährt: höchstens ~80 Erz/s (Hauler: 25.000 Erz pro ~5 min Fahrt + Beladen). Elevator-Stufe 5 (1.000 je Fahrt) reicht dafür; höhere Stufen bringen nichts.
+2. **Geld wächst spät viel schneller als die Preise.** Bei Level 100 hat der Simulations-Spieler ~$21 Billionen übrig und verdient ~$157 Mrd./min. Ab etwa Level 50 sind alle Käufe sofort bezahlbar; der Fortschritt hängt dann nur noch am Level.
+3. Manuelles Abbauen bleibt der größte Einnahmeposten (Modell: Fahren und Abbauen gleichzeitig – in echt etwas weniger).

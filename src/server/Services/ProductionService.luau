@@ -1,7 +1,8 @@
 --!strict
 -- Produktion (docs/06 §2, §9–21, docs/15 §11–12): ein zentraler Takt für alle Spieler,
 -- keine Schleife pro Worker. Kette je Mine:
---   Mining-Worker/Drill → Slot-Puffer → Transport-Worker → Elevator-Puffer → (Fahrt) → Lager
+--   Mining-Worker/Drill → Slot-Puffer → direkt in den Elevator-Puffer → (Fahrt) → Lager
+--   (Felix 2026-10-18, D-041: keine Transport-Worker mehr, Erz geht immer direkt in den Elevator)
 -- Jeder Schritt läuft nur, wenn der nächste Platz hat (Rückstau statt Vernichtung, §18–19).
 -- Wirtschaft ist rein rechnerisch; die Figuren (WorkerVisualService) sind nur Darstellung.
 --
@@ -172,22 +173,13 @@ local function tickPlayer(player: Player)
 				status[drill.Id] = if buffer >= cap then "OutputFull" else "Running"
 			end
 
-			-- 2) Transport-Worker bringen Erz vom Slot-Puffer zum Elevator
-			if #group.transport > 0 then
-				local rate = cfg.Transport.CarryAmount / cfg.Transport.TripSeconds
-				local a = (acc.transport[mineId] or 0) + #group.transport * rate * TICK_SECONDS
-				local whole = math.floor(a)
-				local move = math.min(whole, buffer, math.max(0, elevatorFree))
-				if move > 0 then
-					buffer -= move
-					elevatorFree -= move
-					production.ElevatorBuffer[mine.OreId] = (production.ElevatorBuffer[mine.OreId] or 0) + move
-					transported[mineId] = true
-				end
-				acc.transport[mineId] = if move < whole then math.min(a - whole, 1) else a - whole
-				for _, worker in group.transport do
-					status[worker.Id] = if move > 0 or (buffer > 0 and elevatorFree > 0) then "Working" else "Waiting"
-				end
+			-- 2) Slot-Puffer geht direkt in den Elevator, soweit dort Platz ist (D-041)
+			local move = math.min(buffer, math.max(0, elevatorFree))
+			if move > 0 then
+				buffer -= move
+				elevatorFree -= move
+				production.ElevatorBuffer[mine.OreId] = (production.ElevatorBuffer[mine.OreId] or 0) + move
+				transported[mineId] = true
 			end
 
 			production.MineBuffers[mineId] = if buffer > 0 then buffer else nil

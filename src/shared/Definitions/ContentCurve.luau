@@ -6,14 +6,13 @@
 --
 --   Erzwert:   ab Tier 5 Vorgänger × Wachstum (früh stärker, später schwächer – keine
 --              absurden Zahlen trotz „ungefähr Verdopplung“), auf 2 Stellen gerundet
---   Erz-XP:    folgt der Level-Kurve: XP-Bedarf des Levels der ersten Mine / Teiler,
+--   Erz-XP:    folgt einer festen Bezugskurve (D-042): Bezugs-XP des Levels der ersten Mine / Teiler,
 --              steigt mindestens um 1 je Tier
 --   Barren:    aus OrePerBar Erz, Wert × BarValueFactor, XP × BarXPFactor
 --   Minen:     Level linear von Mine 08 (Level 16) bis Mine 100 (Level 100),
 --              Preis ab Mine 09 = Vielfaches des Erzwerts, zweite Mine einer Erzart teurer
 
 local BalanceConfig = require(script.Parent.Parent.Config.BalanceConfig)
-local Leveling = require(script.Parent.Parent.Util.Leveling)
 
 local cfg = BalanceConfig.ContentCurve
 
@@ -57,7 +56,10 @@ function ContentCurve.oreValues(tier: number, fixedSell: (number) -> number?, fi
 	if xp == nil then
 		local previous = if tier > 1 then select(2, ContentCurve.oreValues(tier - 1, fixedSell, fixedXP)) else 0
 		local firstMine = (tier - 1) * 2 + 1
-		local fromLevel = math.floor(Leveling.xpRequired(ContentCurve.mineLevel(firstMine)) / cfg.XPDivisor + 0.5)
+		-- Bezugskurve fest (D-042): unabhängig von BalanceConfig.Leveling, sonst hebt eine steilere
+		-- Level-Kurve sich über mehr Erz-XP wieder auf
+		local refXP = math.max(1, math.floor(cfg.XPReferenceBase * ContentCurve.mineLevel(firstMine) ^ cfg.XPReferenceExponent))
+		local fromLevel = math.floor(refXP / cfg.XPDivisor + 0.5)
 		xp = math.max(previous + 1, fromLevel)
 	end
 	return sell, xp :: number

@@ -7,7 +7,7 @@
 -- online, nur mit Raten × Abschnittsdauer:
 --   kein Lohn offline (D-040): alle Worker arbeiten
 --   → Mining-Worker/Drills füllen den Slot-Puffer (bis Kapazität)
---   → Transport-Worker bringen Erz zum Elevator (bis Elevator-Kapazität)
+--   → Slot-Puffer direkt in den Elevator (bis Elevator-Kapazität, D-041)
 --   → Elevator-Fahrt ins Lager (bis Lagerkapazität, niedrigste Erz-Stufe zuerst)
 --   → Förderband Lager → Schmelzer (bis Trichterkapazität)
 --   → Schmelzer (Rezeptwahl wie online, bis Ablagekapazität)
@@ -123,7 +123,6 @@ function OfflineSimulation.run(data: Types.PlayerData, seconds: number): Summary
 
 	-- Bruchteile je Rate (wie die Akkumulatoren online)
 	local accMining: { [string]: number } = {}
-	local accTransport: { [string]: number } = {}
 	local accToSmelter, accToStorage, accSmelt = 0, 0, 0
 	local paid: { [string]: boolean } = {}
 
@@ -201,16 +200,12 @@ function OfflineSimulation.run(data: Types.PlayerData, seconds: number): Summary
 				accMining[mineId] = if produced < whole then 0 else a - whole
 			end
 
-			if g.transport > 0 then
-				local a = (accTransport[mineId] or 0) + g.transport * cfg.Transport.CarryAmount / cfg.Transport.TripSeconds * STEP_SECONDS
-				local whole = math.floor(a)
-				local moved = math.min(whole, buffer, math.max(0, elevatorFree))
-				if moved > 0 then
-					buffer -= moved
-					elevatorFree -= moved
-					production.ElevatorBuffer[mine.OreId] = (production.ElevatorBuffer[mine.OreId] or 0) + moved
-				end
-				accTransport[mineId] = if moved < whole then 0 else a - whole
+			-- direkt in den Elevator (D-041)
+			local moved = math.min(buffer, math.max(0, elevatorFree))
+			if moved > 0 then
+				buffer -= moved
+				elevatorFree -= moved
+				production.ElevatorBuffer[mine.OreId] = (production.ElevatorBuffer[mine.OreId] or 0) + moved
 			end
 			production.MineBuffers[mineId] = if buffer > 0 then buffer else nil
 		end

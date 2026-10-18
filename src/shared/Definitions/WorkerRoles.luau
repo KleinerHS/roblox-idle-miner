@@ -1,6 +1,7 @@
 --!strict
 -- Worker-Rollen (docs/05 §3, §8–9). Werte kommen aus BalanceConfig.Workers.
--- Pro Mine: 2 Mining-Slots + 2 Transport-Slots, also max. 4 Worker.
+-- Pro Mine: 2 Mining-Slots (Worker oder Drill). Transport-Worker gibt es seit D-041 nicht mehr
+-- (Erz geht direkt in den Elevator); die Rolle bleibt nur für die Migration alter Profile definiert.
 
 local BalanceConfig = require(script.Parent.Parent.Config.BalanceConfig)
 
@@ -14,7 +15,8 @@ export type RoleDefinition = {
 
 local WorkerRoles = {
 	SlotsPerRole = 2,
-	Order = { "Mining", "Transport" } :: { "Mining" | "Transport" },
+	-- einstellbare Rollen (Laptop, WorkerService)
+	Order = { "Mining" } :: { "Mining" | "Transport" },
 	ById = table.freeze({
 		Mining = table.freeze({
 			Id = "Mining",

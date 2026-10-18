@@ -20,7 +20,20 @@ local ASSUME = {
 	TickSeconds = 5,
 	MaxHours = 400,
 	TargetLevel = 100,
+	-- XP-Kurve zum Ausprobieren (nil = BalanceConfig.Leveling); per _G.BalanceSimXP überschreibbar
+	XPBase = nil :: number?,
+	XPExponent = nil :: number?,
+	XPKnee = nil :: number?, -- ab diesem Level steiler (abschnittsweise Kurve)
+	XPLateExponent = nil :: number?,
+	XPSegments = nil :: { { UpTo: number, Exponent: number } }?, -- abschnittsweise (wie BalanceConfig.Leveling.Segments)
+	Quiet = false, -- true = nur Level-Zeiten
 }
+local override = (_G :: any).BalanceSimXP
+if override then
+	ASSUME.XPBase, ASSUME.XPExponent, ASSUME.Quiet = override.Base, override.Exponent, override.Quiet == true
+	ASSUME.XPKnee, ASSUME.XPLateExponent = override.Knee, override.LateExponent
+	ASSUME.XPSegments = override.Segments
+end
 
 local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Shared")
 local BC = require(Shared.Config.BalanceConfig)
@@ -36,6 +49,43 @@ local BuildSteps = require(D.BuildSteps)
 
 local W = BC.Workers
 local SLOTS = 2
+
+-- XP-Bedarf je Level (wie Leveling.xpRequired, optional mit Testwerten)
+local function xpRequired(level: number): number
+	if ASSUME.XPSegments then
+		-- stetig zusammengesetzte Potenzkurve: in jedem Abschnitt Faktor × (L / Start)^Exponent
+		local base = ASSUME.XPBase or 100
+		local value, from = base, 1
+		for _, seg in ASSUME.XPSegments :: any do
+			local upTo = math.min(level, seg.UpTo)
+			value *= (upTo / from) ^ seg.Exponent
+			from = upTo
+			if level <= seg.UpTo then
+				break
+			end
+		end
+		return math.max(1, math.floor(value))
+	end
+	if ASSUME.XPBase then
+		local base, e = ASSUME.XPBase :: number, ASSUME.XPExponent :: number
+		local knee = ASSUME.XPKnee
+		if knee and level > knee then
+			return math.max(1, math.floor(base * knee ^ e * (level / knee) ^ (ASSUME.XPLateExponent :: number)))
+		end
+		return math.max(1, math.floor(base * level ^ e))
+	end
+	return Leveling.xpRequired(level)
+end
+local function addXP(level: number, xp: number, amount: number): (number, number)
+	xp += amount
+	local need = xpRequired(level)
+	while xp >= need do
+		xp -= need
+		level += 1
+		need = xpRequired(level)
+	end
+	return level, xp
+end
 
 type State = {
 	level: number,
@@ -143,9 +193,8 @@ local function rates(st: State): (number, number, number, { [string]: number })
 				wage += W.Mining.WagePerMinute / 60
 			end
 		end
-		local tr = st.transport[i] or 0
-		wage += tr * W.Transport.WagePerMinute / 60
-		local flow = math.min(mined, tr * W.Transport.CarryAmount / W.Transport.TripSeconds)
+		-- direkt in den Elevator (D-041), keine Transport-Worker
+		local flow = mined
 		produced += flow
 		value += flow * ore(i).SellValue
 		xpSum += flow * ore(i).XPValue
@@ -241,9 +290,31 @@ local function offers(st: State): { Offer }
 		end
 		local ne = BC.Elevator.Upgrades[st.elevator + 1]
 		if ne and st.level >= ne.RequiredLevel then
+			-- Paket: Elevator-Stufe + (falls nötig) Fahrzeuge/Kisten, damit der Verkauf mithält
 			add(`Elevator {ne.Capacity}`, function(a)
 				a.elevator += 1
-				return ne.Cost
+				local cost = ne.Cost
+				local elevatorRate = ne.Capacity / BC.Elevator.CycleSeconds
+				while true do
+					local v = Vehicles.List[a.vehicle]
+					local load = math.min(v.Capacity, a.crates * BC.Storage.CrateSize)
+					local rate = load / (ASSUME.VehicleTripSeconds + load / BC.Loading.UnitsPerSecond)
+					if rate >= elevatorRate then
+						break
+					end
+					if load < v.Capacity and a.crates < BC.Storage.MaxCrates then
+						a.crates += 1
+						cost += cratePrice(a.crates)
+					else
+						local nv2 = Vehicles.List[a.vehicle + 1]
+						if not nv2 or a.level < nv2.RequiredLevel then
+							break
+						end
+						a.vehicle += 1
+						cost += nv2.Price
+					end
+				end
+				return cost
 			end)
 		end
 	end
@@ -280,15 +351,13 @@ local function offers(st: State): { Offer }
 						end
 						a.slots[i] = a.slots[i] or {}
 						a.slots[i][s] = target
-						cost += if target == "worker" then W.Mining.HireCost else Drills.List[target].Price
-						local mined = 0
-						for _, x in a.slots[i] do
-							mined += slotRate(x)
-						end
-						local need = math.min(2, math.ceil(mined / (W.Transport.CarryAmount / W.Transport.TripSeconds)))
-						while (a.transport[i] or 0) < need do
-							a.transport[i] = (a.transport[i] or 0) + 1
-							cost += W.Transport.HireCost
+						if target == "worker" then
+							cost += W.Mining.HireCost
+						elseif cur ~= nil and cur ~= "worker" then
+							-- Upgrade am Laptop: Preisdifferenz × Faktor
+							cost += Drills.UpgradeCost(Drills.List[cur], Drills.List[target])
+						else
+							cost += Drills.List[target].Price
 						end
 						return cost
 					end)
@@ -337,7 +406,7 @@ while S.level < ASSUME.TargetLevel and t < ASSUME.MaxHours * 3600 do
 	wagesPaid += wage * ASSUME.TickSeconds
 	cash += money * ASSUME.TickSeconds
 	local before = S.level
-	S.level, xp = Leveling.addXP(S.level, xp, xpRate * ASSUME.TickSeconds)
+	S.level, xp = addXP(S.level, xp, xpRate * ASSUME.TickSeconds)
 	for l = before + 1, S.level do
 		levelTimes[l] = t
 	end
@@ -371,8 +440,10 @@ local money, xpRate, _, detail = rates(S)
 table.insert(out, `Ende: L{S.level} nach {clock(t)}, Geld ${fmt(cash)}, Gewinn ${fmt(money * 60)}/min, XP {fmt(xpRate * 60)}/min`)
 table.insert(out, `Verdient: manuell ${fmt(earnedManual)}, automatisch ${fmt(earnedAuto)}, Löhne ${fmt(wagesPaid)}`)
 table.insert(out, `Zustand: {Pickaxes.List[S.pick].Id}, {Backpacks.List[S.pack].Id}, Fahrzeug {S.vehicle}, Elevator-Stufe {S.elevator}, Kisten {S.crates}, Minen {S.mines}, Erz/s manuell {string.format("%.1f", detail.manual)}, Automation {string.format("%.1f", detail.produced)} produziert / {string.format("%.1f", detail.sold)} verkauft`)
-table.insert(out, "--- Käufe ---")
-for _, line in log do
-	table.insert(out, line)
+if not ASSUME.Quiet then
+	table.insert(out, "--- Käufe ---")
+	for _, line in log do
+		table.insert(out, line)
+	end
 end
 return table.concat(out, "\n")

@@ -253,3 +253,21 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Source:** Felix, 2026-10-16
 **Decision:** Während der Offline-Zeit (max. 1 h) wird kein Worker-Lohn abgezogen; alle Worker arbeiten weiter. Online gilt der Lohn unverändert (jede Minute). Ändert D-032 (dort: Lohn auch offline).
 **Affected systems:** OfflineSimulation, Offline-Fenster (Lohnzeile entfällt, da 0)
+
+## D-041 – Erz geht direkt in den Elevator, keine Transport-Worker
+
+**Source:** Felix, 2026-10-18 (Antwort auf Q-030: „D – es soll einfach immer direkt in den Elevator gehen, auch wenn nur ein Minenarbeiter da ist“)
+**Decision:** Mining-Worker und Drills liefern ihr Erz direkt in den Elevator (soweit dort Platz ist); der Slot-Puffer bleibt als Rückstau. Transport-Worker entfallen: keine Neueinstellung mehr; vorhandene werden bei der Migration v9 → v10 entlassen und die Einstellungskosten voll erstattet. Worker-Preise bleiben unverändert (Q-032).
+**Affected systems:** ProductionService, OfflineSimulation, WorkerService, WorkerRoles, Laptop (Employees), Data (v10)
+
+## D-042 – Steilere, abschnittsweise XP-Kurve; Zielzeiten
+
+**Source:** Felix, 2026-10-18 (Q-029: L10 nach 1 h, L25 nach 5 h, L50 nach 20 h, L100 nach 50 h aktiver Spielzeit; Q-031: steilere XP-Kurve)
+**Decision:** Die Level-Kurve wird abschnittsweise (docs/11 §40) und nach den Zielzeiten per Simulation eingestellt. Die Erz-XP hängen nicht mehr an der Level-Kurve, sondern an einer festen Bezugskurve (= bisherige Kurve 100 × L^1,5), damit sie unverändert bleiben und die steilere Kurve wirkt.
+**Affected systems:** Leveling, BalanceConfig, ContentCurve
+
+## D-043 – Drill-Upgrade am Laptop
+
+**Source:** Felix, 2026-10-18 (Q-032: „man soll Drills auch upgraden können auf dem Laptop“)
+**Decision:** Ein platzierter Drill lässt sich am Laptop (Employees, Slot-Karte) auf die nächste Stufe aufwerten, sofern das Level reicht. Kosten = Preisdifferenz der Stufen × `BalanceConfig.Drills.UpgradeCostFactor` (Startwert 1). Der Drill bleibt am Slot.
+**Affected systems:** DrillService, Drills, Laptop, Remotes

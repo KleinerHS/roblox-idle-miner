@@ -146,9 +146,53 @@ local function remove(player: Player, drillId: unknown)
 	return Result.ok(drillId)
 end
 
+-- Upgrade am Laptop: platzierter Drill wird zur nächsten Stufe (bleibt am Slot)
+local function upgrade(player: Player, drillId: unknown)
+	if typeof(drillId) ~= "string" then
+		return Result.err(Result.Codes.INVALID_ARGUMENT)
+	end
+	local data = DataService.Get(player)
+	if not data then
+		return Result.err(Result.Codes.DATA_NOT_LOADED)
+	end
+	local drill = data.Machines.Drills[drillId :: string]
+	if not drill then
+		return Result.err(Result.Codes.NOT_OWNED)
+	end
+	if not drill.MineId then
+		return Result.err(Result.Codes.NOT_AVAILABLE)
+	end
+	if not WorkerService.IsNearLaptop(player) then
+		return Result.err(Result.Codes.TOO_FAR)
+	end
+	local current = Drills.Get(drill.Type)
+	local nextDef = current and Drills.Next(current.Id)
+	if not current or not nextDef then
+		return Result.err(Result.Codes.ALREADY_DONE)
+	end
+	if data.MiningLevel < nextDef.RequiredLevel then
+		return Result.err(Result.Codes.LEVEL_TOO_LOW)
+	end
+	local cost = Drills.UpgradeCost(current, nextDef)
+	if data.Cash < cost then
+		return Result.err(Result.Codes.NOT_ENOUGH_MONEY)
+	end
+	-- Prüfung und Änderung ohne Yield dazwischen
+	DataService.Mutate(player, function(d)
+		d.Cash -= cost
+		d.Machines.Drills[drillId :: string].Type = nextDef.Id
+	end)
+	DataService.RequestSave(player)
+	Log.debug(TAG, `{player.Name} wertet {drill.Type} → {nextDef.Id} auf ({drillId}, ${cost})`)
+	DrillService.DrillsChanged:Fire(player)
+	RemoteService.FireClient("Notify", player, { Kind = "Success", Code = "DRILL_UPGRADED", Args = { Name = nextDef.DisplayName } })
+	return Result.ok(nextDef.Id)
+end
+
 function DrillService.Init()
 	RemoteService.OnInvoke("PlaceDrill", place)
 	RemoteService.OnInvoke("RemoveDrill", remove)
+	RemoteService.OnInvoke("UpgradeDrill", upgrade)
 end
 
 function DrillService.Start()

@@ -187,7 +187,7 @@ local function drillSlotCard(order: number, title: string, drill: Types.DrillRec
 	})
 	Create("TextLabel", {
 		Position = UDim2.fromOffset(0, 10),
-		Size = UDim2.new(0.6, 0, 0, 22),
+		Size = UDim2.new(1, -320, 0, 22),
 		BackgroundTransparency = 1,
 		Font = UITheme.FontBold,
 		TextSize = 18,
@@ -200,7 +200,8 @@ local function drillSlotCard(order: number, title: string, drill: Types.DrillRec
 	local rate = if def then string.format(TEXT.DrillRate, NumberFormat.withSeparators(Drills.OrePerMinute(def))) else ""
 	Create("TextLabel", {
 		Position = UDim2.fromOffset(0, 34),
-		Size = UDim2.new(0.66, 0, 0, 18),
+		Size = UDim2.new(1, -320, 0, 18),
+		TextTruncate = Enum.TextTruncate.AtEnd,
 		BackgroundTransparency = 1,
 		Font = UITheme.Font,
 		TextSize = 14,
@@ -223,6 +224,34 @@ local function drillSlotCard(order: number, title: string, drill: Types.DrillRec
 	local id = drill.Id
 	button.Activated:Connect(function()
 		call("RemoveDrill", nil, id)
+	end)
+
+	-- Upgrade auf die nächste Stufe (Felix 2026-10-18)
+	local nextDef = def and Drills.Next(def.Id)
+	local snapshot = StateController.Get()
+	local level = if snapshot then snapshot.MiningLevel else 0
+	local cost = if def and nextDef then Drills.UpgradeCost(def, nextDef) else 0
+	local canUpgrade = nextDef ~= nil and level >= (nextDef :: any).RequiredLevel
+	local upgradeText = if not nextDef then TEXT.UpgradeDrillMax
+		elseif not canUpgrade then string.format(TEXT.UpgradeDrillLevel, (nextDef :: any).RequiredLevel)
+		else string.format(TEXT.UpgradeDrill, NumberFormat.cash(cost))
+	local upgradeButton: TextButton = Create("TextButton", {
+		AnchorPoint = Vector2.new(1, 0.5),
+		Position = UDim2.new(1, -140, 0.5, 0),
+		Size = UDim2.fromOffset(170, 38),
+		BackgroundColor3 = if canUpgrade then UITheme.Colors.DefaultAccent else UITheme.Colors.SurfaceRaised,
+		Font = UITheme.FontBold,
+		TextSize = 15,
+		TextColor3 = if canUpgrade then UITheme.Colors.Background else UITheme.Colors.TextSecondary,
+		Text = upgradeText,
+		Active = canUpgrade,
+		AutoButtonColor = false,
+		Parent = card,
+	}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
+	upgradeButton.Activated:Connect(function()
+		if canUpgrade and nextDef then
+			call("UpgradeDrill", { Price = NumberFormat.cash(cost), Level = (nextDef :: any).RequiredLevel }, id)
+		end
 	end)
 end
 

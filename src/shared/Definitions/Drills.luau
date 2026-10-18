@@ -9,6 +9,7 @@
 -- PersistenceClass "Progression": wird bei Prestige zurückgesetzt (D-012).
 
 local Pickaxes = require(script.Parent.Pickaxes)
+local BalanceConfig = require(script.Parent.Parent.Config.BalanceConfig)
 
 export type DrillDefinition = {
 	Id: string,
@@ -117,6 +118,21 @@ local Drills = {
 -- Modellgröße: wächst bis MK3, ab MK4 gleich groß (Mining-Slots haben feste Größe)
 function Drills.Scale(def: DrillDefinition): number
 	return 1 + (math.min(def.Tier, 3) - 1) * 0.25
+end
+
+-- Nächste Drill-Stufe (für das Upgrade am Laptop) oder nil bei der höchsten Stufe
+function Drills.Next(id: string): DrillDefinition?
+	for i, def in Drills.List do
+		if def.Id == id then
+			return Drills.List[i + 1]
+		end
+	end
+	return nil
+end
+
+-- Upgrade-Kosten von `from` auf die nächste Stufe (BalanceConfig.Drills)
+function Drills.UpgradeCost(from: DrillDefinition, to: DrillDefinition): number
+	return math.max(0, math.floor((to.Price - from.Price) * BalanceConfig.Drills.UpgradeCostFactor + 0.5))
 end
 
 function Drills.Get(id: string): DrillDefinition?
