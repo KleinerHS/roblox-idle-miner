@@ -54,7 +54,7 @@ Umgesetzt: Erz direkt in den Elevator (D-041), abschnittsweise XP-Kurve (D-042),
 | 50 | 20 h | 18 h 00 min |
 | 100 | 50 h | 52 h 36 min |
 
-XP-Bedarf je Level: L10 3.162 · L25 214.000 · L50 ≈ 12,6 Mio. · L50–L100 gleich · danach wieder steigend.
+XP-Bedarf je Level: L10 3.162 · L25 214.000 · L50 ≈ 8,4 Mio. · L50–L100 gleich · danach wieder steigend.
 
 ## Neue Befunde
 
