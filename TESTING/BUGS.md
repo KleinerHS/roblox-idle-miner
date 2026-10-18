@@ -53,3 +53,18 @@ Format: `docs/18_TESTING_AND_QUALITY.md`, Abschnitt 16. IDs fortlaufend (BUG-001
 **Fix:** Werkstatt komplett neu zwischen den Stützen (z 3–16).
 **Regression geprüft:** Überschneidungsprüfung des ganzen Machine-Shops.
 **Likely system:** Machine-Shop (Optik)
+
+## BUG-005 – Von Felix platzierte Objekte stehen im Spiel an falscher Stelle
+
+**Severity:** Medium
+**Status:** Fixed (TESTING_REQUIRED)
+**Build:** 0.40.0
+**Gemeldet:** Felix, 2026-10-18 (Screenshots: 3 Hochregale mitten im Ofen, Geländer schwebt in der Luft)
+**Ursache:** 15 Objekte lagen lose im Workspace statt im `HallLayout`. Im Spiel wird nur das HallLayout auf den jeweiligen Plot kopiert (anderer Ort, gedreht); lose Objekte bleiben an der Edit-Position stehen.
+**Fix (nur in der Place, kein Code):** Objekte ins HallLayout gehängt, Position unverändert:
+- Ofen: `OutputStore.ExtraRack1–3` (Fächer zu `Bay*` umbenannt → reine Deko, keine Kisten), `ZoneFences.ExtraFence1–3`, `Bollards.Bollard4`, `Gantry.DeckRailExtra`
+- Lager: `PackingArea.LaneCones2`, `PackingArea.Bollard1–2`
+- Garage: `FeedPipeRun1–3` (Rohr-Aufhänger)
+Nicht verschoben: eine Rohr-Aufhänger-Gruppe weit außerhalb der Halle (Workspace.Model, Rückfrage an Felix).
+**Regression geprüft:** Kopie auf gedrehten Plot im Edit nachgerechnet (Lage zu Nachbarobjekten exakt), Ausgangslager hat weiter genau 16 Kisten-Plätze.
+**Likely system:** HallLayout
