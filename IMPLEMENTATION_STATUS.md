@@ -655,7 +655,7 @@ Nach Verschiebung in den Laptop (0.36.1): App LUCK per Bildschirmfoto geprüft (
 | XP-Kurve neu eingestellt (Abschnitt bis L50 Exponent 6,9), weil die Automation durch schnelles Laden mehr verkauft | `BalanceConfig.Leveling` | TESTING_REQUIRED |
 | Keine neuen Fahrzeuge (Felix sucht Modelle aus) | – | – |
 
-Simulation (aktives Dauerspiel): L10 1 h 08 · L25 4 h 47 · L50 15 h 15 · L100 50 h 46 (Ziel 1 / 5 / 20 / 50 h; L50 liegt 5 h früher – ein späteres L50 verlängert bei dieser Kurvenform auch L100 deutlich). Geld bleibt spät knapp: bei L100 erst Mine 75 und Spitzhacke Diamond, Rest ≈ 107 min Einkommen. Automation verdient jetzt mehr als manuelles Abbauen (2,6 Bio. zu 1,5 Bio.).
+Simulation (aktives Dauerspiel): L10 1 h 08 · L25 4 h 47 · L50 15 h 15 · L100 50 h 46 (Ziel 1 / 5 / 20 / 50 h; L50 liegt 5 h früher – ein späteres L50 verlängert bei dieser Kurvenform auch L100 deutlich). Felix: L100 wichtiger → so belassen. Geld bleibt spät knapp: bei L100 erst Mine 75 und Spitzhacke Diamond, Rest ≈ 107 min Einkommen. Automation verdient jetzt mehr als manuelles Abbauen (2,6 Bio. zu 1,5 Bio.).
 Beispiel-Preise: Titanium-Spitzhacke $7M (L35, unverändert) · Carbide $320M (L50) · Star Metal $62T (L90) · Mine 50 $720M · Mine 100 $790T · Drill MK12 $3.5Qa. Play-Test ohne Fehler, Zahlenformat bis „Qa/Qi“ ok.
 
 ## Phase 12 – Content Expansion – Details
