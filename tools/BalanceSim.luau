@@ -11,7 +11,7 @@
 -- Annahmen (ASSUME, mit Felix abstimmen):
 --   * aktives Dauerspiel, manuell immer in der besten freien Mine
 --   * Verkaufsweg Rucksack: ManualTripSeconds (Laufen, Förderkorb, Tresen)
---   * Lager → Verkauf nur per Fahrzeug: VehicleTripSeconds + Beladen (Loading.UnitsPerSecond)
+--   * Lager → Verkauf nur per Fahrzeug: VehicleTripSeconds + Beladen (höchstens Loading.FullLoadSeconds)
 --   * nicht simuliert: Schmelzer, Förderbänder, Prestige, Rare Drops, Handel, Offline
 
 local ASSUME = {
@@ -46,6 +46,7 @@ local Ores = require(D.Ores)
 local Drills = require(D.Drills)
 local Vehicles = require(D.Vehicles)
 local BuildSteps = require(D.BuildSteps)
+local ContentCurve = require(D.ContentCurve)
 
 local W = BC.Workers
 local SLOTS = 2
@@ -116,6 +117,7 @@ local t, xp, cash = 0, 0, BC.StartCash
 local earnedManual, earnedAuto, wagesPaid = 0, 0, 0
 local log: { string } = {}
 local levelTimes: { [number]: number } = { [1] = 0 }
+local levelCash: { [number]: number } = {}
 
 local function fmt(n: number): string
 	if n >= 1e9 then
@@ -202,7 +204,7 @@ local function rates(st: State): (number, number, number, { [string]: number })
 	local sold = 0
 	if produced > 0 and st.vehicle > 0 and st.crates > 0 then
 		local load = math.min(Vehicles.List[st.vehicle].Capacity, st.crates * BC.Storage.CrateSize)
-		local vehicleRate = load / (ASSUME.VehicleTripSeconds + load / BC.Loading.UnitsPerSecond)
+		local vehicleRate = load / (ASSUME.VehicleTripSeconds + math.min(load / BC.Loading.UnitsPerSecond, BC.Loading.FullLoadSeconds))
 		sold = math.min(produced, elevatorCap(st) / BC.Elevator.CycleSeconds, vehicleRate)
 	end
 	local share = if produced > 0 then sold / produced else 0
@@ -293,12 +295,12 @@ local function offers(st: State): { Offer }
 			-- Paket: Elevator-Stufe + (falls nötig) Fahrzeuge/Kisten, damit der Verkauf mithält
 			add(`Elevator {ne.Capacity}`, function(a)
 				a.elevator += 1
-				local cost = ne.Cost
+				local cost = ContentCurve.latePrice(ne.Cost, ne.RequiredLevel) -- Spätspiel-Aufschlag (D-046)
 				local elevatorRate = ne.Capacity / BC.Elevator.CycleSeconds
 				while true do
 					local v = Vehicles.List[a.vehicle]
 					local load = math.min(v.Capacity, a.crates * BC.Storage.CrateSize)
-					local rate = load / (ASSUME.VehicleTripSeconds + load / BC.Loading.UnitsPerSecond)
+					local rate = load / (ASSUME.VehicleTripSeconds + math.min(load / BC.Loading.UnitsPerSecond, BC.Loading.FullLoadSeconds))
 					if rate >= elevatorRate then
 						break
 					end
@@ -407,6 +409,7 @@ while S.level < ASSUME.TargetLevel and t < ASSUME.MaxHours * 3600 do
 	S.level, xp = addXP(S.level, xp, xpRate * ASSUME.TickSeconds)
 	for l = before + 1, S.level do
 		levelTimes[l] = t
+		levelCash[l] = cash
 	end
 	decide()
 	local tg = target
@@ -430,7 +433,7 @@ local marks = { 2, 3, 5, 7, 10, 12, 15, 17, 20, 25, 30, 40, 50, 60, 70, 80, 90, 
 local prev = 1
 for _, l in marks do
 	if levelTimes[l] then
-		table.insert(out, `L{l}: {clock(levelTimes[l])} (+{clock(levelTimes[l] - levelTimes[prev])} ab L{prev})`)
+		table.insert(out, `L{l}: {clock(levelTimes[l])} (+{clock(levelTimes[l] - levelTimes[prev])} ab L{prev}) Geld ${fmt(levelCash[l] or 0)}`)
 		prev = l
 	end
 end

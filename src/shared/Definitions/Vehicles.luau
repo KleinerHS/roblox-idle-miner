@@ -7,6 +7,7 @@
 -- Fahrwerte (studs/s bzw. Faktoren) werden von VehicleModelBuilder/VehicleController genutzt.
 
 local Pickaxes = require(script.Parent.Pickaxes)
+local ContentCurve = require(script.Parent.ContentCurve)
 
 export type VehicleStyle = "Pickup" | "Van" | "BoxTruck" | "Truck" | "Hauler"
 
@@ -101,6 +102,8 @@ local list: { VehicleDefinition } = {
 
 local byId: { [string]: VehicleDefinition } = {}
 for _, def in list do
+	-- Spätspiel-Aufschlag ab Level LatePriceStartLevel (D-046)
+	def.Price = ContentCurve.latePrice(def.Price, def.RequiredLevel)
 	assert(byId[def.Id] == nil, `Doppelte Vehicle-ID {def.Id}`)
 	byId[def.Id] = table.freeze(def)
 end

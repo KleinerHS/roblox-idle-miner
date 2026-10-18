@@ -23,6 +23,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 13 | Visual Polish | TESTING_REQUIRED (13a Map & Umgebung, 13b Halle/Lager/Ofen, 13c Mine-Shaft, 13d Licht/Effekte/Sound, 13e UI-Feinschliff; alle Teilschritte warten auf Felix' Test) |
 | 14 | Balance | TESTING_REQUIRED (14a Simulation & Bericht, 14b Umsetzung D-041–D-043, 14c Drill-Stufen D-044) |
 | 15 | Rare Drops & Mining Luck | TESTING_REQUIRED (15a, D-045) |
+| 16 | Verkauf & Spätspiel-Geld | TESTING_REQUIRED (16a, D-046) |
 
 ## Setup – Details
 
@@ -642,6 +643,20 @@ Selbsttest (Play, Felix' Profil): am Laptop Drill d7 (MK1, Mine 01) Level 1 → 
 
 Selbsttest (2026-10-18): Statistik 200.000 Würfe → 1,00 % Rare, davon 15 % Rare Ore, Multiplikator ×2 häufig bis ×10 selten, Erzstufen 1>2>3>4; Play mit kurz erhöhter Testchance (50 %, danach auf 1 % zurückgesetzt): 8 Hits → LUCKY DROP x6/x1 COAL, RARE DROP +1 TIN, Rucksack entsprechend gefüllt; Hinweis per Bildschirmfoto geprüft; BuyLuck am Equipment-Shop: Luck 0 → 1, −$5.000 (Geld danach per DevTools zurückgesetzt), Reiter LUCK per Bildschirmfoto geprüft; keine Fehler. Felix' Profil hat dadurch Mining Luck 1 und ein paar Erze mehr im Rucksack.
 Nach Verschiebung in den Laptop (0.36.1): App LUCK per Bildschirmfoto geprüft (Level 1/10, 1,15 % → 1,30 %, Requires Mining Level 10, BUY $15K); BuyLuck weit weg → TOO_FAR, am Laptop → NOT_ENOUGH_MONEY (Nähe-Prüfung ok); Equipment-Shop ohne LUCK-Reiter.
+
+## Phase 16 – Verkauf & Spätspiel-Geld – Details
+
+### 16a (Version 0.37.0, 2026-10-18)
+
+| System | Dateien | Status |
+|---|---|---|
+| Verladeturm nie Engpass: jedes Fahrzeug in höchstens 4 s voll (Rate = Kapazität / 4 s, mind. 100/s) | `LoadingService`, `BalanceConfig.Loading.FullLoadSeconds` | TESTING_REQUIRED |
+| Spätspiel-Preise: alles mit Mindest-Level > 40 × 1,15 je Level darüber (Minen, Spitzhacken, Rucksäcke, Drills, Fahrzeuge, Elevator-Stufen) | `ContentCurve.latePrice`, `BalanceConfig.ContentCurve`, `Pickaxes`, `Backpacks`, `Drills`, `Vehicles`, `Upgrades`, `Mines` | TESTING_REQUIRED |
+| XP-Kurve neu eingestellt (Abschnitt bis L50 Exponent 6,9), weil die Automation durch schnelles Laden mehr verkauft | `BalanceConfig.Leveling` | TESTING_REQUIRED |
+| Keine neuen Fahrzeuge (Felix sucht Modelle aus) | – | – |
+
+Simulation (aktives Dauerspiel): L10 1 h 08 · L25 4 h 47 · L50 15 h 15 · L100 50 h 46 (Ziel 1 / 5 / 20 / 50 h; L50 liegt 5 h früher – ein späteres L50 verlängert bei dieser Kurvenform auch L100 deutlich). Geld bleibt spät knapp: bei L100 erst Mine 75 und Spitzhacke Diamond, Rest ≈ 107 min Einkommen. Automation verdient jetzt mehr als manuelles Abbauen (2,6 Bio. zu 1,5 Bio.).
+Beispiel-Preise: Titanium-Spitzhacke $7M (L35, unverändert) · Carbide $320M (L50) · Star Metal $62T (L90) · Mine 50 $720M · Mine 100 $790T · Drill MK12 $3.5Qa. Play-Test ohne Fehler, Zahlenformat bis „Qa/Qi“ ok.
 
 ## Phase 12 – Content Expansion – Details
 

@@ -127,7 +127,9 @@ local function tickBay(player: Player, data: Types.PlayerData, garage: Model, ba
 	if VehicleService.GetDriven(player) ~= vehicleId then
 		return { state = "Parked", vehicleId = vehicleId, extended = false }
 	end
-	local budget = math.min(free, math.floor(BalanceConfig.Loading.UnitsPerSecond * TICK_SECONDS))
+	-- Jedes Fahrzeug in höchstens FullLoadSeconds voll (D-046)
+	local rate = math.max(BalanceConfig.Loading.UnitsPerSecond, def.Capacity / BalanceConfig.Loading.FullLoadSeconds)
+	local budget = math.min(free, math.floor(rate * TICK_SECONDS))
 	local plan: { [string]: number } = {}
 	local total = 0
 	for _, id in loadOrder(data.Storage.Items, data.Buildings.build_smelter == true) do

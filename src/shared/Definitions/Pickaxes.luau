@@ -3,6 +3,8 @@
 -- PersistenceClass: wie das Item bei Prestige behandelt wird. Pickaxes, Backpacks und
 -- Fahrzeuge bleiben erhalten (D-012), Drills/Maschinen sind "Progression".
 
+local ContentCurve = require(script.Parent.ContentCurve)
+
 export type PersistenceClass = "Progression" | "Permanent" | "RobuxEntitlement"
 
 export type PickaxeDefinition = {
@@ -119,6 +121,8 @@ local list: { PickaxeDefinition } = {
 
 local byId: { [string]: PickaxeDefinition } = {}
 for _, def in list do
+	-- Spätspiel-Aufschlag ab Level LatePriceStartLevel (D-046)
+	def.Price = ContentCurve.latePrice(def.Price, def.RequiredLevel)
 	assert(byId[def.Id] == nil, `Doppelte Pickaxe-ID {def.Id}`)
 	byId[def.Id] = table.freeze(def)
 end

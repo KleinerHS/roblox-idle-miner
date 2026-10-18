@@ -15,8 +15,8 @@ local BalanceConfig = {
 		Segments = {
 			{ UpTo = 10, Exponent = 1.5 }, -- unverändert (Frühphase passte)
 			{ UpTo = 25, Exponent = 4.6 }, -- per Simulation (D-042): L25 ≈ 5 h
-			{ UpTo = 50, Exponent = 5.3 }, -- per Simulation (D-042): L50 ≈ 18 h
-			{ UpTo = 100, Exponent = 0 }, -- per Simulation (D-042): gleicher Bedarf je Level, L100 ≈ 53 h
+			{ UpTo = 50, Exponent = 6.9 }, -- per Simulation (D-042/D-046, schneller Verladeturm): L50 ≈ 15 h
+			{ UpTo = 100, Exponent = 0 }, -- per Simulation (D-042/D-046): gleicher Bedarf je Level, L100 ≈ 50 h
 			{ UpTo = math.huge, Exponent = 2 }, -- nach Prestige-Level weiter steigend (Level 1000+ möglich), TODO_BALANCE
 		},
 	},
@@ -40,7 +40,10 @@ local BalanceConfig = {
 
 	-- Verladeturm (D-025): Einheiten pro Sekunde vom Lager ins Fahrzeug. bestätigt (D-029).
 	Loading = {
-		UnitsPerSecond = 100, -- Felix (D-029)
+		UnitsPerSecond = 100, -- Felix (D-029), Mindestrate
+		-- Felix 2026-10-18 (D-046): „der Verladeturm soll nie ein Engpass sein“ – jedes Fahrzeug ist
+		-- nach höchstens so vielen Sekunden voll (Rate = Kapazität / FullLoadSeconds, mindestens UnitsPerSecond)
+		FullLoadSeconds = 4, -- TODO_BALANCE
 	},
 
 	-- Schmelzer (docs/06 §28–35). bestätigt (D-028).
@@ -196,6 +199,11 @@ local BalanceConfig = {
 		LastMineLevel = 100, -- Startwert (D-035) docs/02 §30: Mine 100 und Level 100 als Endziel
 		-- Minenpreis ab Mine 09 = Erzwert × Vielfaches (zweite Mine einer Erzart × Faktor)
 		MinePriceOreMultiple = 4500, -- Startwert (D-035)
+		-- Spätspiel-Preise (Felix 2026-10-18, D-046: „die Preise sollen später sowieso sehr teuer sein“):
+		-- alle Kaufpreise mit Mindest-Level über LatePriceStartLevel × LatePriceGrowth^(Level − Start).
+		-- Gilt für Minen, Spitzhacken, Rucksäcke, Drills, Fahrzeuge und Elevator-Stufen.
+		LatePriceStartLevel = 40, -- TODO_BALANCE
+		LatePriceGrowth = 1.15, -- TODO_BALANCE (per Simulation, D-046: Level 100 ≈ ×4.400)
 		SecondMinePriceFactor = 1.25, -- Startwert (D-035)
 	},
 

@@ -9,6 +9,7 @@
 -- PersistenceClass "Progression": wird bei Prestige zurückgesetzt (D-012).
 
 local Pickaxes = require(script.Parent.Pickaxes)
+local ContentCurve = require(script.Parent.ContentCurve)
 local BalanceConfig = require(script.Parent.Parent.Config.BalanceConfig)
 
 export type DrillDefinition = {
@@ -179,6 +180,8 @@ local list: { DrillDefinition } = {
 
 local byId: { [string]: DrillDefinition } = {}
 for _, def in list do
+	-- Spätspiel-Aufschlag ab Level LatePriceStartLevel (D-046)
+	def.Price = ContentCurve.latePrice(def.Price, def.RequiredLevel)
 	assert(byId[def.Id] == nil, `Doppelte Drill-ID {def.Id}`)
 	byId[def.Id] = table.freeze(def)
 end

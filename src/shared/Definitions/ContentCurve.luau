@@ -71,10 +71,22 @@ function ContentCurve.barValues(oreSell: number, oreXP: number): (number, number
 	return ContentCurve.nice(oreSell * orePerBar * cfg.BarValueFactor), math.floor(oreXP * orePerBar * cfg.BarXPFactor + 0.5)
 end
 
--- Minenpreis ab Mine 09 (Mine 03–08: D-019)
+-- Spätspiel-Aufschlag (D-046): 1 bis LatePriceStartLevel, danach × LatePriceGrowth je Level
+function ContentCurve.latePriceFactor(requiredLevel: number): number
+	return cfg.LatePriceGrowth ^ math.max(0, requiredLevel - cfg.LatePriceStartLevel)
+end
+
+-- Preis mit Spätspiel-Aufschlag (unverändert bis zum Startlevel)
+function ContentCurve.latePrice(price: number, requiredLevel: number): number
+	local factor = ContentCurve.latePriceFactor(requiredLevel)
+	return if factor == 1 then price else ContentCurve.nice(price * factor)
+end
+
+-- Minenpreis ab Mine 09 (Mine 03–08: D-019), mit Spätspiel-Aufschlag (D-046)
 function ContentCurve.minePrice(number: number, oreSell: number): number
 	local second = number % 2 == 0
-	return ContentCurve.nice(oreSell * cfg.MinePriceOreMultiple * (if second then cfg.SecondMinePriceFactor else 1))
+	local base = oreSell * cfg.MinePriceOreMultiple * (if second then cfg.SecondMinePriceFactor else 1)
+	return ContentCurve.nice(base * ContentCurve.latePriceFactor(ContentCurve.mineLevel(number)))
 end
 
 return table.freeze(ContentCurve)

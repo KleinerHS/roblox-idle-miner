@@ -8,15 +8,25 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local BalanceConfig = require(Shared.Config.BalanceConfig)
+local ContentCurve = require(Shared.Definitions.ContentCurve)
 
 export type UpgradeKind = "storage" | "elevator"
 export type UpgradeTier = { Capacity: number, Cost: number, RequiredLevel: number }
 
 local Upgrades = {}
 
+-- Kosten mit Spätspiel-Aufschlag (D-046)
+local function withLatePrices(tiers: { UpgradeTier }): { UpgradeTier }
+	local out = {}
+	for _, tier in tiers do
+		table.insert(out, { Capacity = tier.Capacity, Cost = ContentCurve.latePrice(tier.Cost, tier.RequiredLevel), RequiredLevel = tier.RequiredLevel })
+	end
+	return out
+end
+
 local TIERS: { [string]: { UpgradeTier } } = {
-	storage = BalanceConfig.Storage.Upgrades,
-	elevator = BalanceConfig.Elevator.Upgrades,
+	storage = withLatePrices(BalanceConfig.Storage.Upgrades),
+	elevator = withLatePrices(BalanceConfig.Elevator.Upgrades),
 }
 
 function Upgrades.IsKind(kind: unknown): boolean

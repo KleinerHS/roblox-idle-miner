@@ -3,6 +3,7 @@
 -- PersistenceClass siehe Pickaxes.luau (D-012: Backpacks bleiben bei Prestige).
 
 local Pickaxes = require(script.Parent.Pickaxes)
+local ContentCurve = require(script.Parent.ContentCurve)
 
 export type BackpackDefinition = {
 	Id: string,
@@ -80,6 +81,8 @@ local list: { BackpackDefinition } = {
 
 local byId: { [string]: BackpackDefinition } = {}
 for _, def in list do
+	-- Spätspiel-Aufschlag ab Level LatePriceStartLevel (D-046)
+	def.Price = ContentCurve.latePrice(def.Price, def.RequiredLevel)
 	assert(byId[def.Id] == nil, `Doppelte Backpack-ID {def.Id}`)
 	byId[def.Id] = table.freeze(def)
 end
