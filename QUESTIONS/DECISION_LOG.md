@@ -289,3 +289,9 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Source:** Felix, 2026-10-18 („Fahrzeuge brauchst du nicht erstellen, ich suche später welche raus, die du einfach einfügst; der Verladeturm soll nie ein Engpass sein, mach ihn deutlich schneller; die Preise sollen später sowieso sehr teuer sein“)
 **Decision:** Der Verladeturm füllt jedes Fahrzeug in höchstens `Loading.FullLoadSeconds` (4 s; Rate = Kapazität / 4 s, mindestens 100/s aus D-029). Alle Kaufpreise mit Mindest-Level über 40 (Minen, Spitzhacken, Rucksäcke, Drills, Fahrzeuge, Elevator-Stufen) steigen zentral um × 1,15 je Level darüber (`ContentCurve.latePrice`, Level 100 ≈ × 4.400). Weil die Automation mit schnellem Laden deutlich mehr verkauft, wurde die XP-Kurve neu per Simulation eingestellt (Abschnitt bis L50: Exponent 6,9). Neue Fahrzeuge kommen später mit Felix' Modellen. Felix 2026-10-18: L100 (≈ 50 h) ist wichtiger als L50 – die Kurve bleibt so (L50 ≈ 15 h).
 **Affected systems:** LoadingService, BalanceConfig (Loading, ContentCurve, Leveling), ContentCurve, Pickaxes, Backpacks, Drills, Vehicles, Upgrades, Mines
+
+## D-047 – Großes Lager hinter der Halle zurückgestellt
+
+**Source:** Felix, 2026-10-18 („großes Lager vergessen wir erst mal, darüber denke ich ganz am Ende noch mal nach“)
+**Decision:** Das große Lager hinter der Halle wird vorerst nicht gebaut; Entscheidung ganz am Ende. Als Nächstes liefert Felix Fahrzeugmodelle in der Reihenfolge, wie sie preislich und kapazitätsmäßig aufsteigen sollen.
+**Affected systems:** –
