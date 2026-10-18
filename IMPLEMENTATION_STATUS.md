@@ -24,6 +24,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 14 | Balance | TESTING_REQUIRED (14a Simulation & Bericht, 14b Umsetzung D-041–D-043, 14c Drill-Stufen D-044) |
 | 15 | Rare Drops & Mining Luck | TESTING_REQUIRED (15a, D-045) |
 | 16 | Verkauf & Spätspiel-Geld | TESTING_REQUIRED (16a, D-046) |
+| 17 | Icons | TESTING_REQUIRED (17a Erz- und Barren-Icons) |
 
 ## Setup – Details
 
@@ -657,6 +658,18 @@ Nach Verschiebung in den Laptop (0.36.1): App LUCK per Bildschirmfoto geprüft (
 
 Simulation (aktives Dauerspiel): L10 1 h 08 · L25 4 h 47 · L50 15 h 15 · L100 50 h 46 (Ziel 1 / 5 / 20 / 50 h; L50 liegt 5 h früher – ein späteres L50 verlängert bei dieser Kurvenform auch L100 deutlich). Felix: L100 wichtiger → so belassen. Geld bleibt spät knapp: bei L100 erst Mine 75 und Spitzhacke Diamond, Rest ≈ 107 min Einkommen. Automation verdient jetzt mehr als manuelles Abbauen (2,6 Bio. zu 1,5 Bio.).
 Beispiel-Preise: Titanium-Spitzhacke $7M (L35, unverändert) · Carbide $320M (L50) · Star Metal $62T (L90) · Mine 50 $720M · Mine 100 $790T · Drill MK12 $3.5Qa. Play-Test ohne Fehler, Zahlenformat bis „Qa/Qi“ ok.
+
+## Phase 17 – Icons – Details
+
+### 17a – Erz- und Barren-Icons (Version 0.38.0, 2026-10-18)
+
+| System | Dateien | Status |
+|---|---|---|
+| 3D-Icon je Material im ViewportFrame, ohne Bild-Assets (docs/09 §62): Stufe 1–12 Gestein mit matten Erzklumpen, 13–30 metallisch glänzend, ab 31 Kristallgruppe (ab 45 leuchtend), Barren als Barren; feste Form je Stufe | `src/client/UI/Components/OreIcon.luau` | TESTING_REQUIRED |
+| Icons statt Farbpunkten in Verkaufsfenster, Firmenlager, Handel (Angebot und Lagerliste) und Laptop STORAGE | `SellController`, `StorageController`, `TradeController`, `LaptopController` | TESTING_REQUIRED |
+
+Selbsttest (Play): Vorschau aller Stufenarten (Coal, Copper, Tin, Iron, Silver, Cobalt, Titanium, Iridium, Emerald, Jade, Luminous Crystal, Aetherium, Galaxium, Diamond, 3 Barren) per Bildschirmfoto geprüft und nachgebessert (Erz zur Kamera hin, größer); Verkaufsfenster und Firmenlager mit Icons per Bildschirmfoto geprüft; keine Fehler im Log.
+Offen: Kategorie-Icons (Money, Pickaxe, Worker usw., docs/09 §61).
 
 ## Phase 12 – Content Expansion – Details
 

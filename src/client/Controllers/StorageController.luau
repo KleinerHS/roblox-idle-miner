@@ -16,6 +16,7 @@ local NumberFormat = require(Shared.Util.NumberFormat)
 
 local Net = require(script.Parent.Parent.Net)
 local Create = require(script.Parent.Parent.UI.Create)
+local OreIcon = require(script.Parent.Parent.UI.Components.OreIcon)
 local Strings = require(script.Parent.Parent.UI.Strings)
 local Button = require(script.Parent.Parent.UI.Components.Button)
 local StateController = require(script.Parent.StateController)
@@ -105,14 +106,8 @@ local function render()
 			Parent = list,
 		}, {
 			Create("UICorner", { CornerRadius = UITheme.CornerRadius }),
-			Create("Frame", {
-				AnchorPoint = Vector2.new(0, 0.5),
-				Position = UDim2.new(0, 12, 0.5, 0),
-				Size = UDim2.fromOffset(14, 14),
-				BackgroundColor3 = entry.ore.Color,
-			}, { Create("UICorner", { CornerRadius = UDim.new(1, 0) }) }),
 			Create("TextLabel", {
-				Position = UDim2.fromOffset(36, 0),
+				Position = UDim2.fromOffset(40, 0),
 				Size = UDim2.new(0.4, 0, 1, 0),
 				BackgroundTransparency = 1,
 				Font = UITheme.FontBold,
@@ -132,6 +127,11 @@ local function render()
 				Text = NumberFormat.withSeparators(entry.amount),
 			}),
 		})
+		-- Erz-Icon statt Farbpunkt (docs/09 §62)
+		local icon = OreIcon.create(entry.ore.Id, 36)
+		icon.AnchorPoint = Vector2.new(0, 0.5)
+		icon.Position = UDim2.new(0, 2, 0.5, 0)
+		icon.Parent = frame
 		local take: TextButton = Create("TextButton", {
 			AnchorPoint = Vector2.new(1, 0.5),
 			Position = UDim2.new(1, -8, 0.5, 0),

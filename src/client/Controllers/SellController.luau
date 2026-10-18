@@ -18,6 +18,7 @@ local PrestigeLogic = require(Shared.Util.PrestigeLogic)
 
 local Net = require(script.Parent.Parent.Net)
 local Create = require(script.Parent.Parent.UI.Create)
+local OreIcon = require(script.Parent.Parent.UI.Components.OreIcon)
 local Strings = require(script.Parent.Parent.UI.Strings)
 local Button = require(script.Parent.Parent.UI.Components.Button)
 local StateController = require(script.Parent.StateController)
@@ -52,7 +53,7 @@ local function close()
 	openedAt = nil
 end
 
-local function row(order: number, color: Color3, name: string, amount: string, value: string, dim: boolean)
+local function row(order: number, materialId: string, name: string, amount: string, value: string, dim: boolean)
 	local frame = Create("Frame", {
 		Size = UDim2.new(1, 0, 0, 40),
 		BackgroundColor3 = UITheme.Colors.Surface,
@@ -60,13 +61,12 @@ local function row(order: number, color: Color3, name: string, amount: string, v
 		Parent = list,
 	}, {
 		Create("UICorner", { CornerRadius = UITheme.CornerRadius }),
-		Create("Frame", {
-			AnchorPoint = Vector2.new(0, 0.5),
-			Position = UDim2.new(0, 12, 0.5, 0),
-			Size = UDim2.fromOffset(14, 14),
-			BackgroundColor3 = color,
-		}, { Create("UICorner", { CornerRadius = UDim.new(1, 0) }) }),
 	})
+	-- Erz-Icon statt Farbpunkt (docs/09 §62)
+	local icon = OreIcon.create(materialId, 34)
+	icon.AnchorPoint = Vector2.new(0, 0.5)
+	icon.Position = UDim2.new(0, 4, 0.5, 0)
+	icon.Parent = frame
 	local function label(text: string, x: number, w: number, align: Enum.TextXAlignment, bold: boolean)
 		Create("TextLabel", {
 			Position = UDim2.new(x, 0, 0, 0),
@@ -116,9 +116,9 @@ local function refresh()
 				cash += value
 				xp += entry.amount * ore.XPValue
 				count += entry.amount
-				row(i, ore.Color, ore.DisplayName, `× {NumberFormat.withSeparators(entry.amount)}`, NumberFormat.cash(value), false)
+				row(i, ore.Id, ore.DisplayName, `× {NumberFormat.withSeparators(entry.amount)}`, NumberFormat.cash(value), false)
 			else
-				row(i, ore.Color, ore.DisplayName, `× {NumberFormat.withSeparators(entry.amount)}`, TEXT.NotSellable, true)
+				row(i, ore.Id, ore.DisplayName, `× {NumberFormat.withSeparators(entry.amount)}`, TEXT.NotSellable, true)
 			end
 		end
 	end

@@ -18,6 +18,7 @@ local NumberFormat = require(Shared.Util.NumberFormat)
 
 local Net = require(script.Parent.Parent.Net)
 local Create = require(script.Parent.Parent.UI.Create)
+local OreIcon = require(script.Parent.Parent.UI.Components.OreIcon)
 local Strings = require(script.Parent.Parent.UI.Strings)
 local StateController = require(script.Parent.StateController)
 local NotificationController = require(script.Parent.NotificationController)
@@ -79,7 +80,7 @@ local function clear(frame: Instance)
 	end
 end
 
-local function row(parent: Instance, order: number, color: Color3?, label: string, buttonText: string?, onClick: (() -> ())?)
+local function row(parent: Instance, order: number, materialId: string?, label: string, buttonText: string?, onClick: (() -> ())?)
 	local frame = Create("Frame", {
 		Size = UDim2.new(1, -6, 0, 34),
 		BackgroundColor3 = UITheme.Colors.Surface,
@@ -89,17 +90,15 @@ local function row(parent: Instance, order: number, color: Color3?, label: strin
 		Create("UICorner", { CornerRadius = UITheme.CornerRadius }),
 		Create("UIPadding", { PaddingLeft = UDim.new(0, 10), PaddingRight = UDim.new(0, 6) }),
 	})
-	if color then
-		Create("Frame", {
-			AnchorPoint = Vector2.new(0, 0.5),
-			Position = UDim2.new(0, 0, 0.5, 0),
-			Size = UDim2.fromOffset(10, 10),
-			BackgroundColor3 = color,
-			Parent = frame,
-		}, { Create("UICorner", { CornerRadius = UDim.new(1, 0) }) })
+	if materialId then
+		-- Erz-Icon statt Farbpunkt (docs/09 §62)
+		local icon = OreIcon.create(materialId, 28)
+		icon.AnchorPoint = Vector2.new(0, 0.5)
+		icon.Position = UDim2.new(0, -4, 0.5, 0)
+		icon.Parent = frame
 	end
 	Create("TextLabel", {
-		Position = UDim2.fromOffset(if color then 16 else 0, 0),
+		Position = UDim2.fromOffset(if materialId then 26 else 0, 0),
 		Size = UDim2.new(1, if buttonText then -96 else -16, 1, 0),
 		BackgroundTransparency = 1,
 		Font = UITheme.Font,
@@ -141,12 +140,12 @@ local function offerRows(list: ScrollingFrame, offer: any, mine: boolean)
 		local label = `{if m then m.DisplayName else id} ×{NumberFormat.withSeparators(offer.Materials[id])}`
 		if mine then
 			local materialId = id
-			row(list, order, m and m.Color, label, TEXT.Remove, function()
+			row(list, order, id, label, TEXT.Remove, function()
 				myMaterials[materialId] = nil
 				sendOffer()
 			end)
 		else
-			row(list, order, m and m.Color, label)
+			row(list, order, id, label)
 		end
 	end
 	for _, drill in offer.Drills do
@@ -195,7 +194,7 @@ local function stockRows()
 		order += 1
 		local m = Materials.Get(id)
 		local available = snapshot.StorageItems[id] - (myMaterials[id] or 0)
-		local frame = row(stockList, order, m and m.Color, `{if m then m.DisplayName else id} ({NumberFormat.withSeparators(snapshot.StorageItems[id])})`)
+		local frame = row(stockList, order, id, `{if m then m.DisplayName else id} ({NumberFormat.withSeparators(snapshot.StorageItems[id])})`)
 		local nameLabel = frame:FindFirstChildOfClass("TextLabel")
 		if nameLabel then
 			nameLabel.Size = UDim2.new(1, -170, 1, 0)

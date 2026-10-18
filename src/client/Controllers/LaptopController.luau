@@ -28,6 +28,7 @@ local CrateLogic = require(Shared.Util.CrateLogic)
 
 local Net = require(script.Parent.Parent.Net)
 local Create = require(script.Parent.Parent.UI.Create)
+local OreIcon = require(script.Parent.Parent.UI.Components.OreIcon)
 local Strings = require(script.Parent.Parent.UI.Strings)
 local StateController = require(script.Parent.StateController)
 local PlotController = require(script.Parent.PlotController)
@@ -567,7 +568,12 @@ local function renderStorage(snapshot: Types.StateSnapshot)
 	for i, id in ids do
 		local ore = Materials.Get(id)
 		local row = card(2 + i, 40)
-		cardText(row, if ore then ore.DisplayName else id, 0, 16, UITheme.Colors.TextPrimary)
+		local icon = OreIcon.create(id, 30)
+		icon.AnchorPoint = Vector2.new(0, 0.5)
+		icon.Position = UDim2.new(0, -6, 0.5, 0)
+		icon.Parent = row
+		local nameLabel = cardText(row, if ore then ore.DisplayName else id, 0, 16, UITheme.Colors.TextPrimary)
+		nameLabel.Position = UDim2.fromOffset(30, 0)
 		cardText(row, NumberFormat.withSeparators(snapshot.StorageItems[id]), 0, 16, UITheme.Colors.TextPrimary, true, Enum.TextXAlignment.Right)
 	end
 	crateCard(100, snapshot)
