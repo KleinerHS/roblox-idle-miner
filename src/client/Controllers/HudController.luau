@@ -16,6 +16,7 @@ local Types = require(Shared.Types)
 local NumberFormat = require(Shared.Util.NumberFormat)
 
 local Create = require(script.Parent.Parent.UI.Create)
+local CategoryIcon = require(script.Parent.Parent.UI.Components.CategoryIcon)
 local Strings = require(script.Parent.Parent.UI.Strings)
 local StateController = require(script.Parent.StateController)
 local SoundController = require(script.Parent.SoundController)
@@ -129,9 +130,15 @@ function HudController.Init()
 		Parent = gui,
 	}, {
 		Create("UICorner", { CornerRadius = UITheme.CornerRadius }),
-		Create("UIPadding", { PaddingLeft = UDim.new(0, 16), PaddingRight = UDim.new(0, 16) }),
+		Create("UIPadding", { PaddingLeft = UDim.new(0, 8), PaddingRight = UDim.new(0, 16) }),
+		Create("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, VerticalAlignment = Enum.VerticalAlignment.Center, Padding = UDim.new(0, 4), SortOrder = Enum.SortOrder.LayoutOrder }),
 	})
+	-- Geld-Icon (docs/09 §61)
+	local moneyIcon = CategoryIcon.create("Money", 40)
+	moneyIcon.LayoutOrder = 0
+	moneyIcon.Parent = cashCard
 	cashLabel = Create("TextLabel", {
+		LayoutOrder = 1,
 		Size = UDim2.fromScale(0, 1),
 		AutomaticSize = Enum.AutomaticSize.X,
 		BackgroundTransparency = 1,
@@ -155,8 +162,13 @@ function HudController.Init()
 		Create("UIPadding", { PaddingLeft = UDim.new(0, 14), PaddingRight = UDim.new(0, 14), PaddingTop = UDim.new(0, 6), PaddingBottom = UDim.new(0, 8) }),
 		Create("UISizeConstraint", { MaxSize = Vector2.new(380, 48) }),
 	})
+	-- Level-Icon links neben der Überschrift
+	local levelIcon = CategoryIcon.create("Level", 26)
+	levelIcon.Position = UDim2.fromOffset(-6, -4)
+	levelIcon.Parent = levelCard
 	levelLabel = Create("TextLabel", {
-		Size = UDim2.new(0.6, 0, 0, 20),
+		Position = UDim2.fromOffset(22, 0),
+		Size = UDim2.new(0.6, -22, 0, 20),
 		BackgroundTransparency = 1,
 		Font = UITheme.FontBold,
 		TextSize = 17,

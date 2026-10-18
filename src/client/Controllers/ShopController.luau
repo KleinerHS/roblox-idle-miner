@@ -21,6 +21,7 @@ local NumberFormat = require(Shared.Util.NumberFormat)
 
 local Net = require(script.Parent.Parent.Net)
 local Create = require(script.Parent.Parent.UI.Create)
+local CategoryIcon = require(script.Parent.Parent.UI.Components.CategoryIcon)
 local Strings = require(script.Parent.Parent.UI.Strings)
 local StateController = require(script.Parent.StateController)
 local NotificationController = require(script.Parent.NotificationController)
@@ -44,6 +45,14 @@ local SHOP_TABS: { [string]: { { string } } } = {
 	equipment = { { "pickaxe", TEXT.Pickaxes }, { "backpack", TEXT.Backpacks } },
 	machine = { { "drill", TEXT.Drills }, { "conveyor", TEXT.Conveyors } },
 	vehicle = { { "vehicle", TEXT.Vehicles } },
+}
+
+local TAB_ICONS: { [string]: string } = {
+	pickaxe = "Pickaxe",
+	backpack = "Backpack",
+	drill = "Drill",
+	conveyor = "Conveyor",
+	vehicle = "Vehicle",
 }
 
 local SHOP_TITLES: { [string]: string } = {
@@ -319,13 +328,18 @@ local function buildTabs()
 	for order, def in SHOP_TABS[currentShop] do
 		local name = def[1]
 		local button: TextButton = Create("TextButton", {
-			Size = UDim2.fromOffset(140, 36),
+			Size = UDim2.fromOffset(150, 36),
 			Font = UITheme.FontBold,
 			TextSize = 15,
-			Text = def[2],
+			Text = "      " .. def[2],
 			LayoutOrder = order,
 			Parent = tabsFrame,
 		}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
+		-- Kategorie-Icon im Reiter (docs/09 §61)
+		local icon = CategoryIcon.create(TAB_ICONS[name] or "", 30)
+		icon.AnchorPoint = Vector2.new(0, 0.5)
+		icon.Position = UDim2.new(0, 4, 0.5, 0)
+		icon.Parent = button
 		button.Activated:Connect(function()
 			currentTab = name
 			render()

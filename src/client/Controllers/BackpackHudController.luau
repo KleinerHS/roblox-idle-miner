@@ -15,6 +15,7 @@ local NumberFormat = require(Shared.Util.NumberFormat)
 
 local Net = require(script.Parent.Parent.Net)
 local Create = require(script.Parent.Parent.UI.Create)
+local CategoryIcon = require(script.Parent.Parent.UI.Components.CategoryIcon)
 local StateController = require(script.Parent.StateController)
 local ElevatorController = require(script.Parent.ElevatorController)
 
@@ -85,6 +86,11 @@ function BackpackHudController.Init()
 		Create("UIStroke", { Color = UITheme.Colors.SurfaceRaised, Transparency = 0.8, Thickness = 2 }),
 		Create("UIPadding", { PaddingLeft = UDim.new(0, 14), PaddingRight = UDim.new(0, 14), PaddingTop = UDim.new(0, 8), PaddingBottom = UDim.new(0, 10) }),
 	})
+	-- Rucksack-Icon rechts oben (docs/09 §61)
+	local icon = CategoryIcon.create("Backpack", 40)
+	icon.AnchorPoint = Vector2.new(1, 0)
+	icon.Position = UDim2.new(1, 6, 0, -4)
+	icon.Parent = card
 	title = Create("TextLabel", {
 		Size = UDim2.new(1, 0, 0, 16),
 		BackgroundTransparency = 1,

@@ -24,7 +24,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 14 | Balance | TESTING_REQUIRED (14a Simulation & Bericht, 14b Umsetzung D-041–D-043, 14c Drill-Stufen D-044) |
 | 15 | Rare Drops & Mining Luck | TESTING_REQUIRED (15a, D-045) |
 | 16 | Verkauf & Spätspiel-Geld | TESTING_REQUIRED (16a, D-046) |
-| 17 | Icons | TESTING_REQUIRED (17a Erz- und Barren-Icons) |
+| 17 | Icons | TESTING_REQUIRED (17a Erz- und Barren-Icons, 17b Kategorie-Icons) |
 
 ## Setup – Details
 
@@ -669,7 +669,15 @@ Beispiel-Preise: Titanium-Spitzhacke $7M (L35, unverändert) · Carbide $320M (L
 | Icons statt Farbpunkten in Verkaufsfenster, Firmenlager, Handel (Angebot und Lagerliste) und Laptop STORAGE | `SellController`, `StorageController`, `TradeController`, `LaptopController` | TESTING_REQUIRED |
 
 Selbsttest (Play): Vorschau aller Stufenarten (Coal, Copper, Tin, Iron, Silver, Cobalt, Titanium, Iridium, Emerald, Jade, Luminous Crystal, Aetherium, Galaxium, Diamond, 3 Barren) per Bildschirmfoto geprüft und nachgebessert (Erz zur Kamera hin, größer); Verkaufsfenster und Firmenlager mit Icons per Bildschirmfoto geprüft; keine Fehler im Log.
-Offen: Kategorie-Icons (Money, Pickaxe, Worker usw., docs/09 §61).
+
+### 17b – Kategorie-Icons (Version 0.39.0, 2026-10-18)
+
+| System | Dateien | Status |
+|---|---|---|
+| 3D-Kategorie-Icons im selben Stil wie die Erze: Money, Level, XP, Pickaxe, Backpack, Worker, Storage, Elevator, Drill, Conveyor, Smelter, Vehicle, Ore, Settings, Luck, Company, Prestige, Dashboard; gemeinsamer Baustein für Licht/Kamera | `UI/Components/CategoryIcon.luau`, `UI/Components/ModelIcon.luau` (OreIcon nutzt ihn mit) | TESTING_REQUIRED |
+| Eingebaut: Laptop-Navigation (alle 8 Apps), Geld-Anzeige oben rechts, Mining-Level-Leiste, Rucksack-Karte, Shop-Reiter (Pickaxes, Backpacks, Drills, Conveyors, Vehicles) | `LaptopController`, `HudController`, `BackpackHudController`, `ShopController` | TESTING_REQUIRED |
+
+Selbsttest (Play): Vorschau aller 18 Icons per Bildschirmfoto geprüft und nachgebessert (XP, Spitzhacke, Drill nicht mehr abgeschnitten); Laptop, HUD und Machine-Shop mit Icons per Bildschirmfoto geprüft; keine Fehler im Log.
 
 ## Phase 12 – Content Expansion – Details
 

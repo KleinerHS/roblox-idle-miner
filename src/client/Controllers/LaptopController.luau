@@ -28,6 +28,7 @@ local CrateLogic = require(Shared.Util.CrateLogic)
 
 local Net = require(script.Parent.Parent.Net)
 local Create = require(script.Parent.Parent.UI.Create)
+local CategoryIcon = require(script.Parent.Parent.UI.Components.CategoryIcon)
 local OreIcon = require(script.Parent.Parent.UI.Components.OreIcon)
 local Strings = require(script.Parent.Parent.UI.Strings)
 local StateController = require(script.Parent.StateController)
@@ -44,6 +45,17 @@ local content: Frame
 local headerName: TextLabel
 local navButtons: { [string]: TextButton } = {}
 local currentApp = "DASHBOARD"
+-- Icon je Laptop-App
+local APP_ICONS: { [string]: string } = {
+	DASHBOARD = "Dashboard",
+	EMPLOYEES = "Worker",
+	STORAGE = "Storage",
+	ELEVATOR = "Elevator",
+	PRODUCTION = "Drill",
+	LUCK = "Luck",
+	COMPANY = "Company",
+	PRESTIGE = "Prestige",
+}
 local selectedMine = "mine_001"
 local statuses: { [string]: string } = {}
 local busy = false
@@ -987,10 +999,15 @@ local function build()
 			Font = UITheme.FontBold,
 			TextSize = 14,
 			TextColor3 = UITheme.Colors.TextPrimary,
-			Text = app,
+			Text = "      " .. app,
 			LayoutOrder = i,
 			Parent = nav,
 		}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
+		-- Kategorie-Icon links (docs/09 §61)
+		local icon = CategoryIcon.create(APP_ICONS[app] or "", 30)
+		icon.AnchorPoint = Vector2.new(0, 0.5)
+		icon.Position = UDim2.new(0, 6, 0.5, 0)
+		icon.Parent = button
 		button.Activated:Connect(function()
 			confirmStartedAt = nil
 			currentApp = app

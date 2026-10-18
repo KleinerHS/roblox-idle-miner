@@ -11,6 +11,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Materials = require(ReplicatedStorage:WaitForChild("Shared").Definitions.Materials)
+local ModelIcon = require(script.Parent.ModelIcon)
 
 local OreIcon = {}
 
@@ -41,7 +42,7 @@ local function rockBase(model: Model)
 end
 
 -- Richtung zur Kamera (siehe create): Erzklumpen sitzen auf der sichtbaren Seite
-local VIEW = Vector3.new(0.9, 0.75, 1).Unit
+local VIEW = ModelIcon.View
 
 local function build(id: string): Model?
 	local info = Materials.Get(id)
@@ -104,28 +105,7 @@ end
 
 -- Icon für ein Material. `size` in Pixeln (quadratisch).
 function OreIcon.create(id: string, size: number): ViewportFrame
-	local frame = Instance.new("ViewportFrame")
-	frame.Name = "OreIcon"
-	frame.Size = UDim2.fromOffset(size, size)
-	frame.BackgroundTransparency = 1
-	frame.Ambient = Color3.fromRGB(150, 150, 155)
-	frame.LightColor = Color3.fromRGB(255, 250, 240)
-	frame.LightDirection = Vector3.new(-0.6, -1, -0.4)
-	local t = template(id)
-	if not t then
-		return frame
-	end
-	local model = t:Clone()
-	model.Parent = frame
-	local camera = Instance.new("Camera")
-	camera.FieldOfView = 30
-	local cf, extents = model:GetBoundingBox()
-	local radius = extents.Magnitude / 2
-	local distance = radius / math.tan(math.rad(camera.FieldOfView / 2)) * 0.82
-	camera.CFrame = CFrame.lookAt(cf.Position + VIEW * distance, cf.Position)
-	camera.Parent = frame
-	frame.CurrentCamera = camera
-	return frame
+	return ModelIcon.frame(template(id), size, "OreIcon")
 end
 
 return OreIcon
