@@ -623,7 +623,7 @@ Selbsttest (Play): 12 Stufen in richtiger Reihenfolge geladen, Machine-Shop zeig
 
 | System | Dateien | Status |
 |---|---|---|
-| Jeder Drill hat ein Level 1–10 (im DrillRecord), am Laptop Stufe für Stufe kaufbar: Button „LV n → n+1 $X“ / „MAX LEVEL“; +5 % Produktion je Level (Felix, kürzerer Zyklus), Puffer wächst mit; Kosten Preis × 0,2 × 1,35^(n−1) (D-043, TODO_BALANCE) | `BalanceConfig.Drills`, `Drills`, `DrillService`, `ProductionService`, `OfflineSimulation`, `TradeService`, `LaptopController`, `DrillSlotController`, `Types` | TESTING_REQUIRED |
+| Jeder Drill hat ein Level 1–10 (im DrillRecord), am Laptop Stufe für Stufe kaufbar: Button „LV n → n+1 $X“ / „MAX LEVEL“; +10 % Produktion je Level (kürzerer Zyklus), Puffer wächst mit; Kosten Preis × 0,05 × 1,35^(n−1) (Felix: 5 %) (D-043, TODO_BALANCE) | `BalanceConfig.Drills`, `Drills`, `DrillService`, `ProductionService`, `OfflineSimulation`, `TradeService`, `LaptopController`, `DrillSlotController`, `Types` | TESTING_REQUIRED |
 | MK-Stufen-Upgrade aus 14b entfernt (neue MK-Stufe nur per Kauf) | `Drills`, `DrillService`, `tools/BalanceSim.luau` | TESTING_REQUIRED |
 
 Selbsttest (Play, Felix' Profil): am Laptop Drill d7 (MK1, Mine 01) Level 1 → 2 für $1.600, Typ bleibt drill_mk1; Laptop Employees zeigt „Drill MK1 · Lv 2 · 66 ore / min“ und Button „LV 2 → 3 $2.16K“ (Bildschirmfoto); keine Fehler.

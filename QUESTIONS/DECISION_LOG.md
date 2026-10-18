@@ -269,7 +269,7 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 ## D-043 – Drill-Level am Laptop (Level 1–10)
 
 **Source:** Felix, 2026-10-18 („man soll am Laptop nicht die MK-Stufen upgraden können, sondern einen externen Upgrader für den Drill, z. B. Drill MK1 – Lv 1–10“; ersetzt die erste Umsetzung, bei der das Upgrade die MK-Stufe erhöht hat)
-**Decision:** Jeder Drill hat ein eigenes Level 1–10, das am Laptop (Employees, Slot-Karte des platzierten Drills) Stufe für Stufe gekauft wird. Die MK-Stufe ändert sich nur durch Kauf eines neuen Drills im Machine-Shop. Startwerte (`BalanceConfig.Drills`, TODO_BALANCE): +5 % Produktion je Level (Lv 10 = +45 %, Felix 2026-10-18), Puffer wächst mit; Kosten Lv n → n+1 = Drill-Preis × 0,2 × 1,35^(n−1). Das Level gehört zum Drill (bleibt beim Entfernen/Handeln erhalten).
+**Decision:** Jeder Drill hat ein eigenes Level 1–10, das am Laptop (Employees, Slot-Karte des platzierten Drills) Stufe für Stufe gekauft wird. Die MK-Stufe ändert sich nur durch Kauf eines neuen Drills im Machine-Shop. Startwerte (`BalanceConfig.Drills`, TODO_BALANCE): +10 % Produktion je Level (Lv 10 = +90 %), Puffer wächst mit; Kosten Lv n → n+1 = Drill-Preis × 0,05 × 1,35^(n−1) (Felix 2026-10-18: „5%“ = Kostenanteil statt 20 %, damit ein voll aufgewerteter Drill etwa so viel kostet wie die nächste MK-Stufe; MK1 alle 9 Level ≈ $15.900 für 114 Erz/min, MK2 neu $25.000 für 120). Das zwischenzeitliche +5 % Produktion (45683f6) war ein Missverständnis und ist zurückgenommen. Das Level gehört zum Drill (bleibt beim Entfernen/Handeln erhalten).
 **Affected systems:** DrillService, Drills, ProductionService, OfflineSimulation, TradeService, Laptop, DrillSlot-Fenster, Types
 
 ## D-044 – Mehr Drill-Stufen
