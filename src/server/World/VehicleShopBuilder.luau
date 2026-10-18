@@ -194,7 +194,14 @@ function VehicleShopBuilder.build(parent: Instance): Model
 	local slots = cfg.DisplaySlots
 	local columnX = { -29, 0, 29 }
 	local rowZ = { -15, 11 }
-	for i, def in Vehicles.List do
+	-- Nur die kleinen Fahrzeuge werden ausgestellt (Felix 2026-10-18), LKW stehen nur im Katalog
+	local shown = {}
+	for _, def in Vehicles.List do
+		if def.Showroom then
+			table.insert(shown, def)
+		end
+	end
+	for i, def in shown do
 		if i > slots then
 			break
 		end

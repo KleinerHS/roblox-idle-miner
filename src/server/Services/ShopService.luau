@@ -220,6 +220,9 @@ local function buyVehicle(player: Player, typeId: unknown)
 	if not def then
 		return Result.err(Result.Codes.INVALID_ARGUMENT)
 	end
+	if def.Available == false then
+		return Result.err(Result.Codes.NOT_AVAILABLE)
+	end
 	local data = DataService.Get(player)
 	if not data then
 		return Result.err(Result.Codes.DATA_NOT_LOADED)

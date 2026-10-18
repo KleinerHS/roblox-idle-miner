@@ -28,17 +28,25 @@ export type VehicleDefinition = {
 	-- Lackfarbe der Karosserie (Firmenfarbe nur als Akzent, docs/07 §36)
 	PaintColor: Color3,
 	PersistenceClass: Pickaxes.PersistenceClass,
+	-- im Autohaus ausgestellt (Felix 2026-10-18: nur die kleinen Fahrzeuge)
+	Showroom: boolean?,
+	-- false = sichtbar, aber noch nicht kaufbar (Lastzüge warten auf die Anhänger-Technik)
+	Available: boolean?,
 }
+
+-- Karosserien seit 2026-10-18 aus Felix' Modellen (ServerStorage.Vendor.VehicleBodies, D-048).
+-- Namen ohne echte Marken (D-026).
 
 local list: { VehicleDefinition } = {
 	{
 		Id = "vehicle_pickup",
-		DisplayName = "Utility Pickup",
+		DisplayName = "Pickup",
 		Tier = 1,
 		Style = "Pickup",
 		RequiredLevel = 7,
 		Price = 6000,
 		Capacity = 1000, -- fest (docs/07 §7)
+		Showroom = true,
 		MaxSpeed = 55,
 		Acceleration = 1,
 		PaintColor = Color3.fromRGB(232, 232, 228),
@@ -46,12 +54,13 @@ local list: { VehicleDefinition } = {
 	},
 	{
 		Id = "vehicle_van",
-		DisplayName = "Utility Van",
+		DisplayName = "Cargo Van",
 		Tier = 2,
 		Style = "Van",
 		RequiredLevel = 10,
 		Price = 20000,
 		Capacity = 2500,
+		Showroom = true,
 		MaxSpeed = 52,
 		Acceleration = 0.85,
 		PaintColor = Color3.fromRGB(70, 82, 96),
@@ -59,12 +68,13 @@ local list: { VehicleDefinition } = {
 	},
 	{
 		Id = "vehicle_boxtruck",
-		DisplayName = "Box Truck",
+		DisplayName = "High-Roof Van",
 		Tier = 3,
 		Style = "BoxTruck",
 		RequiredLevel = 14,
 		Price = 60000,
 		Capacity = 6000,
+		Showroom = true,
 		MaxSpeed = 46,
 		Acceleration = 0.65,
 		PaintColor = Color3.fromRGB(196, 60, 46),
@@ -74,7 +84,7 @@ local list: { VehicleDefinition } = {
 	-- Preis ≈ 20.000 × Erzwert auf diesem Level, Modelle vorläufig (Feinschliff am Ende)
 	{
 		Id = "vehicle_truck",
-		DisplayName = "Tipper Truck",
+		DisplayName = "Box Truck",
 		Tier = 4,
 		Style = "Truck",
 		RequiredLevel = 25, -- TODO_BALANCE (Q-028)
@@ -87,8 +97,9 @@ local list: { VehicleDefinition } = {
 	},
 	{
 		Id = "vehicle_hauler",
-		DisplayName = "Mining Hauler",
+		DisplayName = "Tipper Road Train",
 		Tier = 5,
+		Available = false, -- Anhänger-Technik folgt (PLANS/ROAD_TRAINS.md)
 		Style = "Hauler",
 		RequiredLevel = 45, -- TODO_BALANCE (Q-028)
 		Price = 78000000, -- TODO_BALANCE (Q-028)
@@ -97,6 +108,20 @@ local list: { VehicleDefinition } = {
 		Acceleration = 0.45, -- TODO_BALANCE (Q-028)
 		PaintColor = Color3.fromRGB(236, 182, 40),
 		PersistenceClass = "Permanent",
+	},
+	{
+		Id = "vehicle_roadtrain",
+		DisplayName = "Grain Road Train",
+		Tier = 6,
+		Style = "Hauler",
+		RequiredLevel = 65, -- TODO_BALANCE
+		Price = 2000000000, -- TODO_BALANCE (vor Spätspiel-Aufschlag)
+		Capacity = 50000, -- TODO_BALANCE
+		MaxSpeed = 36, -- TODO_BALANCE
+		Acceleration = 0.4, -- TODO_BALANCE
+		PaintColor = Color3.fromRGB(230, 230, 230),
+		PersistenceClass = "Permanent",
+		Available = false, -- Anhänger-Technik folgt (PLANS/ROAD_TRAINS.md)
 	},
 }
 

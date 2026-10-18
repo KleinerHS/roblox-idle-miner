@@ -139,6 +139,30 @@ function DevService.Init()
 	end
 	clearVehicles.Parent = folder
 
+	-- Fahrzeug geben/nehmen (nur zum Testen neuer Karosserien):
+	--   game.ServerStorage.DevTools.GiveVehicle:Invoke(game.Players:GetPlayers()[1], "vehicle_truck")
+	local giveVehicle = Instance.new("BindableFunction")
+	giveVehicle.Name = "GiveVehicle"
+	giveVehicle.OnInvoke = function(player: Player, typeId: string): string
+		local newId = ""
+		local ok = DataService.Mutate(player, function(data)
+			data.Vehicles.Seq += 1
+			newId = `v{data.Vehicles.Seq}`
+			data.Vehicles.Owned[newId] = { Id = newId, Type = typeId, Cargo = {} }
+		end)
+		return if ok then newId else "Profil nicht geladen"
+	end
+	giveVehicle.Parent = folder
+	local takeVehicle = Instance.new("BindableFunction")
+	takeVehicle.Name = "TakeVehicle"
+	takeVehicle.OnInvoke = function(player: Player, vehicleId: string): string
+		local ok = DataService.Mutate(player, function(data)
+			data.Vehicles.Owned[vehicleId] = nil
+		end)
+		return if ok then "ok" else "Profil nicht geladen"
+	end
+	takeVehicle.Parent = folder
+
 	-- Bauschritt setzen/entfernen (z. B. Garage wieder abbauen):
 	--   game.ServerStorage.DevTools.SetBuilding:Invoke(game.Players:GetPlayers()[1], "build_garage", false)
 	local setBuilding = Instance.new("BindableFunction")

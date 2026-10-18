@@ -295,3 +295,9 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Source:** Felix, 2026-10-18 („großes Lager vergessen wir erst mal, darüber denke ich ganz am Ende noch mal nach“)
 **Decision:** Das große Lager hinter der Halle wird vorerst nicht gebaut; Entscheidung ganz am Ende. Als Nächstes liefert Felix Fahrzeugmodelle in der Reihenfolge, wie sie preislich und kapazitätsmäßig aufsteigen sollen.
 **Affected systems:** –
+
+## D-048 – Neue Fahrzeugreihe aus Felix' Modellen, Lastzüge mit echten Anhängern
+
+**Source:** Felix, 2026-10-18 (6 Creator-Store-Modelle in Preis-/Größenreihenfolge; „1.a ja dann müssen wir umbauen, plane bitte schon mal“; „die alten Autos komplett entfernen, im Autohaus sollen nur die kleinen Autos ausgestellt werden, später kommen noch mehr dazu, viele davon auch nur Spaß-Autos“)
+**Decision:** Karosserien kommen aus `ServerStorage.Vendor.VehicleBodies` (vorbereitet mit `tools/PrepareVehicleBodies.luau`: ohne Skripte, Logos, Nummernschild-Bilder), gefahren wird weiter mit A-Chassis. IDs bleiben: `vehicle_pickup` = Pickup, `vehicle_van` = Cargo Van, `vehicle_boxtruck` = High-Roof Van, `vehicle_truck` = Box Truck, `vehicle_hauler` = Tipper Road Train (FH 540), neu `vehicle_roadtrain` = Grain Road Train (Scania). Die beiden Lastzüge bekommen echte Anhänger (Plan `PLANS/ROAD_TRAINS.md`) und sind bis dahin „Coming soon“. Im Autohaus stehen nur Pickup, Cargo Van und High-Roof Van. Geschlossene Aufbauten werden übers Dach beladen.
+**Affected systems:** Vehicles, VehicleModelBuilder, VehicleShopBuilder, ShopService, ShopController, LoadingService, DevService

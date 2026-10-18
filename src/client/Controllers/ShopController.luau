@@ -114,7 +114,7 @@ local function cardsFor(tab: string, snapshot: Types.StateSnapshot): { Card }
 				Name = def.DisplayName,
 				Level = def.RequiredLevel,
 				Price = def.Price,
-				Available = true,
+				Available = def.Available ~= false,
 				Stats = {
 					{ label = TEXT.Capacity, value = NumberFormat.withSeparators(def.Capacity) },
 					{ label = TEXT.VehicleSpeed, value = tostring(def.MaxSpeed) },
@@ -275,6 +275,8 @@ local function render()
 			-- Fahrzeuge: einmal kaufen, danach in der Garage am Ring ausparken
 			if isOwned then
 				actionText, actionColor, enabled = TEXT.Owned, UITheme.Colors.Positive, false
+			elseif not card.Available then
+				actionText, actionColor, enabled = TEXT.ComingSoon, UITheme.Colors.SurfaceRaised, false
 			elseif locked then
 				actionText, actionColor, enabled = `{TEXT.Locked}\n{string.format(TEXT.RequiresLevel, card.Level)}`, UITheme.Colors.SurfaceRaised, false
 			else
