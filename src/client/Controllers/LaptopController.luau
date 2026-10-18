@@ -19,6 +19,7 @@ local Drills = require(Shared.Definitions.Drills)
 local SmelterLogic = require(Shared.Util.SmelterLogic)
 local Upgrades = require(Shared.Definitions.Upgrades)
 local BalanceConfig = require(Shared.Config.BalanceConfig)
+local RareDropLogic = require(Shared.Util.RareDropLogic)
 local CompanyIdentity = require(Shared.Definitions.CompanyIdentity)
 local Types = require(Shared.Types)
 local NumberFormat = require(Shared.Util.NumberFormat)
@@ -709,6 +710,41 @@ local function renderCompany(snapshot: Types.StateSnapshot)
 	end)
 end
 
+-- LUCK (D-045): Mining Luck Stufe für Stufe, erhöht nur die Rare-Drop-Chance beim eigenen Mining
+local function renderLuck(snapshot: Types.StateSnapshot)
+	label(TEXT.LuckTitle, 24, UITheme.Colors.TextPrimary, 1, true)
+	label(TEXT.LuckHint, 15, UITheme.Colors.TextSecondary, 2)
+	local level = snapshot.LuckLevel or 0
+	local max = BalanceConfig.Luck.MaxLevel
+	local box = card(3, 120)
+	cardText(box, string.format(TEXT.LuckLine, level, max), 0, 14, UITheme.Colors.TextSecondary, true)
+	cardText(box, string.format(TEXT.LuckChanceLine, string.format("%.2f%%", RareDropLogic.Chance(level) * 100)), 24, 20, UITheme.Colors.TextPrimary, true)
+	local price, requiredLevel = RareDropLogic.NextLuck(level)
+	if not price or not requiredLevel then
+		cardText(box, TEXT.LuckMax, 56, 16, UITheme.Colors.Positive, true)
+		return
+	end
+	cardText(box, string.format(TEXT.LuckNext, string.format("%.2f%%", RareDropLogic.Chance(level + 1) * 100)), 54, 15, UITheme.Colors.TextSecondary)
+	local levelOk = snapshot.MiningLevel >= requiredLevel
+	local affordable = snapshot.Cash >= price
+	cardText(box, string.format(TEXT.RequiresLevel, requiredLevel), 76, 15, if levelOk then UITheme.Colors.TextSecondary else UITheme.Colors.Warning)
+	local ready = levelOk and affordable
+	local button: TextButton = Create("TextButton", {
+		AnchorPoint = Vector2.new(1, 1),
+		Position = UDim2.fromScale(1, 1),
+		Size = UDim2.fromOffset(170, 40),
+		BackgroundColor3 = if ready then accent(snapshot) else UITheme.Colors.SurfaceRaised,
+		Font = UITheme.FontBold,
+		TextSize = 15,
+		TextColor3 = if ready then Color3.fromRGB(20, 24, 28) else UITheme.Colors.TextPrimary,
+		Text = string.format(TEXT.LuckButton, NumberFormat.cash(price)),
+		Parent = box,
+	}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
+	button.Activated:Connect(function()
+		call("BuyLuck", { Level = requiredLevel, Price = NumberFormat.cash(price) })
+	end)
+end
+
 -- PRESTIGE (docs/12 §50–52, docs/09 §74): Voraussetzung, Bonus, Reset-/Behalten-Liste und
 -- Bestätigung in zwei Schritten mit Wartezeit – nie mit einem einzelnen Klick.
 local CONFIRM_SECONDS = 3
@@ -837,6 +873,8 @@ function LaptopController.Render()
 		renderElevator(snapshot)
 	elseif currentApp == "PRODUCTION" then
 		renderProduction(snapshot)
+	elseif currentApp == "LUCK" then
+		renderLuck(snapshot)
 	elseif currentApp == "COMPANY" then
 		renderCompany(snapshot)
 	elseif currentApp == "PRESTIGE" then

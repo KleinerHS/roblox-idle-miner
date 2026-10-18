@@ -18,8 +18,6 @@ local Conveyors = require(Shared.Definitions.Conveyors)
 local Vehicles = require(Shared.Definitions.Vehicles)
 local Types = require(Shared.Types)
 local NumberFormat = require(Shared.Util.NumberFormat)
-local BalanceConfig = require(Shared.Config.BalanceConfig)
-local RareDropLogic = require(Shared.Util.RareDropLogic)
 
 local Net = require(script.Parent.Parent.Net)
 local Create = require(script.Parent.Parent.UI.Create)
@@ -43,7 +41,7 @@ local currentTab = "pickaxe"
 
 -- Reiter je Shop
 local SHOP_TABS: { [string]: { { string } } } = {
-	equipment = { { "pickaxe", TEXT.Pickaxes }, { "backpack", TEXT.Backpacks }, { "luck", TEXT.Luck } },
+	equipment = { { "pickaxe", TEXT.Pickaxes }, { "backpack", TEXT.Backpacks } },
 	machine = { { "drill", TEXT.Drills }, { "conveyor", TEXT.Conveyors } },
 	vehicle = { { "vehicle", TEXT.Vehicles } },
 }
@@ -85,26 +83,6 @@ end
 
 local function cardsFor(tab: string, snapshot: Types.StateSnapshot): { Card }
 	local cards: { Card } = {}
-	if tab == "luck" then
-		-- Mining Luck (D-007): Level 1 … Max, nur das nächste ist kaufbar
-		local current = snapshot.LuckLevel or 0
-		for level = 1, BalanceConfig.Luck.MaxLevel do
-			local price = math.floor(BalanceConfig.Luck.BasePrice * BalanceConfig.Luck.PriceGrowth ^ (level - 1) + 0.5)
-			local before = RareDropLogic.Chance(level - 1) * 100
-			local after = RareDropLogic.Chance(level) * 100
-			table.insert(cards, {
-				Id = tostring(level),
-				Name = string.format(TEXT.LuckName, level),
-				Level = BalanceConfig.Luck.RequiredLevelStep * level,
-				Price = price,
-				Available = level <= current + 1,
-				Stats = {
-					{ label = TEXT.LuckChance, value = string.format("%.2f%%", after), compare = string.format("%.2f%%", before) },
-				},
-			})
-		end
-		return cards
-	end
 	if tab == "pickaxe" then
 		local current = Pickaxes.Get(snapshot.EquippedPickaxe)
 		for _, def in Pickaxes.List do
@@ -198,11 +176,10 @@ local function act(remote: string, itemId: string)
 		return
 	end
 	busy = true
-	local result = if remote == "BuyLuck" then Net.invoke(remote) elseif remote == "BuyMachine" or remote == "BuyVehicle" then Net.invoke(remote, itemId) else Net.invoke(remote, currentTab, itemId)
+	local result = if remote == "BuyMachine" or remote == "BuyVehicle" then Net.invoke(remote, itemId) else Net.invoke(remote, currentTab, itemId)
 	busy = false
 	if not result.success then
-		local def: any = if currentTab == "luck" then { RequiredLevel = BalanceConfig.Luck.RequiredLevelStep * (tonumber(itemId) or 0), Price = math.floor(BalanceConfig.Luck.BasePrice * BalanceConfig.Luck.PriceGrowth ^ ((tonumber(itemId) or 1) - 1) + 0.5) }
-			elseif currentTab == "pickaxe" then Pickaxes.Get(itemId) elseif currentTab == "drill" then Drills.Get(itemId) elseif currentTab == "conveyor" then Conveyors.Get(itemId) elseif currentTab == "vehicle" then Vehicles.Get(itemId) else Backpacks.Get(itemId)
+		local def: any = if currentTab == "pickaxe" then Pickaxes.Get(itemId) elseif currentTab == "drill" then Drills.Get(itemId) elseif currentTab == "conveyor" then Conveyors.Get(itemId) elseif currentTab == "vehicle" then Vehicles.Get(itemId) else Backpacks.Get(itemId)
 		NotificationController.Show("Warning", result.code, { Level = def and def.RequiredLevel, Price = def and def.Price })
 	end
 end
@@ -223,12 +200,6 @@ local function render()
 		return
 	end
 	local owned: { [string]: boolean } = if currentTab == "pickaxe" then snapshot.OwnedPickaxes elseif currentTab == "backpack" then snapshot.OwnedBackpacks else {}
-	if currentTab == "luck" then
-		owned = {}
-		for level = 1, snapshot.LuckLevel or 0 do
-			owned[tostring(level)] = true
-		end
-	end
 	if currentTab == "vehicle" then
 		for _, vehicle in snapshot.Vehicles do
 			owned[vehicle.Type] = true
@@ -264,7 +235,7 @@ local function render()
 		})
 		local statLines = {}
 		for _, stat in card.Stats do
-			table.insert(statLines, if stat.label == "" then stat.value elseif stat.compare then `{stat.label}: {stat.compare} → {stat.value}` else `{stat.label}: {stat.value}`)
+			table.insert(statLines, if stat.compare then `{stat.label}: {stat.compare} → {stat.value}` else `{stat.label}: {stat.value}`)
 		end
 		Create("TextLabel", {
 			Position = UDim2.fromOffset(0, 28),
@@ -281,20 +252,7 @@ local function render()
 
 		-- Status / Aktion rechts
 		local actionText, actionColor, enabled, remote
-		if currentTab == "luck" then
-			if isOwned then
-				actionText, actionColor, enabled = TEXT.Owned, UITheme.Colors.Positive, false
-			elseif not card.Available then
-				actionText, actionColor, enabled = `{TEXT.Locked}`, UITheme.Colors.SurfaceRaised, false
-			elseif locked then
-				actionText, actionColor, enabled = `{TEXT.Locked}\n{string.format(TEXT.RequiresLevel, card.Level)}`, UITheme.Colors.SurfaceRaised, false
-			else
-				local affordable = snapshot.Cash >= card.Price
-				actionText = string.format(TEXT.Buy, NumberFormat.cash(card.Price))
-				actionColor = if affordable then UITheme.Colors.Positive else UITheme.Colors.SurfaceRaised
-				enabled, remote = true, "BuyLuck"
-			end
-		elseif card.Multi then
+		if card.Multi then
 			-- Mehrfach kaufbar (Drills): nur Level und Geld entscheiden
 			if locked then
 				actionText, actionColor, enabled = `{TEXT.Locked}\n{string.format(TEXT.RequiresLevel, card.Level)}`, UITheme.Colors.SurfaceRaised, false

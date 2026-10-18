@@ -141,10 +141,6 @@ Strings.Shop = table.freeze({
 	InventoryValue = "Owned %d · Placed %d · Available %d",
 	Pickaxes = "PICKAXES",
 	Backpacks = "BACKPACKS",
-	Luck = "LUCK",
-	LuckName = "Mining Luck %d",
-	LuckChance = "Rare drop chance",
-	LuckHint = "Only for your own mining – not for workers or drills.",
 	Power = "Mining Power",
 	Speed = "Mining Speed",
 	Capacity = "Capacity",
@@ -166,7 +162,15 @@ Strings.Storage = table.freeze({
 })
 
 Strings.Laptop = table.freeze({
-	Apps = { "DASHBOARD", "EMPLOYEES", "STORAGE", "ELEVATOR", "PRODUCTION", "COMPANY", "PRESTIGE" },
+	Apps = { "DASHBOARD", "EMPLOYEES", "STORAGE", "ELEVATOR", "PRODUCTION", "LUCK", "COMPANY", "PRESTIGE" },
+	-- Mining Luck (D-045, im Laptop seit 2026-10-18)
+	LuckTitle = "MINING LUCK",
+	LuckLine = "Level %d / %d",
+	LuckChanceLine = "Rare drop chance: %s",
+	LuckHint = "Only for your own mining – not for workers or drills.",
+	LuckNext = "Next: %s",
+	LuckButton = "BUY %s",
+	LuckMax = "Fully upgraded.",
 	ComingSoon = "This app is coming soon.",
 	Employees = "EMPLOYEES",
 	NeedStorage = "Build the Storage first to hire workers.",

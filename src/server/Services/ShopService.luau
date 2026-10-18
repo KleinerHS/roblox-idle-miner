@@ -29,6 +29,7 @@ local MachineShopBuilder = require(script.Parent.Parent.World.MachineShopBuilder
 local VehicleShopBuilder = require(script.Parent.Parent.World.VehicleShopBuilder)
 local DataService = require(script.Parent.DataService)
 local MiningService = require(script.Parent.MiningService)
+local WorkerService = require(script.Parent.WorkerService)
 local RemoteService = require(script.Parent.RemoteService)
 
 local TAG = "ShopService"
@@ -270,12 +271,12 @@ function ShopService.Init()
 	counters.vehicle = vehicleShop:FindFirstChild("CounterPromptPart") :: BasePart
 
 	RemoteService.OnInvoke("BuyLuck", function(player: Player)
-		-- Nächstes Mining-Luck-Level im Equipment-Shop (D-007)
+		-- Nächstes Mining-Luck-Level am Laptop (D-045, Felix 2026-10-18: „in den Laptop verschieben“)
 		local data = DataService.Get(player)
 		if not data then
 			return Result.err(Result.Codes.DATA_NOT_LOADED)
 		end
-		if not isNearShop(player, "equipment") then
+		if not WorkerService.IsNearLaptop(player) then
 			return Result.err(Result.Codes.TOO_FAR)
 		end
 		local level = data.Equipment.LuckLevel or 0

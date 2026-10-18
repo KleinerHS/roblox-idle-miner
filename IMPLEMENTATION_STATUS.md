@@ -636,11 +636,12 @@ Selbsttest (Play, Felix' Profil): am Laptop Drill d7 (MK1, Mine 01) Level 1 → 
 | System | Dateien | Status |
 |---|---|---|
 | Server würfelt bei jedem erfolgreichen manuellen Hit: LUCKY DROP ×2–×10 der Hit-Menge oder RARE DROP 1 Erz aus den nächsten 1–4 Stufen (weiter = seltener); nie bei Worker/Drill/Offline; Kapazität darf einmalig überschritten werden (D-006) | `MiningService`, `shared/Util/RareDropLogic.luau`, `BalanceConfig.RareDrops` | TESTING_REQUIRED |
-| Mining Luck 1–10 im Equipment-Shop (Reiter LUCK, Chance vorher → nachher, Level-Anforderung, OWNED), Remote `BuyLuck` | `ShopService`, `ShopController`, `BalanceConfig.Luck`, `Remotes` | TESTING_REQUIRED |
+| Mining Luck 1–10 am Laptop (App LUCK: Stufe, aktuelle und nächste Chance, Level-Anforderung, Kauf-Button; Felix 2026-10-18, vorher Equipment-Shop), Remote `BuyLuck` nur in Laptop-Nähe | `ShopService`, `LaptopController`, `BalanceConfig.Luck`, `Remotes` | TESTING_REQUIRED |
 | Feedback nur nach Server-Bestätigung: großer Hinweis „RARE DROP! +1 TIN“ / „LUCKY DROP! x6 COAL“, Glanz und Funken an der Erzwand, eigener Sound | `MiningController`, `HudController.ShowRareDrop`, `AmbienceConfig.Sounds` | TESTING_REQUIRED |
 | Datenschema v11: `Equipment.LuckLevel` | `DataSchema`, `Types`, `DataService` (Snapshot) | TESTING_REQUIRED |
 
 Selbsttest (2026-10-18): Statistik 200.000 Würfe → 1,00 % Rare, davon 15 % Rare Ore, Multiplikator ×2 häufig bis ×10 selten, Erzstufen 1>2>3>4; Play mit kurz erhöhter Testchance (50 %, danach auf 1 % zurückgesetzt): 8 Hits → LUCKY DROP x6/x1 COAL, RARE DROP +1 TIN, Rucksack entsprechend gefüllt; Hinweis per Bildschirmfoto geprüft; BuyLuck am Equipment-Shop: Luck 0 → 1, −$5.000 (Geld danach per DevTools zurückgesetzt), Reiter LUCK per Bildschirmfoto geprüft; keine Fehler. Felix' Profil hat dadurch Mining Luck 1 und ein paar Erze mehr im Rucksack.
+Nach Verschiebung in den Laptop (0.36.1): App LUCK per Bildschirmfoto geprüft (Level 1/10, 1,15 % → 1,30 %, Requires Mining Level 10, BUY $15K); BuyLuck weit weg → TOO_FAR, am Laptop → NOT_ENOUGH_MONEY (Nähe-Prüfung ok); Equipment-Shop ohne LUCK-Reiter.
 
 ## Phase 12 – Content Expansion – Details
 
