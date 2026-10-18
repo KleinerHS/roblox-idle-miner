@@ -240,6 +240,11 @@ function HudController.Start()
 	end
 end
 
+-- Rare-Drop-Meldung (docs/09 §17): nur nach Server-Bestätigung, kurz und auffällig
+function HudController.ShowRareDrop(title: string, line: string, color: Color3)
+	showPopup(title, line, "", color)
+end
+
 -- Verkaufsrückmeldung "SOLD +$X +Y Mining XP" (docs/09 §49)
 function HudController.ShowSold(cash: number, xp: number)
 	soldActiveUntil = os.clock() + 2.4

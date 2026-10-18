@@ -4,6 +4,6 @@
 
 return {
 	Game = "Roblox Idle Miner",
-	Version = "0.35.0",
-	Phase = "Phase 14d – Drill-Level",
+	Version = "0.36.0",
+	Phase = "Phase 15a – Rare Drops & Mining Luck",
 }

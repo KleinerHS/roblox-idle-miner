@@ -1,5 +1,5 @@
 --!strict
--- Datenschema v10: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
+-- Datenschema v11: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
 -- Regeln:
 --  * Defaults gibt es nur hier.
 --  * Jede Strukturänderung erhöht CURRENT_VERSION und bekommt eine Migration
@@ -15,7 +15,7 @@ local Backpacks = require(Shared.Definitions.Backpacks)
 local Mines = require(Shared.Definitions.Mines)
 local Types = require(Shared.Types)
 
-local CURRENT_VERSION = 10
+local CURRENT_VERSION = 11
 
 local DataSchema = {
 	CurrentVersion = CURRENT_VERSION,
@@ -46,6 +46,7 @@ local TEMPLATE: Types.PlayerData = {
 		EquippedPickaxe = Pickaxes.StarterId,
 		OwnedBackpacks = { [Backpacks.StarterId] = true },
 		EquippedBackpack = Backpacks.StarterId,
+		LuckLevel = 0,
 	},
 
 	Backpack = {},
@@ -198,6 +199,11 @@ local MIGRATIONS: { [number]: (data: { [string]: any }) -> () } = {
 			end
 		end
 		data.Cash = (data.Cash or 0) + refund
+	end,
+	-- v10 → v11: Mining Luck (D-007)
+	[10] = function(data)
+		data.Equipment = data.Equipment or {}
+		data.Equipment.LuckLevel = data.Equipment.LuckLevel or 0
 	end,
 }
 

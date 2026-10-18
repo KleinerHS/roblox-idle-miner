@@ -22,6 +22,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 12 | Content Expansion | TESTING_REQUIRED (12a D-035, 12b D-036, 12c Fahrzeuge – Werte Q-028 offen) |
 | 13 | Visual Polish | TESTING_REQUIRED (13a Map & Umgebung, 13b Halle/Lager/Ofen, 13c Mine-Shaft, 13d Licht/Effekte/Sound, 13e UI-Feinschliff; alle Teilschritte warten auf Felix' Test) |
 | 14 | Balance | TESTING_REQUIRED (14a Simulation & Bericht, 14b Umsetzung D-041–D-043, 14c Drill-Stufen D-044) |
+| 15 | Rare Drops & Mining Luck | TESTING_REQUIRED (15a, D-045) |
 
 ## Setup – Details
 
@@ -627,6 +628,19 @@ Selbsttest (Play): 12 Stufen in richtiger Reihenfolge geladen, Machine-Shop zeig
 | MK-Stufen-Upgrade aus 14b entfernt (neue MK-Stufe nur per Kauf) | `Drills`, `DrillService`, `tools/BalanceSim.luau` | TESTING_REQUIRED |
 
 Selbsttest (Play, Felix' Profil): am Laptop Drill d7 (MK1, Mine 01) Level 1 → 2 für $1.600, Typ bleibt drill_mk1; Laptop Employees zeigt „Drill MK1 · Lv 2 · 66 ore / min“ und Button „LV 2 → 3 $2.16K“ (Bildschirmfoto); keine Fehler.
+
+## Phase 15 – Rare Drops & Mining Luck – Details
+
+### 15a (Version 0.36.0, 2026-10-18)
+
+| System | Dateien | Status |
+|---|---|---|
+| Server würfelt bei jedem erfolgreichen manuellen Hit: LUCKY DROP ×2–×10 der Hit-Menge oder RARE DROP 1 Erz aus den nächsten 1–4 Stufen (weiter = seltener); nie bei Worker/Drill/Offline; Kapazität darf einmalig überschritten werden (D-006) | `MiningService`, `shared/Util/RareDropLogic.luau`, `BalanceConfig.RareDrops` | TESTING_REQUIRED |
+| Mining Luck 1–10 im Equipment-Shop (Reiter LUCK, Chance vorher → nachher, Level-Anforderung, OWNED), Remote `BuyLuck` | `ShopService`, `ShopController`, `BalanceConfig.Luck`, `Remotes` | TESTING_REQUIRED |
+| Feedback nur nach Server-Bestätigung: großer Hinweis „RARE DROP! +1 TIN“ / „LUCKY DROP! x6 COAL“, Glanz und Funken an der Erzwand, eigener Sound | `MiningController`, `HudController.ShowRareDrop`, `AmbienceConfig.Sounds` | TESTING_REQUIRED |
+| Datenschema v11: `Equipment.LuckLevel` | `DataSchema`, `Types`, `DataService` (Snapshot) | TESTING_REQUIRED |
+
+Selbsttest (2026-10-18): Statistik 200.000 Würfe → 1,00 % Rare, davon 15 % Rare Ore, Multiplikator ×2 häufig bis ×10 selten, Erzstufen 1>2>3>4; Play mit kurz erhöhter Testchance (50 %, danach auf 1 % zurückgesetzt): 8 Hits → LUCKY DROP x6/x1 COAL, RARE DROP +1 TIN, Rucksack entsprechend gefüllt; Hinweis per Bildschirmfoto geprüft; BuyLuck am Equipment-Shop: Luck 0 → 1, −$5.000 (Geld danach per DevTools zurückgesetzt), Reiter LUCK per Bildschirmfoto geprüft; keine Fehler. Felix' Profil hat dadurch Mining Luck 1 und ein paar Erze mehr im Rucksack.
 
 ## Phase 12 – Content Expansion – Details
 

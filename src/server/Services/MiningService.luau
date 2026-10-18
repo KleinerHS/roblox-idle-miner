@@ -18,6 +18,9 @@ local Types = require(Shared.Types)
 local Result = require(Shared.Util.Result)
 local Log = require(Shared.Util.Log)
 local PrestigeLogic = require(Shared.Util.PrestigeLogic)
+local RareDropLogic = require(Shared.Util.RareDropLogic)
+local Ores = require(Shared.Definitions.Ores)
+local BalanceConfig = require(Shared.Config.BalanceConfig)
 
 local ToolBuilder = require(script.Parent.Parent.World.ToolBuilder)
 local DataService = require(script.Parent.DataService)
@@ -55,9 +58,31 @@ local function distanceToBox(point: Vector3, box: BasePart): number
 	return (localPoint - clamped).Magnitude
 end
 
--- Platzhalter für Rare Drops (D-006: erst nach Slice A). Gibt nil = kein Rare Drop.
-local function rollRareDrop(_player: Player, _mine: Mines.MineDefinition): nil
-	return nil
+local rng = Random.new()
+
+-- Rare Drop eines erfolgreichen manuellen Hits (docs/03 §7, docs/11 §18–21). Gibt das zusätzliche
+-- Erz und die Anzeige-Daten zurück oder nil. Nur hier – Worker/Drills/Offline haben keine Rare Drops.
+type RareDrop = { Kind: string, OreId: string, Amount: number, Multiplier: number? }
+local function rollRareDrop(data: Types.PlayerData, mine: Mines.MineDefinition, power: number): RareDrop?
+	local ore = Ores.Get(mine.OreId)
+	if not ore then
+		return nil
+	end
+	local maxOffset = #Ores.List - ore.Tier
+	local roll = RareDropLogic.Roll(rng, data.Equipment.LuckLevel or 0, maxOffset)
+	if not roll then
+		return nil
+	end
+	if roll.Kind == "Ore" then
+		local rare = Ores.GetByTier(ore.Tier + (roll :: any).TierOffset)
+		if rare then
+			return { Kind = "Ore", OreId = rare.Id, Amount = BalanceConfig.RareDrops.RareOreAmount }
+		end
+		return nil
+	end
+	local multiplier = (roll :: any).Multiplier :: number
+	-- Zusatz so, dass der Hit insgesamt das Multiplikator-Fache bringt
+	return { Kind = "Amount", OreId = ore.Id, Amount = power * (multiplier - 1), Multiplier = multiplier }
 end
 
 -- Gibt dem Spieler seine ausgerüstete Spitzhacke als Tool (genau eine).
@@ -139,14 +164,21 @@ local function hit(player: Player, slotIndex: unknown)
 	lastHit[player] = now
 
 	local amount = math.min(pickaxe.MiningPower, free)
-	local _rare = rollRareDrop(player, mine)
+	-- Rare Drop darf die Kapazität einmalig überschreiten, nichts geht verloren (D-006)
+	local rare = rollRareDrop(data, mine, pickaxe.MiningPower)
 	DataService.Mutate(player, function(d)
 		d.Backpack[mine.OreId] = (d.Backpack[mine.OreId] or 0) + amount
+		if rare then
+			d.Backpack[rare.OreId] = (d.Backpack[rare.OreId] or 0) + rare.Amount
+		end
 	end)
 
 	local total = backpackTotal(data)
 	Log.debug(TAG, `{player.Name} +{amount} {mine.OreId} ({total}/{capacity})`)
-	return Result.ok({ OreId = mine.OreId, Amount = amount, Total = total, Capacity = capacity })
+	if rare then
+		Log.info(TAG, `{player.Name} Rare Drop: {rare.Kind} +{rare.Amount} {rare.OreId}`)
+	end
+	return Result.ok({ OreId = mine.OreId, Amount = amount, Total = total, Capacity = capacity, Rare = rare })
 end
 
 -- Nach Wechsel der ausgerüsteten Spitzhacke (ShopService) das Tool tauschen.

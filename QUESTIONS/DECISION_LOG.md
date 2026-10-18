@@ -277,3 +277,9 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Source:** Felix, 2026-10-18 (Rückfrage „später mehr Drills“: „A“ = mehr Drill-Stufen; Upgrade am Laptop wie D-043)
 **Decision:** Sechs neue Stufen (Level 18, 35, 58, 80, 90, 100) schließen die Lücken zwischen MK3–MK6 und reichen bis Level 100: insgesamt 12 Stufen. Preis ≈ 25.000 × Erzwert auf dem Level (Regel aus D-036), Leistung geometrisch zwischen den Nachbarn, Puffer = 5 Minuten Produktion (Startwerte). Die Anzeige-Nummer folgt der Reihenfolge (MK1–MK12); die IDs bleiben stabil (z. B. `drill_mk4` heißt jetzt „Drill MK5“). Am Laptop gibt es je Drill die Level 1–10 (D-043), keine MK-Stufen-Upgrades.
 **Affected systems:** Drills, Machine-Shop, Laptop
+
+## D-045 – Rare Drops und Mining Luck umgesetzt (Startwerte)
+
+**Source:** Felix, 2026-10-18 („ja dann mach weiter“ auf den Vorschlag Rare Drops); Regeln aus docs/03 §7–8, docs/11 §18–21, D-006, D-007
+**Decision:** Bei jedem erfolgreichen manuellen Hit würfelt der Server einen Rare Drop (nur Spieler, nie Worker/Drills/Offline). Ein Rare Event ist entweder „LUCKY DROP“ – der Hit bringt ×2 bis ×10 seiner Menge – oder „RARE DROP“ – genau 1 Erz aus den nächsten 1–4 Erzstufen (weiter = seltener). Der Drop darf die Rucksackkapazität einmalig überschreiten (D-006). Mining Luck: 10 Stufen im Equipment-Shop (Reiter LUCK), je Stufe +15 % relative Chance. Startwerte (TODO_BALANCE): Grundchance 1 % je Hit, 15 % der Rare Events sind Rare Ore, Luck-Preis $5.000 × 3^(n−1), Luck-Stufe n ab Mining Level 5n. Luck bleibt bei Prestige erhalten (Equipment).
+**Affected systems:** MiningService, RareDropLogic, BalanceConfig, ShopService, ShopController, MiningController, HudController, SoundController, Data (v11)

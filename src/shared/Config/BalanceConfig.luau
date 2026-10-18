@@ -105,6 +105,30 @@ local BalanceConfig = {
 		FireRefund = 0, -- Felix (D-021)
 	},
 
+	-- Rare Drops beim manuellen Mining (docs/03 §7–8, docs/11 §18–21, D-006). Nur Spieler, nie
+	-- Worker/Drills/Offline. Ein Rare Event ist ENTWEDER Mengen-Multiplikator ODER ein Rare Ore.
+	RareDrops = {
+		BaseChance = 0.01, -- TODO_BALANCE: Chance je erfolgreichem Hit (1 %)
+		OreShare = 0.15, -- TODO_BALANCE: Anteil Rare Ore unter den Rare Events (Rest = Multiplikator)
+		-- Gewichte für den Multiplikator ×2 … ×10 auf die Menge dieses Hits (höher = seltener;
+		-- docs/11 §18: „1x bis 10x“, ×1 wäre kein Bonus)
+		MultiplierWeights = { 30, 22, 15, 10, 8, 6, 4, 3, 2 }, -- TODO_BALANCE (×2 … ×10)
+		-- Gewichte für 1 … 4 Erzstufen weiter (je weiter, desto seltener, docs/11 §19)
+		TierWeights = { 8, 4, 2, 1 }, -- TODO_BALANCE
+		RareOreAmount = 1, -- docs/03 §7: genau ein seltenes Erz
+	},
+
+	-- Mining Luck (docs/10 §17, D-007): eigene Upgrades mit Geld im Equipment-Shop, erhöht nur
+	-- die Rare-Drop-Chance. Chance × (1 + Level × ChanceBonusPerLevel).
+	Luck = {
+		MaxLevel = 10, -- TODO_BALANCE
+		ChanceBonusPerLevel = 0.15, -- TODO_BALANCE (Lv 10 = 2,5-fache Chance)
+		BasePrice = 5000, -- TODO_BALANCE: Preis Level 1
+		PriceGrowth = 3, -- TODO_BALANCE: jedes Level × 3
+		-- Mindest-Mining-Level je Luck-Level: Level n braucht RequiredLevelStep × n
+		RequiredLevelStep = 5, -- TODO_BALANCE
+	},
+
 	-- Drill-Level am Laptop (Felix 2026-10-18, D-043): jeder Drill hat eigene Upgrade-Level
 	-- 1…MaxLevel, unabhängig von der MK-Stufe (neue MK-Stufe nur per Kauf).
 	--   Produktion × (1 + (Level − 1) × ProductionBonusPerLevel), Puffer wächst mit

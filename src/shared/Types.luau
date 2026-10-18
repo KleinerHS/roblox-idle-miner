@@ -73,6 +73,8 @@ export type PlayerData = {
 		EquippedPickaxe: string,
 		OwnedBackpacks: { [string]: boolean },
 		EquippedBackpack: string,
+		-- Mining Luck (D-007), 0 = nichts gekauft
+		LuckLevel: number,
 	},
 
 	-- Inhalt des Rucksacks
@@ -153,6 +155,7 @@ export type StateSnapshot = {
 	EquippedBackpack: string,
 	OwnedPickaxes: { [string]: boolean },
 	OwnedBackpacks: { [string]: boolean },
+	LuckLevel: number,
 	Backpack: ItemCounts,
 	BackpackCapacity: number,
 	StorageCapacity: number,

@@ -63,6 +63,7 @@ local function buildSnapshot(data: Types.PlayerData): Types.StateSnapshot
 		EquippedBackpack = data.Equipment.EquippedBackpack,
 		OwnedPickaxes = table.clone(data.Equipment.OwnedPickaxes),
 		OwnedBackpacks = table.clone(data.Equipment.OwnedBackpacks),
+		LuckLevel = data.Equipment.LuckLevel or 0,
 		Backpack = table.clone(data.Backpack),
 		BackpackCapacity = if backpack then backpack.Capacity else 0,
 		StorageCapacity = data.Storage.Capacity,

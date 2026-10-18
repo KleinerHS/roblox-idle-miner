@@ -22,6 +22,7 @@ local StateController = require(script.Parent.StateController)
 local PlotController = require(script.Parent.PlotController)
 local ElevatorController = require(script.Parent.ElevatorController)
 local NotificationController = require(script.Parent.NotificationController)
+local HudController = require(script.Parent.HudController)
 local SoundController = require(script.Parent.SoundController)
 local AmbienceConfig = require(Shared.Config.AmbienceConfig)
 
@@ -150,6 +151,50 @@ local function floatingText(at: Vector3, text: string)
 	Debris:AddItem(anchor, 1)
 end
 
+-- Rare Drop (docs/03 §8, docs/09 §17): großer Schriftzug, Glanz, Funken, Sound – nur nach
+-- Bestätigung durch den Server
+local RARE_GOLD = Color3.fromRGB(255, 205, 70)
+local function rareEffect(at: Vector3, rare: any)
+	local ore = Ores.Get(rare.OreId)
+	local color = if ore then ore.Color else RARE_GOLD
+	local name = if ore then string.upper(ore.DisplayName) else ""
+	local isOre = rare.Kind == "Ore"
+	local title = if isOre then Strings.Hud.RareDrop else Strings.Hud.LuckyDrop
+	local line = if isOre then `+{rare.Amount} {name}` else `x{rare.Multiplier} {name}`
+	HudController.ShowRareDrop(title, line, if isOre then color:Lerp(Color3.new(1, 1, 1), 0.25) else RARE_GOLD)
+	SoundController.Play(if isOre then "RareDrop" else "LuckyDrop", at)
+
+	-- Leuchtender Glanz und Funken an der Erzwand
+	local anchor = Instance.new("Part")
+	anchor.Anchored = true
+	anchor.CanCollide = false
+	anchor.CanQuery = false
+	anchor.CanTouch = false
+	anchor.Transparency = 1
+	anchor.Size = Vector3.one * 0.2
+	anchor.CFrame = CFrame.new(at)
+	anchor.Parent = workspace
+	local light = Instance.new("PointLight")
+	light.Color = color
+	light.Range = 14
+	light.Brightness = 4
+	light.Parent = anchor
+	TweenService:Create(light, TweenInfo.new(1.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Brightness = 0 }):Play()
+	local sparks = Instance.new("ParticleEmitter")
+	sparks.Texture = "rbxasset://textures/particles/sparkles_main.dds"
+	sparks.Color = ColorSequence.new(color, RARE_GOLD)
+	sparks.LightEmission = 1
+	sparks.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.6), NumberSequenceKeypoint.new(1, 0) })
+	sparks.Lifetime = NumberRange.new(0.6, 1.1)
+	sparks.Speed = NumberRange.new(6, 12)
+	sparks.SpreadAngle = Vector2.new(180, 180)
+	sparks.Drag = 2
+	sparks.Rate = 0
+	sparks.Parent = anchor
+	sparks:Emit(if isOre then 40 else 25)
+	Debris:AddItem(anchor, 1.6)
+end
+
 local function shake()
 	local character = player.Character
 	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
@@ -221,6 +266,9 @@ local function onActivated(tool: Tool)
 		spawnDebris(hitAt, if ore then ore.Color else Color3.new(0.2, 0.2, 0.2))
 		spawnDust(hitAt)
 		SoundController.Play("MineHit", hitAt)
+		if value.Rare then
+			rareEffect(hitAt, value.Rare)
+		end
 		floatingText(hitAt, Strings.message("MINED", { Amount = value.Amount, Ore = if ore then ore.DisplayName else "" }))
 		shake()
 	elseif result.code ~= "COOLDOWN" then

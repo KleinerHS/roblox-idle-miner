@@ -61,6 +61,8 @@ AmbienceConfig.Sounds = {
 	Success = { Ids = { 9113849583 }, Volume = 0.25 } :: SoundDef, -- Coin Throws
 	Sell = { Ids = { 1319346243 }, Volume = 0.45 } :: SoundDef, -- Cash Register
 	LevelUp = { Ids = { 99980076888596 }, Volume = 0.5 } :: SoundDef, -- positiver Jingle
+	RareDrop = { Ids = { 128502047397803 }, Volume = 0.55 } :: SoundDef, -- Rare Ore (Stern)
+	LuckyDrop = { Ids = { 135385970610304 }, Volume = 0.45 } :: SoundDef, -- Mengen-Multiplikator (Funkeln)
 }
 
 -- Mining-Staub beim Treffer (docs/19 §6: kleine Steinpartikel, ggf. Staub)

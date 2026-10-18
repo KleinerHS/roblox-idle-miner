@@ -64,6 +64,7 @@ local MESSAGES: { [string]: string } = {
 	CONVEYOR_PLACED = "{Name} installed!",
 	DRILL_REMOVED = "{Name} moved back to your inventory.",
 	DRILL_UPGRADED = "{Name} upgraded to level {Level}!",
+	LUCK_PURCHASED = "Mining Luck level {Level} purchased!",
 	NOT_OWNED = "You don't own this item yet.",
 
 	-- Worker
@@ -140,6 +141,10 @@ Strings.Shop = table.freeze({
 	InventoryValue = "Owned %d · Placed %d · Available %d",
 	Pickaxes = "PICKAXES",
 	Backpacks = "BACKPACKS",
+	Luck = "LUCK",
+	LuckName = "Mining Luck %d",
+	LuckChance = "Rare drop chance",
+	LuckHint = "Only for your own mining – not for workers or drills.",
 	Power = "Mining Power",
 	Speed = "Mining Speed",
 	Capacity = "Capacity",
@@ -371,6 +376,8 @@ Strings.Hud = table.freeze({
 	MiningLevel = "MINING LEVEL %d",
 	XP = "%s / %s XP",
 	LevelUp = "LEVEL UP!",
+	RareDrop = "RARE DROP!",
+	LuckyDrop = "LUCKY DROP!",
 	LevelUpSub = "Mining Level %d",
 	MineUnlocked = "NEW MINE UNLOCKED",
 	MineAvailable = "NEW MINE FOR SALE",

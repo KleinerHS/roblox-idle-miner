@@ -22,6 +22,7 @@ local Vehicles = require(Shared.Definitions.Vehicles)
 local Types = require(Shared.Types)
 local Result = require(Shared.Util.Result)
 local Log = require(Shared.Util.Log)
+local RareDropLogic = require(Shared.Util.RareDropLogic)
 
 local EquipmentShopBuilder = require(script.Parent.Parent.World.EquipmentShopBuilder)
 local MachineShopBuilder = require(script.Parent.Parent.World.MachineShopBuilder)
@@ -268,6 +269,35 @@ function ShopService.Init()
 	local vehicleShop = VehicleShopBuilder.build(center :: Instance)
 	counters.vehicle = vehicleShop:FindFirstChild("CounterPromptPart") :: BasePart
 
+	RemoteService.OnInvoke("BuyLuck", function(player: Player)
+		-- Nächstes Mining-Luck-Level im Equipment-Shop (D-007)
+		local data = DataService.Get(player)
+		if not data then
+			return Result.err(Result.Codes.DATA_NOT_LOADED)
+		end
+		if not isNearShop(player, "equipment") then
+			return Result.err(Result.Codes.TOO_FAR)
+		end
+		local level = data.Equipment.LuckLevel or 0
+		local price, requiredLevel = RareDropLogic.NextLuck(level)
+		if not price or not requiredLevel then
+			return Result.err(Result.Codes.ALREADY_DONE)
+		end
+		if data.MiningLevel < requiredLevel then
+			return Result.err(Result.Codes.LEVEL_TOO_LOW)
+		end
+		if data.Cash < price then
+			return Result.err(Result.Codes.NOT_ENOUGH_MONEY)
+		end
+		DataService.Mutate(player, function(d)
+			d.Cash -= price :: number
+			d.Equipment.LuckLevel = level + 1
+		end)
+		DataService.RequestSave(player)
+		Log.debug(TAG, `{player.Name} kauft Mining Luck {level + 1} für {price}`)
+		RemoteService.FireClient("Notify", player, { Kind = "Success", Code = "LUCK_PURCHASED", Args = { Level = level + 1 } })
+		return Result.ok(level + 1)
+	end)
 	RemoteService.OnInvoke("BuyItem", buy)
 	RemoteService.OnInvoke("EquipItem", equip)
 	RemoteService.OnInvoke("BuyMachine", buyMachine)
