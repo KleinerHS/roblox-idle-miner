@@ -313,3 +313,9 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Source:** Felix, 2026-10-19 („mach die Verladezone dahin, wo die grüne Hütte vor der Tür ist“; 60 % Geschwindigkeit: „ja“)
 **Decision:** Die Durchfahr-Verladespur der Lastzüge kommt an die Stelle des grünen Häuschens vor der Halle (genaues Objekt wird bei T3 bestätigt). Lastzüge fahren etwa 60 % so schnell wie die kleinen Fahrzeuge (TODO_BALANCE bei der Feinabstimmung).
 **Affected systems:** Vehicles, Verladespur (T3), PLANS/ROAD_TRAINS.md
+
+## D-051 – Keine Hintergrundmusik
+
+**Source:** Felix, 2026-10-19 („entferne bitte die Musik aus dem Spiel“)
+**Decision:** Hintergrundmusik aus (`AmbienceConfig.Music.Enabled = false`). Umgebungsgeräusche, Maschinen- und Ereignis-Sounds bleiben. Die Playlist bleibt in der Config, falls Musik später wieder gewünscht ist.
+**Affected systems:** SoundController, AmbienceConfig

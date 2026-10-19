@@ -225,8 +225,10 @@ function SoundController.Init()
 end
 
 function SoundController.Start()
-	musicIndex = math.random(0, #AmbienceConfig.Music.Ids - 1)
-	nextTrack()
+	if AmbienceConfig.Music.Enabled then
+		musicIndex = math.random(0, #AmbienceConfig.Music.Ids - 1)
+		nextTrack()
+	end
 	SoundController.SetUnderground(underground)
 
 	for _, model in CollectionService:GetTagged("Conveyor") do

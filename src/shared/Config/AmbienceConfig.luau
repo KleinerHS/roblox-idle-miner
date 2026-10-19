@@ -27,8 +27,10 @@ AmbienceConfig.Grade = {
 -- Hall unter Tage (SoundService.AmbientReverb, nur lokal)
 AmbienceConfig.MineReverb = Enum.ReverbType.StoneRoom
 
--- Hintergrundmusik: ruhige Akustik-Playlist (APM Music), unter Tage leiser
+-- Hintergrundmusik: ruhige Akustik-Playlist (APM Music), unter Tage leiser.
+-- Abgeschaltet (Felix 2026-10-19: „entferne bitte die Musik aus dem Spiel“), Playlist bleibt für später.
 AmbienceConfig.Music = {
+	Enabled = false,
 	Ids = {
 		1840007392, -- Maypole Summer
 		1844683008, -- Open Fields
