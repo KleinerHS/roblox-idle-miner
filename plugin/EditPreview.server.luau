@@ -55,6 +55,20 @@ local function makeNonArchivable(root: Instance)
 	end
 end
 
+-- Versatz von der Plot-Lage zur Lage von Workspace.HallLayout (LayoutOrigin bzw. Attribut Origin)
+local function layoutDelta(plotCFrame: CFrame): CFrame?
+	local layout = workspace:FindFirstChild("HallLayout")
+	if not layout then
+		return nil
+	end
+	local marker = layout:FindFirstChild("LayoutOrigin")
+	local origin: any = if marker and marker:IsA("BasePart") then marker.CFrame else layout:GetAttribute("Origin")
+	if typeof(origin) ~= "CFrame" then
+		return nil
+	end
+	return origin * plotCFrame:Inverse()
+end
+
 local function build(folder: Folder, world: Instance, shared: Instance)
 	local GameConfig = require(shared:FindFirstChild("Config"):FindFirstChild("GameConfig") :: ModuleScript) :: any
 	local BuildSteps = require(shared:FindFirstChild("Definitions"):FindFirstChild("BuildSteps") :: ModuleScript) :: any
@@ -82,6 +96,12 @@ local function build(folder: Folder, world: Instance, shared: Instance)
 				local exterior = plot:FindFirstChild("Exterior")
 				if exterior then
 					exterior:Destroy()
+				end
+				-- Das Layout darf woanders bzw. gedreht liegen (z. B. gerade zum Raster): Plot 1 dorthin
+				-- setzen, wo das Layout liegt, sonst überlagern sich zwei verdrehte Hallen
+				local delta = layoutDelta(PlotBuilder.getPlotCFrame(plotId))
+				if delta then
+					plot:PivotTo(delta * plot:GetPivot())
 				end
 			end
 			for _, step in (if hasLayout then {} else BuildSteps.List) do

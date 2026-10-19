@@ -69,3 +69,14 @@ Nicht verschoben: eine Rohr-Aufhänger-Gruppe weit außerhalb der Halle (Workspa
 **Play-Test 2026-10-19:** alle 12 Objekte auf Plot 1 an der richtigen Stelle (Hochregale in der Lücke, Geländer an der Plattform, hohe Zäune zwischen Lager und Ofen).
 **Regression geprüft:** Kopie auf gedrehten Plot im Edit nachgerechnet (Lage zu Nachbarobjekten exakt), Ausgangslager hat weiter genau 16 Kisten-Plätze.
 **Likely system:** HallLayout
+
+## BUG-006 – World Preview zeigt die Halle doppelt und verdreht
+
+**Severity:** Low (nur Studio-Vorschau, nicht im Spiel)
+**Status:** Fixed (TESTING_REQUIRED)
+**Build:** 0.40.0
+**Gemeldet:** Felix, 2026-10-19
+**Ursache:** Das HallLayout liegt gerade zum Raster gedreht (LayoutOrigin bei -688/-431, 90°), Plot 1 der Vorschau aber an der echten Plot-Stelle (-727/-420, um 30° anders gedreht). Boden, Markierungen und Hallenboden von Plot 1 überlagerten sich verdreht mit der Halle aus dem Layout.
+**Fix:** Das Vorschau-Plugin setzt Plot 1 an die Lage des HallLayouts (`plugin/EditPreview.server.luau`, `layoutDelta`). Im Spiel ändert sich nichts. Plugin neu gebaut; die offene Vorschau habe ich direkt korrigiert.
+**Einschränkung:** In der Vorschau ist die Zufahrtsstraße von Plot 1 dadurch leicht gegen die Hauptstraße verdreht (nur Vorschau).
+**Likely system:** Studio-Plugin World Preview
