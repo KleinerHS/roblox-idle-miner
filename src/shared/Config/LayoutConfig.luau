@@ -82,21 +82,42 @@ local LayoutConfig = {
 	} :: { [string]: { Vector3 } },
 
 	-- Garage im vorderen Hallenbereich (docs/07 §3, D-008, D-016), lokal zur Plotmitte.
-	-- Fahrzeuge stehen mit der Front zum Rolltor (-Z). Der Verladeturm steht hinter und
-	-- zwischen den beiden Stellplätzen und speist von oben in die Ladefläche. TODO_LAYOUT
+	-- Phase 18b (Felix 2026-10-19, D-052): Durchfahr-Verladestraße. Einfahrt durch eine Öffnung in
+	-- der linken Hallenwand (+X), geradeaus unter dem einen Verladerüssel durch, Rechtskurve und
+	-- Ausfahrt durch das Rolltor. Stellplätze (Ausparken) liegen vor dem Rüssel an der Vorderwand,
+	-- Fahrzeuge stehen mit der Front in Fahrtrichtung (-X). TODO_LAYOUT
 	Garage = {
-		-- Mitte der Stellplätze (X/Z) und Größe einer Stellfläche (Breite X, Länge Z)
-		Bays = { Vector2.new(28, -60), Vector2.new(52, -60) },
-		BaySize = Vector2.new(15, 30),
+		-- Mitte der Stellplätze (X/Z), Größe einer Stellfläche (Breite, Länge) und Drehung (Grad;
+		-- 90 = Front zeigt nach -X, in Fahrtrichtung der Verladestraße)
+		Bays = { Vector2.new(127, -62), Vector2.new(127, -74.5) },
+		BaySize = Vector2.new(12.5, 30),
+		BayYaw = 90,
 		-- Leuchtring zur Fahrzeugauswahl (docs/07 §4)
-		Ring = Vector2.new(105, -50),
+		Ring = Vector2.new(136, -12),
 		RingRadius = 5,
-		-- Verladeturm (D-008) mit Auslegern zu beiden Stellplätzen
-		Tower = Vector2.new(40, -36),
+		-- Verladeturm (D-008) hinter der Spur, Portal über die Spur bis zum Rüssel
+		Tower = Vector2.new(80, -16),
+		-- Der eine Verladerüssel (Mitte über der Spur)
+		Chute = Vector2.new(80, -41),
+		ChuteCount = 1,
 		-- Länge des Zuführrohrs vom Turm nach hinten bis zum Lager
-		TowerFeedLength = 39,
-		-- Höchstabstand Ladefläche ↔ Ausleger-Ende zum Beladen (Phase 6c)
+		TowerFeedLength = 19,
+		-- Höchstabstand Ladefläche ↔ Rüssel zum Beladen (Phase 6c)
 		LoadDistance = 14,
+		-- Verladestraße: Mittellinie Z, Breite, Beginn der Rechtskurve (X), Kurvenradius
+		Lane = { Z = -41, Width = 24, TurnX = 50, TurnRadius = 32 },
+		-- Öffnung in der linken Hallenwand (Z von/bis, Höhe über dem Hallenboden)
+		SideOpening = { Z1 = -59, Z2 = -24, Height = 26 },
+		-- Tor im linken Zaun (Z von/bis)
+		Gate = { Z1 = -62, Z2 = -20 },
+	},
+	-- Zufahrt zur Verladestraße außen am Grundstück (D-052): zweigt von der Zufahrtsstraße ab,
+	-- läuft links am Zaun entlang und biegt zum Tor ein. JunctionZ = Abzweig an der Zufahrt,
+	-- OuterX = Mittellinie des Stücks neben dem Zaun, Radius der beiden Kurven. TODO_LAYOUT
+	SideRoad = {
+		JunctionZ = -230,
+		OuterX = 262,
+		Radius = 46,
 	},
 	ButtonSize = Vector3.new(7, 0.4, 7),
 

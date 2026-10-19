@@ -319,3 +319,9 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Source:** Felix, 2026-10-19 („entferne bitte die Musik aus dem Spiel“)
 **Decision:** Hintergrundmusik aus (`AmbienceConfig.Music.Enabled = false`). Umgebungsgeräusche, Maschinen- und Ereignis-Sounds bleiben. Die Playlist bleibt in der Config, falls Musik später wieder gewünscht ist.
 **Affected systems:** SoundController, AmbienceConfig
+
+## D-052 – Durchfahr-Verladestraße mit einem Rüssel
+
+**Source:** Felix, 2026-10-19 (Skizzen; „Verladestraße, durch die man mit den großen LKWs einfach durchfahren kann … den Verladeturm kannst du gerne komplett umbauen, außerdem muss es nur noch einen Verladerüssel geben“; Antworten: Richtung ja, Verkauf in der Stadt, neue Straßenkurve neben dem Grundstück, alter Turm wird aufbewahrt)
+**Decision:** Einfahrt über eine neue Straße neben dem Grundstück (Abzweig von der Zufahrt, zwei weite Kurven) durch ein Zauntor und eine Öffnung in der linken Hallenwand, geradeaus unter dem einen Verladerüssel durch, Rechtskurve, Ausfahrt durch das Rolltor, weiter zum Verkauf in der Stadt. Der Turm steht hinter der Spur, ein Portal trägt den Rüssel über die Spur. Die zwei Stellplätze zum Ausparken liegen vor dem Rüssel mit Front in Fahrtrichtung. Ersetzt den Ort aus D-050 (grüne Hütte). Felix' Kopie des alten Turms liegt in `ServerStorage.Archive.OldLoadingTower`.
+**Affected systems:** GarageTemplate, LoadingService, HallTemplates, PlotExterior, PlotBuilder, EnvironmentBuilder, LayoutConfig, HallLayout (Place)

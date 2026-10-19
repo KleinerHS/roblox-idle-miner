@@ -1,6 +1,7 @@
 --!strict
 -- Automatisches Beladen am Verladeturm (docs/07 §9–12, D-008, D-009, D-025).
--- Steht ein eigenes Fahrzeug still unter einer Schurre, speist der Turm direkt aus dem
+-- Seit Phase 18b (D-052) gibt es einen Verladerüssel über der Durchfahr-Verladestraße.
+-- Steht ein eigenes Fahrzeug still unter dem Rüssel, speist der Turm direkt aus dem
 -- Firmenlager in die Ladefläche: alles Verkaufbare, wertvollstes Material zuerst, bis das
 -- Fahrzeug voll ist. Keine Bedienung nötig (D-025: manuelles Beladen entfällt).
 -- D-030 (Felix): Geladen wird nur, wenn der Spieler im Fahrzeug sitzt (ein nur geparktes
@@ -40,7 +41,7 @@ local STANDSTILL_SPEED = 2
 local LoadingService = {}
 
 type BayState = { state: string, vehicleId: string?, extended: boolean, hint: string?, bottomY: number? }
--- [player][bay] = letzter Zustand (für Anzeige/Schurre/Meldung nur bei Änderung)
+-- [player][Rüssel] = letzter Zustand (für Anzeige/Schurre/Meldung nur bei Änderung)
 local bayStates: { [Player]: { [number]: BayState } } = {}
 
 local function sum(items: Types.ItemCounts): number
@@ -119,7 +120,7 @@ local function tickBay(player: Player, data: Types.PlayerData, garage: Model, ba
 		local right = Vector3.new(-forward.Z, 0, forward.X)
 		local along, side = d:Dot(forward), d:Dot(right)
 		if math.abs(along) > ALIGN_ALONG or math.abs(side) > ALIGN_SIDE then
-			local hint = if math.abs(along) > ALIGN_ALONG then (if along > 0 then "Move forward" else "Move back") else "Center in the bay"
+			local hint = if math.abs(along) > ALIGN_ALONG then (if along > 0 then "Move forward" else "Move back") else "Center under the chute"
 			return { state = "Align", vehicleId = vehicleId, extended = false, hint = hint }
 		end
 	end
@@ -177,21 +178,21 @@ local function tickPlayer(player: Player)
 	end
 	local states = bayStates[player] or {}
 	bayStates[player] = states
-	for bay = 1, Vehicles.BayCount do
+	for bay = 1, LayoutConfig.Garage.ChuteCount do
 		local new = tickBay(player, data, garage, bay)
 		local old = states[bay]
 		-- Anzeige
 		local record = new.vehicleId and data.Vehicles.Owned[new.vehicleId]
 		local def = record and Vehicles.Get(record.Type)
 		-- freundliche, schwebende Schrift (Felix 2026-10-13): normale Groß-/Kleinschreibung
-		local title = if def then `Bay {bay} · {def.DisplayName}` else `Bay {bay}`
+		local title = if def then `Loading · {def.DisplayName}` else "Loading"
 		local value = "Ready"
 		if record and def then
 			local fill = `{NumberFormat.withSeparators(sum(record.Cargo))} / {NumberFormat.withSeparators(def.Capacity)}`
 			value = if new.state == "Full" then `Full · {fill}`
 				elseif new.state == "NoStock" then "Storage is empty"
 				elseif new.state == "Parked" then `Hop in to load · {fill}`
-				elseif new.state == "Align" then new.hint or "Center in the bay"
+				elseif new.state == "Align" then new.hint or "Center under the chute"
 				else fill
 		end
 		GarageTemplate.setBayState(garage, bay, new.state, title, value)

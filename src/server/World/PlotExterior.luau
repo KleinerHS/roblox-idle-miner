@@ -33,6 +33,7 @@ local GREEN_BOOTH = Color3.fromRGB(70, 104, 76)
 local CONTAINER = Color3.fromRGB(70, 110, 78)
 local YELLOW = Color3.fromRGB(236, 182, 40)
 local WHITE = Color3.fromRGB(236, 236, 232)
+local CONCRETE_SILL = Color3.fromRGB(130, 128, 124)
 local TIRE = Color3.fromRGB(30, 30, 32)
 local BARREL = Color3.fromRGB(40, 90, 150)
 local GLASS = Color3.fromRGB(170, 210, 230)
@@ -231,7 +232,10 @@ function PlotExterior.build(model: Model, origin: CFrame)
 	-- Holzzaun rundum mit Lücke für den Vorplatz
 	local e = 1.5
 	fence(folder, "FenceBack", o, Vector2.new(-halfX + e, halfZ - e), Vector2.new(halfX - e, halfZ - e))
-	fence(folder, "FenceLeft", o, Vector2.new(halfX - e, -halfZ + e), Vector2.new(halfX - e, halfZ - e))
+	-- Linker Zaun mit Tor für die Verladestraße (D-052)
+	local gate = cfg.Garage.Gate
+	fence(folder, "FenceLeft", o, Vector2.new(halfX - e, -halfZ + e), Vector2.new(halfX - e, gate.Z1))
+	fence(folder, "FenceLeftRear", o, Vector2.new(halfX - e, gate.Z2), Vector2.new(halfX - e, halfZ - e))
 	fence(folder, "FenceRight", o, Vector2.new(-halfX + e, -halfZ + e), Vector2.new(-halfX + e, halfZ - e))
 	fence(folder, "FenceFrontLeft", o, Vector2.new(entranceL, -halfZ + e), Vector2.new(halfX - e, -halfZ + e))
 	fence(folder, "FenceFrontRight", o, Vector2.new(-halfX + e, -halfZ + e), Vector2.new(entranceR, -halfZ + e))
@@ -275,10 +279,10 @@ function PlotExterior.build(model: Model, origin: CFrame)
 	local leftYardX = (hallLeft + halfX) / 2
 	slab(folder, "GravelLeft", o, hallLeft, halfX - 3, hallFront, hallBack, GROUND + 0.08, 0.2, GRAVEL, Enum.Material.Pebble)
 	slab(folder, "GravelRight", o, -halfX + 3, hallRight, hallFront, hallBack, GROUND + 0.08, 0.2, GRAVEL, Enum.Material.Pebble)
-	rack(folder, "SideRackA", o * CFrame.new(leftYardX - 6, GROUND + 0.1, hallFront + 40) * CFrame.Angles(0, math.rad(90), 0), 6)
+	rack(folder, "SideRackA", o * CFrame.new(leftYardX - 6, GROUND + 0.1, hallFront + 14) * CFrame.Angles(0, math.rad(90), 0), 6)
 	rack(folder, "SideRackB", o * CFrame.new(leftYardX - 6, GROUND + 0.1, hallFront + 75) * CFrame.Angles(0, math.rad(90), 0), 4)
 	for i = 1, 4 do
-		tireStack(folder, `SideTires{i}`, o * CFrame.new(leftYardX + 8, GROUND + 0.1, hallFront + 22 + i * 4.2), rng:NextInteger(2, 5))
+		tireStack(folder, `SideTires{i}`, o * CFrame.new(leftYardX + 8, GROUND + 0.1, hallFront + 92 + i * 4.2), rng:NextInteger(2, 5))
 	end
 	for i = 1, 3 do
 		barrel(folder, `SideBarrel{i}`, o * CFrame.new(leftYardX + 8 + (i % 2) * 2, GROUND + 0.1, hallFront + 112 + i * 2.2), if i == 2 then Color3.fromRGB(190, 50, 40) else BARREL)
@@ -290,11 +294,37 @@ function PlotExterior.build(model: Model, origin: CFrame)
 		end
 	end
 	for i = 1, 5 do
-		EnvironmentBuilder.boulder(folder, `SideRockL{i}`, (o * CFrame.new(halfX - 9, GROUND, hallFront + 10 + i * 24)).Position, rng:NextNumber(2.5, 5), rng)
+		EnvironmentBuilder.boulder(folder, `SideRockL{i}`, (o * CFrame.new(halfX - 9, GROUND, hallFront + 50 + i * 22)).Position, rng:NextNumber(2.5, 5), rng)
 		EnvironmentBuilder.boulder(folder, `SideRockR{i}`, (o * CFrame.new(-halfX + 9, GROUND, hallFront + 100 + i * 12)).Position, rng:NextNumber(2.5, 5), rng)
 	end
 	for i = 1, 3 do
 		tireStack(folder, `SideTiresR{i}`, o * CFrame.new(-halfX + 10, GROUND + 0.1, hallFront + 6 + i * 4.2), rng:NextInteger(2, 4))
+	end
+
+	-- Verladestraße zwischen Zauntor und Hallenöffnung (D-052): Asphalt, Randlinien, Rampe auf
+	-- Hallenbodenhöhe, Torpfosten mit Schild
+	local laneCfg = cfg.Garage.Lane
+	local lz1, lz2 = laneCfg.Z - laneCfg.Width / 2, laneCfg.Z + laneCfg.Width / 2
+	slab(folder, "SideLane", o, hallLeft + 0.8, halfX + 0.5, lz1, lz2, GROUND + 0.12, 0.2, ASPHALT, Enum.Material.Asphalt)
+	for _, z in { lz1 + 0.6, lz2 - 0.6 } do
+		local line = slab(folder, `SideLaneEdge{z}`, o, hallLeft + 6, halfX - 1, z - 0.25, z + 0.25, GROUND + 0.14, 0.04, WHITE, Enum.Material.SmoothPlastic)
+		line.CanCollide = false
+	end
+	local rampLen = 6
+	local rampRise = cfg.HallFloorTop - (GROUND + 0.12)
+	local ramp = Instance.new("WedgePart")
+	ramp.Name = "SideLaneRamp"
+	ramp.Anchored = true
+	ramp.Size = Vector3.new(laneCfg.Width, rampRise, rampLen)
+	-- Wedge steigt zur Halle hin (-X) an
+	ramp.CFrame = o * CFrame.new(hallLeft + 1 + rampLen / 2, GROUND + 0.12 + rampRise / 2, laneCfg.Z) * CFrame.Angles(0, math.rad(-90), 0)
+	ramp.Color = ASPHALT
+	ramp.Material = Enum.Material.Asphalt
+	ramp.Parent = folder
+	-- Schwelle in der Wandöffnung auf Hallenbodenhöhe
+	slab(folder, "SideLaneSill", o, hallLeft - 1, hallLeft + 1, lz1, lz2, cfg.HallFloorTop, 0.4, CONCRETE_SILL, Enum.Material.Concrete)
+	for _, z in { gate.Z1, gate.Z2 } do
+		part(folder, `GatePost{z}`, Vector3.new(1.2, 6, 1.2), o * CFrame.new(halfX - e, GROUND + 3, z), FENCE_DARK, Enum.Material.Wood)
 	end
 
 	-- Hinterhof: Bäume am Zaun, Klimageräte, Laternen

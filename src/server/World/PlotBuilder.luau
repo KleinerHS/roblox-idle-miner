@@ -149,6 +149,66 @@ local function buildRoad(model: Model, origin: CFrame)
 	)
 end
 
+-- Zufahrt zur Verladestraße (D-052): zweigt von der Zufahrtsstraße zur +X-Seite ab, läuft am
+-- linken Zaun entlang nach hinten und biegt zum Zauntor ein. Gerade Stücke und Kurven aus
+-- kurzen Abschnitten, mit gestrichelter Mittellinie und Randlinien.
+local COLOR_LINE_YELLOW = Color3.fromRGB(232, 190, 60)
+local COLOR_LINE_WHITE = Color3.fromRGB(236, 236, 232)
+local function buildSideRoad(model: Model, origin: CFrame)
+	local cfg = LayoutConfig.SideRoad
+	local w = LayoutConfig.RoadWidth
+	local halfX = LayoutConfig.PlotSize.X / 2
+	local laneZ = LayoutConfig.Garage.Lane.Z
+	local r = cfg.Radius
+	local folder = Instance.new("Model")
+	folder.Name = "SideRoad"
+	folder.Parent = model
+	local n = 0
+	-- Abschnitt von a nach b (lokal X/Z) mit Belag und Markierung
+	-- curve: Krümmung (1/Radius, Vorzeichen = Seite des Mittelpunkts), damit die Außenkante
+	-- der Kurvenstücke lückenlos überlappt
+	local function piece(a: Vector2, b: Vector2, dash: boolean, curve: number?)
+		n += 1
+		local mid = (a + b) / 2
+		local len = (b - a).Magnitude
+		local cf = origin * CFrame.lookAt(Vector3.new(mid.X, 0.55, mid.Y), Vector3.new(b.X, 0.55, b.Y))
+		local k = math.abs(curve or 0)
+		makePart(`SideRoad{n}`, Vector3.new(w, 1, len * (1 + k * w / 2) + 0.4), cf, COLOR_ROAD, Enum.Material.Asphalt, folder)
+		for _, s in { -1, 1 } do
+			local edge = makePart(`SideRoadEdge{n}_{s}`, Vector3.new(0.4, 0.04, len * (1 + k * (w / 2 - 1.2)) + 0.1), cf * CFrame.new(s * (w / 2 - 1.2), 0.52, 0), COLOR_LINE_WHITE, Enum.Material.SmoothPlastic, folder)
+			edge.CanCollide = false
+			edge.CanQuery = false
+		end
+		if dash then
+			local d = makePart(`SideRoadDash{n}`, Vector3.new(0.5, 0.04, math.min(6, len * 0.5)), cf * CFrame.new(0, 0.52, 0), COLOR_LINE_YELLOW, Enum.Material.SmoothPlastic, folder)
+			d.CanCollide = false
+			d.CanQuery = false
+		end
+	end
+	local function straight(a: Vector2, b: Vector2)
+		local len = (b - a).Magnitude
+		local count = math.max(1, math.floor(len / 12))
+		for i = 1, count do
+			piece(a:Lerp(b, (i - 1) / count), a:Lerp(b, i / count), true)
+		end
+	end
+	local function arc(center: Vector2, from: number, to: number)
+		local steps = 30
+		for i = 1, steps do
+			local a0 = math.rad(from + (to - from) * (i - 1) / steps)
+			local a1 = math.rad(from + (to - from) * i / steps)
+			piece(center + Vector2.new(math.cos(a0), math.sin(a0)) * r, center + Vector2.new(math.cos(a1), math.sin(a1)) * r, i % 4 == 0, 1 / r)
+		end
+	end
+	local junctionX = LayoutConfig.DoorCenterX + w / 2
+	local x1 = cfg.OuterX - r
+	straight(Vector2.new(junctionX, cfg.JunctionZ), Vector2.new(x1, cfg.JunctionZ))
+	arc(Vector2.new(x1, cfg.JunctionZ + r), -90, 0)
+	straight(Vector2.new(cfg.OuterX, cfg.JunctionZ + r), Vector2.new(cfg.OuterX, laneZ - r))
+	arc(Vector2.new(x1, laneZ - r), 0, 90)
+	straight(Vector2.new(x1, laneZ), Vector2.new(halfX + 0.5, laneZ))
+end
+
 function PlotBuilder.getDefaultSpawnCFrame(plotId: number): CFrame
 	return PlotBuilder.getPlotCFrame(plotId) * CFrame.new(LayoutConfig.SpawnOffset)
 end
@@ -186,6 +246,7 @@ function PlotBuilder.build(parent: Instance, plotId: number): Model
 	end
 	buildSign(model, origin, plotId)
 	buildRoad(model, origin)
+	buildSideRoad(model, origin)
 
 	local spawnPoint = makePart(
 		"SpawnPoint",

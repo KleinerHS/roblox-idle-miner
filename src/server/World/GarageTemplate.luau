@@ -1,13 +1,14 @@
 --!strict
--- Garage im vorderen Hallenbereich (docs/07 §3–4, §18, D-008, D-016). PLATZHALTER-Optik nach
--- FACTORY_MASTERPLAN_TOPDOWN.png: zwei Stellplätze mit Bodenmarkierung und Nummer, leuchtender
--- Auswahlring, Verladeturm mit Auslegern über beiden Stellplätzen, Werkstatt-Details.
+-- Garage im vorderen Hallenbereich (docs/07 §3–4, §18, D-008, D-016) mit Durchfahr-Verladestraße
+-- (Phase 18b, D-052): Einfahrt durch die linke Hallenwand, geradeaus unter dem einen Verladerüssel
+-- durch, Rechtskurve, Ausfahrt durch das Rolltor. Zwei Stellplätze zum Ausparken vor dem Rüssel,
+-- leuchtender Auswahlring, Verladeturm hinter der Spur mit Portal über die Spur, Werkstatt-Details.
 -- Akzente in der Firmenfarbe tragen das Attribut CompanyAccent (BuildingService färbt sie).
 --
 -- Vereinbarte Namen/Attribute:
 --   Part "BaySpawn1"/"BaySpawn2"   – Fahrzeug-Spawn (Bodenmitte, LookVector zum Rolltor)
 --   Part "GarageRing"              – Auslöser der Fahrzeugauswahl (Attribut GarageRing = true)
---   Part "LoadPoint1"/"LoadPoint2" – Bezugspunkt der Ladeschurre über dem Stellplatz (Attribut Bay)
+--   Part "LoadPoint1"              – Bezugspunkt des Verladerüssels über der Spur (Attribut Bay)
 --   Part "ChuteTube{n}" (+ "ChuteTube{n}Mid"/"Inner", Teleskop), "ChuteNozzle{n}", "ChuteLamp{n}",
 --   "BayDisplay{n}" – automatisches Beladen
 --   Part "GarageDoor"              – Glas-Rolltor in der Hallen-Toröffnung (VehicleService)
@@ -85,14 +86,14 @@ local function bay(garage: Model, index: number, o: CFrame)
 	local cfg = LayoutConfig.Garage
 	local c = cfg.Bays[index]
 	local w, l = cfg.BaySize.X, cfg.BaySize.Y
-	local base = o * CFrame.new(c.X, 0, c.Y)
+	local base = o * CFrame.new(c.X, 0, c.Y) * CFrame.Angles(0, math.rad(cfg.BayYaw), 0)
 	for _, side in { -1, 1 } do
 		local line = part(model, `Bay{index}Side{side}`, Vector3.new(0.5, 0.06, l), base * CFrame.new(side * w / 2, 0.03, 0), YELLOW, Enum.Material.SmoothPlastic)
 		flat(line)
 	end
 	local backLine = part(model, `Bay{index}Back`, Vector3.new(w + 0.5, 0.06, 0.5), base * CFrame.new(0, 0.03, l / 2), YELLOW, Enum.Material.SmoothPlastic)
 	flat(backLine)
-	-- Gestreifte Einfahrtskante vorne (zum Tor)
+	-- Gestreifte Ausfahrtskante vorne (in Fahrtrichtung)
 	for i = 1, 8 do
 		local stripe = part(model, `Bay{index}Front{i}`, Vector3.new(w / 8, 0.06, 0.5), base * CFrame.new(-w / 2 + w / 8 * (i - 0.5), 0.03, -l / 2), if i % 2 == 0 then BLACK else YELLOW, Enum.Material.SmoothPlastic)
 		flat(stripe)
@@ -143,20 +144,21 @@ local function ring(garage: Model, o: CFrame)
 end
 
 -- Verladestation (D-008, D-025; Felix 2026-10-13: „aufgebaut wie im echten Leben“, Rüssel über
--- der Ladefläche, Farben wie der Rest der Halle). Aufbau wie eine LKW-Verladestation:
---   * Stahlturm (gelbe I-Profile, Kreuzverbände, Laufrost mit Geländer, Steigleiter mit
---     Rückenschutz) mit Vorratssilo, Trichter und Schieber
+-- der Ladefläche, Farben wie der Rest der Halle; 2026-10-19: nur noch ein Rüssel über einer
+-- Durchfahrspur, D-052). Aufbau wie eine LKW-Verladestation:
+--   * Stahlturm hinter der Spur (gelbe I-Profile, Kreuzverbände, Laufrost mit Geländer,
+--     Steigleiter mit Rückenschutz) mit Vorratssilo, Trichter und Schieber
 --   * Zuführrohr aus dem Lager oben ins Silo, an der Hallendecke abgehängt
---   * Portal über beiden Stellplätzen mit Laufsteg; je Stellplatz ein Zwischenbunker, gespeist
---     über eine Förderschnecke aus dem Silo, darunter Schieber und Faltenbalg-Verladerüssel
---     (fährt bis auf die Ladefläche aus), Statuslampe und Strahler
+--   * Portal vom Turm über die Spur mit Laufsteg; darunter ein Zwischenbunker, gespeist über eine
+--     Förderschnecke aus dem Silo, Schieber und Faltenbalg-Verladerüssel (fährt bis auf die
+--     Ladefläche aus), Statuslampe und Strahler
 --   * Steuerkabine am Fuß des Turms
 -- Beladen läuft automatisch (LoadingService), ohne Bedienung. Vereinbarte Namen:
--- LoadPoint{i}, ChuteTube{i} (Attribut ChuteTop), ChuteNozzle{i}, ChuteLamp{i}, BayDisplay{i}.
-local BEAM_Y = 22 -- Mitte der oberen Träger (Turm und Portal)
+-- LoadPoint1, ChuteTube1 (Attribut ChuteTop), ChuteNozzle1, ChuteLamp1, BayDisplay1.
+local BEAM_Y = 24 -- Mitte der oberen Träger (Turm und Portal); hoch genug für Lastzüge
 local DECK_Y = BEAM_Y + 1 -- Oberkante Laufrost
 -- Unterkante des Rüssel-Faltenbalgs; das Teleskoprohr fährt von hier nach unten aus
-local CHUTE_TOP = 15.9
+local CHUTE_TOP = BEAM_Y - 6.1
 local CHUTE_REST = 1.4
 local ORANGE = Color3.fromRGB(226, 140, 40)
 local GREY_BOX = Color3.fromRGB(120, 124, 130)
@@ -215,6 +217,7 @@ end
 
 local function tower(model: Model, o: CFrame)
 	local cfg = LayoutConfig.Garage
+	-- Turm-Koordinaten: -Z zeigt vom Turm zur Spur
 	local t = o * CFrame.new(cfg.Tower.X, 0, cfg.Tower.Y)
 	local function at(x: number, y: number, z: number): CFrame
 		return t * CFrame.new(x, y, z)
@@ -222,11 +225,10 @@ local function tower(model: Model, o: CFrame)
 	local function pos(x: number, y: number, z: number): Vector3
 		return (t * CFrame.new(x, y, z)).Position
 	end
-	local x1, x2 = cfg.Bays[1].X - cfg.Tower.X, cfg.Bays[2].X - cfg.Tower.X
-	-- Rüssel über der Ladefläche: Fahrzeuge stehen mit der Front zum Tor, die Ladefläche liegt
-	-- etwa 4 Studs hinter der Stellplatzmitte
-	local spoutZ = cfg.Bays[1].Y + 4 - cfg.Tower.Y
-	local beamFrontZ, beamBackZ = spoutZ - 3.5, spoutZ + 3.5
+	-- Rüssel über der Spurmitte, Portal-Stützen jenseits der Spur
+	local spoutX = cfg.Chute.X - cfg.Tower.X
+	local spoutZ = cfg.Chute.Y - cfg.Tower.Y
+	local farZ = cfg.Lane.Z - cfg.Lane.Width / 2 - 3 - cfg.Tower.Y
 
 	-- Fundament mit Warnkante
 	local found = Instance.new("Model")
@@ -338,8 +340,8 @@ local function tower(model: Model, o: CFrame)
 	tube(feed, "TowerFeedDrop", pos(0, 3, backZ), pos(0, pipeY + 0.8, backZ), 1.6, STEEL_LIGHT)
 	tube(feed, "TowerFeedInlet", pos(0, pipeY + 0.8, 2.4), pos(0, roofY + 0.6, 2.4), 1.6, STEEL_LIGHT)
 	local ceiling = LayoutConfig.HallWallHeight
-	for i = 1, 5 do
-		local z = 2.4 + i * (backZ - 2.4) / 6
+	for i = 1, 3 do
+		local z = 2.4 + i * (backZ - 2.4) / 4
 		disc(feed, `Flange{i}`, at(0, pipeY, z) * CFrame.Angles(math.rad(90), 0, 0), 0.3, 1.9, STEEL)
 		part(feed, `Hanger{i}`, Vector3.new(0.12, ceiling - pipeY, 0.12), at(0, pipeY + (ceiling - pipeY) / 2, z), STEEL_DARK).CanCollide = false
 	end
@@ -348,121 +350,118 @@ local function tower(model: Model, o: CFrame)
 	part(feed, "IntakeGrate", Vector3.new(2.6, 0.1, 2.6), at(0, 3.05, backZ), STEEL_DARK, Enum.Material.DiamondPlate)
 	FloatingText.title(feed, "TowerIntakeLabel", at(0, 6, backZ - 2), "From storage", 1.4)
 
-	-- Portal über den Stellplätzen: Stützen außen und mittig, zwei Querträger, Längsträger zum Turm
+	-- Portal vom Turm über die Spur: zwei Längsträger auf den Turmstützen und auf zwei Stützen
+	-- jenseits der Spur, Querträger vorne, zwei Querriegel für den Bunker, Laufsteg obendrauf
 	local portal = Instance.new("Model")
 	portal.Name = "LoadingPortal"
 	portal.Parent = model
-	local outer = math.max(math.abs(x1), math.abs(x2)) + cfg.BaySize.X / 2 + 1.8
-	for _, z in { beamFrontZ, beamBackZ } do
-		for _, x in { -outer, 0, outer } do
-			column(portal, `PortalColumn{x}_{z}`, at(x, 0, z), BEAM_Y - 0.8)
-		end
-		beam(portal, `CrossBeam{z}`, pos(-outer - 0.6, BEAM_Y, z), pos(outer + 0.6, BEAM_Y, z), 0.8, 1.6, YELLOW)
-	end
-	for _, x in { -outer, outer } do
-		beam(portal, `PortalTie{x}`, pos(x, BEAM_Y, beamFrontZ + 0.4), pos(x, BEAM_Y, beamBackZ - 0.4), 0.6, 1.2, YELLOW)
-	end
 	for _, x in { -L, L } do
-		beam(portal, `LongBeam{x}`, pos(x, BEAM_Y, -L - 0.75), pos(x, BEAM_Y, beamBackZ + 0.4), 0.7, 1.4, YELLOW)
+		column(portal, `PortalColumn{x}`, at(x, 0, farZ), BEAM_Y - 0.8)
+		beam(portal, `LongBeam{x}`, pos(x, BEAM_Y, -L + 0.4), pos(x, BEAM_Y, farZ - 0.6), 0.7, 1.6, YELLOW)
+		-- Kopfbänder zwischen Stütze und Längsträger
+		beam(portal, `KneeBrace{x}`, pos(x, BEAM_Y - 5, farZ), pos(x, BEAM_Y - 0.8, farZ + 4.5), 0.35, 0.35, YELLOW)
 	end
-	local stripe = part(portal, "TowerCrossbeamStripe", Vector3.new(outer * 2 + 1, 0.5, 0.1), at(0, BEAM_Y, beamFrontZ - 0.45), ACCENT_DEFAULT, Enum.Material.SmoothPlastic)
-	accent(stripe)
-	-- Laufsteg: vom Turm zum Portal und quer über die Bunker
-	local walkLen = -L - beamFrontZ
-	part(portal, "Walkway", Vector3.new(3, 0.2, walkLen), at(0, DECK_Y - 0.1, -L - walkLen / 2 - 0.2), STEEL_LIGHT, Enum.Material.DiamondPlate)
-	part(portal, "CrossWalk", Vector3.new(outer * 2 - 1, 0.2, 2.4), at(0, DECK_Y - 0.1, beamFrontZ + 0.3), STEEL_LIGHT, Enum.Material.DiamondPlate)
-	railing(portal, "WalkRailL", pos(1.6, DECK_Y, -L - 1.1), pos(1.6, DECK_Y, beamFrontZ + 1.6))
-	railing(portal, "WalkRailR", pos(-1.6, DECK_Y, -L - 1.1), pos(-1.6, DECK_Y, beamFrontZ + 1.6))
-	railing(portal, "CrossRailFront", pos(-outer + 0.8, DECK_Y, beamFrontZ - 0.8), pos(outer - 0.8, DECK_Y, beamFrontZ - 0.8))
-	railing(portal, "CrossRailBackL", pos(outer - 0.8, DECK_Y, beamFrontZ + 1.6), pos(1.6, DECK_Y, beamFrontZ + 1.6))
-	railing(portal, "CrossRailBackR", pos(-outer + 0.8, DECK_Y, beamFrontZ + 1.6), pos(-1.6, DECK_Y, beamFrontZ + 1.6))
-	FloatingText.title(portal, "TowerLabel", at(0, DECK_Y + 6, beamFrontZ), "Loading", 2.4, YELLOW)
+	beam(portal, "CrossBeamFar", pos(-L - 0.6, BEAM_Y, farZ), pos(L + 0.6, BEAM_Y, farZ), 0.8, 1.6, YELLOW)
+	for _, dz in { -3.1, 3.1 } do
+		beam(portal, `BinBeam{dz}`, pos(-L + 0.35, BEAM_Y - 0.4, spoutZ + dz), pos(L - 0.35, BEAM_Y - 0.4, spoutZ + dz), 0.5, 0.8, YELLOW)
+	end
+	for _, x in { -L - 0.4, L + 0.4 } do
+		local stripe = part(portal, `TowerCrossbeamStripe{x}`, Vector3.new(0.1, 0.5, -L - farZ - 1), at(x, BEAM_Y, (-L + farZ) / 2), ACCENT_DEFAULT, Enum.Material.SmoothPlastic)
+		accent(stripe)
+	end
+	-- Laufsteg vom Turm bis zum Portalende
+	local walkLen = -L - farZ
+	part(portal, "Walkway", Vector3.new(3, 0.2, walkLen + 0.6), at(spoutX, DECK_Y - 0.1, -L - walkLen / 2), STEEL_LIGHT, Enum.Material.DiamondPlate)
+	railing(portal, "WalkRailL", pos(spoutX + 1.6, DECK_Y, -L - 1.1), pos(spoutX + 1.6, DECK_Y, farZ + 0.3))
+	railing(portal, "WalkRailR", pos(spoutX - 1.6, DECK_Y, -L - 1.1), pos(spoutX - 1.6, DECK_Y, farZ + 0.3))
+	railing(portal, "WalkRailEnd", pos(spoutX - 1.6, DECK_Y, farZ + 0.3), pos(spoutX + 1.6, DECK_Y, farZ + 0.3))
+	FloatingText.title(portal, "TowerLabel", at(spoutX, DECK_Y + 6, spoutZ), "Loading", 2.4, YELLOW)
 
-	-- Je Stellplatz: Förderschnecke vom Silo, Bunker, Schieber, Faltenbalg-Rüssel, Lampe, Strahler
-	for i, x in { x1, x2 } do
-		local station = Instance.new("Model")
-		station.Name = `LoadStation{i}`
-		station.Parent = model
-		local binTop = BEAM_Y - 1.2
-		local binH = 3.4
-		-- Bunker mit Versteifungsrippen, Aufhängung, Trichterstufen, Schieber und Antrieb
-		part(station, "Bin", Vector3.new(5, binH, 5), at(x, binTop - binH / 2, spoutZ), GREY_BOX)
-		for _, s in { -1, 1 } do
-			part(station, `Rib{s}`, Vector3.new(5.15, 0.25, 0.25), at(x, binTop - binH / 2 + s * 0.9, spoutZ - 2.55), YELLOW).CanCollide = false
-			part(station, `RibBack{s}`, Vector3.new(5.15, 0.25, 0.25), at(x, binTop - binH / 2 + s * 0.9, spoutZ + 2.55), YELLOW).CanCollide = false
+	-- Der eine Rüssel: Förderschnecke vom Silo, Bunker, Schieber, Faltenbalg-Rüssel, Lampe, Strahler
+	local i = 1
+	local x = spoutX
+	local station = Instance.new("Model")
+	station.Name = `LoadStation{i}`
+	station.Parent = model
+	local binTop = BEAM_Y - 1.2
+	local binH = 3.4
+	-- Bunker mit Versteifungsrippen, Aufhängung, Trichterstufen, Schieber und Antrieb
+	part(station, "Bin", Vector3.new(5, binH, 5), at(x, binTop - binH / 2, spoutZ), GREY_BOX)
+	for _, s in { -1, 1 } do
+		part(station, `Rib{s}`, Vector3.new(5.15, 0.25, 0.25), at(x, binTop - binH / 2 + s * 0.9, spoutZ - 2.55), YELLOW).CanCollide = false
+		part(station, `RibBack{s}`, Vector3.new(5.15, 0.25, 0.25), at(x, binTop - binH / 2 + s * 0.9, spoutZ + 2.55), YELLOW).CanCollide = false
+	end
+	for _, s in { -1, 1 } do
+		for _, zz in { -1, 1 } do
+			part(station, `Hanger{s}_{zz}`, Vector3.new(0.3, BEAM_Y - 0.8 - binTop, 0.3), at(x + s * 2.2, (binTop + BEAM_Y - 0.8) / 2, spoutZ + zz * 3.1), YELLOW)
 		end
-		for _, s in { -1, 1 } do
-			for _, zz in { -1, 1 } do
-				part(station, `Hanger{s}_{zz}`, Vector3.new(0.3, BEAM_Y - 0.8 - binTop, 0.3), at(x + s * 2.2, (binTop + BEAM_Y - 0.8) / 2, spoutZ + zz * 3.1), YELLOW)
-			end
-		end
-		local coneTop = binTop - binH
-		part(station, "Cone1", Vector3.new(3.8, 0.8, 3.8), at(x, coneTop - 0.4, spoutZ), GREY_BOX)
-		part(station, "Cone2", Vector3.new(2.6, 0.7, 2.6), at(x, coneTop - 1.15, spoutZ), GREY_BOX)
-		local gate = coneTop - 1.5 - 0.3
-		part(station, "Gate", Vector3.new(2.4, 0.6, 2.4), at(x, gate, spoutZ), STEEL_DARK)
-		tube(station, "GateCylinder", pos(x + 1.2, gate, spoutZ), pos(x + 3.4, gate, spoutZ), 0.4, ORANGE)
-		-- Faltenbalg (eingefahren) zwischen Schieber und Rüsselrohr
-		local bellowTop = gate - 0.3
-		local folds = 5
-		local foldH = (bellowTop - CHUTE_TOP) / folds
-		for k = 0, folds - 1 do
-			local w = if k % 2 == 0 then 2.4 else 2
-			part(station, `Bellow{k}`, Vector3.new(w, foldH, w), at(x, bellowTop - foldH * (k + 0.5), spoutZ), RUBBER, Enum.Material.Rubber).CanCollide = false
-		end
-		local tubePart = part(station, `ChuteTube{i}`, Vector3.new(1.7, CHUTE_REST, 1.7), at(x, CHUTE_TOP - CHUTE_REST / 2, spoutZ), Color3.fromRGB(40, 40, 42), Enum.Material.Fabric)
-		tubePart:SetAttribute("ChuteTop", pos(x, CHUTE_TOP, spoutZ).Y)
-		tubePart.CanCollide = false
-		-- Teleskop: zwei weitere, schmalere Rohre stecken eingefahren im äußeren
-		for k, n in { "Mid", "Inner" } do
-			local w = 1.7 - k * 0.2
-			local inner = part(station, `ChuteTube{i}{n}`, Vector3.new(w, CHUTE_REST, w), at(x, CHUTE_TOP - CHUTE_REST / 2, spoutZ), Color3.fromRGB(52 + k * 10, 52 + k * 10, 56 + k * 10), Enum.Material.Metal)
-			inner.CanCollide = false
-		end
-		local nozzle = part(station, `ChuteNozzle{i}`, Vector3.new(2.5, 0.8, 2.5), at(x, CHUTE_TOP - CHUTE_REST - 0.4, spoutZ), RUBBER, Enum.Material.Rubber)
-		nozzle.CanCollide = false
-		local lp = part(station, `LoadPoint{i}`, Vector3.new(1, 1, 1), at(x, CHUTE_TOP - 6, spoutZ), WHITE, Enum.Material.SmoothPlastic)
-		lp.Transparency = 1
-		flat(lp)
-		lp:SetAttribute("Bay", i)
-		-- Förderschnecke vom Silo-Verteiler schräg hoch in die Rückwand des Bunkers (unter dem
-		-- Querträger durch), Getriebemotor oben am unteren Ende
-		local sgn = if x < 0 then -1 else 1
-		local from = pos(sgn * 1.2, gateY - 1.05, -1.2)
-		local to = pos(x - sgn * 0.8, binTop - 0.9, spoutZ + 2.2)
-		tube(station, "ScrewConveyor", from, to, 1.1, STEEL_LIGHT)
-		local dir = (to - from).Unit
-		local motorAt = from + dir * 2.6 + Vector3.new(0, 0.9, 0)
-		part(station, "ScrewMotor", Vector3.new(1, 0.9, 1.6), CFrame.lookAt(motorAt, motorAt + dir), ORANGE)
-		for k = 1, 3 do
-			local p = from + dir * ((to - from).Magnitude * k / 4)
-			disc(station, `ScrewFlange{k}`, CFrame.lookAt(p, p + dir) * CFrame.Angles(math.rad(90), 0, 0), 0.25, 1.4, STEEL)
-		end
-		-- Statuslampe am Bunker (grün beladen, blau voll, orange leer, grau frei)
-		local lamp = part(station, `ChuteLamp{i}`, Vector3.new(0.9, 0.9, 0.9), at(x + 1.8, coneTop + 0.6, spoutZ - 2.75), STEEL_LIGHT, Enum.Material.Neon)
-		lamp.Shape = Enum.PartType.Ball
-		local lampLight = Instance.new("PointLight")
-		lampLight.Name = "Glow"
-		lampLight.Range = 9
-		lampLight.Enabled = false
-		lampLight.Parent = lamp
-		-- Strahler unter dem vorderen Querträger
-		local flood = part(station, "Floodlight", Vector3.new(1.4, 0.4, 0.8), at(x - 3.6, BEAM_Y - 1, beamFrontZ), Color3.fromRGB(255, 250, 225), Enum.Material.Neon)
+	end
+	local coneTop = binTop - binH
+	part(station, "Cone1", Vector3.new(3.8, 0.8, 3.8), at(x, coneTop - 0.4, spoutZ), GREY_BOX)
+	part(station, "Cone2", Vector3.new(2.6, 0.7, 2.6), at(x, coneTop - 1.15, spoutZ), GREY_BOX)
+	local gate = coneTop - 1.5 - 0.3
+	part(station, "Gate", Vector3.new(2.4, 0.6, 2.4), at(x, gate, spoutZ), STEEL_DARK)
+	tube(station, "GateCylinder", pos(x + 1.2, gate, spoutZ), pos(x + 3.4, gate, spoutZ), 0.4, ORANGE)
+	-- Faltenbalg (eingefahren) zwischen Schieber und Rüsselrohr
+	local bellowTop = gate - 0.3
+	local folds = 5
+	local foldH = (bellowTop - CHUTE_TOP) / folds
+	for k = 0, folds - 1 do
+		local w = if k % 2 == 0 then 2.4 else 2
+		part(station, `Bellow{k}`, Vector3.new(w, foldH, w), at(x, bellowTop - foldH * (k + 0.5), spoutZ), RUBBER, Enum.Material.Rubber).CanCollide = false
+	end
+	local tubePart = part(station, `ChuteTube{i}`, Vector3.new(1.7, CHUTE_REST, 1.7), at(x, CHUTE_TOP - CHUTE_REST / 2, spoutZ), Color3.fromRGB(40, 40, 42), Enum.Material.Fabric)
+	tubePart:SetAttribute("ChuteTop", pos(x, CHUTE_TOP, spoutZ).Y)
+	tubePart.CanCollide = false
+	-- Teleskop: zwei weitere, schmalere Rohre stecken eingefahren im äußeren
+	for k, n in { "Mid", "Inner" } do
+		local w = 1.7 - k * 0.2
+		local inner = part(station, `ChuteTube{i}{n}`, Vector3.new(w, CHUTE_REST, w), at(x, CHUTE_TOP - CHUTE_REST / 2, spoutZ), Color3.fromRGB(52 + k * 10, 52 + k * 10, 56 + k * 10), Enum.Material.Metal)
+		inner.CanCollide = false
+	end
+	local nozzle = part(station, `ChuteNozzle{i}`, Vector3.new(2.5, 0.8, 2.5), at(x, CHUTE_TOP - CHUTE_REST - 0.4, spoutZ), RUBBER, Enum.Material.Rubber)
+	nozzle.CanCollide = false
+	local lp = part(station, `LoadPoint{i}`, Vector3.new(1, 1, 1), at(x, CHUTE_TOP - 6, spoutZ), WHITE, Enum.Material.SmoothPlastic)
+	lp.Transparency = 1
+	flat(lp)
+	lp:SetAttribute("Bay", i)
+	-- Förderschnecke vom Silo-Verteiler schräg hoch in die Turmseite des Bunkers (zwischen den
+	-- Turmriegeln durch), Getriebemotor oben am unteren Ende
+	local from = pos(x, gateY - 1.05, -1.2)
+	local to = pos(x, binTop - 0.9, spoutZ + 2.2)
+	tube(station, "ScrewConveyor", from, to, 1.1, STEEL_LIGHT)
+	local dir = (to - from).Unit
+	local motorAt = from + dir * 2.6 + Vector3.new(0, 0.9, 0)
+	part(station, "ScrewMotor", Vector3.new(1, 0.9, 1.6), CFrame.lookAt(motorAt, motorAt + dir), ORANGE)
+	for k = 1, 3 do
+		local p = from + dir * ((to - from).Magnitude * k / 4)
+		disc(station, `ScrewFlange{k}`, CFrame.lookAt(p, p + dir) * CFrame.Angles(math.rad(90), 0, 0), 0.25, 1.4, STEEL)
+	end
+	-- Statuslampe am Bunker zur Einfahrt hin (grün beladen, blau voll, orange leer, grau frei)
+	local lamp = part(station, `ChuteLamp{i}`, Vector3.new(0.9, 0.9, 0.9), at(x - 2.75, coneTop + 0.6, spoutZ - 1.8), STEEL_LIGHT, Enum.Material.Neon)
+	lamp.Shape = Enum.PartType.Ball
+	local lampLight = Instance.new("PointLight")
+	lampLight.Name = "Glow"
+	lampLight.Range = 9
+	lampLight.Enabled = false
+	lampLight.Parent = lamp
+	-- Strahler unter den Längsträgern links und rechts des Bunkers
+	for _, s in { -1, 1 } do
+		local flood = part(station, `Floodlight{s}`, Vector3.new(0.8, 0.4, 1.4), at(s * L, BEAM_Y - 1, spoutZ + s * 5), Color3.fromRGB(255, 250, 225), Enum.Material.Neon)
 		flood.CanCollide = false
 		local spot = Instance.new("SpotLight")
 		spot.Face = Enum.NormalId.Bottom
 		spot.Angle = 70
-		spot.Range = 24
+		spot.Range = 26
 		spot.Brightness = 1.2
 		spot.Parent = flood
-		-- Anzeige vorne am Stellplatz, zum Fahrer gedreht (schaut zur Hallenrückseite)
-		local bayCenter = cfg.Bays[i]
-		local displayCF = o * CFrame.new(bayCenter.X, 14.5, bayCenter.Y - cfg.BaySize.Y / 2 - 1) * CFrame.Angles(0, math.rad(180), 0)
-		FloatingText.create(model, `BayDisplay{i}`, displayCF, 7, {
-			{ Name = "Title", Text = `Bay {i}`, Size = 1.4, Color = Color3.fromRGB(200, 208, 220) },
-			{ Name = "Value", Text = "Ready", Size = 1.8 },
-		})
 	end
+	-- Anzeige über der Spur vor dem Rüssel, zum ankommenden Fahrer gedreht (schaut nach +X)
+	local displayCF = o * CFrame.new(cfg.Chute.X - 16, 15.5, cfg.Lane.Z) * CFrame.Angles(0, math.rad(-90), 0)
+	FloatingText.create(model, `BayDisplay{i}`, displayCF, 7, {
+		{ Name = "Title", Text = "Loading", Size = 1.4, Color = Color3.fromRGB(200, 208, 220) },
+		{ Name = "Value", Text = "Ready", Size = 1.8 },
+	})
 
 	-- Steuerkabine am Turmfuß mit Fenster, Tür, Klimagerät und Schaltschrank
 	local cabin = Instance.new("Model")
@@ -479,6 +478,63 @@ local function tower(model: Model, o: CFrame)
 	local led = part(cabin, "CabinetLed", Vector3.new(0.3, 0.3, 0.1), c * CFrame.new(3.6, 2.5, -0.42), Color3.fromRGB(90, 220, 110), Enum.Material.Neon)
 	led.CanCollide = false
 	AmbientProps.blink(led)
+end
+
+-- Bodenmarkierung der Verladestraße: gelbe Randlinien von der Seitenöffnung bis zur Kurve, Bogen
+-- zum Rolltor, Richtungspfeile, Ladefeld unter dem Rüssel, Schriftzug an der Einfahrt
+local function lane(model: Model, o: CFrame)
+	local cfg = LayoutConfig.Garage
+	local laneCfg = cfg.Lane
+	local folder = Instance.new("Model")
+	folder.Name = "LoadingLane"
+	folder.Parent = model
+	local hallLeft = LayoutConfig.HallOffset.X + LayoutConfig.HallSize.X / 2
+	local hallFront = LayoutConfig.HallOffset.Y - LayoutConfig.HallSize.Y / 2
+	local half = laneCfg.Width / 2
+	local straight = hallLeft - laneCfg.TurnX
+	for _, s in { -1, 1 } do
+		local line = part(folder, `LaneEdge{s}`, Vector3.new(straight, 0.06, 0.5), o * CFrame.new((hallLeft + laneCfg.TurnX) / 2, 0.03, laneCfg.Z + s * half), YELLOW, Enum.Material.SmoothPlastic)
+		flat(line)
+	end
+	-- Rechtskurve: Mittelpunkt vor der Spur Richtung Tor
+	local center = Vector2.new(laneCfg.TurnX, laneCfg.Z - laneCfg.TurnRadius)
+	local segments = 14
+	for _, s in { -1, 1 } do
+		local r = laneCfg.TurnRadius + s * half
+		for k = 1, segments do
+			local a0 = math.rad(90 + (k - 1) / segments * 90)
+			local a1 = math.rad(90 + k / segments * 90)
+			local p0 = center + Vector2.new(math.cos(a0), math.sin(a0)) * r
+			local p1 = center + Vector2.new(math.cos(a1), math.sin(a1)) * r
+			local mid = (p0 + p1) / 2
+			local len = (p1 - p0).Magnitude + 0.3
+			local seg = part(folder, `TurnEdge{s}_{k}`, Vector3.new(0.5, 0.06, len), o * CFrame.lookAt(Vector3.new(mid.X, 0.03, mid.Y), Vector3.new(p1.X, 0.03, p1.Y)), YELLOW, Enum.Material.SmoothPlastic)
+			flat(seg)
+		end
+		-- kurzes Stück geradeaus bis zum Tor
+		local x = center.X - laneCfg.TurnRadius + s * -half
+		local len = center.Y - hallFront
+		local tail = part(folder, `ExitEdge{s}`, Vector3.new(0.5, 0.06, len), o * CFrame.new(x, 0.03, center.Y - len / 2), YELLOW, Enum.Material.SmoothPlastic)
+		flat(tail)
+	end
+	-- Pfeile in Fahrtrichtung (-X) auf der Geraden
+	for k, ax in { hallLeft - 12, cfg.Chute.X + 28, laneCfg.TurnX + 8 } do
+		for _, s in { -1, 1 } do
+			local tip = o * CFrame.new(ax - 2, 0.035, laneCfg.Z)
+			local arm = part(folder, `Arrow{k}_{s}`, Vector3.new(0.6, 0.06, 4.6), tip * CFrame.Angles(0, math.rad(s * 45 - 90), 0) * CFrame.new(0, 0, -2.1), WHITE, Enum.Material.SmoothPlastic)
+			flat(arm)
+		end
+		local shaft = part(folder, `ArrowShaft{k}`, Vector3.new(6, 0.06, 0.6), o * CFrame.new(ax + 1.4, 0.035, laneCfg.Z), WHITE, Enum.Material.SmoothPlastic)
+		flat(shaft)
+	end
+	-- Ladefeld unter dem Rüssel (weißer Rahmen) mit Schrift
+	local box = o * CFrame.new(cfg.Chute.X, 0.04, cfg.Chute.Y)
+	for _, s in { -1, 1 } do
+		flat(part(folder, `LoadBoxSide{s}`, Vector3.new(14, 0.06, 0.4), box * CFrame.new(0, 0, s * 7), WHITE, Enum.Material.SmoothPlastic))
+		flat(part(folder, `LoadBoxEnd{s}`, Vector3.new(0.4, 0.06, 14), box * CFrame.new(s * 7, 0, 0), WHITE, Enum.Material.SmoothPlastic))
+	end
+	floorText(folder, "LoadBoxText", "LOAD", Vector2.new(8, 2.6), box * CFrame.new(5, 0.03, 0) * CFrame.Angles(0, math.rad(-90), 0), WHITE)
+	floorText(folder, "LaneText", "LOADING LANE", Vector2.new(16, 3), o * CFrame.new(hallLeft - 22, 0.07, laneCfg.Z) * CFrame.Angles(0, math.rad(-90), 0), YELLOW)
 end
 
 -- Zustand eines Stellplatzes am Turm (LoadingService): Lampe, Anzeige, Schurrenlänge
@@ -529,7 +585,7 @@ function GarageTemplate.chuteGoals(model: Model, bay: number, bottomY: number?):
 	if typeof(top) ~= "number" then
 		return goals
 	end
-	local length = if bottomY then math.clamp(top - bottomY - 0.8, CHUTE_REST, 15) else CHUTE_REST
+	local length = if bottomY then math.clamp(top - bottomY - 0.8, CHUTE_REST, 19) else CHUTE_REST
 	local x, z = tube.Position.X, tube.Position.Z
 	local rot = tube.CFrame - tube.Position
 	-- Teleskop aus drei Rohren: gleich lang, gleichmäßig überlappend ausgefahren
@@ -550,9 +606,9 @@ function GarageTemplate.chuteGoals(model: Model, bay: number, bottomY: number?):
 	return goals
 end
 
--- Deko-Ecke rechts neben dem Auswahlring (Felix 2026-10-10: keine Werkstatt, nur Deko, damit die
--- Halle nicht leer wirkt): Hochregale mit Paletten und Kartons, Ölfässer, Palettenstapel.
--- Lokal zur Plotmitte, Bereich x 76..104, z −54..−6 (frei von Ring, Stellplätzen, Turm, Stützen).
+-- Deko-Ecke hinter der Verladestraße neben dem Auswahlring (Felix 2026-10-10: keine Werkstatt, nur
+-- Deko, damit die Halle nicht leer wirkt): Hochregale mit Paletten und Kartons, Ölfässer,
+-- Palettenstapel. Lokal zur Plotmitte, Bereich x 100..148, z −27..4 (frei von Spur, Ring, Turm).
 local PALLET_WOOD = Color3.fromRGB(176, 140, 96)
 local CARTON = { Color3.fromRGB(184, 146, 98), Color3.fromRGB(168, 130, 84), Color3.fromRGB(196, 160, 112) }
 local RACK_UPRIGHT = Color3.fromRGB(40, 90, 150)
@@ -636,7 +692,6 @@ local function drum(parent: Instance, name: string, cf: CFrame, color: Color3)
 end
 
 local function props(model: Model, o: CFrame)
-	local cfg = LayoutConfig.Garage
 	local deco = Instance.new("Folder")
 	deco.Name = "Decoration"
 	deco.Parent = model
@@ -645,12 +700,12 @@ local function props(model: Model, o: CFrame)
 	local RED = Color3.fromRGB(190, 50, 40)
 	local GREEN = Color3.fromRGB(60, 110, 60)
 
-	-- Hochregale an Vorder- und Seitenwand
-	highRack(deco, "RackFront", o * CFrame.new(135, 0, -79.2), 4, rng)
-	highRack(deco, "RackSide", o * CFrame.new(147.4, 0, -69) * CFrame.Angles(0, math.rad(90), 0), 2, rng)
+	-- Hochregale an der Lagergrenze (Front zur Spur) und an der Seitenwand
+	highRack(deco, "RackFront", o * CFrame.new(118, 0, 2.2) * CFrame.Angles(0, math.rad(180), 0), 4, rng)
+	highRack(deco, "RackSide", o * CFrame.new(147.4, 0, -12) * CFrame.Angles(0, math.rad(90), 0), 2, rng)
 
 	-- Ölfässer auf Auffangwanne und eine Palette mit Fässern
-	local spill = o * CFrame.new(144, 0, -36)
+	local spill = o * CFrame.new(106, 0, -23)
 	local spillGroup = Instance.new("Model")
 	spillGroup.Name = "SpillPallet"
 	spillGroup.Parent = deco
@@ -658,7 +713,7 @@ local function props(model: Model, o: CFrame)
 	for i, p in { Vector2.new(-0.95, -0.95), Vector2.new(0.95, -0.95), Vector2.new(0, 1) } do
 		drum(spillGroup, `SpillDrum{i}`, spill * CFrame.new(p.X, 0.4, p.Y), if i == 3 then RED else BLUE)
 	end
-	local drumPallet = o * CFrame.new(144.5, 0, -53)
+	local drumPallet = o * CFrame.new(112, 0, -23)
 	local drumGroup = Instance.new("Model")
 	drumGroup.Name = "DrumPallet"
 	drumGroup.Parent = deco
@@ -666,19 +721,19 @@ local function props(model: Model, o: CFrame)
 	for i, p in { Vector2.new(-0.95, -0.8), Vector2.new(0.95, -0.8), Vector2.new(-0.95, 0.8), Vector2.new(0.95, 0.8) } do
 		drum(drumGroup, `PalletDrum{i}`, drumPallet * CFrame.new(p.X, 0.5, p.Y), if i == 2 then GREEN else BLUE)
 	end
-	drum(deco, "LooseDrum1", o * CFrame.new(140.5, 0, -51.5), RED)
-	drum(deco, "LooseDrum2", o * CFrame.new(141, 0, -54.6), BLUE)
+	drum(deco, "LooseDrum1", o * CFrame.new(116.5, 0, -21.5), RED)
+	drum(deco, "LooseDrum2", o * CFrame.new(117, 0, -24.6), BLUE)
 
 	-- Kartonpaletten und ein Stapel leerer Paletten auf dem Boden
-	cartonPallet(deco, "FloorPallet1", o * CFrame.new(131, 0, -67) * CFrame.Angles(0, math.rad(8), 0), rng, 3)
-	cartonPallet(deco, "FloorPallet2", o * CFrame.new(136, 0, -67.5) * CFrame.Angles(0, math.rad(-4), 0), rng, 2)
-	cartonPallet(deco, "FloorPallet3", o * CFrame.new(129, 0, -45) * CFrame.Angles(0, math.rad(90), 0), rng, 3)
+	cartonPallet(deco, "FloorPallet1", o * CFrame.new(103, 0, -6) * CFrame.Angles(0, math.rad(8), 0), rng, 3)
+	cartonPallet(deco, "FloorPallet2", o * CFrame.new(108, 0, -6.5) * CFrame.Angles(0, math.rad(-4), 0), rng, 2)
+	cartonPallet(deco, "FloorPallet3", o * CFrame.new(126, 0, -22) * CFrame.Angles(0, math.rad(90), 0), rng, 3)
 	for i = 1, 6 do
-		pallet(deco, `EmptyPallet{i}`, o * CFrame.new(125, (i - 1) * 0.5, -73) * CFrame.Angles(0, math.rad(if i % 2 == 0 then 3 else -2), 0))
+		pallet(deco, `EmptyPallet{i}`, o * CFrame.new(103, (i - 1) * 0.5, -13) * CFrame.Angles(0, math.rad(if i % 2 == 0 then 3 else -2), 0))
 	end
 
-	-- Feuerlöscher an der Hallenstütze
-	local ext = o * CFrame.new(147.7, 3, -62)
+	-- Feuerlöscher an der Hallenstütze neben der Seitenöffnung
+	local ext = o * CFrame.new(147.7, 3, -20.4)
 	local extGroup = Instance.new("Model")
 	extGroup.Name = "Extinguisher"
 	extGroup.Parent = deco
@@ -700,11 +755,6 @@ local function props(model: Model, o: CFrame)
 	AmbientProps.palletTruck(shop, "GaragePalletTruck", o * CFrame.new(-34, 0, -30) * CFrame.Angles(0, math.rad(60), 0))
 	AmbientProps.cones(shop, "LaneCones", o * CFrame.new(-12, 0, -60) * CFrame.Angles(0, math.rad(90), 0), 4, 6)
 	AmbientProps.staffPath(model, "StaffWorkshop", { (o * CFrame.new(-26, 0, -75)).Position, (o * CFrame.new(-36, 0, -56)).Position, (o * CFrame.new(-26, 0, -26)).Position })
-
-	-- Firmenfarbener Streifen auf dem Boden entlang der Garage (dezenter Akzent)
-	local line = part(model, "GarageAccentLine", Vector3.new(0.6, 0.06, 40), o * CFrame.new(cfg.Ring.X - 9, 0.03, cfg.Ring.Y + 4), ACCENT_DEFAULT, Enum.Material.SmoothPlastic)
-	flat(line)
-	accent(line)
 end
 
 -- Glas-Rolltor in der Hallen-Toröffnung (docs/07 §3, §19). Geschlossen füllt es die Öffnung;
@@ -749,6 +799,7 @@ function GarageTemplate.build(plotCFrame: CFrame): Model
 	end
 	ring(model, o)
 	tower(model, o)
+	lane(model, o)
 	props(model, o)
 	door(model, plotCFrame)
 	return model

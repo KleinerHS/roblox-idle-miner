@@ -88,6 +88,17 @@ local function makeBlockers(lakes: { Vector3 }): { Blocker }
 			end
 			return false
 		end,
+		-- Zufahrt zur Verladestraße neben dem Plot (D-052)
+		function(p)
+			local side = cfg.SideRoad
+			for _, cf in plots do
+				local l = cf:PointToObjectSpace(p)
+				if l.X > cfg.DoorCenterX and l.X < side.OuterX + cfg.RoadWidth / 2 + 14 and l.Z > side.JunctionZ - cfg.RoadWidth / 2 - 14 and l.Z < cfg.Garage.Lane.Z + cfg.RoadWidth / 2 + 14 then
+					return true
+				end
+			end
+			return false
+		end,
 		-- Zufahrtsstraßen mit Gehweg/Laternen
 		function(p)
 			for _, cf in plots do
@@ -249,12 +260,26 @@ local function roadDetails(parent: Instance, plotId: number)
 	for _, side in { -1, 1 } do
 		local edge = part(folder, `EdgeLine{side}`, Vector3.new(0.4, 0.04, length), cf * CFrame.new(x + side * (cfg.RoadWidth / 2 - 1.2), roadTop + 0.02, -halfZ - length / 2), LINE_WHITE, Enum.Material.SmoothPlastic)
 		edge.CanCollide = false
-		part(folder, `Sidewalk{side}`, Vector3.new(5, 1.2, length), cf * CFrame.new(x + side * (cfg.RoadWidth / 2 + 2.5), cfg.GroundY + 0.6, -halfZ - length / 2), PAVING, Enum.Material.Pavement)
-		part(folder, `Curb{side}`, Vector3.new(0.6, 1.3, length), cf * CFrame.new(x + side * (cfg.RoadWidth / 2 + 0.3), cfg.GroundY + 0.65, -halfZ - length / 2), PAVING_DARK, Enum.Material.Concrete)
+		-- Gehweg und Bordstein; auf der +X-Seite Lücke für den Abzweig zur Verladestraße (D-052)
+		local spans = { { -halfZ, -halfZ - length } }
+		local gapHalf = cfg.RoadWidth / 2 + 6
+		local jz = cfg.SideRoad.JunctionZ
+		if side > 0 then
+			spans = { { -halfZ, jz + gapHalf }, { jz - gapHalf, -halfZ - length } }
+		end
+		for k, span in spans do
+			local spanLen = span[1] - span[2]
+			local zc = (span[1] + span[2]) / 2
+			part(folder, `Sidewalk{side}_{k}`, Vector3.new(5, 1.2, spanLen), cf * CFrame.new(x + side * (cfg.RoadWidth / 2 + 2.5), cfg.GroundY + 0.6, zc), PAVING, Enum.Material.Pavement)
+			part(folder, `Curb{side}_{k}`, Vector3.new(0.6, 1.3, spanLen), cf * CFrame.new(x + side * (cfg.RoadWidth / 2 + 0.3), cfg.GroundY + 0.65, zc), PAVING_DARK, Enum.Material.Concrete)
+		end
 		-- Laternen versetzt auf beiden Seiten
 		local count = math.floor(length / 60)
 		for n = 1, count do
 			local lz = -halfZ - (n - 0.5) * (length / count) + (if side > 0 then 9 else -9)
+			if side > 0 and math.abs(lz - cfg.SideRoad.JunctionZ) < cfg.RoadWidth / 2 + 10 then
+				continue
+			end
 			streetLamp(folder, `Lamp{side}_{n}`, cf * CFrame.new(x + side * (cfg.RoadWidth / 2 + 3.6), cfg.GroundY + 1.2, lz) * CFrame.Angles(0, math.rad(if side > 0 then 90 else -90), 0))
 		end
 	end

@@ -51,7 +51,7 @@ Ziel: echte Anhänger mit Gelenk, ohne Rückwärtsfahren-Zwang, Beladen und Verk
 
 Jeder Schritt mit Checkpoint und Felix' Freigabe.
 
-## Entscheidungen (D-050)
+## Entscheidungen (D-050, D-052)
 
-- Verladespur: an der Stelle des grünen Häuschens vor der Halle (Objekt bei T3 bestätigen).
+- Verladespur: erledigt in 18b als Durchfahr-Verladestraße durch die Garage (D-052) – Einfahrt links durch die Hallenwand, ein Rüssel, Ausfahrt durchs Rolltor; Zufahrt über eine neue Straße neben dem Grundstück. T3 entfällt in der ursprünglichen Form; mit echten Anhängern wird nur noch geprüft, ob die Kurve zum Tor (Radius 32) reicht.
 - Höchstgeschwindigkeit: ca. 60 % der kleinen Fahrzeuge.

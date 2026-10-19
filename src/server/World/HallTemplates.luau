@@ -74,7 +74,27 @@ function HallTemplates.buildWalls(plotCFrame: CFrame): Model
 	local base = plotCFrame * CFrame.new(cx, y0, cz)
 
 	wallSegment(model, "Back", hx * 2 + t, base * CFrame.new(0, 0, hz), t, H)
-	wallSegment(model, "Left", hz * 2, base * CFrame.new(hx, 0, 0) * CFrame.Angles(0, math.rad(90), 0), t, H)
+	-- Linke Wand mit Öffnung für die Verladestraße (D-052): vorderes Stück, hinteres Stück, Sturz
+	local opening = LayoutConfig.Garage.SideOpening
+	local oz1, oz2 = opening.Z1 - cz, opening.Z2 - cz
+	wallSegment(model, "LeftFront", oz1 + hz, base * CFrame.new(hx, 0, (-hz + oz1) / 2) * CFrame.Angles(0, math.rad(90), 0), t, H)
+	wallSegment(model, "Left", hz - oz2, base * CFrame.new(hx, 0, (oz2 + hz) / 2) * CFrame.Angles(0, math.rad(90), 0), t, H)
+	local sideFrame = Instance.new("Model")
+	sideFrame.Name = "SideOpening"
+	sideFrame.Parent = model
+	local ozMid, ozW, oH = (oz1 + oz2) / 2, oz2 - oz1, opening.Height
+	part(sideFrame, "SideLintel", Vector3.new(t, H - oH, ozW), base * CFrame.new(hx, oH + (H - oH) / 2, ozMid), WALL, Enum.Material.Metal)
+	-- gelb-schwarze Kanten an beiden Leibungen, innen und außen
+	for _, z in { oz1, oz2 } do
+		part(sideFrame, `SideJamb{z}`, Vector3.new(t + 0.4, oH, 0.8), base * CFrame.new(hx, oH / 2, z + (if z == oz1 then 0.4 else -0.4)), YELLOW, Enum.Material.SmoothPlastic)
+		for k = 0, math.floor(oH / 2) - 1 do
+			local stripe = part(sideFrame, `SideStripe{z}_{k}`, Vector3.new(t + 0.6, 1, 0.82), base * CFrame.new(hx, 1.5 + k * 2, z + (if z == oz1 then 0.4 else -0.4)), Color3.fromRGB(30, 30, 30), Enum.Material.SmoothPlastic)
+			stripe.CanCollide = false
+		end
+	end
+	local header = part(sideFrame, "SideHeader", Vector3.new(0.3, 1.2, ozW), base * CFrame.new(hx + t / 2 + 0.2, oH + 0.8, ozMid), YELLOW, Enum.Material.SmoothPlastic)
+	header.CanCollide = false
+	FloatingText.title(sideFrame, "SideOpeningLabel", base * CFrame.new(hx + 3, oH + 4, ozMid) * CFrame.Angles(0, math.rad(-90), 0), "Loading Lane", 2.4, YELLOW)
 	wallSegment(model, "Right", hz * 2, base * CFrame.new(-hx, 0, 0) * CFrame.Angles(0, math.rad(90), 0), t, H)
 
 	-- Vorderwand mit Toröffnung
@@ -101,7 +121,9 @@ function HallTemplates.buildWalls(plotCFrame: CFrame): Model
 		part(model, `ColumnBack{x}`, Vector3.new(1.2, H, 1.2), base * CFrame.new(x, H / 2, hz - 1.4), STEEL, Enum.Material.Metal)
 	end
 	for z = -hz + 20, hz - 20, 20 do
-		part(model, `ColumnL{z}`, Vector3.new(1.2, H, 1.2), base * CFrame.new(hx - 1.4, H / 2, z), STEEL, Enum.Material.Metal)
+		if z < oz1 - 1 or z > oz2 + 1 then
+			part(model, `ColumnL{z}`, Vector3.new(1.2, H, 1.2), base * CFrame.new(hx - 1.4, H / 2, z), STEEL, Enum.Material.Metal)
+		end
 		part(model, `ColumnR{z}`, Vector3.new(1.2, H, 1.2), base * CFrame.new(-hx + 1.4, H / 2, z), STEEL, Enum.Material.Metal)
 	end
 	-- Wandlüfter (drehen sich im Spiel) zwischen den Stützen: rechts über der Schmelze, links über
@@ -112,7 +134,7 @@ function HallTemplates.buildWalls(plotCFrame: CFrame): Model
 	for i, z in { -70, -30, 10 } do
 		AmbientProps.wallFan(fans, `FanRight{i}`, base * CFrame.new(-hx + 1.4, 20, z) * CFrame.Angles(0, math.rad(-90), 0), 7)
 	end
-	for i, z in { -70, -30 } do
+	for i, z in { -90, -30 } do
 		AmbientProps.wallFan(fans, `FanLeft{i}`, base * CFrame.new(hx - 1.4, 20, z) * CFrame.Angles(0, math.rad(90), 0), 7)
 	end
 	for i, x in { -130, -90, -30 } do

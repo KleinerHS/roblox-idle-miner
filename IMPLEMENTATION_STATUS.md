@@ -25,7 +25,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 15 | Rare Drops & Mining Luck | TESTING_REQUIRED (15a, D-045) |
 | 16 | Verkauf & Spätspiel-Geld | TESTING_REQUIRED (16a, D-046) |
 | 17 | Icons | TESTING_REQUIRED (17a Erz- und Barren-Icons, 17b Kategorie-Icons) |
-| 18 | Fahrzeuge aus Felix' Modellen | TESTING_REQUIRED (18a: 4 Fahrzeuge; 18b–: Lastzüge mit Anhängern geplant, D-048) |
+| 18 | Fahrzeuge aus Felix' Modellen | TESTING_REQUIRED (18a: 4 Fahrzeuge; 18b: Durchfahr-Verladestraße mit einem Rüssel und Seitenstraße, D-052; Lastzüge mit Anhängern folgen, D-048) |
 
 ## Setup – Details
 
@@ -694,6 +694,21 @@ Selbsttest (Play): Vorschau aller 18 Icons per Bildschirmfoto geprüft und nachg
 
 Selbsttest (Play): Pickup ausgeparkt, Fahrer in der Kabine, 207 Studs gefahren, aufrecht, keine losen Teile, Ladung sichtbar; Box Truck (DAF) passt in Stellplatz 2 unter den Turm, Ladefläche 1,3 Studs vom Rüssel, Beladen startet (danach per UnloadVehicle zurück ins Lager); Autohaus baut Pickup, Cargo Van, High-Roof Van. Test-Fahrzeuge wieder entfernt.
 Offen: Place speichern (Vorlagen liegen nur in der Place); Lastzüge (PLANS/ROAD_TRAINS.md).
+
+### 18b (Version 0.41.0, 2026-10-19) – Durchfahr-Verladestraße (D-052)
+
+| System | Dateien | Status |
+|---|---|---|
+| Öffnung in der linken Hallenwand (35 breit, 26 hoch) mit gelben Leibungen und Schild „Loading Lane“; Stütze und Lüfter versetzt | `HallTemplates.buildWalls`, Place: `HallLayout.HallWalls` | TESTING_REQUIRED |
+| Verladestraße in der Garage: Spur geradeaus, Rechtskurve zum Rolltor, Markierungen, Pfeile, Ladefeld | `GarageTemplate` (lane), `LayoutConfig.Garage.Lane` | TESTING_REQUIRED |
+| Verladeturm neu: Turm hinter der Spur, Portal über die Spur, nur noch ein Rüssel (höher für Lastzüge), Anzeige zum ankommenden Fahrer | `GarageTemplate` (tower), `LoadingService` (ChuteCount) | TESTING_REQUIRED |
+| Zwei Stellplätze zum Ausparken vor dem Rüssel (Front in Fahrtrichtung), Auswahlring und Deko hinter der Spur | `GarageTemplate`, `LayoutConfig.Garage` | TESTING_REQUIRED |
+| Zauntor links, Asphaltspur mit Rampe zur Hallenöffnung; Regal, Reifen, Felsen aus der Spur geräumt | `PlotExterior`, Place: `HallLayout.Exterior` | TESTING_REQUIRED |
+| Neue Straße neben jedem Grundstück: Abzweig von der Zufahrt, zwei weite Kurven (Radius 46), Einfahrt zum Zauntor; Gehweg-Lücke am Abzweig; keine Bäume auf der Strecke | `PlotBuilder.buildSideRoad`, `EnvironmentBuilder`, `LayoutConfig.SideRoad` | TESTING_REQUIRED |
+| Alter Turm (Felix' Kopie) aufbewahrt | Place: `ServerStorage.Archive.OldLoadingTower` | IMPLEMENTED |
+
+Selbsttest (Play): Box Truck über die Seitenstraße durch die Wandöffnung bis in die Halle gefahren (ohne Anstoßen); unter dem Rüssel erkannt („Loading · Box Truck“), Rüssel fährt bis über das Dach aus, Beladen läuft; Kollisionsprüfung des Box Trucks entlang der ganzen Spur inkl. Kurve und Tor: nur das (automatisch öffnende) Rolltor. Stellplätze, Ring, Seitenstraße und Bäume per Draufsicht geprüft.
+Offen: Lastzüge (Anhänger-Physik, T1) – Kurvenradius in der Garage (32) für Lastzüge erst mit echten Anhängern prüfbar.
 
 ## Phase 12 – Content Expansion – Details
 
