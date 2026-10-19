@@ -51,7 +51,7 @@ Ziel: echte Anhänger mit Gelenk, ohne Rückwärtsfahren-Zwang, Beladen und Verk
 
 Jeder Schritt mit Checkpoint und Felix' Freigabe.
 
-## Offene Fragen an Felix
+## Entscheidungen (D-050)
 
-- Soll die Verladespur neben der Garage liegen (Platz auf dem Grundstück nötig) oder eigene Station an der Straße?
-- Höchstgeschwindigkeit der Lastzüge (Vorschlag: deutlich langsamer als kleine Fahrzeuge)?
+- Verladespur: an der Stelle des grünen Häuschens vor der Halle (Objekt bei T3 bestätigen).
+- Höchstgeschwindigkeit: ca. 60 % der kleinen Fahrzeuge.

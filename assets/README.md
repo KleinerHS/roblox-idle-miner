@@ -5,22 +5,21 @@ Sie werden **nicht** von Rojo synchronisiert.
 
 | Datei | Inhalt in der Place | Stand |
 |---|---|---|
-| `HallLayout.rbxm` | `Workspace.HallLayout` – Felix' Hallen-Anordnung (Gebäude, Regale, Büro mit Laptop, Schrank, Bett, Stuhl, `LayoutOrigin`) | 2026-10-17 |
-| `AChassis.rbxm` | `ServerStorage.Vendor.AChassis` – A-Chassis-Kit 1.7.2 (MPL-2.0, siehe `licenses/`) und die Abstimmungen `Tunes/vehicle_pickup`, `vehicle_van`, `vehicle_boxtruck`, `vehicle_truck`, `vehicle_hauler` | 2026-10-17 |
-| `WorkspaceExtras.rbxm` | Folder `WorkspaceExtras` mit allen losen Objekten direkt im Workspace (außerhalb HallLayout, von Felix absichtlich platziert): 3× Rack2, Zaun-, Rohr-/Aufhänger-Gruppen, LaneCones, Bollards, Railing – 15 Objekte | 2026-10-18 |
+| `HallLayout.rbxm` | `Workspace.HallLayout` – Felix' Hallen-Anordnung (Gebäude, Regale, Büro mit Laptop, Schrank, Bett, Stuhl, `LayoutOrigin`); seit 2026-10-19 inkl. der früher losen Objekte und deckungsgleich mit Plot 1 ausgerichtet | 2026-10-19 |
+| `AChassis.rbxm` | `ServerStorage.Vendor.AChassis` – A-Chassis-Kit 1.7.2 (MPL-2.0, siehe `licenses/`) und die Abstimmungen `Tunes/vehicle_pickup`, `vehicle_van`, `vehicle_boxtruck`, `vehicle_truck`, `vehicle_hauler` | 2026-10-19 |
+| `VehicleBodies.rbxm` | `ServerStorage.Vendor.VehicleBodies` – Karosserie-Vorlagen aus Felix' Fahrzeugmodellen (`vehicle_pickup`, `vehicle_van`, `vehicle_boxtruck`, `vehicle_truck`). **Unvollständig:** die ~130 UnionOperations von `vehicle_truck` (DAF) fehlen, zwei unbenannte MeshParts des Pickups weichen minimal ab | 2026-10-19 |
 
 ## Wiederherstellen
 
 In Studio: Rechtsklick auf `Workspace` bzw. `ServerStorage.Vendor` → **Insert from File…** → Datei wählen.
-Bei `WorkspaceExtras.rbxm` die Objekte nach dem Einfügen aus dem Folder direkt in den Workspace ziehen.
 Vorher das vorhandene Objekt gleichen Namens löschen oder umbenennen.
 
 ## Einschränkung
 
 Erzeugt per Skript (`tools/ExportRbxmx.luau`), weil Studio keinen Export per Skript erlaubt.
-Rücktest: alle Dateien in Studio geladen und mit dem Original verglichen (Name, Klasse, CFrame,
+Rücktest (zuletzt 2026-10-19): alle Dateien in Studio geladen und mit dem Original verglichen (Name, Klasse, CFrame,
 Größe, Farbe, Material, Transparenz, Kollision, Werte, Texte, Licht, Mesh/Textur, Skript-Quelltext,
-Verknüpfungen, Attribute, Tags, Pivots) – 0 Abweichungen.
+Verknüpfungen, Attribute, Tags, Pivots) – HallLayout und AChassis 0 Abweichungen.
 
 **Nicht enthalten:** 8 UnionOperations aus zwei Creator-Store-Modellen im Büro (per Skript nicht lesbar):
 - `Office/Chair/Rolling Chair`: Back Rest, Seat, Left Armrest, Right Armrest (Asset 2095488658)
