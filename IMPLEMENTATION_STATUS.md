@@ -25,7 +25,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 15 | Rare Drops & Mining Luck | TESTING_REQUIRED (15a, D-045) |
 | 16 | Verkauf & Spätspiel-Geld | TESTING_REQUIRED (16a, D-046) |
 | 17 | Icons | TESTING_REQUIRED (17a Erz- und Barren-Icons, 17b Kategorie-Icons) |
-| 18 | Fahrzeuge aus Felix' Modellen | TESTING_REQUIRED (18a: 4 Fahrzeuge; 18b: Durchfahr-Verladestraße mit einem Rüssel und Seitenstraße, D-052; Lastzüge mit Anhängern folgen, D-048) |
+| 18 | Fahrzeuge aus Felix' Modellen | TESTING_REQUIRED (18a: 4 Fahrzeuge; 18b: Durchfahr-Verladestraße, D-052; 18c: Lastzug mit echten Anhängern, D-053) |
 
 ## Setup – Details
 
@@ -709,6 +709,21 @@ Offen: Place speichern (Vorlagen liegen nur in der Place); Lastzüge (PLANS/ROAD
 
 Selbsttest (Play): Box Truck über die Seitenstraße durch die Wandöffnung bis in die Halle gefahren (ohne Anstoßen); unter dem Rüssel erkannt („Loading · Box Truck“), Rüssel fährt bis über das Dach aus, Beladen läuft; Kollisionsprüfung des Box Trucks entlang der ganzen Spur inkl. Kurve und Tor: nur das (automatisch öffnende) Rolltor. Stellplätze, Ring, Seitenstraße und Bäume per Draufsicht geprüft.
 Offen: Lastzüge (Anhänger-Physik, T1) – Kurvenradius in der Garage (32) für Lastzüge erst mit echten Anhängern prüfbar.
+
+### 18c (Version 0.42.0, 2026-10-19) – Lastzug mit echten Anhängern (D-053)
+
+| System | Dateien | Status |
+|---|---|---|
+| Scania-Lastzug aus Felix' Modell: Zugmaschine als A-Chassis-Fahrzeug, Auflieger + Dolly + zweiter Auflieger als eigene Physik-Modelle (freie Räder, Kugelgelenk-Kupplungen mit Knick- und Kippgrenze), Netzwerkbesitz beim Fahrer | `World/TrailerBuilder.luau`, `VehicleService`, `tools/PrepareTrailers.luau`, Place: `VehicleBodies.vehicle_roadtrain(_Trailers)` | TESTING_REQUIRED |
+| Logo (Schriftzug) und Nummernschilder entfernt (D-026) | `tools/PrepareVehicleBodies.luau` (RemoveMeshes), Place | IMPLEMENTED |
+| Lastzug steht auf der Zufahrt neben dem Grundstück (eigener Platz, max. ein Lastzug), Reset dorthin | `VehicleService` (ROAD_TRAIN_SLOT) | TESTING_REQUIRED |
+| Beladen Anhänger für Anhänger: vorderer zuerst bis zu seinem Anteil, dann „Trailer full · move forward“; Ladung je Anhänger sichtbar | `LoadingService`, `VehicleService.GetCargoFills` | TESTING_REQUIRED |
+| A-Chassis-Abstimmung `vehicle_roadtrain` (14 t, Tempolimit 60 km/h – TODO_BALANCE) | Place: `AChassis.Tunes` | TESTING_REQUIRED |
+| Zauntor vorne breiter (Anhänger ziehen in der Kurve nach innen), Regal aus dem Kurvenbereich | `LayoutConfig.Garage.Gate`, `PlotExterior`, Place | TESTING_REQUIRED |
+| DevTool PlaceVehicle (Fahrzeug an Grundstücks-Koordinaten aufstellen) | `DevService`, `VehicleService.SpawnAt` | IMPLEMENTED |
+
+Selbsttest (Play): Lastzug erscheint aufrecht und ruhig; fährt geradeaus, Anhänger folgen; Kurve vor dem Tor, Einfahrt durch Zaun und Wandöffnung (Anhänger ohne Hängenbleiben); Beladen: Auflieger 1 bis 25.000, dann Hinweis vorziehen, Auflieger 2 bis voll; Ausfahrtskurve durchs Rolltor mit allen Anhängern. Test-Lastzug danach entfernt, Test-Erz wieder aus dem Lager genommen.
+Offen: Im Autohaus noch „Coming soon“ bis Felix' Fahrtest; FH 540 (Tipper Road Train) folgt; Tempo/Beschleunigung TODO_BALANCE.
 
 ## Phase 12 – Content Expansion – Details
 

@@ -117,11 +117,11 @@ local list: { VehicleDefinition } = {
 		RequiredLevel = 65, -- TODO_BALANCE
 		Price = 2000000000, -- TODO_BALANCE (vor Spätspiel-Aufschlag)
 		Capacity = 50000, -- TODO_BALANCE
-		MaxSpeed = 36, -- TODO_BALANCE
+		MaxSpeed = 33, -- TODO_BALANCE: ~60 % der kleinen Fahrzeuge (Felix 2026-10-19); A-Chassis-Tune SpeedLimit 60 km/h
 		Acceleration = 0.4, -- TODO_BALANCE
 		PaintColor = Color3.fromRGB(230, 230, 230),
 		PersistenceClass = "Permanent",
-		Available = false, -- Anhänger-Technik folgt (PLANS/ROAD_TRAINS.md)
+		Available = false, -- im Autohaus erst nach Fahrtest freigeben (PLANS/ROAD_TRAINS.md); per DevTool GiveVehicle testbar
 	},
 }
 

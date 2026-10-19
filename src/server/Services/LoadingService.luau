@@ -73,21 +73,44 @@ local function loadOrder(storage: Types.ItemCounts, keepSmeltable: boolean): { s
 	return ids
 end
 
--- Eigenes Fahrzeug, das still unter der Schurre dieses Stellplatzes steht
-local function vehicleUnder(player: Player, data: Types.PlayerData, point: BasePart): (string?, Model?)
+-- Abstand Ladefläche ↔ Rüssel längs/quer (im Rahmen der Ladefläche)
+local function offsetOf(point: BasePart, bed: BasePart): (number, number)
+	local d = Vector3.new(point.Position.X - bed.Position.X, 0, point.Position.Z - bed.Position.Z)
+	local forward = Vector3.new(bed.CFrame.LookVector.X, 0, bed.CFrame.LookVector.Z).Unit
+	local right = Vector3.new(-forward.Z, 0, forward.X)
+	return d:Dot(forward), d:Dot(right)
+end
+
+-- Lange Ladeflächen (Anhänger) dürfen weiter versetzt stehen
+local function alongTolerance(bed: BasePart): number
+	return math.max(ALIGN_ALONG, bed.Size.Z / 2 - 4)
+end
+
+-- Eigenes Fahrzeug, das still unter dem Rüssel steht; dazu die Ladefläche darunter und ihre
+-- Nummer (Lastzug: Anhänger in Fahrtrichtung) und Anzahl
+local function vehicleUnder(player: Player, data: Types.PlayerData, point: BasePart): (string?, Model?, BasePart?, number, number)
 	for id in data.Vehicles.Owned do
 		local model = VehicleService.GetModel(player, id)
 		local chassis = model and model.PrimaryPart
-		if model and chassis then
-			local bed = model:FindFirstChild("CargoFill", true)
-			local ref = if bed and bed:IsA("BasePart") then bed.Position else chassis.Position
+		if model and chassis and chassis.AssemblyLinearVelocity.Magnitude < STANDSTILL_SPEED then
+			local fills = VehicleService.GetCargoFills(player, id)
+			local best, bestIndex, bestDist = nil, 0, math.huge
+			for k, bed in fills do
+				local along, side = offsetOf(point, bed)
+				local dist = math.max(0, math.abs(along) - alongTolerance(bed) + ALIGN_ALONG) + math.abs(side)
+				if dist < bestDist then
+					best, bestIndex, bestDist = bed, k, dist
+				end
+			end
+			local ref = if best then best.Position else chassis.Position
 			local flat = Vector3.new(point.Position.X - ref.X, 0, point.Position.Z - ref.Z)
-			if flat.Magnitude <= LayoutConfig.Garage.LoadDistance and chassis.AssemblyLinearVelocity.Magnitude < STANDSTILL_SPEED then
-				return id, model
+			local reach = LayoutConfig.Garage.LoadDistance + (if best then best.Size.Z / 2 else 0)
+			if flat.Magnitude <= reach then
+				return id, model, best, bestIndex, math.max(1, #fills)
 			end
 		end
 	end
-	return nil, nil
+	return nil, nil, nil, 0, 0
 end
 
 local function setChute(garage: Model, bay: number, bottomY: number?)
@@ -102,25 +125,32 @@ local function tickBay(player: Player, data: Types.PlayerData, garage: Model, ba
 	if not (point and point:IsA("BasePart")) then
 		return { state = "Idle", vehicleId = nil, extended = false }
 	end
-	local vehicleId, model = vehicleUnder(player, data, point)
+	local vehicleId, model, bed, bedIndex, bedCount = vehicleUnder(player, data, point)
 	local record = vehicleId and data.Vehicles.Owned[vehicleId]
 	local def = record and Vehicles.Get(record.Type)
 	if not (vehicleId and model and record and def) then
 		return { state = "Idle", vehicleId = nil, extended = false }
 	end
-	local free = def.Capacity - sum(record.Cargo)
+	local loaded = sum(record.Cargo)
+	local free = def.Capacity - loaded
 	if free <= 0 then
 		return { state = "Full", vehicleId = vehicleId, extended = false }
 	end
+	-- Lastzug: jeder Anhänger trägt seinen Anteil, der vordere wird zuerst voll (Phase 18c)
+	if bedCount > 1 then
+		local share = def.Capacity / bedCount
+		local limit = math.floor(share * bedIndex)
+		if loaded >= limit then
+			return { state = "Align", vehicleId = vehicleId, extended = false, hint = "Trailer full · move forward" }
+		end
+		free = math.min(free, limit - loaded)
+	end
 	-- Ladefläche mittig unter dem Rüssel? Sonst Hinweis zum Rangieren (Felix 2026-10-13)
-	local bed = model:FindFirstChild("CargoFill", true)
-	if bed and bed:IsA("BasePart") then
-		local d = Vector3.new(point.Position.X - bed.Position.X, 0, point.Position.Z - bed.Position.Z)
-		local forward = Vector3.new(bed.CFrame.LookVector.X, 0, bed.CFrame.LookVector.Z).Unit
-		local right = Vector3.new(-forward.Z, 0, forward.X)
-		local along, side = d:Dot(forward), d:Dot(right)
-		if math.abs(along) > ALIGN_ALONG or math.abs(side) > ALIGN_SIDE then
-			local hint = if math.abs(along) > ALIGN_ALONG then (if along > 0 then "Move forward" else "Move back") else "Center under the chute"
+	if bed then
+		local along, side = offsetOf(point, bed)
+		local tol = alongTolerance(bed)
+		if math.abs(along) > tol or math.abs(side) > ALIGN_SIDE then
+			local hint = if math.abs(along) > tol then (if along > 0 then "Move forward" else "Move back") else "Center under the chute"
 			return { state = "Align", vehicleId = vehicleId, extended = false, hint = hint }
 		end
 	end
@@ -160,8 +190,8 @@ local function tickBay(player: Player, data: Types.PlayerData, garage: Model, ba
 	VehicleService.RefreshCargo(player, id)
 	-- Rüssel bis kurz über die Ladung (bzw. die leere Ladefläche), wächst mit der Ladung mit
 	local bottomY: number? = nil
-	local fill = model:FindFirstChild("CargoFill", true)
-	if fill and fill:IsA("BasePart") then
+	local fill = bed
+	if fill then
 		local surface = fill.Position.Y - fill.Size.Y / 2
 		-- Geschlossener Aufbau (CargoHidden): Rüssel stoppt über dem Dach (Oberkante CargoFill)
 		local top = if fill.Transparency < 1 or fill:GetAttribute("CargoHidden") then fill.Position.Y + fill.Size.Y / 2 else surface

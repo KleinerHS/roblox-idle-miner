@@ -23,6 +23,8 @@ type Config = {
 	-- Markenlogos: Teile an Position (Fahrzeugrahmen) mit ungefährer Größe, Decals/Texturen nach Bild-ID
 	RemoveParts: { { Near: Vector3, Size: Vector3 } }?,
 	RemoveImages: { string }?,
+	-- Markenlogos als eigene MeshParts (MeshId, z. B. "rbxassetid://6658790299")
+	RemoveMeshes: { string }?,
 	-- Fahrersitz ohne VehicleSeat: Name des Sitzteils (linkes Exemplar) und Höhenkorrektur
 	SeatPart: string?,
 	SeatDrop: number?,
@@ -260,6 +262,8 @@ local function prepare(name: string, cfg: Config): string
 					break
 				end
 			end
+		elseif d:IsA("MeshPart") and cfg.RemoveMeshes and table.find(cfg.RemoveMeshes, d.MeshId) then
+			d:Destroy()
 		elseif d:IsA("BasePart") and cfg.RemoveParts then
 			local lp = pivotFrame:PointToObjectSpace(d.Position)
 			for _, r in cfg.RemoveParts do

@@ -279,7 +279,7 @@ function PlotExterior.build(model: Model, origin: CFrame)
 	local leftYardX = (hallLeft + halfX) / 2
 	slab(folder, "GravelLeft", o, hallLeft, halfX - 3, hallFront, hallBack, GROUND + 0.08, 0.2, GRAVEL, Enum.Material.Pebble)
 	slab(folder, "GravelRight", o, -halfX + 3, hallRight, hallFront, hallBack, GROUND + 0.08, 0.2, GRAVEL, Enum.Material.Pebble)
-	rack(folder, "SideRackA", o * CFrame.new(leftYardX - 6, GROUND + 0.1, hallFront + 14) * CFrame.Angles(0, math.rad(90), 0), 6)
+	rack(folder, "SideRackA", o * CFrame.new(leftYardX - 6, GROUND + 0.1, hallFront + 135) * CFrame.Angles(0, math.rad(90), 0), 6)
 	rack(folder, "SideRackB", o * CFrame.new(leftYardX - 6, GROUND + 0.1, hallFront + 75) * CFrame.Angles(0, math.rad(90), 0), 4)
 	for i = 1, 4 do
 		tireStack(folder, `SideTires{i}`, o * CFrame.new(leftYardX + 8, GROUND + 0.1, hallFront + 92 + i * 4.2), rng:NextInteger(2, 5))

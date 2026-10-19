@@ -16,6 +16,9 @@ local DataSchema = require(script.Parent.Parent.Data.DataSchema)
 local DataService = require(script.Parent.DataService)
 local BuildingService = require(script.Parent.BuildingService)
 local OfflineService = require(script.Parent.OfflineService)
+local VehicleService = require(script.Parent.VehicleService)
+local PlotService = require(script.Parent.PlotService)
+local PlotBuilder = require(script.Parent.Parent.World.PlotBuilder)
 
 local TAG = "DevService"
 
@@ -162,6 +165,20 @@ function DevService.Init()
 		return if ok then "ok" else "Profil nicht geladen"
 	end
 	takeVehicle.Parent = folder
+	-- Ausgeparktes Fahrzeug an eine Stelle des eigenen Grundstücks setzen (lokal X/Z, Blickrichtung
+	-- in Grad: 0 = zur Straße/-Z, 90 = -X Richtung Verladestraße):
+	--   game.ServerStorage.DevTools.PlaceVehicle:Invoke(game.Players:GetPlayers()[1], "v10", 60, -41, 90)
+	local placeVehicle = Instance.new("BindableFunction")
+	placeVehicle.Name = "PlaceVehicle"
+	placeVehicle.OnInvoke = function(player: Player, vehicleId: string, x: number, z: number, yaw: number): string
+		local plotId = PlotService.GetPlotId(player)
+		if not plotId then
+			return "kein Grundstück"
+		end
+		local cf = PlotBuilder.getPlotCFrame(plotId) * CFrame.new(x, 1.45, z) * CFrame.Angles(0, math.rad(yaw), 0)
+		return if VehicleService.SpawnAt(player, vehicleId, cf) then "ok" else "Fahrzeug nicht ausgeparkt"
+	end
+	placeVehicle.Parent = folder
 
 	-- Bauschritt setzen/entfernen (z. B. Garage wieder abbauen):
 	--   game.ServerStorage.DevTools.SetBuilding:Invoke(game.Players:GetPlayers()[1], "build_garage", false)

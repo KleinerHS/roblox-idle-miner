@@ -6,8 +6,8 @@ Sie werden **nicht** von Rojo synchronisiert.
 | Datei | Inhalt in der Place | Stand |
 |---|---|---|
 | `HallLayout.rbxm` | `Workspace.HallLayout` – Felix' Hallen-Anordnung (Gebäude, Regale, Büro mit Laptop, Schrank, Bett, Stuhl, `LayoutOrigin`); seit 2026-10-19 inkl. der früher losen Objekte und deckungsgleich mit Plot 1 ausgerichtet | 2026-10-19 |
-| `AChassis.rbxm` | `ServerStorage.Vendor.AChassis` – A-Chassis-Kit 1.7.2 (MPL-2.0, siehe `licenses/`) und die Abstimmungen `Tunes/vehicle_pickup`, `vehicle_van`, `vehicle_boxtruck`, `vehicle_truck`, `vehicle_hauler` | 2026-10-19 |
-| `VehicleBodies.rbxm` | `ServerStorage.Vendor.VehicleBodies` – Karosserie-Vorlagen aus Felix' Fahrzeugmodellen (`vehicle_pickup`, `vehicle_van`, `vehicle_boxtruck`, `vehicle_truck`). **Unvollständig:** die ~130 UnionOperations von `vehicle_truck` (DAF) fehlen, zwei unbenannte MeshParts des Pickups weichen minimal ab | 2026-10-19 |
+| `AChassis.rbxm` | `ServerStorage.Vendor.AChassis` – A-Chassis-Kit 1.7.2 (MPL-2.0, siehe `licenses/`) und die Abstimmungen `Tunes/vehicle_pickup`, `vehicle_van`, `vehicle_boxtruck`, `vehicle_truck`, `vehicle_hauler`, `vehicle_roadtrain` (Lastzug, Tempolimit 60 km/h) | 2026-10-19 |
+| `VehicleBodies.rbxm` | `ServerStorage.Vendor.VehicleBodies` – Karosserie-Vorlagen aus Felix' Fahrzeugmodellen (`vehicle_pickup`, `vehicle_van`, `vehicle_boxtruck`, `vehicle_truck`, Lastzug `vehicle_roadtrain` + `vehicle_roadtrain_Trailers` 1–3). **Unvollständig:** die ~130 UnionOperations von `vehicle_truck` (DAF) fehlen, zwei unbenannte MeshParts des Pickups weichen minimal ab | 2026-10-19 |
 
 ## Wiederherstellen
 

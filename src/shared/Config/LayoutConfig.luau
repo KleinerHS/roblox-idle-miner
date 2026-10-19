@@ -108,8 +108,9 @@ local LayoutConfig = {
 		Lane = { Z = -41, Width = 24, TurnX = 50, TurnRadius = 32 },
 		-- Öffnung in der linken Hallenwand (Z von/bis, Höhe über dem Hallenboden)
 		SideOpening = { Z1 = -59, Z2 = -24, Height = 26 },
-		-- Tor im linken Zaun (Z von/bis)
-		Gate = { Z1 = -62, Z2 = -20 },
+		-- Tor im linken Zaun (Z von/bis); vorne weit offen, weil die Anhänger in der Kurve vor dem
+		-- Tor nach innen ziehen (Fahrtest Phase 18c)
+		Gate = { Z1 = -110, Z2 = -20 },
 	},
 	-- Zufahrt zur Verladestraße außen am Grundstück (D-052): zweigt von der Zufahrtsstraße ab,
 	-- läuft links am Zaun entlang und biegt zum Tor ein. JunctionZ = Abzweig an der Zufahrt,

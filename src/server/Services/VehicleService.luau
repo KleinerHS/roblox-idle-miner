@@ -26,6 +26,8 @@ local Signal = require(Shared.Util.Signal)
 local Log = require(Shared.Util.Log)
 
 local VehicleModelBuilder = require(script.Parent.Parent.World.VehicleModelBuilder)
+local TrailerBuilder = require(script.Parent.Parent.World.TrailerBuilder)
+local PlotBuilder = require(script.Parent.Parent.World.PlotBuilder)
 local DataService = require(script.Parent.DataService)
 local PlotService = require(script.Parent.PlotService)
 local BuildingService = require(script.Parent.BuildingService)
@@ -49,6 +51,8 @@ local VehicleService = {
 
 -- [player] = { [vehicleId] = Model }
 local spawned: { [Player]: { [string]: Model } } = {}
+-- Anhänger der Lastzüge: [player] = { [vehicleId] = { Model } } (Phase 18c)
+local trailers: { [Player]: { [string]: { Model } } } = {}
 local ringTouch: { [Player]: number } = {}
 
 -- Fahrersitz: A-Chassis heißt "DriveSeat", der eigene Fallback "DriverSeat"
@@ -87,12 +91,19 @@ local function nearRing(player: Player): boolean
 	return (root.Position - ring.Position).Magnitude <= RING_DISTANCE
 end
 
-local function freeBay(data: Types.PlayerData): number?
+-- Lastzüge stehen nicht in der Halle, sondern auf der Zufahrt zur Verladestraße: eigener Platz
+-- (Nummer nach den Hallen-Stellplätzen), höchstens ein Lastzug gleichzeitig
+local ROAD_TRAIN_SLOT = Vehicles.BayCount + 1
+
+local function freeBay(data: Types.PlayerData, typeId: string?): number?
 	local used: { [number]: boolean } = {}
 	for _, v in data.Vehicles.Owned do
 		if v.Bay then
 			used[v.Bay] = true
 		end
+	end
+	if typeId and TrailerBuilder.HasTrailers(typeId) then
+		return if used[ROAD_TRAIN_SLOT] then nil else ROAD_TRAIN_SLOT
 	end
 	for bay = 1, Vehicles.BayCount do
 		if not used[bay] then
@@ -156,6 +167,35 @@ local function despawn(player: Player, vehicleId: string)
 		seat.Occupant.Sit = false
 	end
 	model:Destroy()
+	local own = trailers[player]
+	for _, t in (own and own[vehicleId]) or {} do
+		t:Destroy()
+	end
+	if own then
+		own[vehicleId] = nil
+	end
+end
+
+-- Ladeflächen eines Fahrzeugs in Fahrtrichtung (Lastzug: je beladbarer Anhänger eine)
+function VehicleService.GetCargoFills(player: Player, vehicleId: string): { BasePart }
+	local fills: { BasePart } = {}
+	local own = trailers[player]
+	local list = own and own[vehicleId]
+	if list and #list > 0 then
+		for _, t in list do
+			local f = t:FindFirstChild("CargoFill")
+			if f and f:IsA("BasePart") then
+				table.insert(fills, f)
+			end
+		end
+		return fills
+	end
+	local model = spawned[player] and spawned[player][vehicleId]
+	local f = model and model:FindFirstChild("CargoFill", true)
+	if f and f:IsA("BasePart") then
+		table.insert(fills, f)
+	end
+	return fills
 end
 
 local function updateCargoVisual(player: Player, vehicleId: string)
@@ -164,22 +204,53 @@ local function updateCargoVisual(player: Player, vehicleId: string)
 	local model = spawned[player] and spawned[player][vehicleId]
 	local def = record and Vehicles.Get(record.Type)
 	if record and model and def then
-		VehicleModelBuilder.setCargoVisual(model, cargoTotal(record.Cargo) / def.Capacity)
+		local fraction = cargoTotal(record.Cargo) / def.Capacity
+		local own = trailers[player]
+		local list = own and own[vehicleId]
+		if list and #list > 0 then
+			-- Lastzug: Anhänger werden der Reihe nach voll (vorderer zuerst)
+			local fills = VehicleService.GetCargoFills(player, vehicleId)
+			for k, f in fills do
+				local share = math.clamp(fraction * #fills - (k - 1), 0, 1)
+				f.Transparency = if share > 0 then 0 else 1
+			end
+		else
+			VehicleModelBuilder.setCargoVisual(model, fraction)
+		end
 		model:SetAttribute("Cargo", cargoTotal(record.Cargo))
 	end
 end
 
 -- Fahrzeug auf seinem Stellplatz erscheinen lassen
-local function spawnAtBay(player: Player, record: Types.VehicleRecord): Model?
+local function spawnAtBay(player: Player, record: Types.VehicleRecord, override: CFrame?): Model?
 	local def = Vehicles.Get(record.Type)
 	local garage = garageModel(player)
-	local bayPart = garage and record.Bay and garage:FindFirstChild(`BaySpawn{record.Bay}`, true)
 	local data = DataService.Get(player)
-	if not (def and bayPart and bayPart:IsA("BasePart") and data) then
+	if not (def and garage and record.Bay and data) then
 		return nil
 	end
+	-- Lastzüge passen auf keinen Stellplatz: sie stehen auf der Zufahrt zur Verladestraße neben
+	-- dem Grundstück, Front Richtung Zauntor (D-052, PLANS/ROAD_TRAINS.md T4)
+	local withTrailers = TrailerBuilder.HasTrailers(def.Id)
+	local floorCF: CFrame
+	if withTrailers then
+		local plotId = PlotService.GetPlotId(player)
+		if not plotId then
+			return nil
+		end
+		local side = LayoutConfig.SideRoad
+		floorCF = PlotBuilder.getPlotCFrame(plotId) * CFrame.new(side.OuterX, 1.05, LayoutConfig.Garage.Lane.Z - side.Radius - 20) * CFrame.Angles(0, math.pi, 0)
+	else
+		local bayPart = garage:FindFirstChild(`BaySpawn{record.Bay}`, true)
+		if not (bayPart and bayPart:IsA("BasePart")) then
+			return nil
+		end
+		floorCF = bayPart.CFrame * CFrame.new(0, -bayPart.Size.Y / 2, 0)
+	end
+	if override then
+		floorCF = override
+	end
 	despawn(player, record.Id)
-	local floorCF = bayPart.CFrame * CFrame.new(0, -bayPart.Size.Y / 2, 0)
 	-- Fahrphysik von A-Chassis (D-026); ohne Kit im Place eigener Fallback
 	local vendor = ServerStorage:FindFirstChild("Vendor")
 	local kit = vendor and vendor:FindFirstChild("AChassis")
@@ -215,6 +286,40 @@ local function spawnAtBay(player: Player, record: Types.VehicleRecord): Model?
 	end
 	spawned[player] = spawned[player] or {}
 	spawned[player][record.Id] = model
+	if withTrailers then
+		local root = seatOf(model) or model.PrimaryPart
+		if root then
+			local rootAtBuild = root.CFrame
+			local list = TrailerBuilder.build(def.Id, floorCF + Vector3.new(0, 0.15, 0), root, folder(), model.Name)
+			for _, t in list do
+				t:SetAttribute("VehicleId", record.Id)
+				t:SetAttribute("OwnerUserId", player.UserId)
+				setGroup(t)
+			end
+			-- Ankoppeln, sobald A-Chassis die Zugmaschine aufgebaut hat
+			task.delay(1.2, function()
+				if model.Parent and root.Parent then
+					TrailerBuilder.release(list, root, rootAtBuild)
+					local seat = seatOf(model)
+					local occupant = seat and seat.Occupant
+					TrailerBuilder.setOwner(list, occupant and Players:GetPlayerFromCharacter(occupant.Parent))
+				end
+			end)
+			trailers[player] = trailers[player] or {}
+			trailers[player][record.Id] = list
+			-- Netzwerkbesitz der Anhänger folgt dem Fahrer (A-Chassis setzt ihn für die Zugmaschine)
+			local seat = seatOf(model)
+			if seat then
+				seat:GetPropertyChangedSignal("Occupant"):Connect(function()
+					local occupant = seat.Occupant
+					local driver = occupant and Players:GetPlayerFromCharacter(occupant.Parent)
+					task.delay(0.5, function()
+						TrailerBuilder.setOwner(list, driver)
+					end)
+				end)
+			end
+		end
+	end
 	updateCargoVisual(player, record.Id)
 	return model
 end
@@ -260,7 +365,7 @@ local function drive(player: Player, vehicleId: unknown)
 		return Result.err(Result.Codes.NOT_OWNED)
 	end
 	if not record.Bay then
-		local bay = freeBay(data)
+		local bay = freeBay(data, record.Type)
 		if not bay then
 			return Result.err(Result.Codes.BAYS_FULL)
 		end
@@ -360,6 +465,7 @@ local function clearAll(player: Player)
 		despawn(player, id)
 	end
 	spawned[player] = nil
+	trailers[player] = nil
 end
 
 -- Rolltor: hebt sich bei Annäherung, schließt nach kurzer Haltezeit (docs/07 §19)
@@ -502,6 +608,16 @@ function VehicleService.ClearAll(player: Player)
 end
 
 -- Gespawntes Modell eines Fahrzeugs (für Beladen/Verkauf in Phase 6c)
+-- Nur für Tests (DevTools.PlaceVehicle): Fahrzeug mit Stellplatz an einer Boden-CFrame neu aufstellen
+function VehicleService.SpawnAt(player: Player, vehicleId: string, floorCF: CFrame): Model?
+	local data = DataService.Get(player)
+	local record = data and data.Vehicles.Owned[vehicleId]
+	if not (record and record.Bay) then
+		return nil
+	end
+	return spawnAtBay(player, record, floorCF)
+end
+
 function VehicleService.GetModel(player: Player, vehicleId: string): Model?
 	return spawned[player] and spawned[player][vehicleId]
 end

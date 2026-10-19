@@ -55,3 +55,13 @@ Jeder Schritt mit Checkpoint und Felix' Freigabe.
 
 - Verladespur: erledigt in 18b als Durchfahr-Verladestraße durch die Garage (D-052) – Einfahrt links durch die Hallenwand, ein Rüssel, Ausfahrt durchs Rolltor; Zufahrt über eine neue Straße neben dem Grundstück. T3 entfällt in der ursprünglichen Form; mit echten Anhängern wird nur noch geprüft, ob die Kurve zum Tor (Radius 32) reicht.
 - Höchstgeschwindigkeit: ca. 60 % der kleinen Fahrzeuge.
+
+## Stand 18c (2026-10-19)
+
+- T1/T2 umgesetzt für den Scania (D-053): `World/TrailerBuilder.luau`, Vorlagen in `ServerStorage.Vendor.VehicleBodies.vehicle_roadtrain` und `vehicle_roadtrain_Trailers`.
+- T4 teilweise: Lastzug erscheint auf der Zufahrt neben dem Grundstück; Reset dorthin.
+- Vorlagen neu erzeugen (Studio, Edit; Quelle `ServerStorage._VehicleCandidates`, Creator-Store-Modell 15557972363 neu einfügen):
+  1. `V6_ScaniaTractor` = Body, Wheels, DriveSeat des Modells „SCANIA R visor 2“; `tools/PrepareVehicleBodies.luau` mit
+     `vehicle_roadtrain = { Source = "V6_ScaniaTractor", Wheels = "named", Remove = { "placa" }, RemoveMeshes = { "rbxassetid://6658790299", "rbxassetid://5616208782", "rbxassetid://5703034461" } }`, danach CargoFill der Zugmaschine löschen.
+  2. `V6_Scania` = komplettes Modell; `tools/PrepareTrailers.luau` mit Kupplungspunkten Trailer1 (-0.2, -2.7, -14.7) → 0, Trailer2 (-0.3, -2.1, 16.9) → 1, Trailer3 (-0.3, -2.6, 33.7) → 2 (Pivot-Rahmen der Quelle), Ladung im Untermodell „boiadeiro“.
+- Offen: Freigabe im Autohaus nach Felix' Fahrtest, FH 540 (Kipp-Auflieger) mit derselben Technik.
