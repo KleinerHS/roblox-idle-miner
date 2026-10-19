@@ -66,5 +66,6 @@ Format: `docs/18_TESTING_AND_QUALITY.md`, Abschnitt 16. IDs fortlaufend (BUG-001
 - Lager: `PackingArea.LaneCones2`, `PackingArea.Bollard1–2`
 - Garage: `FeedPipeRun1–3` (Rohr-Aufhänger)
 Nicht verschoben: eine Rohr-Aufhänger-Gruppe weit außerhalb der Halle (Workspace.Model, Rückfrage an Felix).
+**Play-Test 2026-10-19:** alle 12 Objekte auf Plot 1 an der richtigen Stelle (Hochregale in der Lücke, Geländer an der Plattform, hohe Zäune zwischen Lager und Ofen).
 **Regression geprüft:** Kopie auf gedrehten Plot im Edit nachgerechnet (Lage zu Nachbarobjekten exakt), Ausgangslager hat weiter genau 16 Kisten-Plätze.
 **Likely system:** HallLayout
