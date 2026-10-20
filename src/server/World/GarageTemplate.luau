@@ -518,7 +518,7 @@ local function lane(model: Model, o: CFrame)
 		flat(tail)
 	end
 	-- Pfeile in Fahrtrichtung (-X) auf der Geraden
-	for k, ax in { hallLeft - 12, cfg.Chute.X + 28, laneCfg.TurnX + 8 } do
+	for k, ax in { hallLeft - 6, cfg.Chute.X - 22, laneCfg.TurnX + 8 } do
 		for _, s in { -1, 1 } do
 			local tip = o * CFrame.new(ax - 2, 0.035, laneCfg.Z)
 			local arm = part(folder, `Arrow{k}_{s}`, Vector3.new(0.6, 0.06, 4.6), tip * CFrame.Angles(0, math.rad(s * 45 - 90), 0) * CFrame.new(0, 0, -2.1), WHITE, Enum.Material.SmoothPlastic)

@@ -96,9 +96,10 @@ local LayoutConfig = {
 		Ring = Vector2.new(136, -12),
 		RingRadius = 5,
 		-- Verladeturm (D-008) hinter der Spur, Portal über die Spur bis zum Rüssel
-		Tower = Vector2.new(80, -16),
+		-- Felix 2026-10-20: Turm im Layout nach x 111.9 verschoben (näher an die Einfahrt)
+		Tower = Vector2.new(111.9, -16),
 		-- Der eine Verladerüssel (Mitte über der Spur)
-		Chute = Vector2.new(80, -41),
+		Chute = Vector2.new(111.9, -41),
 		ChuteCount = 1,
 		-- Länge des Zuführrohrs vom Turm nach hinten bis zum Lager
 		TowerFeedLength = 19,

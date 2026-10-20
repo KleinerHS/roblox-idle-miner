@@ -468,22 +468,17 @@ local function clearAll(player: Player)
 	trailers[player] = nil
 end
 
--- Rolltor: hebt sich bei Annäherung, schließt nach kurzer Haltezeit (docs/07 §19)
+-- Rolltore: heben sich bei Annäherung, schließen nach kurzer Haltezeit (docs/07 §19). Vorne das
+-- Garagentor, seit Phase 18b/18c auch das Tor der Seiteneinfahrt (Hallenwände, Attribut RollerDoor)
 type DoorState = { door: BasePart, closedCF: CFrame, openCF: CFrame, closedSize: Vector3, openSize: Vector3, open: boolean, lastNear: number }
-local doors: { [Player]: DoorState } = {}
+local doors: { [Player]: { DoorState } } = {}
 
-local function registerDoor(player: Player)
-	local garage = garageModel(player)
-	local door = garage and garage:FindFirstChild("GarageDoor", true)
-	if not (door and door:IsA("BasePart")) then
-		doors[player] = nil
-		return
-	end
+local function doorState(door: BasePart): DoorState
 	-- Offen: auf OpenHeight zusammengerollt, Oberkante bleibt am Rollkasten
 	local openHeight = door:GetAttribute("OpenHeight")
 	local h = if typeof(openHeight) == "number" then openHeight else 0.8
 	local closedCF, closedSize = door.CFrame, door.Size
-	doors[player] = {
+	return {
 		door = door,
 		closedCF = closedCF,
 		closedSize = closedSize,
@@ -494,50 +489,83 @@ local function registerDoor(player: Player)
 	}
 end
 
+local function registerDoor(player: Player)
+	local list: { DoorState } = {}
+	local garage = garageModel(player)
+	local door = garage and garage:FindFirstChild("GarageDoor", true)
+	if door and door:IsA("BasePart") then
+		table.insert(list, doorState(door))
+	end
+	local walls = BuildingService.GetModel(player, "build_walls")
+	for _, d in (walls and walls:GetDescendants()) or {} do
+		if d:IsA("BasePart") and d:GetAttribute("RollerDoor") == true then
+			table.insert(list, doorState(d))
+		end
+	end
+	doors[player] = if #list > 0 then list else nil
+end
+
+-- Teile eines gefahrenen Fahrzeugs, die ein Tor öffnen (Lastzug: auch alle Anhänger)
+local function drivenParts(player: Player): { BasePart }
+	local parts: { BasePart } = {}
+	for id, model in spawned[player] or {} do
+		local seat = seatOf(model)
+		if seat and seat.Occupant and model.PrimaryPart then
+			table.insert(parts, model.PrimaryPart)
+			local own = trailers[player]
+			for _, t in (own and own[id]) or {} do
+				if t.PrimaryPart then
+					table.insert(parts, t.PrimaryPart)
+				end
+			end
+		end
+	end
+	return parts
+end
+
 local function doorLoop()
 	while true do
 		task.wait(DOOR_CHECK_SECONDS)
 		local now = os.clock()
-		for player, state in doors do
-			if not state.door.Parent then
-				doors[player] = nil
-				continue
-			end
-			-- Nähe im Torraum: seitlich innerhalb der Torbreite, davor oder dahinter in Reichweite
-			local halfWidth = state.closedSize.X / 2 + 6
-			local function within(position: Vector3, range: number): boolean
-				local p = state.closedCF:PointToObjectSpace(position)
-				return math.abs(p.X) <= halfWidth and math.abs(p.Z) <= range and math.abs(p.Y) <= state.closedSize.Y
-			end
-			local near = false
-			for _, other in Players:GetPlayers() do
-				local root = rootOf(other)
-				if root and within(root.Position, DOOR_PLAYER_RANGE) then
-					near = true
-					break
+		for player, list in doors do
+			local moving = drivenParts(player)
+			for _, state in list do
+				if not state.door.Parent then
+					continue
 				end
-			end
-			if not near then
-				for _, model in spawned[player] or {} do
-					-- nur gefahrene Fahrzeuge (geparkte im Stellplatz öffnen das Tor nicht)
-					local chassis = model.PrimaryPart
-					local seat = seatOf(model)
-					local driven = seat ~= nil and seat.Occupant ~= nil
-					if chassis and driven and within(chassis.Position, DOOR_VEHICLE_RANGE) then
+				-- Nähe im Torraum: seitlich innerhalb der Torbreite, davor oder dahinter in Reichweite
+				local halfWidth = state.closedSize.X / 2 + 6
+				local function within(position: Vector3, range: number): boolean
+					local p = state.closedCF:PointToObjectSpace(position)
+					return math.abs(p.X) <= halfWidth and math.abs(p.Z) <= range and math.abs(p.Y) <= state.closedSize.Y
+				end
+				local near = false
+				for _, other in Players:GetPlayers() do
+					local root = rootOf(other)
+					if root and within(root.Position, DOOR_PLAYER_RANGE) then
 						near = true
 						break
 					end
 				end
-			end
-			if near then
-				state.lastNear = now
-			end
-			local shouldOpen = now - state.lastNear < DOOR_HOLD_SECONDS
-			if shouldOpen ~= state.open then
-				state.open = shouldOpen
-				local goal = if shouldOpen then { CFrame = state.openCF, Size = state.openSize } else { CFrame = state.closedCF, Size = state.closedSize }
-				TweenService:Create(state.door, TweenInfo.new(if shouldOpen then 1.1 else 1.6, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), goal):Play()
-				state.door.CanCollide = not shouldOpen
+				if not near then
+					-- nur gefahrene Fahrzeuge (geparkte im Stellplatz öffnen das Tor nicht)
+					for _, part in moving do
+						if within(part.Position, DOOR_VEHICLE_RANGE) then
+							near = true
+							break
+						end
+					end
+				end
+				if near then
+					state.lastNear = now
+				end
+				local shouldOpen = now - state.lastNear < DOOR_HOLD_SECONDS
+				if shouldOpen ~= state.open then
+					state.open = shouldOpen
+					local goal = if shouldOpen then { CFrame = state.openCF, Size = state.openSize } else { CFrame = state.closedCF, Size = state.closedSize }
+					TweenService:Create(state.door, TweenInfo.new(if shouldOpen then 1.1 else 1.6, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), goal):Play()
+					state.door.CanCollide = not shouldOpen
+				end
 			end
 		end
 	end
@@ -564,6 +592,10 @@ end
 function VehicleService.Start()
 	-- Leuchtring: Betreten öffnet die Auswahl (nur eigener Ring)
 	BuildingService.ModelBuilt:Connect(function(player, stepId, model)
+		if stepId == "build_walls" then
+			registerDoor(player)
+			return
+		end
 		if stepId ~= GARAGE_STEP then
 			return
 		end

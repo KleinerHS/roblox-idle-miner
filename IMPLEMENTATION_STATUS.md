@@ -725,6 +725,16 @@ Offen: Lastzüge (Anhänger-Physik, T1) – Kurvenradius in der Garage (32) für
 Selbsttest (Play): Lastzug erscheint aufrecht und ruhig; fährt geradeaus, Anhänger folgen; Kurve vor dem Tor, Einfahrt durch Zaun und Wandöffnung (Anhänger ohne Hängenbleiben); Beladen: Auflieger 1 bis 25.000, dann Hinweis vorziehen, Auflieger 2 bis voll; Ausfahrtskurve durchs Rolltor mit allen Anhängern. Test-Lastzug danach entfernt, Test-Erz wieder aus dem Lager genommen.
 Offen: Im Autohaus noch „Coming soon“ bis Felix' Fahrtest; FH 540 (Tipper Road Train) folgt; Tempo/Beschleunigung TODO_BALANCE.
 
+### 18d (Version 0.42.1, 2026-10-20) – Nachbesserungen nach Felix' Test
+
+| System | Dateien | Status |
+|---|---|---|
+| Fahrzeuge leise: kein Standgas, nur leichtes Motorgeräusch beim Fahren (A-Chassis-Sound ENG_Idle: Base 0, Throttle 0,06, Redline 0,04) | Place: `AChassis` (Kit + alle Tunes) | TESTING_REQUIRED |
+| Glas-Rolltor in der Seiteneinfahrt, öffnet bei gefahrenen Fahrzeugen und Spielern, bleibt offen, solange ein Anhänger des Lastzugs im Torbereich ist | `HallTemplates` (SideDoor, Attribut RollerDoor), `VehicleService` (mehrere Tore, Anhänger), Place | TESTING_REQUIRED |
+| Bodenmarkierung (Ladefeld, Pfeile), Turmfundament und Anzeige an Felix' verschobenen Turm (x 111,9) angepasst | `LayoutConfig.Garage` (Tower/Chute), `GarageTemplate`, Place | TESTING_REQUIRED |
+
+Selbsttest (Play): Seitentor öffnet, wenn ein gefahrenes Fahrzeug davor steht (26 → 0,8 hoch), und schließt wieder; Ladefeld liegt unter dem Rüssel; Stand-Lautstärke des Motors 0,017.
+
 ## Phase 12 – Content Expansion – Details
 
 Schritte: 12a alle Minen/Erze/Barren über zentrale Kurven · 12b weitere Spitzhacken, Rucksäcke, Drills, Fahrzeuge, Ausbaustufen (offen).

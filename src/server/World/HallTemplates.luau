@@ -92,8 +92,33 @@ function HallTemplates.buildWalls(plotCFrame: CFrame): Model
 			stripe.CanCollide = false
 		end
 	end
-	local header = part(sideFrame, "SideHeader", Vector3.new(0.3, 1.2, ozW), base * CFrame.new(hx + t / 2 + 0.2, oH + 0.8, ozMid), YELLOW, Enum.Material.SmoothPlastic)
-	header.CanCollide = false
+	-- Glas-Rolltor wie vorne (Felix 2026-10-20); VehicleService öffnet es bei Annäherung
+	local doorCF = base * CFrame.new(hx + 0.9, oH / 2, ozMid) * CFrame.Angles(0, math.rad(90), 0)
+	local curtain = part(sideFrame, "SideDoor", Vector3.new(ozW - 1.6, oH, 0.35), doorCF, GLASS, Enum.Material.Glass)
+	curtain.Transparency = 0.45
+	curtain:SetAttribute("OpenHeight", 0.8)
+	curtain:SetAttribute("RollerDoor", true)
+	for _, face in { Enum.NormalId.Front, Enum.NormalId.Back } do
+		local gui = Instance.new("SurfaceGui")
+		gui.Face = face
+		gui.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
+		gui.PixelsPerStud = 10
+		gui.LightInfluence = 1
+		gui.Parent = curtain
+		local slats = math.floor(oH / 2)
+		for i = 1, slats do
+			local line = Instance.new("Frame")
+			line.AnchorPoint = Vector2.new(0, 0.5)
+			line.Position = UDim2.fromScale(0, i / slats)
+			line.Size = UDim2.new(1, 0, 0, 3)
+			line.BackgroundColor3 = Color3.fromRGB(90, 96, 104)
+			line.BorderSizePixel = 0
+			line.Parent = gui
+		end
+	end
+	part(sideFrame, "SideDoorHousing", Vector3.new(2.4, 2.4, ozW), base * CFrame.new(hx + 1.3, oH + 1.2, ozMid), WALL_DARK, Enum.Material.Metal)
+	local sensor = part(sideFrame, "SideDoorSensor", Vector3.new(0.6, 0.6, 1.2), base * CFrame.new(hx + 2.1, oH + 3, ozMid + ozW / 2 - 2), Color3.fromRGB(90, 200, 120), Enum.Material.Neon)
+	sensor.CanCollide = false
 	FloatingText.title(sideFrame, "SideOpeningLabel", base * CFrame.new(hx + 3, oH + 4, ozMid) * CFrame.Angles(0, math.rad(-90), 0), "Loading Lane", 2.4, YELLOW)
 	wallSegment(model, "Right", hz * 2, base * CFrame.new(-hx, 0, 0) * CFrame.Angles(0, math.rad(90), 0), t, H)
 
