@@ -732,8 +732,9 @@ Offen: Im Autohaus noch „Coming soon“ bis Felix' Fahrtest; FH 540 (Tipper Ro
 | Fahrzeuge leise: kein Standgas, nur leichtes Motorgeräusch beim Fahren (A-Chassis-Sound ENG_Idle: Base 0, Throttle 0,06, Redline 0,04) | Place: `AChassis` (Kit + alle Tunes) | TESTING_REQUIRED |
 | Glas-Rolltor in der Seiteneinfahrt, öffnet bei gefahrenen Fahrzeugen und Spielern, bleibt offen, solange ein Anhänger des Lastzugs im Torbereich ist | `HallTemplates` (SideDoor, Attribut RollerDoor), `VehicleService` (mehrere Tore, Anhänger), Place | TESTING_REQUIRED |
 | Bodenmarkierung (Ladefeld, Pfeile), Turmfundament und Anzeige an Felix' verschobenen Turm (x 111,9) angepasst | `LayoutConfig.Garage` (Tower/Chute), `GarageTemplate`, Place | TESTING_REQUIRED |
+| Einsteigen nur mit F (Hinweis „Drive“ am Fahrersitz, nur Besitzer); Berühren des Sitzes setzt niemanden mehr hinein; Ausparken setzt weiterhin direkt ans Steuer | `VehicleService` (addEnterPrompt) | TESTING_REQUIRED |
 
-Selbsttest (Play): Seitentor öffnet, wenn ein gefahrenes Fahrzeug davor steht (26 → 0,8 hoch), und schließt wieder; Ladefeld liegt unter dem Rüssel; Stand-Lautstärke des Motors 0,017.
+Selbsttest (Play): Seitentor öffnet, wenn ein gefahrenes Fahrzeug davor steht (26 → 0,8 hoch), und schließt wieder; neben dem Pickup F gedrückt → sitzt am Steuer, Leertaste → ausgestiegen, Hinweis wieder da, auf den Sitz fallen → kein Einsteigen; Ladefeld liegt unter dem Rüssel; Stand-Lautstärke des Motors 0,017.
 
 ## Phase 12 – Content Expansion – Details
 

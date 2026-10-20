@@ -222,6 +222,9 @@ local function updateCargoVisual(player: Player, vehicleId: string)
 end
 
 -- Fahrzeug auf seinem Stellplatz erscheinen lassen
+-- Einsteigen mit F (Felix 2026-10-20), weiter unten definiert
+local addEnterPrompt: (player: Player, model: Model, displayName: string) -> ()
+
 local function spawnAtBay(player: Player, record: Types.VehicleRecord, override: CFrame?): Model?
 	local def = Vehicles.Get(record.Type)
 	local garage = garageModel(player)
@@ -274,6 +277,7 @@ local function spawnAtBay(player: Player, record: Types.VehicleRecord, override:
 		end
 	end)
 	guardSeat(model, player)
+	addEnterPrompt(player, model, def.DisplayName)
 	model.Parent = folder()
 	-- Eigener Fallback: Physik gehört dem Fahrer. A-Chassis setzt den Besitzer selbst.
 	if not model:FindFirstChild("A-Chassis Tune") then
@@ -335,6 +339,37 @@ local function seatPlayer(player: Player, model: Model)
 		end
 		seat:Sit(humanoid)
 	end
+end
+
+-- Einsteigen nur noch mit F über einen Hinweis am Fahrersitz (Felix 2026-10-20): Berühren des
+-- Sitzes setzt niemanden mehr hinein; Ausparken an der Garage setzt den Fahrer weiterhin direkt
+-- ans Steuer. Nur der Besitzer kann den Hinweis auslösen.
+addEnterPrompt = function(player: Player, model: Model, displayName: string)
+	local seat = seatOf(model)
+	if not seat then
+		return
+	end
+	seat.CanTouch = false
+	local prompt = Instance.new("ProximityPrompt")
+	prompt.Name = "EnterPrompt"
+	prompt.ActionText = "Drive"
+	prompt.ObjectText = displayName
+	prompt.KeyboardKeyCode = Enum.KeyCode.F
+	prompt.GamepadKeyCode = Enum.KeyCode.ButtonY
+	prompt.HoldDuration = 0
+	prompt.MaxActivationDistance = 12
+	prompt.RequiresLineOfSight = false
+	prompt.Parent = seat
+	prompt.Triggered:Connect(function(who)
+		if who ~= player then
+			RemoteService.FireClient("Notify", who, { Kind = "Warning", Code = Result.Codes.NOT_OWNER })
+			return
+		end
+		seatPlayer(player, model)
+	end)
+	seat:GetPropertyChangedSignal("Occupant"):Connect(function()
+		prompt.Enabled = seat.Occupant == nil
+	end)
 end
 
 local function checkGarage(player: Player): (Types.PlayerData?, string?)
