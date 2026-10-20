@@ -17,9 +17,11 @@ local TrailerBuilder = {}
 -- Gelenkgrenzen (Grad). TODO_BALANCE: Feinabstimmung beim Fahrtest
 local MAX_ARTICULATION = 75
 local MAX_TILT = 12
--- Dichte des Grundkörpers und der Reifen (Roblox-Einheiten)
-local CHASSIS_DENSITY = 1.2
-local TIRE_DENSITY = 0.9
+-- Dichte des Grundkörpers und der Reifen (Roblox-Einheiten). Bewusst leicht (Felix 2026-10-20:
+-- „muss nicht komplett realistisch sein, nur gut zu fahren“): schwere Auflieger drückten die
+-- Zugmaschine in die Federn und schoben sie in Kurven weg.
+local CHASSIS_DENSITY = 0.3
+local TIRE_DENSITY = 0.5
 local TIRE_FRICTION = 1.1
 
 local function templates(defId: string): Folder?

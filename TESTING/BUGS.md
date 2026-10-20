@@ -91,3 +91,14 @@ Nicht verschoben: eine Rohr-Aufhänger-Gruppe weit außerhalb der Halle (Workspa
 **Fix:** Jedes Rad sitzt jetzt an X/Z seiner Radoptik, die Optik wird exakt auf die Radmitte geschoben (`VehicleModelBuilder.buildAChassis`); Drehmoment der Tunes `vehicle_hauler` und `vehicle_roadtrain` verdreifacht (Peak 2850, Idle 2070, Redline 1300 – TODO_BALANCE).
 **Regression geprüft:** Abstand Radoptik ↔ Radmitte im Spiel bei allen vier Rädern 0; FH 540 beschleunigt in 5 s auf 37 Studs/s (vorher ca. 6). Gilt auch für Pickup, Vans, Box Truck (gleicher Code) – dort war die Optik bereits mittig.
 **Likely system:** Fahrzeuge (Optik/Fahrphysik)
+
+## BUG-008 – Lastzug-Zugmaschine federt komplett ein und driftet in Kurven
+
+**Severity:** Medium
+**Status:** Fixed (TESTING_REQUIRED)
+**Build:** 0.43.1
+**Gemeldet:** Felix, 2026-10-20 („nicht alle Räder liegen auf … muss nicht komplett realistisch sein, nur gut zu fahren“)
+**Ursache:** Schwere Auflieger (Dichte 1.2) lasteten über die Sattelkupplung auf der Zugmaschine; dazu 14 t Fahrzeuggewicht bei weicher Hauler-Federung und Hinterachslenkung → Federung auf Anschlag, Räder ohne Bodenkontakt, Drift.
+**Fix:** Anhänger leicht (Grundkörper 0,3, Reifen 0,5; `TrailerBuilder`); Tunes `vehicle_hauler`/`vehicle_roadtrain`: Gewicht 8 t, Federn 45/50, Dämpfer 9/10, Schwerpunkt 0,05, keine Hinterachslenkung (Place).
+**Regression geprüft:** FH 540 im Play: im Stand alle vier Räder auf Bodenhöhe, Sitz waagerecht; Geradeausfahrt bis 54 Studs/s ohne Schlupf, Räder bleiben am Boden, Sitzhöhe konstant (kein Durchfedern). Bei voller Geschwindigkeit in die Kurve rutscht er noch (dann vorher abbremsen).
+**Likely system:** Fahrzeuge (Fahrphysik)
