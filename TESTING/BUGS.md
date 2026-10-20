@@ -80,3 +80,14 @@ Nicht verschoben: eine Rohr-Aufhänger-Gruppe weit außerhalb der Halle (Workspa
 **Fix:** Das Vorschau-Plugin setzt Plot 1 an die Lage des HallLayouts (`plugin/EditPreview.server.luau`, `layoutDelta`). Im Spiel ändert sich nichts. Plugin neu gebaut; die offene Vorschau habe ich direkt korrigiert.
 **Einschränkung:** In der Vorschau ist die Zufahrtsstraße von Plot 1 dadurch leicht gegen die Hauptstraße verdreht (nur Vorschau).
 **Likely system:** Studio-Plugin World Preview
+
+## BUG-007 – Räder der Lastzug-Zugmaschinen eiern, Lastzüge sehr langsam
+
+**Severity:** Medium
+**Status:** Fixed (TESTING_REQUIRED)
+**Build:** 0.43.0
+**Gemeldet:** Felix, 2026-10-20 (Screenshot FH 540)
+**Ursache:** (1) Die A-Chassis-Räder wurden an symmetrische Achspositionen aus der Vorlage gesetzt (eine Spurweite, eine Höhe), die Radoptik der Felix-Modelle sitzt aber unsymmetrisch und teils höher/tiefer – die Optik drehte um eine versetzte Achse. (2) Motor-Drehmoment der Lastzug-Abstimmungen (von der alten Hauler-Abstimmung übernommen) zu schwach für Zugmaschine plus drei Anhängerteile.
+**Fix:** Jedes Rad sitzt jetzt an X/Z seiner Radoptik, die Optik wird exakt auf die Radmitte geschoben (`VehicleModelBuilder.buildAChassis`); Drehmoment der Tunes `vehicle_hauler` und `vehicle_roadtrain` verdreifacht (Peak 2850, Idle 2070, Redline 1300 – TODO_BALANCE).
+**Regression geprüft:** Abstand Radoptik ↔ Radmitte im Spiel bei allen vier Rädern 0; FH 540 beschleunigt in 5 s auf 37 Studs/s (vorher ca. 6). Gilt auch für Pickup, Vans, Box Truck (gleicher Code) – dort war die Optik bereits mittig.
+**Likely system:** Fahrzeuge (Optik/Fahrphysik)

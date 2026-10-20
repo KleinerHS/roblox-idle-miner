@@ -596,6 +596,20 @@ function VehicleModelBuilder.buildAChassis(def: Vehicles.VehicleDefinition, cf: 
 		RL = Vector3.new(-spec.track, spec.r, spec.rear),
 		RR = Vector3.new(spec.track, spec.r, spec.rear),
 	}
+	-- Mit Vorlage: jedes Rad genau in die Mitte seiner Radoptik, sonst dreht die Felge um eine
+	-- versetzte Achse (Felix 2026-10-20: „die Räder drehen außerhalb der Achse“; die Vorlagen sind
+	-- nicht symmetrisch, z. B. Hinterachse schmaler als Vorderachse)
+	if template then
+		local origin = template:GetPivot()
+		for name in targets do
+			local visual = template:FindFirstChild(`Wheel{name}`)
+			if visual and visual:IsA("Model") and #visual:GetChildren() > 0 then
+				-- Lage aus der Radoptik (X/Z), Höhe einheitlich = Radius (Boden bleibt eben)
+				local center = origin:PointToObjectSpace(visual:GetBoundingBox().Position)
+				targets[name] = Vector3.new(center.X, spec.r, center.Z)
+			end
+		end
+	end
 	for name, localPos in targets do
 		local wheel = wheels:FindFirstChild(name)
 		if wheel and wheel:IsA("BasePart") then
@@ -615,7 +629,16 @@ function VehicleModelBuilder.buildAChassis(def: Vehicles.VehicleDefinition, cf: 
 			if parts and visual then
 				-- Radoptik aus der Vorlage dreht mit dem Rad (A-Chassis verschweißt "Parts")
 				wheel.Transparency = 1
-				placeFromTemplate(template :: Model, visual, cf, parts, true)
+				local placed = placeFromTemplate(template :: Model, visual, cf, parts, true)
+				-- Radoptik exakt auf die Radmitte setzen (sonst eiert sie beim Drehen)
+				if placed:IsA("Model") then
+					local shift = wheel.Position - placed:GetBoundingBox().Position
+					for _, d in placed:GetDescendants() do
+						if d:IsA("BasePart") then
+							d.CFrame += shift
+						end
+					end
+				end
 			elseif parts then
 				local rim = Instance.new("Part")
 				rim.Name = "Rim"
