@@ -103,3 +103,14 @@ Nicht verschoben: eine Rohr-Aufhänger-Gruppe weit außerhalb der Halle (Workspa
 **Regression geprüft:** FH 540 im Play: im Stand alle vier Räder auf Bodenhöhe, Sitz waagerecht; Geradeausfahrt bis 54 Studs/s ohne Schlupf, Räder bleiben am Boden, Sitzhöhe konstant (kein Durchfedern). Bei voller Geschwindigkeit in die Kurve rutscht er noch (dann vorher abbremsen).
 **Likely system:** Fahrzeuge (Fahrphysik)
 **Nachbesserung 2026-10-20 (Felix: „die Front federt immer noch viel zu viel ein, Physik bitte sehr sehr einfach“):** Federung der Lastzug-Zugmaschinen komplett aus (`Tune.SuspensionEnabled = false`, starre Achsen), Gewichtsverteilung 50/50, Lenkwinkel nimmt mit dem Tempo ab (`SteerDecay` 60 km/h, `MinSteer` 30 %). Getestet: Kabine bleibt beim Anfahren, Bremsen und in Kurven waagerecht (Nicken/Rollen < 0,02), alle Räder am Boden. Bei Höchsttempo lenkt er bewusst nur noch wenig – vor Kurven abbremsen.
+
+## BUG-009 – Lastzug-Zugmaschine „laggy“, Fahrphysik zu kompliziert
+
+**Severity:** Medium
+**Status:** Fixed (TESTING_REQUIRED)
+**Build:** 0.43.3
+**Gemeldet:** Felix, 2026-10-20 („die ganze Zugmaschine ist laggy, mach es sehr einfach“)
+**Ursache:** A-Chassis (Federung, Reifenphysik, Netzwerkbesitz beim Fahrer) plus physikalische Anhänger: viele gekoppelte Teile, Ruckeln und Wegrutschen.
+**Fix:** Eigenes, sehr einfaches Fahrsystem nur für die Lastzug-Zugmaschinen (`VehicleModelBuilder.buildSimple`, `SimpleDriveService`): ein Grundkörper gleitet auf vier reibungsfreien Kugeln, Tempo und Richtung werden direkt gesetzt (W/S, A/D aus dem Sitz), Lenkwinkel 40° im Stand, 14° bei Höchsttempo, Server rechnet alles (kein Netzwerkbesitz beim Spieler). Anhänger bleiben physikalisch angekoppelt. Kleine Fahrzeuge fahren weiter mit A-Chassis.
+**Regression geprüft:** FH 540 im Play: bleibt immer waagerecht, fährt geradeaus durch Zauntor und Seitenöffnung bis unter den Rüssel („Move forward“-Hinweis erscheint), Testfahrt mit Server-Autopilot (12 Studs/s) durch die Rechtskurve, durchs Rolltor und über den Vorplatz bis zur Straße: alle Anhänger folgen, nichts hängt fest; Rückwärtsfahren geht. Einschränkung: Räder der Zugmaschine drehen sich nicht mit (nur Optik).
+**Likely system:** Fahrzeuge (Fahrphysik)

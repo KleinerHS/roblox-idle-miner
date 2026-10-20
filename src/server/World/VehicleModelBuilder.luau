@@ -705,6 +705,109 @@ function VehicleModelBuilder.buildAChassis(def: Vehicles.VehicleDefinition, cf: 
 	return car
 end
 
+-- Sehr einfaches Fahrzeug für Lastzug-Zugmaschinen (Felix 2026-10-20: „mach es sehr einfach, es
+-- muss nicht realistisch sein“): ein unsichtbarer Grundkörper trägt die Karosserie aus der Vorlage
+-- und gleitet auf vier reibungsfreien Kugeln an den Radpositionen. Tempo und Richtung setzt
+-- World/SimpleDrive (LinearVelocity in der Ebene, AlignOrientation hält ihn waagerecht). Kein
+-- A-Chassis, keine Federung. Vereinbarte Namen: "Chassis" (PrimaryPart), "DriveSeat".
+function VehicleModelBuilder.buildSimple(def: Vehicles.VehicleDefinition, cf: CFrame): Model?
+	local template = bodyTemplate(def.Id)
+	if not template then
+		return nil
+	end
+	local spec = templateSpec(template)
+	local origin = template:GetPivot()
+	local model = Instance.new("Model")
+	model.Name = def.Id
+	model:SetAttribute("VehicleType", def.Id)
+	model:SetAttribute("SimpleDrive", true)
+	model:SetAttribute("Wheelbase", math.max(4, spec.rear - spec.front))
+
+	local root = Instance.new("Part")
+	root.Name = "Chassis"
+	root.Size = Vector3.new(math.max(4, spec.track * 2 - 1), 1.2, math.max(6, spec.rear - spec.front + 4))
+	root.CFrame = cf * CFrame.new(0, spec.r + 0.8, (spec.front + spec.rear) / 2)
+	root.Transparency = 1
+	root.CanCollide = false
+	root.CanTouch = false
+	root.CustomPhysicalProperties = PhysicalProperties.new(2, 0, 0, 1, 1)
+	root.Parent = model
+	model.PrimaryPart = root
+
+	local function weldTo(part: BasePart)
+		local w = Instance.new("WeldConstraint")
+		w.Part0 = root
+		w.Part1 = part
+		w.Parent = part
+	end
+	-- Karosserie und Radoptik (masselos, ohne Kollision)
+	for _, child in template:GetChildren() do
+		if child.Name == "Body" or child.Name:sub(1, 5) == "Wheel" then
+			local c = placeFromTemplate(template, child, cf, model, false)
+			for _, d in c:GetDescendants() do
+				if d:IsA("BasePart") then
+					d.Massless = true
+					d.CanCollide = false
+					weldTo(d)
+				end
+			end
+		end
+	end
+	-- Gleitkugeln an den Radpositionen (rollen über kleine Kanten, keine Reibung)
+	for _, name in { "FL", "FR", "RL", "RR" } do
+		local visual = template:FindFirstChild(`Wheel{name}`)
+		local center = if visual and visual:IsA("Model") and #visual:GetChildren() > 0 then origin:PointToObjectSpace(visual:GetBoundingBox().Position) else Vector3.new(if name:sub(2) == "L" then -spec.track else spec.track, spec.r, if name:sub(1, 1) == "F" then spec.front else spec.rear)
+		local skid = Instance.new("Part")
+		skid.Name = `Skid{name}`
+		skid.Shape = Enum.PartType.Ball
+		skid.Size = Vector3.new(spec.r * 2, spec.r * 2, spec.r * 2)
+		skid.CFrame = cf * CFrame.new(center.X, spec.r, center.Z)
+		skid.Transparency = 1
+		skid.CanTouch = false
+		skid.CustomPhysicalProperties = PhysicalProperties.new(1, 0, 0, 100, 100)
+		skid.Parent = model
+		weldTo(skid)
+	end
+	-- Fahrersitz (nur zum Sitzen und für die Eingaben W/A/S/D)
+	local seat = Instance.new("VehicleSeat")
+	seat.Name = "DriveSeat"
+	seat.Size = Vector3.new(2, 1, 2)
+	local marker = template:FindFirstChild("SeatMarker")
+	seat.CFrame = if marker and marker:IsA("BasePart") then cf * origin:ToObjectSpace(marker.CFrame) else cf * CFrame.new(-1.5, spec.r + 2, spec.front + 3)
+	seat.Transparency = 1
+	seat.CanCollide = false
+	seat.MaxSpeed = 0
+	seat.Torque = 0
+	seat.HeadsUpDisplay = false
+	seat.Massless = true
+	seat.Parent = model
+	weldTo(seat)
+
+	-- Antrieb: Geschwindigkeit in der Ebene und Ausrichtung (setzt SimpleDrive)
+	local a = Instance.new("Attachment")
+	a.Name = "DriveAttachment"
+	a.Parent = root
+	local lv = Instance.new("LinearVelocity")
+	lv.Name = "Drive"
+	lv.Attachment0 = a
+	lv.RelativeTo = Enum.ActuatorRelativeTo.World
+	lv.VelocityConstraintMode = Enum.VelocityConstraintMode.Plane
+	lv.PrimaryTangentAxis = Vector3.xAxis
+	lv.SecondaryTangentAxis = Vector3.zAxis
+	lv.PlaneVelocity = Vector2.zero
+	lv.MaxForce = 4e6
+	lv.Parent = root
+	local ao = Instance.new("AlignOrientation")
+	ao.Name = "Heading"
+	ao.Mode = Enum.OrientationAlignmentMode.OneAttachment
+	ao.Attachment0 = a
+	ao.CFrame = cf.Rotation
+	ao.Responsiveness = 60
+	ao.MaxTorque = 4e7
+	ao.Parent = root
+	return model
+end
+
 -- Firmenfarbe und Firmenname anwenden (docs/07 §36–37)
 function VehicleModelBuilder.applyCompany(model: Model, accent: Color3?, companyName: string)
 	for _, d in model:GetDescendants() do

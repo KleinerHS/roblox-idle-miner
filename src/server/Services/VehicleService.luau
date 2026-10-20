@@ -276,7 +276,11 @@ local function spawnAtBay(player: Player, record: Types.VehicleRecord, override:
 	-- Fahrphysik von A-Chassis (D-026); ohne Kit im Place eigener Fallback
 	local vendor = ServerStorage:FindFirstChild("Vendor")
 	local kit = vendor and vendor:FindFirstChild("AChassis")
-	local model = if kit then VehicleModelBuilder.buildAChassis(def, floorCF + Vector3.new(0, 0.15, 0), kit) else nil
+	-- Lastzüge: sehr einfaches eigenes Fahrsystem statt A-Chassis (Felix 2026-10-20)
+	local model = if withTrailers then VehicleModelBuilder.buildSimple(def, floorCF + Vector3.new(0, 0.15, 0)) else nil
+	if not model and kit then
+		model = VehicleModelBuilder.buildAChassis(def, floorCF + Vector3.new(0, 0.15, 0), kit)
+	end
 	if not model then
 		warn("[Server][VehicleService] A-Chassis-Kit fehlt (ServerStorage.Vendor.AChassis) – eigener Fallback")
 		model = VehicleModelBuilder.build(def, floorCF + Vector3.new(0, 0.15, 0), true)
@@ -299,7 +303,15 @@ local function spawnAtBay(player: Player, record: Types.VehicleRecord, override:
 	addEnterPrompt(player, model, def.DisplayName)
 	model.Parent = folder()
 	-- Eigener Fallback: Physik gehört dem Fahrer. A-Chassis setzt den Besitzer selbst.
-	if not model:FindFirstChild("A-Chassis Tune") then
+	if model:GetAttribute("SimpleDrive") then
+		-- Einfaches Fahrsystem rechnet auf dem Server (SimpleDriveService)
+		local chassis = model.PrimaryPart
+		if chassis then
+			pcall(function()
+				chassis:SetNetworkOwner(nil)
+			end)
+		end
+	elseif not model:FindFirstChild("A-Chassis Tune") then
 		local chassis = model.PrimaryPart
 		if chassis then
 			pcall(function()
@@ -325,7 +337,8 @@ local function spawnAtBay(player: Player, record: Types.VehicleRecord, override:
 					TrailerBuilder.release(list, root, rootAtBuild)
 					local seat = seatOf(model)
 					local occupant = seat and seat.Occupant
-					TrailerBuilder.setOwner(list, occupant and Players:GetPlayerFromCharacter(occupant.Parent))
+					local driver = occupant and Players:GetPlayerFromCharacter(occupant.Parent)
+					TrailerBuilder.setOwner(list, if model:GetAttribute("SimpleDrive") then nil else driver)
 				end
 			end)
 			trailers[player] = trailers[player] or {}
@@ -336,6 +349,10 @@ local function spawnAtBay(player: Player, record: Types.VehicleRecord, override:
 				seat:GetPropertyChangedSignal("Occupant"):Connect(function()
 					local occupant = seat.Occupant
 					local driver = occupant and Players:GetPlayerFromCharacter(occupant.Parent)
+					-- Einfaches Fahrsystem: alles bleibt beim Server
+					if model:GetAttribute("SimpleDrive") then
+						driver = nil
+					end
 					task.delay(0.5, function()
 						TrailerBuilder.setOwner(list, driver)
 					end)
