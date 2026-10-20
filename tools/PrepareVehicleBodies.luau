@@ -149,7 +149,17 @@ local function prepare(name: string, cfg: Config): string
 				if #visuals == 0 then
 					table.insert(visuals, d)
 				end
-				table.insert(wheels, { pos = d.Position, radius = math.max(d.Size.X, d.Size.Y, d.Size.Z) / 2, width = math.min(d.Size.X, d.Size.Y, d.Size.Z), visuals = visuals })
+				-- Mitte der sichtbaren Radoptik (die unsichtbaren Radteile mancher Modelle sitzen woanders)
+				local pos = d.Position
+				local biggest = 0
+				for _, v in visuals do
+					local m = math.max(v.Size.X, v.Size.Y, v.Size.Z)
+					if m > biggest then
+						biggest = m
+						pos = v.Position
+					end
+				end
+				table.insert(wheels, { pos = pos, radius = math.max(d.Size.X, d.Size.Y, d.Size.Z) / 2, width = math.min(d.Size.X, d.Size.Y, d.Size.Z), visuals = visuals })
 			end
 		end
 	else

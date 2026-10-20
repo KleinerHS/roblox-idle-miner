@@ -114,3 +114,14 @@ Nicht verschoben: eine Rohr-Aufhänger-Gruppe weit außerhalb der Halle (Workspa
 **Fix:** Eigenes, sehr einfaches Fahrsystem nur für die Lastzug-Zugmaschinen (`VehicleModelBuilder.buildSimple`, `SimpleDriveService`): ein Grundkörper gleitet auf vier reibungsfreien Kugeln, Tempo und Richtung werden direkt gesetzt (W/S, A/D aus dem Sitz), Lenkwinkel 40° im Stand, 14° bei Höchsttempo, Server rechnet alles (kein Netzwerkbesitz beim Spieler). Anhänger bleiben physikalisch angekoppelt. Kleine Fahrzeuge fahren weiter mit A-Chassis.
 **Regression geprüft:** FH 540 im Play: bleibt immer waagerecht, fährt geradeaus durch Zauntor und Seitenöffnung bis unter den Rüssel („Move forward“-Hinweis erscheint), Testfahrt mit Server-Autopilot (12 Studs/s) durch die Rechtskurve, durchs Rolltor und über den Vorplatz bis zur Straße: alle Anhänger folgen, nichts hängt fest; Rückwärtsfahren geht. Einschränkung: Räder der Zugmaschine drehen sich nicht mit (nur Optik).
 **Likely system:** Fahrzeuge (Fahrphysik)
+
+## BUG-010 – FH 540: Hinterräder in der Luft, Front „eingefedert“, Auflieger vorne zu hoch
+
+**Severity:** Medium
+**Status:** Fixed (TESTING_REQUIRED)
+**Build:** 0.44.0
+**Gemeldet:** Felix, 2026-10-20 (Screenshot)
+**Ursache:** Das Creator-Store-Modell des FH 540 steht um 4,4° geneigt. Die Vorlagen wurden in einem waagerechten Rahmen erzeugt, dessen Bodenhöhe aus den unsichtbaren Radteilen kam (die waagerecht sind), während die sichtbaren Räder schräg lagen → Zugmaschine optisch vorne tief/hinten hoch. Beim Geraderichten der Anhänger wurde außerdem um die schräge Modellachse gedreht → Kupplung und Anhängerräder in falscher Höhe, Auflieger mit der Nase nach oben.
+**Fix:** Quelle vor dem Vorbereiten waagerecht gestellt (Neigung aus den sichtbaren Rädern der Zugmaschine), Anhänger nur um die senkrechte Achse gerade gedreht; `PrepareVehicleBodies`/`PrepareTrailers` nehmen jetzt die Mitte der sichtbaren Radoptik. Vorlagen `vehicle_hauler` und `vehicle_hauler_Trailers` neu erzeugt.
+**Regression geprüft:** Im Play: alle Räder der Zugmaschine auf dem Boden (Abstand −0,08…+0,02), Zugmaschine und alle drei Anhänger waagerecht (Neigung < 0,006); Bild verschickt. Scania unverändert (Neigung dort nur 0,5°).
+**Likely system:** Fahrzeuge (Vorlagen)

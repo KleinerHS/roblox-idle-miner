@@ -91,7 +91,18 @@ local wheelParent = source:FindFirstChild(CONFIG.TractorWheelParent) :: Instance
 local sum, count, radius = Vector3.zero, 0, 0
 for _, d in wheelParent:GetDescendants() do
 	if d:IsA("BasePart") and table.find(CONFIG.TractorWheels, d.Name) then
-		sum += d.Position
+		-- Mitte der größten sichtbaren Radoptik (wie PrepareVehicleBodies)
+		local pos, biggest = d.Position, 0
+		for _, v in d:GetDescendants() do
+			if v:IsA("BasePart") and v.Transparency < 0.98 then
+				local m = math.max(v.Size.X, v.Size.Y, v.Size.Z)
+				if m > biggest then
+					biggest = m
+					pos = v.Position
+				end
+			end
+		end
+		sum += pos
 		count += 1
 		radius = math.max(radius, math.max(d.Size.X, d.Size.Y, d.Size.Z) / 2)
 	end
@@ -133,8 +144,17 @@ for index, cfg in CONFIG.Trailers do
 				end
 			end
 			local r = d.Size.Y / 2
+			-- Mitte der größten sichtbaren Radoptik
+			local center, biggest = d.Position, 0
+			for _, v in visuals do
+				local m = math.max(v.Size.X, v.Size.Y, v.Size.Z)
+				if m > biggest then
+					biggest = m
+					center = v.Position
+				end
+			end
 			-- Achse quer zur Fahrtrichtung (lokal X des Rahmens)
-			local p = frame:PointToObjectSpace(d.Position)
+			local p = frame:PointToObjectSpace(center)
 			table.insert(tires, { cf = frame * CFrame.new(p), size = Vector3.new(1.6, r * 2, r * 2), visuals = visuals })
 		end
 	end
