@@ -65,3 +65,10 @@ Jeder Schritt mit Checkpoint und Felix' Freigabe.
      `vehicle_roadtrain = { Source = "V6_ScaniaTractor", Wheels = "named", Remove = { "placa" }, RemoveMeshes = { "rbxassetid://6658790299", "rbxassetid://5616208782", "rbxassetid://5703034461" } }`, danach CargoFill der Zugmaschine löschen.
   2. `V6_Scania` = komplettes Modell; `tools/PrepareTrailers.luau` mit Kupplungspunkten Trailer1 (-0.2, -2.7, -14.7) → 0, Trailer2 (-0.3, -2.1, 16.9) → 1, Trailer3 (-0.3, -2.6, 33.7) → 2 (Pivot-Rahmen der Quelle), Ladung im Untermodell „boiadeiro“.
 - Offen: Freigabe im Autohaus nach Felix' Fahrtest, FH 540 (Kipp-Auflieger) mit derselben Technik.
+
+## Stand 18d (2026-10-20)
+
+- FH 540 (`vehicle_hauler`) mit derselben Technik: Quelle Creator-Store 15853678225, Untermodell „FH 540 8x8 V2“. Vor dem Vorbereiten die leicht geknickten Anhänger um ihre Kupplungspunkte gerade drehen (Achswinkel aus „Wheels Left/Right“), Kipp-Aufbau „Model“ → „Tub“ umbenennen.
+  - Zugmaschine: `PrepareVehicleBodies` mit `Wheels = "named"`, `Remove = { "license plates", "placa" }`, danach Logo-MeshParts 6020548390/461/218 und Decal 6857365666 entfernen, CargoFill löschen.
+  - Anhänger: `PrepareTrailers` mit Kupplungen Trailer1 (0, -0.6, -6.1) → 0, Trailer2 (-0.41, -0.8, -36.3) → 1, Trailer3 (-0.47, -0.8, -48.78) → 2 (nach dem Geraderichten), Ladung „Tub“; CargoFill danach um 1,9 nach oben (Planenhöhe) und `CargoHidden = true`.
+- Beide Lastzüge per DevTool testbar; im Autohaus weiter „Coming soon“ bis Felix' Freigabe.

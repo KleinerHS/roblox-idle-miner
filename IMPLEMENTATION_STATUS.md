@@ -734,7 +734,9 @@ Offen: Im Autohaus noch „Coming soon“ bis Felix' Fahrtest; FH 540 (Tipper Ro
 | Bodenmarkierung (Ladefeld, Pfeile), Turmfundament und Anzeige an Felix' verschobenen Turm (x 111,9) angepasst | `LayoutConfig.Garage` (Tower/Chute), `GarageTemplate`, Place | TESTING_REQUIRED |
 | Einsteigen nur mit F (Hinweis „Drive“ am Fahrersitz, nur Besitzer); Berühren des Sitzes setzt niemanden mehr hinein; Ausparken setzt weiterhin direkt ans Steuer | `VehicleService` (addEnterPrompt) | TESTING_REQUIRED |
 
-Selbsttest (Play): Seitentor öffnet, wenn ein gefahrenes Fahrzeug davor steht (26 → 0,8 hoch), und schließt wieder; neben dem Pickup F gedrückt → sitzt am Steuer, Leertaste → ausgestiegen, Hinweis wieder da, auf den Sitz fallen → kein Einsteigen; Ladefeld liegt unter dem Rüssel; Stand-Lautstärke des Motors 0,017.
+| FH 540 als zweiter Lastzug (Tipper Road Train): Zugmaschine 8x8 aus Felix' Modell, Kipp-Auflieger mit Plane + Dolly + zweiter Kipp-Auflieger (Anhänger vor dem Vorbereiten gerade ausgerichtet), Logos/Schriftzüge/Nummernschilder entfernt; Ladung unter der Plane (Rüssel stoppt auf der Plane); Tune 14 t, 60 km/h | Place: `VehicleBodies.vehicle_hauler(_Trailers)`, `AChassis.Tunes.vehicle_hauler`, `VehicleService` (CargoHidden je Anhänger), `Vehicles` | TESTING_REQUIRED |
+| Frisch ausgeparkte Fahrzeuge: Fahrer wird erst eingesetzt, wenn A-Chassis bereit und das Fahrzeug beim Spieler geladen ist (vorher fuhr ein frisch ausgeparkter Lastzug nicht) | `VehicleService` (waitReady) | TESTING_REQUIRED |
+Selbsttest (Play): FH 540 ausgeparkt, Fahrer hat Steuerung, fährt mit allen Anhängern durch die Kurve vor dem Tor; unter dem Rüssel Auflieger 1 bis 12.500, dann „Trailer full · move forward“; Test-Erz wieder aus dem Lager genommen. Seitentor öffnet, wenn ein gefahrenes Fahrzeug davor steht (26 → 0,8 hoch), und schließt wieder; neben dem Pickup F gedrückt → sitzt am Steuer, Leertaste → ausgestiegen, Hinweis wieder da, auf den Sitz fallen → kein Einsteigen; Ladefeld liegt unter dem Rüssel; Stand-Lautstärke des Motors 0,017.
 
 ## Phase 12 – Content Expansion – Details
 

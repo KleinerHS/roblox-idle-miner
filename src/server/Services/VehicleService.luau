@@ -212,7 +212,8 @@ local function updateCargoVisual(player: Player, vehicleId: string)
 			local fills = VehicleService.GetCargoFills(player, vehicleId)
 			for k, f in fills do
 				local share = math.clamp(fraction * #fills - (k - 1), 0, 1)
-				f.Transparency = if share > 0 then 0 else 1
+				-- Auflieger mit Plane (CargoHidden): Ladung bleibt unsichtbar
+				f.Transparency = if share > 0 and not f:GetAttribute("CargoHidden") then 0 else 1
 			end
 		else
 			VehicleModelBuilder.setCargoVisual(model, fraction)
@@ -222,6 +223,24 @@ local function updateCargoVisual(player: Player, vehicleId: string)
 end
 
 -- Fahrzeug auf seinem Stellplatz erscheinen lassen
+-- Frisch gebautes A-Chassis-Fahrzeug: erst einsteigen lassen, wenn A-Chassis es initialisiert hat
+-- (legt Body["#Weight"] an) und es beim Spieler gestreamt ist. Sonst bekommt der Fahrer keine
+-- Steuerung (Felix-Test 2026-10-20: Lastzug fuhr nach dem Ausparken nicht).
+local function waitReady(player: Player, model: Model)
+	local at = model:GetPivot().Position
+	pcall(function()
+		player:RequestStreamAroundAsync(at, 8)
+	end)
+	local body = model:FindFirstChild("Body")
+	if model:FindFirstChild("A-Chassis Tune") and body then
+		local t0 = os.clock()
+		while model.Parent and not body:FindFirstChild("#Weight") and os.clock() - t0 < 4 do
+			task.wait(0.1)
+		end
+	end
+	task.wait(0.3)
+end
+
 -- Einsteigen mit F (Felix 2026-10-20), weiter unten definiert
 local addEnterPrompt: (player: Player, model: Model, displayName: string) -> ()
 
@@ -416,11 +435,21 @@ local function drive(player: Player, vehicleId: unknown)
 		return Result.err(Result.Codes.INTERNAL_ERROR)
 	end
 	local model = spawned[player] and spawned[player][fresh.Id]
+	local fresh_spawn = false
 	if not model or not model.Parent then
 		model = spawnAtBay(player, fresh)
+		fresh_spawn = true
 	end
 	if not model then
 		return Result.err(Result.Codes.INTERNAL_ERROR)
+	end
+	if fresh_spawn then
+		-- Weit entfernte Fahrzeuge (Lastzug auf der Zufahrt) erst zum Spieler streamen, sonst
+		-- sitzt er nur auf dem Server im Fahrzeug
+		waitReady(player, model)
+		if not model.Parent then
+			return Result.err(Result.Codes.INTERNAL_ERROR)
+		end
 	end
 	seatPlayer(player, model)
 	Log.debug(TAG, `{player.Name} fährt {fresh.Type} ({fresh.Id}) von Stellplatz {fresh.Bay}`)
@@ -476,7 +505,12 @@ local function reset(player: Player, vehicleId: unknown)
 	end
 	-- Wer am Steuer saß, sitzt danach wieder am Steuer
 	if drivenId == record.Id then
-		task.defer(seatPlayer, player, model)
+		task.spawn(function()
+			waitReady(player, model)
+			if model.Parent then
+				seatPlayer(player, model)
+			end
+		end)
 	end
 	RemoteService.FireClient("Notify", player, { Kind = "Info", Code = "VEHICLE_RESET" })
 	return Result.ok(record.Id)
