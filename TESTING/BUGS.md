@@ -107,7 +107,7 @@ Nicht verschoben: eine Rohr-Aufhänger-Gruppe weit außerhalb der Halle (Workspa
 ## BUG-009 – Lastzug-Zugmaschine „laggy“, Fahrphysik zu kompliziert
 
 **Severity:** Medium
-**Status:** Fixed (TESTING_REQUIRED)
+**Status:** Zurückgenommen (Felix 2026-10-20: eigene Physik ohne Lenkeinschlag, Radrotation und Motorsound – zurück zu A-Chassis, mit Werten lösen; siehe BUG-011)
 **Build:** 0.43.3
 **Gemeldet:** Felix, 2026-10-20 („die ganze Zugmaschine ist laggy, mach es sehr einfach“)
 **Ursache:** A-Chassis (Federung, Reifenphysik, Netzwerkbesitz beim Fahrer) plus physikalische Anhänger: viele gekoppelte Teile, Ruckeln und Wegrutschen.
@@ -125,3 +125,13 @@ Nicht verschoben: eine Rohr-Aufhänger-Gruppe weit außerhalb der Halle (Workspa
 **Fix:** Quelle vor dem Vorbereiten waagerecht gestellt (Neigung aus den sichtbaren Rädern der Zugmaschine), Anhänger nur um die senkrechte Achse gerade gedreht; `PrepareVehicleBodies`/`PrepareTrailers` nehmen jetzt die Mitte der sichtbaren Radoptik. Vorlagen `vehicle_hauler` und `vehicle_hauler_Trailers` neu erzeugt.
 **Regression geprüft:** Im Play: alle Räder der Zugmaschine auf dem Boden (Abstand −0,08…+0,02), Zugmaschine und alle drei Anhänger waagerecht (Neigung < 0,006); Bild verschickt. Scania unverändert (Neigung dort nur 0,5°).
 **Likely system:** Fahrzeuge (Vorlagen)
+
+## BUG-011 – Lastzüge wieder mit A-Chassis, nur über Werte einfach gemacht
+
+**Severity:** Medium
+**Status:** Fixed (TESTING_REQUIRED)
+**Build:** 0.44.1
+**Gemeldet:** Felix, 2026-10-20 („geh lieber wieder zur alten Physik zurück und fix es da mit Werten“)
+**Fix:** Eigenes Fahrsystem (SimpleDriveService, buildSimple) entfernt, Lastzüge fahren wieder mit A-Chassis (Lenkeinschlag, drehende Räder, Motorsound). Werte der Tunes `vehicle_hauler`/`vehicle_roadtrain`: Federung aus (`SuspensionEnabled = false`), 8 t, Gewicht 50/50, Drehmoment ×3, Tempo-Limit 60 km/h, Lenkwinkel nimmt ab 120 km/h-Skala bis auf 45 % ab. Zusammen mit den waagerecht neu erzeugten FH-Vorlagen (BUG-010) stehen alle Räder am Boden.
+**Regression geprüft:** FH 540 im Play mit A-Chassis: alle vier Räder auf Bodenhöhe, Kabine beim Anfahren, Fahren und in der Kurve waagerecht (Nicken/Rollen < 0,011), Kurvenfahrt bei 30 Studs/s ohne Rutschen (Schlupf ≤ 3°), Rückwärtsfahren geht.
+**Likely system:** Fahrzeuge (Fahrphysik)
