@@ -150,7 +150,7 @@ Nicht verschoben: eine Rohr-Aufhänger-Gruppe weit außerhalb der Halle (Workspa
 ## BUG-013 – Lastzug: Lenkeinschlag zu gering, Bremsen reagieren kaum
 
 **Severity:** Medium
-**Status:** Fixed (TESTING_REQUIRED)
+**Status:** Fixed (USER_APPROVED, Felix 2026-10-21)
 **Build:** 0.44.4
 **Gemeldet:** Felix, 2026-10-21 („der Lenkeinschlag ist zu gering und die Bremsen reagieren gefühlt gar nicht“)
 **Ursache:** Tunes der Lastzüge mit kleinem Lenkwinkel und starkem Abbau bei Tempo; Bremskraft für 8 t zu niedrig; die Anhänger rollten völlig frei und schoben die Zugmaschine beim Bremsen weiter.

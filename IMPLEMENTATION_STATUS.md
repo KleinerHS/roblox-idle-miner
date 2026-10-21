@@ -742,7 +742,7 @@ Selbsttest (Play): FH 540 ausgeparkt, Fahrer hat Steuerung, fährt mit allen Anh
 
 | System | Dateien / Instanzen | Status |
 |---|---|---|
-| Lastzüge mit A-Chassis ohne Federung, Allrad, 55 % vorne; mittlere Räder drehen/lenken mit (WheelExtra); größerer Lenkeinschlag (50/45°, Abbau erst ab hohem Tempo, min. 70 %); stärkere Bremsen; Anhängerräder bremsen mit (beim Bremsen und ohne Fahrer) | Place: `AChassis.Tunes.vehicle_hauler`/`vehicle_roadtrain` (Backup `assets/AChassis.rbxm`), `VehicleModelBuilder` (ExtraWheels), `TrailerBuilder.setBrake`, `VehicleService` | TESTING_REQUIRED |
+| Lastzüge mit A-Chassis ohne Federung, Allrad, 55 % vorne; mittlere Räder drehen/lenken mit (WheelExtra); größerer Lenkeinschlag (50/45°, Abbau erst ab hohem Tempo, min. 70 %); stärkere Bremsen; Anhängerräder bremsen mit (beim Bremsen und ohne Fahrer) | Place: `AChassis.Tunes.vehicle_hauler`/`vehicle_roadtrain` (Backup `assets/AChassis.rbxm`), `VehicleModelBuilder` (ExtraWheels), `TrailerBuilder.setBrake`, `VehicleService` | USER_APPROVED (Felix 2026-10-21: „läuft top, das lassen wir so“) |
 
 Selbsttest (Play): FH 540 bremst von 37 Studs/s in ~0,7 s auf 0, danach normal rückwärts; Wendekreis bei langsamer Fahrt ~30–40 Studs. Offen: Freischalten beider Lastzüge im Autohaus nach Felix' Freigabe.
 
