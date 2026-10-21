@@ -78,22 +78,31 @@ function SellingBuilder.build(parent: Instance): Model
 	text.Text = "SELL"
 	text.Parent = gui
 
+	-- „SELL“ groß in der Luft über dem Kreis, runde, freundliche Schrift (Felix 2026-10-21)
+	local anchor = part(model, "SignAnchor", Vector3.new(1, 1, 1), CFrame.new(c.X, topY + 24, c.Z), GREEN, Enum.Material.SmoothPlastic)
+	anchor.Transparency = 1
 	local sign = Instance.new("BillboardGui")
 	sign.Name = "SellSign"
-	sign.Size = UDim2.fromOffset(260, 70)
-	sign.StudsOffsetWorldSpace = Vector3.new(0, 16, 0)
-	sign.MaxDistance = 600
+	sign.Size = UDim2.fromScale(40, 15) -- in Studs: wächst mit der Welt, wirkt wie ein Schriftzug
+	sign.MaxDistance = 900
 	sign.LightInfluence = 0
-	sign.Parent = zone
+	sign.Parent = anchor
 	local signText = Instance.new("TextLabel")
 	signText.Size = UDim2.fromScale(1, 1)
 	signText.BackgroundTransparency = 1
-	signText.Font = Enum.Font.GothamBlack
+	signText.FontFace = Font.new("rbxasset://fonts/families/FredokaOne.json", Enum.FontWeight.Regular)
 	signText.TextScaled = true
-	signText.TextColor3 = GREEN_GLOW
-	signText.TextStrokeTransparency = 0.3
-	signText.Text = "SELL · DRIVE THROUGH"
+	signText.TextColor3 = Color3.fromRGB(255, 255, 255)
+	signText.Text = "SELL"
 	signText.Parent = sign
+	local gradient = Instance.new("UIGradient")
+	gradient.Color = ColorSequence.new(Color3.fromRGB(190, 255, 170), Color3.fromRGB(70, 220, 110))
+	gradient.Rotation = 90
+	gradient.Parent = signText
+	local stroke = Instance.new("UIStroke")
+	stroke.Color = Color3.fromRGB(20, 90, 45)
+	stroke.Thickness = 4
+	stroke.Parent = signText
 
 	model.Parent = parent
 	return model
