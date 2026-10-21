@@ -1,7 +1,7 @@
 --!strict
 -- Umgebung der Map (Phase 13a, docs/19 §4, MAP_MASTERPLAN_TOPDOWN.png, CENTRAL_AREA_REFERENCE.png):
 -- Wiese statt Baseplate, Bergkette mit Schneegipfeln rund um die Map, Nadelwald, Felsen, Seen
--- zwischen den Plots, Straßenmarkierungen und Laternen an den Zufahrten, Platz mit Brunnen,
+-- zwischen den Plots, Straßenmarkierungen und Laternen an den Zufahrten, Platz mit Verkaufskreis (D-056),
 -- Wasserturm und Windrad. Reine Optik: keine Spiellogik hängt davon ab.
 --
 -- Alles wird deterministisch (fester Zufalls-Seed) aus LayoutConfig abgeleitet, damit jeder Server
@@ -285,57 +285,7 @@ local function roadDetails(parent: Instance, plotId: number)
 	end
 end
 
--- Brunnen mit Beeten, Bänken und Laternen in der Platzmitte
-local function plazaCenter(parent: Instance)
-	local folder = Instance.new("Folder")
-	folder.Name = "Plaza"
-	folder.Parent = parent
-	local c = LayoutConfig.MapCenter
-	disc(folder, "PlazaRing", 37, 0.1, c.X, c.Z, TOP + 0.25, PAVING_DARK, Enum.Material.Cobblestone)
-	disc(folder, "PlazaInner", 31, 0.1, c.X, c.Z, TOP + 0.27, PAVING, Enum.Material.Cobblestone)
-	-- Brunnen: Becken, Wasser, Säule mit zwei Schalen
-	disc(folder, "FountainRim", 10, 1.6, c.X, c.Z, TOP + 1.7, Color3.fromRGB(160, 150, 136), Enum.Material.Concrete)
-	local water = disc(folder, "FountainWater", 9.2, 0.3, c.X, c.Z, TOP + 1.75, WATER, Enum.Material.Glass)
-	water.Transparency = 0.2
-	water.CanCollide = false
-	part(folder, "FountainColumn", Vector3.new(6, 1.8, 1.8), CFrame.new(c.X, TOP + 4.5, c.Z) * CFrame.Angles(0, 0, math.rad(90)), Color3.fromRGB(170, 160, 146), Enum.Material.Concrete, Enum.PartType.Cylinder)
-	disc(folder, "FountainBowl1", 4.2, 0.7, c.X, c.Z, TOP + 5.2, Color3.fromRGB(170, 160, 146), Enum.Material.Concrete)
-	part(folder, "FountainColumn2", Vector3.new(3, 1, 1), CFrame.new(c.X, TOP + 6.5, c.Z) * CFrame.Angles(0, 0, math.rad(90)), Color3.fromRGB(170, 160, 146), Enum.Material.Concrete, Enum.PartType.Cylinder)
-	disc(folder, "FountainBowl2", 2.2, 0.5, c.X, c.Z, TOP + 8, Color3.fromRGB(170, 160, 146), Enum.Material.Concrete)
-	local spout = part(folder, "FountainSpout", Vector3.new(0.8, 2.4, 0.8), CFrame.new(c.X, TOP + 9.2, c.Z), WATER, Enum.Material.Glass)
-	spout.Transparency = 0.35
-	spout.CanCollide = false
-	local splash = Instance.new("ParticleEmitter")
-	splash.Texture = "rbxasset://textures/particles/sparkles_main.dds"
-	splash.Color = ColorSequence.new(Color3.fromRGB(200, 230, 255))
-	splash.Size = NumberSequence.new(0.4, 0.1)
-	splash.Transparency = NumberSequence.new(0.3, 1)
-	splash.Lifetime = NumberRange.new(0.8, 1.2)
-	splash.Rate = 30
-	splash.Speed = NumberRange.new(6, 9)
-	splash.SpreadAngle = Vector2.new(25, 25)
-	splash.Acceleration = Vector3.new(0, -20, 0)
-	splash.Parent = spout
-	-- Beete mit Bäumen, Bänke und Laternen im Kreis
-	local rng = Random.new(5)
-	for i = 0, 5 do
-		local a = math.rad(i * 60 + 30)
-		local px, pz = c.X + math.cos(a) * 20, c.Z + math.sin(a) * 20
-		part(folder, `Planter{i}`, Vector3.new(6, 1.2, 6), CFrame.new(px, TOP + 0.6, pz) * CFrame.Angles(0, -a, 0), WOOD, Enum.Material.WoodPlanks)
-		part(folder, `PlanterSoil{i}`, Vector3.new(5.4, 0.2, 5.4), CFrame.new(px, TOP + 1.25, pz) * CFrame.Angles(0, -a, 0), GRASS_DARK, Enum.Material.Grass)
-		pine(folder, 1000 + i, Vector3.new(px, TOP + 1.2, pz), 0.55, rng)
-		local ba = math.rad(i * 60)
-		local bench = CFrame.new(c.X + math.cos(ba) * 24, TOP, c.Z + math.sin(ba) * 24) * CFrame.Angles(0, -ba + math.rad(90), 0)
-		part(folder, `BenchSeat{i}`, Vector3.new(5, 0.3, 1.6), bench * CFrame.new(0, 1.5, 0), WOOD, Enum.Material.Wood)
-		part(folder, `BenchBack{i}`, Vector3.new(5, 1.4, 0.3), bench * CFrame.new(0, 2.3, 0.75), WOOD, Enum.Material.Wood)
-		for _, dx in { -2, 2 } do
-			part(folder, `BenchLeg{i}_{dx}`, Vector3.new(0.3, 1.4, 1.4), bench * CFrame.new(dx, 0.7, 0), STEEL, Enum.Material.Metal)
-		end
-		streetLamp(folder, `PlazaLamp{i}`, CFrame.new(c.X + math.cos(a) * 29, TOP, c.Z + math.sin(a) * 29) * CFrame.Angles(0, -a - math.rad(90), 0))
-	end
-end
-
--- Kreisverkehr um den Brunnen und Speichen bis zum Platzrand, in Verlängerung der Zufahrten
+-- Kreisverkehr um den Verkaufskreis und Speichen bis zum Platzrand, in Verlängerung der Zufahrten
 local function plazaRoads(parent: Instance)
 	local folder = Instance.new("Folder")
 	folder.Name = "PlazaRoads"
@@ -357,8 +307,8 @@ local function plazaRoads(parent: Instance)
 			dash.CanCollide = false
 		end
 	end
-	-- Inselbordstein um den Brunnenplatz
-	disc(folder, "IslandCurb", inner, 0.4, c.X, c.Z, TOP + 0.2, PAVING_DARK, Enum.Material.Concrete)
+	-- Insel: flach und befahrbar, darauf der grüne Verkaufskreis (SellingBuilder, D-056)
+	disc(folder, "Island", inner, 0.1, c.X, c.Z, roadTop, Color3.fromRGB(58, 60, 64), Enum.Material.Asphalt).CanCollide = false
 	-- Speichen: Fortsetzung jeder Zufahrt (gleiche Linie) vom Platzrand bis in den Ring
 	for plotId = 1, GameConfig.MaxPlots do
 		local cf = plotCFrame(plotId)
@@ -597,7 +547,6 @@ function EnvironmentBuilder.build(parent: Instance): Folder
 	end
 
 	plazaRoads(folder)
-	plazaCenter(folder)
 	for i, pos in env.Cabins do
 		cabin(folder, i, pos)
 	end

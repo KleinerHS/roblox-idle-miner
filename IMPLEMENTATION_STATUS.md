@@ -756,6 +756,16 @@ Selbsttest (Play): FH 540 bremst von 37 Studs/s in ~0,7 s auf 0, danach normal r
 
 Selbsttest (Play): Pickup (v4) steht rostig in der Garage, Lack-Material und dunkle Scheiben kommen im Spiel an; alle Fahrzeugvorlagen in der Vorschau ohne Blick ins Innere.
 
+### 18g (Version 0.46.0, 2026-10-21) – Grüner Verkaufskreis (D-056)
+
+| System | Dateien / Instanzen | Status |
+|---|---|---|
+| Verkaufsgebäude, Tresen und Verkaufsfenster entfernt; Brunnen, Beete/Bäume, Bänke, Laternen in der Platzmitte entfernt, Insel flach | `World/SellingBuilder.luau`, `World/EnvironmentBuilder.luau`, `Controllers/SellController.luau`, `Remotes` (SellAll/OpenSellMenu → Sold) | TESTING_REQUIRED |
+| Grüner Verkaufskreis (Radius 36, leuchtender Rand, „SELL“, Schild): Durchfahren verkauft die Fahrzeugladung, Hineinlaufen den Rucksack, ohne Fenster | `Services/SellingService.luau`, `LayoutConfig.SellCircle` | TESTING_REQUIRED |
+| Dev-Kommandos `GiveAllVehicles`, `FillVehicle` | `DevService` | TESTING_REQUIRED |
+
+Selbsttest (Play): zu Fuß mit 200 Erz im Rucksack in den Kreis → 1.523 $ + XP, Einblendung; Cargo Van mit 300 Kohle mit ~47 Studs/s durch den Kreis → sofort verkauft (300 $), Ladung 0, keine Fehler.
+
 ## Phase 12 – Content Expansion – Details
 
 Schritte: 12a alle Minen/Erze/Barren über zentrale Kurven · 12b weitere Spitzhacken, Rucksäcke, Drills, Fahrzeuge, Ausbaustufen (offen).

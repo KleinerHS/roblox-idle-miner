@@ -144,16 +144,11 @@ local LayoutConfig = {
 		},
 	},
 
-	-- Verkaufsgebäude in der Mitte (CENTRAL_AREA_REFERENCE.png: vorne an der Straße).
-	-- Position relativ zu MapCenter (X/Z); Eingang zeigt nach +Z zur Straße Richtung Plot 5.
-	-- TODO_LAYOUT bis zum Bau der zentralen Service-Area.
-	SellingBuilding = {
-		-- Sektor zwischen den Straßen zu Plot 4 und Plot 5, Eingang zum Kreisverkehr
-		Offset = Vector2.new(75, 130),
-		Size = Vector3.new(44, 16, 28),
+	-- Verkaufskreis in der Insel des Kreisverkehrs (D-056, ersetzt Verkaufsgebäude und Brunnen):
+	-- Durchfahren verkauft die Ladung, Hineinlaufen den Rucksack. Radius < RoundaboutInner.
+	SellCircle = {
+		Radius = 36,
 	},
-	-- Maximale Entfernung zum Verkaufstresen
-	SellCounterDistance = 14,
 
 	-- Equipment-Shop in der Mitte (CENTRAL_AREA_REFERENCE.png: links, blau).
 	-- Position relativ zu MapCenter; Eingang zeigt zur Platzmitte. TODO_LAYOUT

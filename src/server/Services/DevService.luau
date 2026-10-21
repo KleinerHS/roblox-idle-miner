@@ -192,6 +192,22 @@ function DevService.Init()
 		return if #added > 0 then table.concat(added, ", ") else "alle Fahrzeuge schon vorhanden"
 	end
 	giveAll.Parent = folder
+	-- Fahrzeug direkt beladen (Test Verkaufskreis), z. B. 500 Kohle in v4:
+	--   game.ServerStorage.DevTools.FillVehicle:Invoke(game.Players:GetPlayers()[1], "v4", "ore_coal", 500)
+	local fillVehicle = Instance.new("BindableFunction")
+	fillVehicle.Name = "FillVehicle"
+	fillVehicle.OnInvoke = function(player: Player, vehicleId: string, oreId: string, amount: number): string
+		local ok = DataService.Mutate(player, function(data)
+			local record = data.Vehicles.Owned[vehicleId]
+			if record then
+				local n = (record.Cargo[oreId] or 0) + amount
+				record.Cargo[oreId] = if n > 0 then n else nil
+			end
+		end)
+		VehicleService.RefreshCargo(player, vehicleId)
+		return if ok then "ok" else "Profil nicht geladen"
+	end
+	fillVehicle.Parent = folder
 	local takeVehicle = Instance.new("BindableFunction")
 	takeVehicle.Name = "TakeVehicle"
 	takeVehicle.OnInvoke = function(player: Player, vehicleId: string): string

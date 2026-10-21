@@ -343,3 +343,9 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Source:** Felix, 2026-10-21 („man soll ein Auto nur einmal besitzen können“)
 **Decision:** Jeder Fahrzeugtyp kann nur einmal besessen werden. Das Autohaus prüft das bereits serverseitig (`ShopService.buyVehicle`, Fehler ALREADY_DONE) und zeigt „Owned“; jetzt verweigern auch die Dev-Kommandos `GiveVehicle`/`GiveAllVehicles` doppelte Typen.
 **Affected systems:** ShopService, DevService
+
+## D-056 – Grüner Verkaufskreis statt Verkaufsgebäude
+
+**Source:** Felix, 2026-10-21 („mach den Sell-Shop weg und mach einfach in der Mitte den Brunnen und die Bäume weg und einen großen grünen Kreis; wenn man da durchfährt, verkauft man automatisch, ohne dass ein Fenster aufgeht“)
+**Decision:** Verkaufsgebäude, Tresen und Verkaufsfenster entfallen. In der Insel des Kreisverkehrs (Brunnen, Beete mit Bäumen, Bänke und Laternen entfernt, Insel flach und befahrbar) liegt ein grüner Kreis (Radius 36, `LayoutConfig.SellCircle`). Fährt man mit Ladung hindurch, wird die ganze Fahrzeugladung sofort verkauft; zu Fuß wird der Rucksack verkauft (damit Rucksack-Verkauf weiter möglich ist – Annahme, von Felix zu bestätigen). Rückmeldung nur als kurze Einblendung „SOLD +$… +… Mining XP“. Ersetzt den Fahrzeug-Verkauf mit Bestätigung (docs/07 §25/§31).
+**Affected systems:** SellingService, SellingBuilder, SellController, EnvironmentBuilder, LayoutConfig, Remotes
