@@ -309,6 +309,17 @@ local function spawnAtBay(player: Player, record: Types.VehicleRecord, override:
 	end
 	spawned[player] = spawned[player] or {}
 	spawned[player][record.Id] = model
+	-- Zusatzachsen (mittlere Räder der Lastzug-Zugmaschinen) nach dem Start von A-Chassis
+	task.spawn(function()
+		local body = model:FindFirstChild("Body")
+		local t0 = os.clock()
+		while model.Parent and body and not body:FindFirstChild("#Weight") and os.clock() - t0 < 5 do
+			task.wait(0.1)
+		end
+		if model.Parent then
+			VehicleModelBuilder.attachExtraWheels(model)
+		end
+	end)
 	if withTrailers then
 		local root = seatOf(model) or model.PrimaryPart
 		if root then
@@ -702,6 +713,19 @@ function VehicleService.Start()
 		ringTouch[player] = nil
 	end)
 	task.spawn(doorLoop)
+	-- Zusatzachsen nachführen (Drehzahl, Lenkung)
+	task.spawn(function()
+		while true do
+			task.wait(0.1)
+			for _, list in spawned do
+				for _, model in list do
+					if model.Parent and model:FindFirstChild("ExtraWheels") then
+						VehicleModelBuilder.updateExtraWheels(model)
+					end
+				end
+			end
+		end
+	end)
 end
 
 -- Alle Fahrzeuge des Spielers aus der Welt nehmen (Prestige: Garage wird zurückgesetzt)

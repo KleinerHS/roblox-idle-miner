@@ -135,3 +135,14 @@ Nicht verschoben: eine Rohr-Aufhänger-Gruppe weit außerhalb der Halle (Workspa
 **Fix:** Eigenes Fahrsystem (SimpleDriveService, buildSimple) entfernt, Lastzüge fahren wieder mit A-Chassis (Lenkeinschlag, drehende Räder, Motorsound). Werte der Tunes `vehicle_hauler`/`vehicle_roadtrain`: Federung aus (`SuspensionEnabled = false`), 8 t, Gewicht 50/50, Drehmoment ×3, Tempo-Limit 60 km/h, Lenkwinkel nimmt ab 120 km/h-Skala bis auf 45 % ab. Zusammen mit den waagerecht neu erzeugten FH-Vorlagen (BUG-010) stehen alle Räder am Boden.
 **Regression geprüft:** FH 540 im Play mit A-Chassis: alle vier Räder auf Bodenhöhe, Kabine beim Anfahren, Fahren und in der Kurve waagerecht (Nicken/Rollen < 0,011), Kurvenfahrt bei 30 Studs/s ohne Rutschen (Schlupf ≤ 3°), Rückwärtsfahren geht.
 **Likely system:** Fahrzeuge (Fahrphysik)
+
+## BUG-012 – Lastzug: mittlere Räder der Zugmaschine stehen still, Lenkung rutscht
+
+**Severity:** Medium
+**Status:** Fixed (TESTING_REQUIRED)
+**Build:** 0.44.2
+**Gemeldet:** Felix, 2026-10-21 („nur die vordersten und hintersten Reifen bewegen sich, er lenkt nicht richtig, er rutscht mehr rum“)
+**Ursache:** A-Chassis kennt nur vier Räder; die Radoptik der mittleren Achsen war Teil der starren Karosserie. Hinterradantrieb mit verdreifachtem Drehmoment schob die schwere Kombination über die Vorderräder (Untersteuern, durchdrehende Hinterräder).
+**Fix:** Radoptik der mittleren Achsen in den Vorlagen als `WheelExtra{i}` abgetrennt (Place); nach dem Start von A-Chassis bekommt jede eine Nabe an einem Motor-Scharnier am Fahrersitz, `VehicleModelBuilder.updateExtraWheels` dreht sie so schnell wie das echte Rad (10×/s) und lenkt Achsen vor der Mitte mit 60 % des Vorderrad-Einschlags mit (FH 540 hat zwei Lenkachsen). Tunes der Lastzüge: Allradantrieb (50:50), Gewicht 55 % vorne.
+**Regression geprüft:** FH 540 im Play: mittlere Räder drehen mit (z. B. echtes Rad −20, Zusatzrad −23 rad/s), zweite Vorderachse lenkt mit (FL −17°, Zusatzachse −10°); Kurve bei ~27 Studs/s mit Gierrate 0,5 rad/s und Schlupf 3–12° statt Wegrutschen.
+**Likely system:** Fahrzeuge (Fahrphysik/Optik)

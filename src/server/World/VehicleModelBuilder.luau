@@ -705,6 +705,152 @@ function VehicleModelBuilder.buildAChassis(def: Vehicles.VehicleDefinition, cf: 
 	return car
 end
 
+-- Zusatzachsen der Lastzug-Zugmaschinen (Felix 2026-10-21: „nur die vordersten und hintersten
+-- Reifen bewegen sich“). A-Chassis kennt nur vier Räder; die Radoptik der mittleren Achsen liegt in
+-- der Vorlage als Models "WheelExtra{i}" (Attribut Radius). Nach dem Start von A-Chassis bekommt
+-- jedes eine Nabe an einem Motor-Scharnier am Fahrersitz; VehicleModelBuilder.updateExtraWheels
+-- dreht sie so schnell wie die echten Räder und lenkt Achsen vor der Mitte mit.
+-- Mehr Haftung der echten Räder gegen Rutschen (nur Fahrzeuge mit Zusatzachsen).
+local EXTRA_STEER_FACTOR = 0.6
+local ROADTRAIN_TIRE_FRICTION = 1.6
+
+function VehicleModelBuilder.attachExtraWheels(car: Model)
+	local template = bodyTemplate(car:GetAttribute("VehicleType") :: string)
+	local seat = car:FindFirstChild("DriveSeat")
+	if not (template and seat and seat:IsA("BasePart")) or car:FindFirstChild("ExtraWheels") then
+		return
+	end
+	local marker = template:FindFirstChild("SeatMarker")
+	if not (marker and marker:IsA("BasePart")) then
+		return
+	end
+	local origin = template:GetPivot()
+	-- Vorlage → Welt über den Fahrersitz (sitzt genau auf dem SeatMarker)
+	local toWorld = seat.CFrame * origin:ToObjectSpace(marker.CFrame):Inverse()
+	local folder = Instance.new("Model")
+	folder.Name = "ExtraWheels"
+	local any = false
+	for _, extra in template:GetChildren() do
+		if not (extra:IsA("Model") and extra.Name:match("^WheelExtra")) then
+			continue
+		end
+		local bbox = extra:GetBoundingBox()
+		local center = origin:ToObjectSpace(bbox)
+		local centerCF = CFrame.new(center.Position) -- Achse = lokal X des Rahmens
+		local hub = Instance.new("Part")
+		hub.Name = `{extra.Name}Hub`
+		hub.Size = Vector3.new(0.4, 0.4, 0.4)
+		hub.Transparency = 1
+		hub.CanCollide = false
+		hub.CanTouch = false
+		hub.CanQuery = false
+		hub.Massless = true
+		hub.CFrame = toWorld * centerCF
+		hub.Parent = folder
+		for _, v in extra:GetDescendants() do
+			if v:IsA("BasePart") then
+				local c = v:Clone()
+				c.CFrame = toWorld * origin:ToObjectSpace(v.CFrame)
+				c.Anchored = false
+				c.CanCollide = false
+				c.CanTouch = false
+				c.CanQuery = false
+				c.Massless = true
+				c.Parent = folder
+				local w = Instance.new("WeldConstraint")
+				w.Part0 = hub
+				w.Part1 = c
+				w.Parent = c
+			end
+		end
+		local a0 = Instance.new("Attachment")
+		a0.Name = `{extra.Name}Axle`
+		a0.Parent = seat
+		a0.WorldCFrame = toWorld * centerCF
+		a0:SetAttribute("BaseCFrame", a0.CFrame)
+		a0:SetAttribute("Steers", center.Position.Z < 0)
+		local a1 = Instance.new("Attachment")
+		a1.Parent = hub
+		a1.WorldCFrame = toWorld * centerCF
+		local hinge = Instance.new("HingeConstraint")
+		hinge.Name = "Spin"
+		hinge.Attachment0 = a0
+		hinge.Attachment1 = a1
+		hinge.ActuatorType = Enum.ActuatorType.Motor
+		hinge.MotorMaxTorque = 1e5
+		hinge.AngularVelocity = 0
+		hinge.Parent = hub
+		any = true
+	end
+	if any then
+		folder.Parent = car
+		-- Mehr Haftung der echten Räder
+		local wheels = car:FindFirstChild("Wheels")
+		for _, w in (wheels and wheels:GetChildren()) or {} do
+			if w:IsA("BasePart") then
+				local pp = w.CurrentPhysicalProperties
+				w.CustomPhysicalProperties = PhysicalProperties.new(pp.Density, ROADTRAIN_TIRE_FRICTION, 0, 100, 1)
+			end
+		end
+	else
+		folder:Destroy()
+	end
+end
+
+-- Zusatzachsen nachführen: Drehzahl wie das nächste echte Rad, Lenkwinkel wie vorne links
+function VehicleModelBuilder.updateExtraWheels(car: Model)
+	local folder = car:FindFirstChild("ExtraWheels")
+	local seat = car:FindFirstChild("DriveSeat")
+	local wheels = car:FindFirstChild("Wheels")
+	if not (folder and seat and seat:IsA("BasePart") and wheels) then
+		return
+	end
+	local fl = wheels:FindFirstChild("FL")
+	local rl = wheels:FindFirstChild("RL")
+	if not (fl and fl:IsA("BasePart") and rl and rl:IsA("BasePart")) then
+		return
+	end
+	-- Lenkwinkel vorne aus der Radachse im Sitz-Rahmen
+	local axle = seat.CFrame:VectorToObjectSpace(fl.CFrame.RightVector)
+	if axle.X < 0 then
+		axle = -axle
+	end
+	local steer = math.atan2(-axle.Z, axle.X)
+	-- Raddrehung relativ zur Karosserie um die Radachse
+	local function spin(wheel: BasePart): number
+		local rel = wheel.AssemblyAngularVelocity - seat.AssemblyAngularVelocity
+		return rel:Dot(wheel.CFrame.RightVector)
+	end
+	local frontSpin, rearSpin = spin(fl), spin(rl)
+	local owner = nil
+	pcall(function()
+		owner = seat:GetNetworkOwner()
+	end)
+	for _, hub in folder:GetChildren() do
+		local hinge = hub:FindFirstChild("Spin")
+		if hinge and hinge:IsA("HingeConstraint") and hinge.Attachment0 then
+			local a0 = hinge.Attachment0 :: Attachment
+			local steers = a0:GetAttribute("Steers") == true
+			local base = a0:GetAttribute("BaseCFrame")
+			if typeof(base) == "CFrame" then
+				a0.CFrame = base * CFrame.Angles(0, if steers then steer * EXTRA_STEER_FACTOR else 0, 0)
+			end
+			-- Vorzeichen: Radachse von FL/RL zeigt je nach Seite anders herum
+			local ref = if steers then fl else rl
+			local w = if steers then frontSpin else rearSpin
+			local sign = if ref.CFrame.RightVector:Dot(seat.CFrame.RightVector) >= 0 then 1 else -1
+			hinge.AngularVelocity = w * sign
+			if hub:IsA("BasePart") then
+				pcall(function()
+					if hub:GetNetworkOwner() ~= owner then
+						hub:SetNetworkOwner(owner)
+					end
+				end)
+			end
+		end
+	end
+end
+
 -- Firmenfarbe und Firmenname anwenden (docs/07 §36–37)
 function VehicleModelBuilder.applyCompany(model: Model, accent: Color3?, companyName: string)
 	for _, d in model:GetDescendants() do
