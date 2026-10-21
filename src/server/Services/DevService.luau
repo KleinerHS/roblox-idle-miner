@@ -11,6 +11,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Log = require(ReplicatedStorage:WaitForChild("Shared").Util.Log)
 local BalanceConfig = require(ReplicatedStorage:WaitForChild("Shared").Config.BalanceConfig)
+local Vehicles = require(ReplicatedStorage:WaitForChild("Shared").Definitions.Vehicles)
 
 local DataSchema = require(script.Parent.Parent.Data.DataSchema)
 local DataService = require(script.Parent.DataService)
@@ -156,6 +157,32 @@ function DevService.Init()
 		return if ok then newId else "Profil nicht geladen"
 	end
 	giveVehicle.Parent = folder
+	-- Alle Fahrzeugtypen geben, die der Spieler noch nicht hat (Felix-Test):
+	--   game.ServerStorage.DevTools.GiveAllVehicles:Invoke(game.Players:GetPlayers()[1])
+	local giveAll = Instance.new("BindableFunction")
+	giveAll.Name = "GiveAllVehicles"
+	giveAll.OnInvoke = function(player: Player): string
+		local added = {}
+		local ok = DataService.Mutate(player, function(data)
+			local have: { [string]: boolean } = {}
+			for _, v in data.Vehicles.Owned do
+				have[v.Type] = true
+			end
+			for _, def in Vehicles.List do
+				if not have[def.Id] then
+					data.Vehicles.Seq += 1
+					local newId = `v{data.Vehicles.Seq}`
+					data.Vehicles.Owned[newId] = { Id = newId, Type = def.Id, Cargo = {} }
+					table.insert(added, `{def.Id}={newId}`)
+				end
+			end
+		end)
+		if not ok then
+			return "Profil nicht geladen"
+		end
+		return if #added > 0 then table.concat(added, ", ") else "alle Fahrzeuge schon vorhanden"
+	end
+	giveAll.Parent = folder
 	local takeVehicle = Instance.new("BindableFunction")
 	takeVehicle.Name = "TakeVehicle"
 	takeVehicle.OnInvoke = function(player: Player, vehicleId: string): string
