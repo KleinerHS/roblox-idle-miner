@@ -157,3 +157,14 @@ Nicht verschoben: eine Rohr-Aufhänger-Gruppe weit außerhalb der Halle (Workspa
 **Fix:** Tunes `vehicle_hauler`/`vehicle_roadtrain`: SteerInner 50, SteerOuter 45, SteerDecay 200, MinSteer 70; BrakeForce 12000, BrakeAccel 0.4, EBrakeForce 2500, PBrakeForce 6000 (Place, gesichert in `assets/AChassis.rbxm`). Anhängerräder hängen jetzt an Motor-Scharnieren ohne Kraft (frei rollend); beim Bremsen (S gegen die Fahrtrichtung) oder ohne Fahrer hält `TrailerBuilder.setBrake` sie fest.
 **Regression geprüft:** FH 540 im Play: von 37 Studs/s auf 0 in ~0,7 s (~13 Studs), Anhängerbremse greift nur beim Bremsen, danach normales Rückwärtsfahren; Wendekreis bei ~15 Studs/s etwa 30–40 Studs; keine Fehler in der Konsole.
 **Likely system:** Fahrzeuge (Fahrphysik)
+
+## BUG-014 – High-Roof Van wackelt, Kühlergrill fehlt, Lichter schwarz
+
+**Severity:** Medium
+**Status:** Fixed (TESTING_REQUIRED)
+**Build:** 0.46.1
+**Gemeldet:** Felix, 2026-10-21 („der High-Roof Van wackelt die ganze Zeit hin und her … außerdem fehlt der Kühlergrill“)
+**Ursache:** (1) Tune `vehicle_boxtruck` hatte mit 5,2 t dieselbe Federung/Dämpfung wie der 2,4-t-Cargo-Van → nach jedem Stoß schaukelte er lange seitlich (±1,5°, auch im Stand). (2) Im Modell war die Kühlergrill-Öffnung leer (Blick in den Motorraum). (3) Beim Abdunkeln der Scheiben (D-054) wurden Scheinwerfer-/Rücklichtgläser mit erfasst und schwarz.
+**Fix:** Federung vorne/hinten 42/46, Dämpfung 22,5/25 (im Stoßtest schwingt er nach ~0,8 s aus statt ~2 s, höhere Werte wurden instabil). Neuer Kühlergrill (`Body.Grille`, dunkler Rahmen mit Chromstreben). Lichtgläser wieder wie im Original. Dazu auf Felix' Wunsch: Scheiben des Ladebereichs überlackiert (Attribut `PaintedOver`), Markenlogo an der Hecktür entfernt (D-026).
+**Regression geprüft:** Geradeausfahrt bis 32 Studs/s ohne Schaukeln (Rollwinkel < 0,5°), Bremsen ruhig; Vorlage per Export/Rücktest gesichert.
+**Likely system:** Fahrzeuge (A-Chassis-Tune, Place-Vorlage)
