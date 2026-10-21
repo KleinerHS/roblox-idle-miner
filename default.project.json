@@ -15,6 +15,12 @@
         "$path": "src/client"
       }
     },
+    "MaterialService": {
+      "$ignoreUnknownInstances": true,
+      "RustyPickupPaint": {
+        "$path": "src/materials/RustyPickupPaint.model.json"
+      }
+    },
     "Workspace": {
       "$properties": {
         "StreamingEnabled": true

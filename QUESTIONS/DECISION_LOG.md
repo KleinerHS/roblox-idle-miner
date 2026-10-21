@@ -331,3 +331,9 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Source:** Felix, 2026-10-19 („weiter“ – Freigabe Lastzug-Schritt 1; 60 % Tempo: „ja“)
 **Decision:** Der Grain Road Train (`vehicle_roadtrain`) besteht aus der Zugmaschine (A-Chassis) und drei eigenen Physik-Modellen (Auflieger, Dolly, zweiter Auflieger) mit frei drehenden Rädern und Kugelgelenk-Kupplungen (Knicken bis 75°, Kippen bis 12°). Lastzüge stehen nicht in der Halle, sondern auf der Zufahrt neben dem Grundstück (eigener Platz, höchstens einer). Beladen Anhänger für Anhänger: Jeder Auflieger trägt die Hälfte, der vordere wird zuerst voll. Tempo per A-Chassis-Limiter 60 km/h (TODO_BALANCE). Im Autohaus bleibt er „Coming soon“, bis Felix ihn gefahren hat.
 **Affected systems:** TrailerBuilder, VehicleService, LoadingService, DevService, Vehicles, Place (VehicleBodies, AChassis.Tunes)
+
+## D-054 – Rostiger Pickup als Startauto (500 $), verdunkelte Scheiben bei allen Fahrzeugen
+
+**Source:** Felix, 2026-10-21 („das Auto … umbauen, es muss mehr ranzig und verrostet aussehen, es soll das Starterauto werden, das man für 500 $ im Shop bekommt, der Lack soll an manchen Stellen schon abplatzen; außerdem merk dir: alle Fahrzeuge sollen verdunkelte Scheiben haben“)
+**Decision:** `vehicle_pickup` bleibt das erste Fahrzeug (Level 7 wie die Garage), kostet 500 $. Optik: verblasster cremeweißer Lack mit abgeplatzten Stellen (eigene kachelbare Textur `assets/textures/rusty_pickup_paint.png`, erzeugt mit `tools/gen_rusty_paint.py`, hochgeladen als `rbxassetid://81833308405600`, MaterialVariant `RustyPickupPaint` über Rojo in `MaterialService`); Stoßstangen, Felgen, Spiegel, Kühlergrill rostbraun. Alle Fahrzeugscheiben sind undurchsichtig dunkel (Attribut `Window = true` an den Scheibenteilen); der Scania bekam eine fehlende Frontscheibe. Gilt auch für alle künftigen Fahrzeuge.
+**Affected systems:** Vehicles, Place (VehicleBodies), MaterialService, default.project.json

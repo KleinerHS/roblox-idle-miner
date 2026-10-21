@@ -746,6 +746,16 @@ Selbsttest (Play): FH 540 ausgeparkt, Fahrer hat Steuerung, fährt mit allen Anh
 
 Selbsttest (Play): FH 540 bremst von 37 Studs/s in ~0,7 s auf 0, danach normal rückwärts; Wendekreis bei langsamer Fahrt ~30–40 Studs. Offen: Freischalten beider Lastzüge im Autohaus nach Felix' Freigabe.
 
+### 18f (Version 0.45.0, 2026-10-21) – Rostiges Startauto, dunkle Scheiben (D-054)
+
+| System | Dateien / Instanzen | Status |
+|---|---|---|
+| Pickup kostet 500 $ (Startauto, Level 7) | `Definitions/Vehicles.luau` | TESTING_REQUIRED |
+| Pickup-Optik: verblasster Lack mit abgeplatzten Stellen und Rost, rostige Stoßstangen/Felgen/Anbauteile | Place: `VehicleBodies.vehicle_pickup`; `src/materials/RustyPickupPaint.model.json` (MaterialService), `tools/gen_rusty_paint.py`, `assets/textures/rusty_pickup_paint.png` | TESTING_REQUIRED |
+| Verdunkelte, undurchsichtige Scheiben bei allen sechs Fahrzeugen (Scania: Frontscheibe ergänzt) | Place: `VehicleBodies.*` (Attribut `Window`) | TESTING_REQUIRED |
+
+Selbsttest (Play): Pickup (v4) steht rostig in der Garage, Lack-Material und dunkle Scheiben kommen im Spiel an; alle Fahrzeugvorlagen in der Vorschau ohne Blick ins Innere.
+
 ## Phase 12 – Content Expansion – Details
 
 Schritte: 12a alle Minen/Erze/Barren über zentrale Kurven · 12b weitere Spitzhacken, Rucksäcke, Drills, Fahrzeuge, Ausbaustufen (offen).
