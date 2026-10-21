@@ -139,8 +139,13 @@ function TrailerBuilder.build(defId: string, cf: CFrame, tractorRoot: BasePart, 
 			a1.Parent = tire
 			a1.WorldCFrame = tire.CFrame
 			local hinge = Instance.new("HingeConstraint")
+			hinge.Name = "Axle"
 			hinge.Attachment0 = a0
 			hinge.Attachment1 = a1
+			-- Motor ohne Kraft = frei rollend; zum Bremsen hält er die Räder fest (setBrake)
+			hinge.ActuatorType = Enum.ActuatorType.Motor
+			hinge.AngularVelocity = 0
+			hinge.MotorMaxTorque = 0
 			hinge.Parent = tire
 			local visual = t:FindFirstChild(`Wheel{i}`)
 			if visual then
@@ -196,6 +201,20 @@ function TrailerBuilder.release(trailers: { Model }, hitchRoot: BasePart, hitchA
 		for _, d in m:GetDescendants() do
 			if d:IsA("BasePart") then
 				d.Anchored = false
+			end
+		end
+	end
+end
+
+-- Anhängerbremse (Felix 2026-10-21: „die Bremsen reagieren gefühlt gar nicht“): 0 = frei,
+-- 1 = Räder voll gebremst. Ohne Bremse schieben die Anhänger die Zugmaschine.
+local BRAKE_TORQUE = 3e4
+function TrailerBuilder.setBrake(trailers: { Model }, strength: number)
+	local torque = BRAKE_TORQUE * math.clamp(strength, 0, 1)
+	for _, m in trailers do
+		for _, d in m:GetDescendants() do
+			if d:IsA("HingeConstraint") and d.Name == "Axle" and d.MotorMaxTorque ~= torque then
+				d.MotorMaxTorque = torque
 			end
 		end
 	end

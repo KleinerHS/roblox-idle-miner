@@ -738,6 +738,14 @@ Offen: Im Autohaus noch „Coming soon“ bis Felix' Fahrtest; FH 540 (Tipper Ro
 | Frisch ausgeparkte Fahrzeuge: Fahrer wird erst eingesetzt, wenn A-Chassis bereit und das Fahrzeug beim Spieler geladen ist (vorher fuhr ein frisch ausgeparkter Lastzug nicht) | `VehicleService` (waitReady) | TESTING_REQUIRED |
 Selbsttest (Play): FH 540 ausgeparkt, Fahrer hat Steuerung, fährt mit allen Anhängern durch die Kurve vor dem Tor; unter dem Rüssel Auflieger 1 bis 12.500, dann „Trailer full · move forward“; Test-Erz wieder aus dem Lager genommen. Seitentor öffnet, wenn ein gefahrenes Fahrzeug davor steht (26 → 0,8 hoch), und schließt wieder; neben dem Pickup F gedrückt → sitzt am Steuer, Leertaste → ausgestiegen, Hinweis wieder da, auf den Sitz fallen → kein Einsteigen; Ladefeld liegt unter dem Rüssel; Stand-Lautstärke des Motors 0,017.
 
+### 18e (Version 0.44.4, 2026-10-21) – Fahrverhalten der Lastzüge (BUG-009 bis BUG-013)
+
+| System | Dateien / Instanzen | Status |
+|---|---|---|
+| Lastzüge mit A-Chassis ohne Federung, Allrad, 55 % vorne; mittlere Räder drehen/lenken mit (WheelExtra); größerer Lenkeinschlag (50/45°, Abbau erst ab hohem Tempo, min. 70 %); stärkere Bremsen; Anhängerräder bremsen mit (beim Bremsen und ohne Fahrer) | Place: `AChassis.Tunes.vehicle_hauler`/`vehicle_roadtrain` (Backup `assets/AChassis.rbxm`), `VehicleModelBuilder` (ExtraWheels), `TrailerBuilder.setBrake`, `VehicleService` | TESTING_REQUIRED |
+
+Selbsttest (Play): FH 540 bremst von 37 Studs/s in ~0,7 s auf 0, danach normal rückwärts; Wendekreis bei langsamer Fahrt ~30–40 Studs. Offen: Freischalten beider Lastzüge im Autohaus nach Felix' Freigabe.
+
 ## Phase 12 – Content Expansion – Details
 
 Schritte: 12a alle Minen/Erze/Barren über zentrale Kurven · 12b weitere Spitzhacken, Rucksäcke, Drills, Fahrzeuge, Ausbaustufen (offen).

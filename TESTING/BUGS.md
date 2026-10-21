@@ -146,3 +146,14 @@ Nicht verschoben: eine Rohr-Aufhänger-Gruppe weit außerhalb der Halle (Workspa
 **Fix:** Radoptik der mittleren Achsen in den Vorlagen als `WheelExtra{i}` abgetrennt (Place); nach dem Start von A-Chassis bekommt jede eine Nabe an einem Motor-Scharnier am Fahrersitz, `VehicleModelBuilder.updateExtraWheels` dreht sie so schnell wie das echte Rad (10×/s) und lenkt Achsen vor der Mitte mit 60 % des Vorderrad-Einschlags mit (FH 540 hat zwei Lenkachsen). Tunes der Lastzüge: Allradantrieb (50:50), Gewicht 55 % vorne.
 **Regression geprüft:** FH 540 im Play: mittlere Räder drehen mit (z. B. echtes Rad −20, Zusatzrad −23 rad/s), zweite Vorderachse lenkt mit (FL −17°, Zusatzachse −10°); Kurve bei ~27 Studs/s mit Gierrate 0,5 rad/s und Schlupf 3–12° statt Wegrutschen.
 **Likely system:** Fahrzeuge (Fahrphysik/Optik)
+
+## BUG-013 – Lastzug: Lenkeinschlag zu gering, Bremsen reagieren kaum
+
+**Severity:** Medium
+**Status:** Fixed (TESTING_REQUIRED)
+**Build:** 0.44.4
+**Gemeldet:** Felix, 2026-10-21 („der Lenkeinschlag ist zu gering und die Bremsen reagieren gefühlt gar nicht“)
+**Ursache:** Tunes der Lastzüge mit kleinem Lenkwinkel und starkem Abbau bei Tempo; Bremskraft für 8 t zu niedrig; die Anhänger rollten völlig frei und schoben die Zugmaschine beim Bremsen weiter.
+**Fix:** Tunes `vehicle_hauler`/`vehicle_roadtrain`: SteerInner 50, SteerOuter 45, SteerDecay 200, MinSteer 70; BrakeForce 12000, BrakeAccel 0.4, EBrakeForce 2500, PBrakeForce 6000 (Place, gesichert in `assets/AChassis.rbxm`). Anhängerräder hängen jetzt an Motor-Scharnieren ohne Kraft (frei rollend); beim Bremsen (S gegen die Fahrtrichtung) oder ohne Fahrer hält `TrailerBuilder.setBrake` sie fest.
+**Regression geprüft:** FH 540 im Play: von 37 Studs/s auf 0 in ~0,7 s (~13 Studs), Anhängerbremse greift nur beim Bremsen, danach normales Rückwärtsfahren; Wendekreis bei ~15 Studs/s etwa 30–40 Studs; keine Fehler in der Konsole.
+**Likely system:** Fahrzeuge (Fahrphysik)

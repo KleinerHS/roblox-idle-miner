@@ -713,14 +713,26 @@ function VehicleService.Start()
 		ringTouch[player] = nil
 	end)
 	task.spawn(doorLoop)
-	-- Zusatzachsen nachführen (Drehzahl, Lenkung)
+	-- Zusatzachsen nachführen (Drehzahl, Lenkung) und Anhängerbremse
 	task.spawn(function()
 		while true do
 			task.wait(0.1)
-			for _, list in spawned do
-				for _, model in list do
-					if model.Parent and model:FindFirstChild("ExtraWheels") then
+			for player, list in spawned do
+				for id, model in list do
+					if not model.Parent then
+						continue
+					end
+					if model:FindFirstChild("ExtraWheels") then
 						VehicleModelBuilder.updateExtraWheels(model)
+					end
+					local own = trailers[player]
+					local trailerList = own and own[id]
+					local seat = seatOf(model)
+					if trailerList and #trailerList > 0 and seat then
+						-- Bremsen: S/Pfeil runter bei Vorwärtsfahrt, ohne Fahrer Feststellbremse
+						local forward = seat.AssemblyLinearVelocity:Dot(seat.CFrame.LookVector)
+						local braking = (seat.Occupant == nil) or (seat.ThrottleFloat < -0.1 and forward > 1) or (seat.ThrottleFloat > 0.1 and forward < -1)
+						TrailerBuilder.setBrake(trailerList, if braking then 1 else 0)
 					end
 				end
 			end
