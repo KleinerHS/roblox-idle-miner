@@ -337,3 +337,9 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Source:** Felix, 2026-10-21 („das Auto … umbauen, es muss mehr ranzig und verrostet aussehen, es soll das Starterauto werden, das man für 500 $ im Shop bekommt, der Lack soll an manchen Stellen schon abplatzen; außerdem merk dir: alle Fahrzeuge sollen verdunkelte Scheiben haben“)
 **Decision:** `vehicle_pickup` bleibt das erste Fahrzeug (Level 7 wie die Garage), kostet 500 $. Optik: verblasster cremeweißer Lack mit abgeplatzten Stellen (eigene kachelbare Textur `assets/textures/rusty_pickup_paint.png`, erzeugt mit `tools/gen_rusty_paint.py`, hochgeladen als `rbxassetid://81833308405600`, MaterialVariant `RustyPickupPaint` über Rojo in `MaterialService`); Stoßstangen, Felgen, Spiegel, Kühlergrill rostbraun. Alle Fahrzeugscheiben sind undurchsichtig dunkel (Attribut `Window = true` an den Scheibenteilen); der Scania bekam eine fehlende Frontscheibe. Gilt auch für alle künftigen Fahrzeuge.
 **Affected systems:** Vehicles, Place (VehicleBodies), MaterialService, default.project.json
+
+## D-055 – Jedes Fahrzeug nur einmal
+
+**Source:** Felix, 2026-10-21 („man soll ein Auto nur einmal besitzen können“)
+**Decision:** Jeder Fahrzeugtyp kann nur einmal besessen werden. Das Autohaus prüft das bereits serverseitig (`ShopService.buyVehicle`, Fehler ALREADY_DONE) und zeigt „Owned“; jetzt verweigern auch die Dev-Kommandos `GiveVehicle`/`GiveAllVehicles` doppelte Typen.
+**Affected systems:** ShopService, DevService

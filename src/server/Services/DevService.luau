@@ -148,6 +148,15 @@ function DevService.Init()
 	local giveVehicle = Instance.new("BindableFunction")
 	giveVehicle.Name = "GiveVehicle"
 	giveVehicle.OnInvoke = function(player: Player, typeId: string): string
+		-- jedes Fahrzeug nur einmal (Felix 2026-10-21, wie im Autohaus)
+		local current = DataService.Get(player)
+		if current then
+			for id, v in current.Vehicles.Owned do
+				if v.Type == typeId then
+					return `schon vorhanden ({id})`
+				end
+			end
+		end
 		local newId = ""
 		local ok = DataService.Mutate(player, function(data)
 			data.Vehicles.Seq += 1
