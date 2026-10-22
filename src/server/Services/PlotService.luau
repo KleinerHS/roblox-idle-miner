@@ -14,6 +14,7 @@ local Log = require(Shared.Util.Log)
 
 local PlotBuilder = require(script.Parent.Parent.World.PlotBuilder)
 local EnvironmentBuilder = require(script.Parent.Parent.World.EnvironmentBuilder)
+local CenterBuilder = require(script.Parent.Parent.World.CenterBuilder)
 local HallLayout = require(script.Parent.Parent.World.HallLayout)
 local RemoteService = require(script.Parent.RemoteService)
 
@@ -100,7 +101,9 @@ function PlotService.Init()
 	if oldEnvironment then
 		oldEnvironment:Destroy()
 	end
-	EnvironmentBuilder.build(workspace)
+	local environment = EnvironmentBuilder.build(workspace)
+	-- Gestaltung der Map-Mitte (Promenade, Parkplätze, Park, Garten, Bäume; D-057)
+	CenterBuilder.build(environment)
 	-- Die Baseplate der Place-Datei liegt unter der Wiese; außerhalb davon soll sie nicht als graue
 	-- Fläche auffallen (nur zur Laufzeit, die Place-Datei bleibt unverändert)
 	local baseplate = workspace:FindFirstChild("Baseplate")

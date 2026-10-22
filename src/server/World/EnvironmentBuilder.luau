@@ -363,75 +363,6 @@ local function cabin(parent: Instance, index: number, pos: Vector2)
 	m.Parent = parent
 end
 
--- Parkplätze vor den Shops und Grüninseln in den freien Sektoren des Platzes (Referenzbild)
-local function plazaDressing(parent: Instance)
-	local folder = Instance.new("Folder")
-	folder.Name = "PlazaDressing"
-	folder.Parent = parent
-	local cfg = LayoutConfig
-	local c = cfg.MapCenter
-	local rng = Random.new(cfg.Environment.Seed + 7)
-	-- Parkplatz vor einem Shop: Asphalt mit weißen Stellplatzlinien, quer zur Blickrichtung
-	local function parking(name: string, shop: { Offset: Vector2, Size: Vector3 }, stalls: number)
-		local pos = Vector3.new(c.X + shop.Offset.X, TOP, c.Z + shop.Offset.Y)
-		local toCenter = (Vector3.new(c.X, TOP, c.Z) - pos).Unit
-		local frontDist = shop.Size.Z / 2 + 12 + 9
-		local lotCF = CFrame.lookAt(pos + toCenter * frontDist, pos + toCenter * (frontDist + 1))
-		local width = stalls * 4.6
-		part(folder, `{name}Lot`, Vector3.new(width + 2, 0.08, 18), lotCF * CFrame.new(0, 0.04, 0), Color3.fromRGB(64, 66, 70), Enum.Material.Asphalt).CanCollide = false
-		for i = 0, stalls do
-			local line = part(folder, `{name}Stall{i}`, Vector3.new(0.3, 0.04, 9), lotCF * CFrame.new(-width / 2 + i * 4.6, 0.1, 4), LINE_WHITE, Enum.Material.SmoothPlastic)
-			line.CanCollide = false
-		end
-		local back = part(folder, `{name}BackLine`, Vector3.new(width, 0.04, 0.3), lotCF * CFrame.new(0, 0.1, 8.5), LINE_WHITE, Enum.Material.SmoothPlastic)
-		back.CanCollide = false
-	end
-	parking("VehicleShop", cfg.VehicleShop, 6)
-	parking("MachineShop", cfg.MachineShop, 5)
-	parking("EquipmentShop", cfg.EquipmentShop, 5)
-	-- Baumreihe am Platzrand, ausgenommen Straßeneinmündungen und Shops
-	local function angleFree(deg: number): boolean
-		local function near(target: number, width: number): boolean
-			local d = math.abs(((deg - target + 180) % 360) - 180)
-			return d < width
-		end
-		for _, roadAngle in cfg.PlotAngles do
-			if near(roadAngle, 11) then
-				return false
-			end
-		end
-		return true
-	end
-	for deg = 0, 359, 9 do
-		if angleFree(deg) then
-			local a = math.rad(deg)
-			local r = cfg.CenterPlazaRadius - 9
-			local tx, tz = c.X + math.cos(a) * r, c.Z - math.sin(a) * r
-			part(folder, `EdgePlanter{deg}`, Vector3.new(5, 1, 5), CFrame.new(tx, TOP + 0.5, tz) * CFrame.Angles(0, a, 0), WOOD, Enum.Material.WoodPlanks)
-			part(folder, `EdgePlanterSoil{deg}`, Vector3.new(4.4, 0.2, 4.4), CFrame.new(tx, TOP + 1.05, tz) * CFrame.Angles(0, a, 0), GRASS_DARK, Enum.Material.Grass)
-			pine(folder, 3000 + deg, Vector3.new(tx, TOP + 1, tz), rng:NextNumber(0.55, 0.75), rng)
-		end
-	end
-	-- Grüninseln mit Bäumen, Felsen, Bank und Laterne
-	for i, angle in { 120, 240 } do
-		local a = math.rad(angle)
-		local ix, iz = c.X + math.cos(a) * 105, c.Z - math.sin(a) * 105
-		disc(folder, `Island{i}Curb`, 21, 0.5, ix, iz, TOP + 0.45, PAVING_DARK, Enum.Material.Concrete)
-		disc(folder, `Island{i}`, 20, 0.5, ix, iz, TOP + 0.5, GRASS, Enum.Material.Grass)
-		for t = 1, 4 do
-			local ta = rng:NextNumber(0, math.pi * 2)
-			local tr = rng:NextNumber(4, 14)
-			pine(folder, 2000 + i * 10 + t, Vector3.new(ix + math.cos(ta) * tr, TOP + 0.5, iz + math.sin(ta) * tr), rng:NextNumber(0.7, 1.1), rng)
-		end
-		boulder(folder, `Island{i}Rock`, Vector3.new(ix + rng:NextNumber(-8, 8), TOP + 0.5, iz + rng:NextNumber(-8, 8)), rng:NextNumber(2.5, 4), rng)
-		local toCenter = -a + math.rad(90)
-		local bench = CFrame.new(ix - math.cos(a) * 16, TOP + 0.5, iz + math.sin(a) * 16) * CFrame.Angles(0, toCenter + math.rad(180), 0)
-		part(folder, `Island{i}BenchSeat`, Vector3.new(5, 0.3, 1.6), bench * CFrame.new(0, 1.5, 0), WOOD, Enum.Material.Wood)
-		part(folder, `Island{i}BenchBack`, Vector3.new(5, 1.4, 0.3), bench * CFrame.new(0, 2.3, 0.75), WOOD, Enum.Material.Wood)
-		streetLamp(folder, `Island{i}Lamp`, CFrame.new(ix - math.cos(a) * 18 + 4, TOP + 0.5, iz + math.sin(a) * 18) * CFrame.Angles(0, toCenter, 0))
-	end
-end
-
 -- Wasserturm (hinter dem Machine-Shop) und Windrad (hinter dem Fahrzeughaus), wie im Referenzbild
 local function landmarks(parent: Instance)
 	local folder = Instance.new("Folder")
@@ -550,7 +481,6 @@ function EnvironmentBuilder.build(parent: Instance): Folder
 	for i, pos in env.Cabins do
 		cabin(folder, i, pos)
 	end
-	plazaDressing(folder)
 	landmarks(folder)
 
 	folder.Parent = parent

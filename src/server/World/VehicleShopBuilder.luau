@@ -94,7 +94,11 @@ function VehicleShopBuilder.build(parent: Instance): Model
 	local center = LayoutConfig.MapCenter
 	local pos = Vector3.new(center.X + cfg.Offset.X, LayoutConfig.GroundY + 1, center.Z + cfg.Offset.Y)
 	-- LookVector (= lokale -Z, Eingang) zeigt zur Platzmitte
-	local o = CFrame.lookAt(pos, Vector3.new(center.X, pos.Y, center.Z))
+	-- D-057: mit SectorAngle parallel zum Sektor ausgerichtet (Eingang zum Kreisverkehr)
+	local sector = (cfg :: any).SectorAngle
+	local o = if typeof(sector) == "number"
+		then CFrame.lookAt(pos, pos - Vector3.new(math.cos(math.rad(sector)), 0, -math.sin(math.rad(sector))))
+		else CFrame.lookAt(pos, Vector3.new(center.X, pos.Y, center.Z))
 
 	local W, H, D = cfg.Size.X, cfg.Size.Y, cfg.Size.Z
 	local hw, hd = W / 2, D / 2

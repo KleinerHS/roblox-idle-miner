@@ -153,19 +153,23 @@ local LayoutConfig = {
 	-- Equipment-Shop in der Mitte (CENTRAL_AREA_REFERENCE.png: links, blau).
 	-- Position relativ zu MapCenter; Eingang zeigt zur Platzmitte. TODO_LAYOUT
 	EquipmentShop = {
-		Offset = Vector2.new(-150, 0),
+		-- D-057: mittig zwischen den Straßen, Parkplatz davor
+		Offset = Vector2.new(-145, 46),
+		SectorAngle = 180,
 		Size = Vector3.new(40, 16, 30),
 	},
 	-- Machine-Shop in der Mitte (CENTRAL_AREA_REFERENCE.png: hinten, orange). Liegt zwischen
 	-- den Straßen zu Plot 2 und Plot 3; Rolltor zeigt zur Platzmitte. TODO_LAYOUT
 	MachineShop = {
-		Offset = Vector2.new(80, -139),
+		Offset = Vector2.new(35, -153), -- D-057
+		SectorAngle = 60,
 		Size = Vector3.new(52, 18, 40),
 	},
 	-- Fahrzeughaus in der Mitte (CENTRAL_AREA_REFERENCE.png: rechts, rot). Liegt zwischen den
 	-- Straßen zu Plot 3 und Plot 4; Glasfront zeigt zur Platzmitte. TODO_LAYOUT
 	VehicleShop = {
-		Offset = Vector2.new(185, 0),
+		Offset = Vector2.new(164, -46), -- D-057
+		SectorAngle = 0,
 		-- Großer Glas-Showroom (D-027): Breite, Höhe, Tiefe. Phase 12c: Platz für 6 Fahrzeuge
 		-- in zwei Reihen (Felix); bleibt innerhalb des Platzes (CenterPlazaRadius) und frei
 		-- vom Machine-Shop.
@@ -224,6 +228,25 @@ local LayoutConfig = {
 	RoundaboutInner = 40,
 	RoundaboutOuter = 64,
 	RoadWidth = 28,
+
+	-- Gestaltung der Mitte (D-057, CenterBuilder): Promenade um den Kreisverkehr, Gehwege,
+	-- Parkplätze, Park mit Teich, Garten mit Pavillon, Bäume. Winkel wie PlotAngles. TODO_LAYOUT
+	Center = {
+		Seed = 77,
+		PromenadeOuter = 82,
+		FenceRadius = 272,
+		SidewalkWidth = 5,
+		ShopLotStalls = 12,
+		BigLotAngle = -60,
+		BigLotDoubleRows = 3,
+		BigLotMaxStalls = 16,
+		PondAngle = 120,
+		GardenAngle = -120,
+		TreeCount = 200,
+		BushCount = 220,
+		AlleySpacing = 22,
+		RockCount = 24,
+	},
 }
 
 return table.freeze(LayoutConfig)

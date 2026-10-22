@@ -766,7 +766,15 @@ Selbsttest (Play): Pickup (v4) steht rostig in der Garage, Lack-Material und dun
 
 Selbsttest (Play): zu Fuß mit 200 Erz im Rucksack in den Kreis → 1.523 $ + XP, Einblendung; Cargo Van mit 300 Kohle mit ~47 Studs/s durch den Kreis → sofort verkauft (300 $), Ladung 0, keine Fehler.
 
-## Phase 12 – Content Expansion – Details
+### 18h (Version 0.47.0, 2026-10-22) – Neue Map-Mitte (D-057)
+
+| System | Dateien / Instanzen | Status |
+|---|---|---|
+| Mitte neu: Wiese, Zaun, Promenade um den Kreisverkehr, Gehwege mit Laternen und Baumalleen, Park mit Teich, Garten mit Pavillon, Bäume/Büsche/Blumen/Felsen | `World/CenterBuilder.luau`, `LayoutConfig.Center`, `PlotService` | TESTING_REQUIRED |
+| Großer Parkplatz (3 Doppelreihen) und Parkplätze vor den drei Shops | `CenterBuilder` | TESTING_REQUIRED |
+| Shops mittig zwischen den Straßen, parallel zum Sektor, mit Vorplatz | `LayoutConfig` (Offsets, SectorAngle), `*ShopBuilder` | TESTING_REQUIRED |
+
+Selbsttest (Play): Mitte von oben und aus der Perspektive geprüft, keine Teile auf Straßen/Kreisverkehr, Verkaufskreis weiter in der Map-Mitte, keine Fehler in der Konsole.
 
 Schritte: 12a alle Minen/Erze/Barren über zentrale Kurven · 12b weitere Spitzhacken, Rucksäcke, Drills, Fahrzeuge, Ausbaustufen (offen).
 
