@@ -32,6 +32,8 @@ export type VehicleDefinition = {
 	Showroom: boolean?,
 	-- false = sichtbar, aber noch nicht kaufbar (Lastzüge warten auf die Anhänger-Technik)
 	Available: boolean?,
+	-- "truck" = wird im LKW-Laden verkauft und ausgestellt (D-058), sonst im Autohaus
+	Dealer: string?,
 }
 
 -- Karosserien seit 2026-10-18 aus Felix' Modellen (ServerStorage.Vendor.VehicleBodies, D-048).
@@ -85,6 +87,7 @@ local list: { VehicleDefinition } = {
 	{
 		Id = "vehicle_truck",
 		DisplayName = "Box Truck",
+		Dealer = "truck",
 		Tier = 4,
 		Style = "Truck",
 		RequiredLevel = 25, -- TODO_BALANCE (Q-028)
@@ -98,6 +101,7 @@ local list: { VehicleDefinition } = {
 	{
 		Id = "vehicle_hauler",
 		DisplayName = "Tipper Road Train",
+		Dealer = "truck",
 		Tier = 5,
 		Available = false, -- im Autohaus erst nach Fahrtest freigeben (PLANS/ROAD_TRAINS.md); per DevTool GiveVehicle testbar
 		Style = "Hauler",
@@ -112,6 +116,7 @@ local list: { VehicleDefinition } = {
 	{
 		Id = "vehicle_roadtrain",
 		DisplayName = "Grain Road Train",
+		Dealer = "truck",
 		Tier = 6,
 		Style = "Hauler",
 		RequiredLevel = 65, -- TODO_BALANCE

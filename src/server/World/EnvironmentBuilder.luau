@@ -109,6 +109,15 @@ local function makeBlockers(lakes: { Vector3 }): { Blocker }
 			end
 			return false
 		end,
+		-- LKW-Laden mit Vorplatz und Zufahrt (D-058)
+		function(p)
+			local t = cfg.TruckShop
+			local pos = Vector3.new(cfg.MapCenter.X + t.Offset.X, p.Y, cfg.MapCenter.Z + t.Offset.Y)
+			local a = math.rad(t.SectorAngle)
+			local o = CFrame.lookAt(pos, pos - Vector3.new(math.cos(a), 0, -math.sin(a)))
+			local l = o:PointToObjectSpace(p)
+			return math.abs(l.X) < t.Size.X / 2 + 22 and l.Z < t.Size.Z / 2 + 16 and l.Z > -t.Size.Z / 2 - 24 - t.DrivewayLength
+		end,
 		-- Platz in der Mitte
 		function(p)
 			return Vector2.new(p.X - cfg.MapCenter.X, p.Z - cfg.MapCenter.Z).Magnitude < cfg.CenterPlazaRadius + 14

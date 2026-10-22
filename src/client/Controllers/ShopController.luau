@@ -45,6 +45,7 @@ local SHOP_TABS: { [string]: { { string } } } = {
 	equipment = { { "pickaxe", TEXT.Pickaxes }, { "backpack", TEXT.Backpacks } },
 	machine = { { "drill", TEXT.Drills }, { "conveyor", TEXT.Conveyors } },
 	vehicle = { { "vehicle", TEXT.Vehicles } },
+	truck = { { "truck", TEXT.Trucks } },
 }
 
 local TAB_ICONS: { [string]: string } = {
@@ -53,12 +54,14 @@ local TAB_ICONS: { [string]: string } = {
 	drill = "Drill",
 	conveyor = "Conveyor",
 	vehicle = "Vehicle",
+	truck = "Vehicle",
 }
 
 local SHOP_TITLES: { [string]: string } = {
 	equipment = TEXT.EquipmentTitle,
 	machine = TEXT.MachineTitle,
 	vehicle = TEXT.VehicleTitle,
+	truck = TEXT.TruckTitle,
 }
 local openedAt: Vector3? = nil
 local busy = false
@@ -107,8 +110,12 @@ local function cardsFor(tab: string, snapshot: Types.StateSnapshot): { Card }
 				},
 			})
 		end
-	elseif tab == "vehicle" then
+	elseif tab == "vehicle" or tab == "truck" then
 		for _, def in Vehicles.List do
+			-- Autohaus und LKW-Laden zeigen jeweils ihre Fahrzeuge (D-058)
+			if (def.Dealer == "truck") ~= (tab == "truck") then
+				continue
+			end
 			table.insert(cards, {
 				Id = def.Id,
 				Name = def.DisplayName,
@@ -188,7 +195,7 @@ local function act(remote: string, itemId: string)
 	local result = if remote == "BuyMachine" or remote == "BuyVehicle" then Net.invoke(remote, itemId) else Net.invoke(remote, currentTab, itemId)
 	busy = false
 	if not result.success then
-		local def: any = if currentTab == "pickaxe" then Pickaxes.Get(itemId) elseif currentTab == "drill" then Drills.Get(itemId) elseif currentTab == "conveyor" then Conveyors.Get(itemId) elseif currentTab == "vehicle" then Vehicles.Get(itemId) else Backpacks.Get(itemId)
+		local def: any = if currentTab == "pickaxe" then Pickaxes.Get(itemId) elseif currentTab == "drill" then Drills.Get(itemId) elseif currentTab == "conveyor" then Conveyors.Get(itemId) elseif currentTab == "vehicle" or currentTab == "truck" then Vehicles.Get(itemId) else Backpacks.Get(itemId)
 		NotificationController.Show("Warning", result.code, { Level = def and def.RequiredLevel, Price = def and def.Price })
 	end
 end
@@ -209,7 +216,7 @@ local function render()
 		return
 	end
 	local owned: { [string]: boolean } = if currentTab == "pickaxe" then snapshot.OwnedPickaxes elseif currentTab == "backpack" then snapshot.OwnedBackpacks else {}
-	if currentTab == "vehicle" then
+	if currentTab == "vehicle" or currentTab == "truck" then
 		for _, vehicle in snapshot.Vehicles do
 			owned[vehicle.Type] = true
 		end
@@ -271,7 +278,7 @@ local function render()
 				actionColor = if affordable then UITheme.Colors.Positive else UITheme.Colors.SurfaceRaised
 				enabled, remote = true, "BuyMachine"
 			end
-		elseif currentTab == "vehicle" then
+		elseif currentTab == "vehicle" or currentTab == "truck" then
 			-- Fahrzeuge: einmal kaufen, danach in der Garage am Ring ausparken
 			if isOwned then
 				actionText, actionColor, enabled = TEXT.Owned, UITheme.Colors.Positive, false

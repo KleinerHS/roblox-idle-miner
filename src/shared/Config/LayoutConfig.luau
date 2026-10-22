@@ -177,6 +177,16 @@ local LayoutConfig = {
 		-- Höchstzahl ausgestellter Fahrzeuge (zwei Reihen à drei)
 		DisplaySlots = 6,
 	},
+	-- LKW-Laden etwas außerhalb der Mitte (D-058): hinter dem großen Parkplatz, Eingang zur Mitte,
+	-- fünf Stellplätze für Lastzüge mit allen Anhängern (alle LKW + 2 frei). Zufahrt zum Parkplatz.
+	TruckShop = {
+		Offset = Vector2.new(235, 315),
+		SectorAngle = -60,
+		Size = Vector3.new(112, 26, 132),
+		Bays = 5,
+		DrivewayLength = 130,
+		DrivewayWidth = 20,
+	},
 	-- Maximale Entfernung zum Lager-Terminal
 	StorageTerminalDistance = 14,
 	-- Maximale Entfernung zum Shop-Tresen

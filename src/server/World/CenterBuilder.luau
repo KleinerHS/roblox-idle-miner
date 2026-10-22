@@ -401,7 +401,7 @@ local function fence(parent: Instance)
 	for i = 1, segments do
 		local a = (i - 0.5) / segments * math.pi * 2
 		local p = Vector3.new(c.X + math.cos(a) * R, TOP, c.Z + math.sin(a) * R)
-		if spokeDistance(p) < cfg.RoadWidth / 2 + cfg.Center.SidewalkWidth + 2 then
+		if spokeDistance(p) < cfg.RoadWidth / 2 + cfg.Center.SidewalkWidth + 2 or inRect(p) then
 			continue
 		end
 		local cf = CFrame.new(p) * CFrame.Angles(0, -a, 0)
@@ -473,6 +473,14 @@ function CenterBuilder.build(parent: Instance): Folder
 			flowerBed(folder, "ShopBed", front * CFrame.new(sx * (shop.Size.X / 2 - 4), 0, 1), 6, 2, rng)
 		end
 		occupy(front, Vector2.new(shop.Size.X, 8), 1)
+	end
+	-- Zufahrt zum LKW-Laden (D-058) bleibt frei, auch am Zaun
+	do
+		local t = cfg.TruckShop
+		local pos = Vector3.new(c.X + t.Offset.X, TOP, c.Z + t.Offset.Y)
+		local o = CFrame.lookAt(pos, pos - sectorFrame(t.SectorAngle).LookVector)
+		local len = t.DrivewayLength + 24
+		occupy(o * CFrame.new(0, 0, -t.Size.Z / 2 - len / 2), Vector2.new(t.DrivewayWidth, len), 3)
 	end
 	for _, pos in cfg.Environment.Cabins do
 		occupy(CFrame.new(c.X + pos.X, TOP, c.Z + pos.Y), Vector2.new(24, 24), 2)

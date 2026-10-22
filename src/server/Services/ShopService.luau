@@ -27,6 +27,7 @@ local RareDropLogic = require(Shared.Util.RareDropLogic)
 local EquipmentShopBuilder = require(script.Parent.Parent.World.EquipmentShopBuilder)
 local MachineShopBuilder = require(script.Parent.Parent.World.MachineShopBuilder)
 local VehicleShopBuilder = require(script.Parent.Parent.World.VehicleShopBuilder)
+local TruckShopBuilder = require(script.Parent.Parent.World.TruckShopBuilder)
 local DataService = require(script.Parent.DataService)
 local MiningService = require(script.Parent.MiningService)
 local WorkerService = require(script.Parent.WorkerService)
@@ -227,7 +228,7 @@ local function buyVehicle(player: Player, typeId: unknown)
 	if not data then
 		return Result.err(Result.Codes.DATA_NOT_LOADED)
 	end
-	if not isNearShop(player, "vehicle") then
+	if not isNearShop(player, if def.Dealer == "truck" then "truck" else "vehicle") then
 		return Result.err(Result.Codes.TOO_FAR)
 	end
 	for _, owned in data.Vehicles.Owned do
@@ -272,6 +273,8 @@ function ShopService.Init()
 	counters.machine = machineShop:FindFirstChild("CounterPromptPart") :: BasePart
 	local vehicleShop = VehicleShopBuilder.build(center :: Instance)
 	counters.vehicle = vehicleShop:FindFirstChild("CounterPromptPart") :: BasePart
+	local truckShop = TruckShopBuilder.build(center :: Instance)
+	counters.truck = truckShop:FindFirstChild("CounterPromptPart") :: BasePart
 
 	RemoteService.OnInvoke("BuyLuck", function(player: Player)
 		-- Nächstes Mining-Luck-Level am Laptop (D-045, Felix 2026-10-18: „in den Laptop verschieben“)
