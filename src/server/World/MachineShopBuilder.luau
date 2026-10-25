@@ -16,6 +16,7 @@ local LayoutConfig = require(Shared.Config.LayoutConfig)
 local Drills = require(Shared.Definitions.Drills)
 
 local DrillModelBuilder = require(script.Parent.DrillModelBuilder)
+local ShopDecor = require(script.Parent.ShopDecor)
 
 local MachineShopBuilder = {}
 
@@ -123,7 +124,7 @@ function MachineShopBuilder.build(parent: Instance): Model
 
 	-- Front mit großem offenem Rolltor (docs/10 §26: große Hallentore)
 	local front = -D / 2 + t / 2
-	local doorW, doorH = 20, 12
+	local doorW, doorH = 28, 16
 	local sideW = (W - doorW) / 2
 	for _, side in { 1, -1 } do
 		local x = side * (doorW / 2 + sideW / 2)
@@ -157,6 +158,38 @@ function MachineShopBuilder.build(parent: Instance): Model
 	local sign = part(model, "Sign", Vector3.new(24, 4, 0.5), o * CFrame.new(0, H - 2.4, -D / 2 - 0.5), STEEL_DARK, Enum.Material.SmoothPlastic)
 	surfaceText(sign, "⚙  MACHINES", ORANGE)
 	part(model, "SignFrame", Vector3.new(24.6, 4.6, 0.3), o * CFrame.new(0, H - 2.4, -D / 2 - 0.3), ORANGE_DARK, Enum.Material.Metal)
+
+	-- Einladend (D-060): Dachschild, Vordach, Strahler, Fahnen, Pflanzen, Drill im Schaufenster draußen
+	ShopDecor.roofSign(model, "RoofSign", o * CFrame.new(0, H + 5, -D / 2 + 2), W * 0.7, 6.4, "⚙ DRILLS & MACHINES", ORANGE, WHITE, STEEL_DARK)
+	ShopDecor.awning(model, "DoorAwning", o * CFrame.new(0, doorH + 2.4, -D / 2 - 0.5), doorW + 8, 5, ORANGE, STEEL_DARK)
+	for k = -2, 2 do
+		local x = k * (W / 5)
+		if math.abs(x) > doorW / 2 + 2 then
+			part(model, `FloodArm{k}`, Vector3.new(0.3, 0.3, 2), o * CFrame.new(x, H - 6, -D / 2 - 1), STEEL_DARK, Enum.Material.Metal)
+			local head = part(model, `Flood{k}`, Vector3.new(1.4, 0.9, 1), o * CFrame.new(x, H - 6.3, -D / 2 - 2) * CFrame.Angles(math.rad(-35), 0, 0), LIGHT, Enum.Material.Neon)
+			head.CastShadow = false
+			local light = Instance.new("SpotLight")
+			light.Face = Enum.NormalId.Bottom
+			light.Range = 20
+			light.Angle = 70
+			light.Brightness = 1.2
+			light.Color = LIGHT
+			light.Parent = head
+		end
+	end
+	for _, side in { -1, 1 } do
+		ShopDecor.flag(model, `Flag{side}`, o * CFrame.new(side * (W / 2 + 3), 0, -D / 2 - 2), if side > 0 then ORANGE else STEEL_DARK)
+		ShopDecor.planter(model, `DoorPlanter{side}`, o * CFrame.new(side * (doorW / 2 + 2.5), 0.6, -D / 2 - 2), 2.6)
+	end
+	do
+		local showDef = Drills.List[math.min(#Drills.List, 3)]
+		local top = ShopDecor.podium(model, "Showcase", o * CFrame.new(W / 2 - 10, 0, -D / 2 - 6), 3.2, ORANGE, H - 2)
+		local show = DrillModelBuilder.build(showDef, top * CFrame.new(0, 0.2, 0))
+		show.Name = "ShowcaseDrill"
+		show.Parent = model
+		local plate = part(model, "ShowcasePlate", Vector3.new(5, 1.2, 0.2), top * CFrame.new(0, -0.4, -3.5) * CFrame.Angles(math.rad(-20), 0, 0), STEEL_DARK, Enum.Material.SmoothPlastic)
+		surfaceText(plate, showDef.DisplayName:upper(), WHITE)
+	end
 
 	-- Maschinenplattform in der Mitte mit allen drei Drills (Rückmeldung Felix 2026-10-10)
 	local platform = Instance.new("Folder")

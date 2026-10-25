@@ -154,16 +154,18 @@ local LayoutConfig = {
 	-- Position relativ zu MapCenter; Eingang zeigt zur Platzmitte. TODO_LAYOUT
 	EquipmentShop = {
 		-- D-057: mittig zwischen den Straßen, Parkplatz davor
-		Offset = Vector2.new(-167, 46),
+		Offset = Vector2.new(-171, 46),
 		SectorAngle = 180,
-		Size = Vector3.new(40, 16, 30),
+		-- D-060: größer und einladender (vorher 40 × 16 × 30)
+		Size = Vector3.new(64, 22, 44),
 	},
 	-- Machine-Shop in der Mitte (CENTRAL_AREA_REFERENCE.png: hinten, orange). Liegt zwischen
 	-- den Straßen zu Plot 2 und Plot 3; Rolltor zeigt zur Platzmitte. TODO_LAYOUT
 	MachineShop = {
-		Offset = Vector2.new(46.2, -172), -- D-057, Kreisel größer (2026-10-25)
+		Offset = Vector2.new(48.2, -175.4), -- D-057/D-060
 		SectorAngle = 60,
-		Size = Vector3.new(52, 18, 40),
+		-- D-060: größer und einladender (vorher 52 × 18 × 40)
+		Size = Vector3.new(72, 24, 54),
 	},
 	-- Fahrzeughaus in der Mitte (CENTRAL_AREA_REFERENCE.png: rechts, rot). Liegt zwischen den
 	-- Straßen zu Plot 3 und Plot 4; Glasfront zeigt zur Platzmitte. TODO_LAYOUT

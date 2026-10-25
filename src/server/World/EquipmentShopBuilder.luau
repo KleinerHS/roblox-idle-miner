@@ -16,6 +16,8 @@ local LayoutConfig = require(Shared.Config.LayoutConfig)
 local Pickaxes = require(Shared.Definitions.Pickaxes)
 local Backpacks = require(Shared.Definitions.Backpacks)
 
+local ShopDecor = require(script.Parent.ShopDecor)
+
 local EquipmentShopBuilder = {}
 
 local BLUE = Color3.fromRGB(44, 92, 170)
@@ -110,22 +112,73 @@ function EquipmentShopBuilder.build(parent: Instance): Model
 
 	-- Front mit Eingang und Schaufenstern
 	local front = -D / 2 + t / 2
-	local doorW, doorH = 9, 10
+	local doorW, doorH = 12, 12
 	local sideW = (W - doorW) / 2
 	for _, side in { 1, -1 } do
 		local x = side * (doorW / 2 + sideW / 2)
 		part(model, `FrontBase{side}`, Vector3.new(sideW, 2.6, t), o * CFrame.new(x, 1.3, front), BLUE_DARK, Enum.Material.Metal)
-		local glass = part(model, `Window{side}`, Vector3.new(sideW - 2, 7, 0.3), o * CFrame.new(x, 6.1, front), GLASS, Enum.Material.Glass)
+		-- große Schaufenster (D-060)
+		local glass = part(model, `Window{side}`, Vector3.new(sideW - 2, 10, 0.3), o * CFrame.new(x, 7.6, front), GLASS, Enum.Material.Glass)
 		glass.Transparency = 0.4
-		part(model, `FrontUpper{side}`, Vector3.new(sideW, H - 9.6, t), o * CFrame.new(x, 9.6 + (H - 9.6) / 2, front), BLUE, Enum.Material.Metal)
+		for _, dy in { -5.2, 5.2 } do
+			part(model, `WindowFrame{side}_{dy}`, Vector3.new(sideW - 1.4, 0.5, 0.5), o * CFrame.new(x, 7.6 + dy, front - 0.1), WHITE, Enum.Material.SmoothPlastic)
+		end
+		for _, dx in { -1, 1 } do
+			part(model, `WindowPost{side}_{dx}`, Vector3.new(0.5, 10.9, 0.5), o * CFrame.new(x + dx * (sideW / 2 - 0.95), 7.6, front - 0.1), WHITE, Enum.Material.SmoothPlastic)
+		end
+		part(model, `FrontUpper{side}`, Vector3.new(sideW, H - 12.6, t), o * CFrame.new(x, 12.6 + (H - 12.6) / 2, front), BLUE, Enum.Material.Metal)
+		ShopDecor.awning(model, `WindowAwning{side}`, o * CFrame.new(x, 13.4, front - 0.5), sideW - 1, 4.5, BLUE, WHITE)
 		part(model, `DoorPost{side}`, Vector3.new(0.8, doorH, 1), o * CFrame.new(side * (doorW / 2 + 0.4), doorH / 2, front), BLUE_DARK, Enum.Material.Metal)
 	end
 	part(model, "DoorHeader", Vector3.new(doorW + 1.6, H - doorH, t), o * CFrame.new(0, doorH + (H - doorH) / 2, front), BLUE, Enum.Material.Metal)
 
 	part(model, "Roof", Vector3.new(W + 2, 0.8, D + 2), o * CFrame.new(0, H + 0.4, 0), ROOF, Enum.Material.Metal)
-	local sign = part(model, "Sign", Vector3.new(22, 4, 0.5), o * CFrame.new(0, H - 2.8, -D / 2 - 0.4), BLUE_DARK, Enum.Material.SmoothPlastic)
-	surfaceText(sign, "⛏  EQUIPMENT", WHITE)
+	local sign = part(model, "Sign", Vector3.new(W * 0.6, 4, 0.5), o * CFrame.new(0, H - 3.4, -D / 2 - 0.4), BLUE_DARK, Enum.Material.SmoothPlastic)
+	surfaceText(sign, "PICKAXES · BACKPACKS", WHITE)
 	part(model, "Awning", Vector3.new(doorW + 6, 0.4, 4), o * CFrame.new(0, doorH + 0.8, -D / 2 - 2) * CFrame.Angles(math.rad(-8), 0, 0), BLUE_DARK, Enum.Material.Metal)
+
+	-- Einladend (D-060): großes Dachschild, Riesen-Spitzhacke, Fahnen, Pflanzen, Bank
+	ShopDecor.roofSign(model, "RoofSign", o * CFrame.new(0, H + 4.8, -D / 2 + 2), W * 0.7, 6, "⛏ PICKAXES", BLUE, WHITE, BLUE_DARK)
+	local giant = o * CFrame.new(W / 2 - 12, H + 0.8, D / 4) * CFrame.Angles(0, math.rad(20), math.rad(-25))
+	local handle = part(model, "GiantPickaxeHandle", Vector3.new(22, 1.6, 1.6), giant * CFrame.new(0, 11, 0) * CFrame.Angles(0, 0, math.rad(90)), WOOD, Enum.Material.Wood)
+	handle.Shape = Enum.PartType.Cylinder
+	part(model, "GiantPickaxeHead", Vector3.new(14, 2.4, 2.4), giant * CFrame.new(0, 21.5, 0), Color3.fromRGB(150, 210, 230), Enum.Material.Metal)
+	for _, side in { -1, 1 } do
+		local tip = Instance.new("WedgePart")
+		tip.Name = `GiantPickaxeTip{side}`
+		tip.Anchored = true
+		tip.CanTouch = false
+		tip.Size = Vector3.new(2.4, 2.4, 4)
+		tip.CFrame = giant * CFrame.new(side * 9, 21.5, 0) * CFrame.Angles(0, math.rad(side * 90), 0)
+		tip.Color = Color3.fromRGB(150, 210, 230)
+		tip.Material = Enum.Material.Metal
+		tip.Parent = model
+	end
+	part(model, "GiantPickaxeBand", Vector3.new(2.8, 3, 2.8), giant * CFrame.new(0, 21.5, 0), BLUE_DARK, Enum.Material.Metal)
+	for _, side in { -1, 1 } do
+		ShopDecor.flag(model, `Flag{side}`, o * CFrame.new(side * (W / 2 + 3), 0, -D / 2 - 2), if side > 0 then BLUE else WHITE)
+		ShopDecor.planter(model, `DoorPlanter{side}`, o * CFrame.new(side * (doorW / 2 + 2.2), 0.6, -D / 2 - 2), 2.6)
+	end
+	local benchCF = o * CFrame.new(-W / 4, 0.6, -D / 2 - 3.5) * CFrame.Angles(0, math.rad(180), 0)
+	part(model, "BenchSeat", Vector3.new(5, 0.3, 1.6), benchCF * CFrame.new(0, 1.5, 0), WOOD, Enum.Material.Wood)
+	part(model, "BenchBack", Vector3.new(5, 1.4, 0.3), benchCF * CFrame.new(0, 2.3, 0.75), WOOD, Enum.Material.Wood)
+	for _, dx in { -2, 2 } do
+		part(model, `BenchLeg{dx}`, Vector3.new(0.3, 1.4, 1.4), benchCF * CFrame.new(dx, 0.7, 0), METAL, Enum.Material.Metal)
+	end
+
+	-- Innen: Teppich und Podeste mit den drei besten Spitzhacken
+	part(model, "Rug", Vector3.new(W * 0.45, 0.08, 12), o * CFrame.new(0, 0.64, -D / 2 + 12), Color3.fromRGB(150, 60, 50), Enum.Material.Fabric)
+	local best = {}
+	for i = #Pickaxes.List, math.max(1, #Pickaxes.List - 2), -1 do
+		table.insert(best, Pickaxes.List[i])
+	end
+	for k, def in best do
+		local x = (k - 2) * 10
+		local top = ShopDecor.podium(model, `Podium{k}`, o * CFrame.new(x, 0.6, -D / 2 + 12), 2.2, BLUE, H - 2)
+		displayPickaxe(model, top * CFrame.new(0, 2.2, 0) * CFrame.Angles(0, 0, math.rad(12)), def.HeadColor)
+		local plate = part(model, `PodiumPlate{k}`, Vector3.new(3.6, 0.9, 0.2), top * CFrame.new(0, -0.5, -2.3) * CFrame.Angles(math.rad(-20), 0, 0), BLUE_DARK, Enum.Material.SmoothPlastic)
+		surfaceText(plate, def.DisplayName:upper(), WHITE)
+	end
 
 	-- Spitzhacken an der Rückwand (eine pro Stufe)
 	local racks = Instance.new("Folder")
@@ -184,8 +237,8 @@ function EquipmentShopBuilder.build(parent: Instance): Model
 	prompt:SetAttribute("ShopId", "equipment")
 	prompt.Parent = promptPart
 
-	for i, x in { -10, 0, 10 } do
-		local lamp = part(model, `Lamp{i}`, Vector3.new(3, 0.3, 1.2), o * CFrame.new(x, H - 0.5, 0), LIGHT, Enum.Material.Neon)
+	for i, x in { -W / 3, -W / 9, W / 9, W / 3 } do
+		local lamp = part(model, `Lamp{i}`, Vector3.new(4, 0.3, 1.4), o * CFrame.new(x, H - 0.5, 0), LIGHT, Enum.Material.Neon)
 		local light = Instance.new("PointLight")
 		light.Range = 22
 		light.Brightness = 1
