@@ -5,7 +5,7 @@
 --
 -- Aufbau (alles aus LayoutConfig.Center abgeleitet, deterministisch):
 --   * Wiese statt grauer Pflasterfläche, Holzzaun am Platzrand (Lücken an den Straßen)
---   * Promenade (Pflasterring) um den Kreisverkehr mit Blumenbeeten, Bänken und Laternen
+--   * Promenade (Pflasterring) um den Kreisverkehr, je Sektor eine Sitzecke (Bänke, Laternen, Beete)
 --   * Gehwege mit Laternen entlang der Speichenstraßen
 --   * Parkplätze vor den drei Shops und ein großer Parkplatz in einem freien Sektor
 --   * Park mit Teich und Garten mit Pavillon und Picknicktischen in den übrigen Sektoren
@@ -19,6 +19,7 @@ local LayoutConfig = require(Shared.Config.LayoutConfig)
 local GameConfig = require(Shared.Config.GameConfig)
 
 local EnvironmentBuilder = require(script.Parent.EnvironmentBuilder)
+local TruckShopBuilder = require(script.Parent.TruckShopBuilder)
 
 local CenterBuilder = {}
 
@@ -335,30 +336,43 @@ end
 
 local function promenade(parent: Instance, rng: Random)
 	local cfg = LayoutConfig
+	local cc = cfg.Center
 	local c = cfg.MapCenter
 	local folder = Instance.new("Folder")
 	folder.Name = "Promenade"
 	folder.Parent = parent
-	annulus(folder, "Ring", cfg.RoundaboutOuter, cfg.Center.PromenadeOuter, TOP + 0.03, COBBLE, Enum.Material.Cobblestone, 72)
-	annulus(folder, "Edge", cfg.Center.PromenadeOuter - 0.6, cfg.Center.PromenadeOuter + 0.4, TOP + 0.05, PAVING_DARK, Enum.Material.Concrete, 72)
-	-- Dekoration rund um den Kreisverkehr, nicht auf den Einmündungen
-	local r = (cfg.RoundaboutOuter + cfg.Center.PromenadeOuter) / 2 + 2
-	local n = 0
-	for deg = 0, 359, 8 do
-		local a = math.rad(deg)
-		local p = Vector3.new(c.X + math.cos(a) * r, TOP, c.Z + math.sin(a) * r)
-		if spokeDistance(p) < cfg.RoadWidth / 2 + 8 then
-			continue
-		end
-		n += 1
-		local face = CFrame.lookAt(p, Vector3.new(c.X, TOP, c.Z))
-		local kind = n % 3
-		if kind == 1 then
-			flowerBed(folder, `Bed{n}`, face, 6, 2.4, rng)
-		elseif kind == 2 then
-			bench(folder, `Bench{n}`, face * CFrame.Angles(0, math.rad(180), 0))
-		else
-			EnvironmentBuilder.streetLamp(folder, `Lamp{n}`, CFrame.lookAt(p + (p - Vector3.new(c.X, TOP, c.Z)).Unit * 4, Vector3.new(c.X, TOP, c.Z)))
+	annulus(folder, "Ring", cfg.RoundaboutOuter, cc.PromenadeOuter, TOP + 0.03, COBBLE, Enum.Material.Cobblestone, 72)
+	annulus(folder, "Edge", cc.PromenadeOuter - 0.6, cc.PromenadeOuter + 0.4, TOP + 0.05, PAVING_DARK, Enum.Material.Concrete, 72)
+	-- Sitzecke je Sektor (D-061): nur in der Sektormitte am äußeren Rand, denn an den Ein- und
+	-- Ausfahrten fahren die Anhänger der Lastzüge über die Promenade. Zwei Bänke mit Blick ins
+	-- Grüne, Laternen außen, Blumenbeete dahinter auf der Wiese; die Mitte bleibt als Durchgang frei.
+	local center = Vector3.new(c.X, TOP, c.Z)
+	local rBench = cc.PromenadeOuter - cc.RestSpotInset
+	local function onRing(angle: number, r: number): CFrame
+		local p = Vector3.new(c.X + math.cos(angle) * r, TOP, c.Z + math.sin(angle) * r)
+		return CFrame.lookAt(p, center)
+	end
+	for i = 1, GameConfig.MaxPlots do
+		local frame = sectorFrame(cfg.PlotAngles[i] + 30)
+		local lo, hi = sectorSpan(frame, rBench * 0.9)
+		local mid = (frame * CFrame.new((lo + hi) / 2, 0, -math.sqrt(math.max(rBench ^ 2 - ((lo + hi) / 2) ^ 2, 0)))).Position
+		local a0 = math.atan2(mid.Z - c.Z, mid.X - c.X)
+		for _, side in { -1, 1 } do
+			local tag = `{i}{if side > 0 then "R" else "L"}`
+			local benchCF = onRing(a0 + side * cc.RestSpotSpread / rBench, rBench)
+			if not inRect(benchCF.Position) then
+				bench(folder, `Bench{tag}`, benchCF * CFrame.Angles(0, math.rad(180), 0))
+			end
+			local lampCF = onRing(a0 + side * cc.RestSpotLampSpread / rBench, cc.PromenadeOuter - 1)
+			if not inRect(lampCF.Position) then
+				EnvironmentBuilder.streetLamp(folder, `Lamp{tag}`, lampCF)
+			end
+			local rBed = cc.PromenadeOuter + 4
+			local bedCF = onRing(a0 + side * (cc.RestSpotSpread + 0.5) / rBed, rBed)
+			if not inRect(bedCF.Position) then
+				flowerBed(folder, `Bed{tag}`, bedCF, 6, 2.4, rng)
+				occupy(bedCF, Vector2.new(6, 2.4), 2)
+			end
 		end
 	end
 end
@@ -383,7 +397,11 @@ local function sidewalks(parent: Instance)
 			local count = math.floor(len / 34)
 			for k = 1, count do
 				local z = -len / 2 + (k - 0.5) * (len / count) + (if side > 0 then 8 else -8)
-				EnvironmentBuilder.streetLamp(folder, `Lamp{i}{side}{k}`, cf * CFrame.new(side * (cfg.RoadWidth / 2 + w - 1), 0, z) * CFrame.Angles(0, math.rad(if side > 0 then 90 else -90), 0))
+				local lampCF = cf * CFrame.new(side * (cfg.RoadWidth / 2 + w - 1), 0, z)
+				-- nicht im Bereich, über den die Anhänger beim Abbiegen fahren (D-061)
+				if flat2(lampCF.Position - c).Magnitude >= cfg.Center.PromenadeOuter + cfg.Center.SidewalkLampStart then
+					EnvironmentBuilder.streetLamp(folder, `Lamp{i}{side}{k}`, lampCF * CFrame.Angles(0, math.rad(if side > 0 then 90 else -90), 0))
+				end
 			end
 		end
 	end
@@ -481,8 +499,10 @@ function CenterBuilder.build(parent: Instance): Folder
 		local o = CFrame.lookAt(pos, pos - sectorFrame(t.SectorAngle).LookVector)
 		-- Halle mit Vorplatz und Zufahrt (die Halle steht seit 2026-10-25 innerhalb des Zauns)
 		occupy(o, Vector2.new(t.Size.X, t.Size.Z), 4)
-		local len = t.DrivewayLength + t.ApronDepth
-		occupy(o * CFrame.new(0, 0, -t.Size.Z / 2 - len / 2), Vector2.new(math.max(t.DrivewayWidth, t.Size.X), len), 3)
+		occupy(o * CFrame.new(0, 0, -t.Size.Z / 2 - t.ApronDepth / 2), Vector2.new(t.Size.X, t.ApronDepth), 3)
+		-- Zufahrt bis an den Kreisverkehr: auch Promenaden-Deko bleibt draußen (D-061)
+		local len = TruckShopBuilder.drivewayLength()
+		occupy(o * CFrame.new(0, 0, -t.Size.Z / 2 - t.ApronDepth - len / 2), Vector2.new(t.DrivewayWidth, len), 3)
 	end
 	for _, pos in cfg.Environment.Cabins do
 		occupy(CFrame.new(c.X + pos.X, TOP, c.Z + pos.Y), Vector2.new(24, 24), 6)
@@ -590,7 +610,7 @@ function CenterBuilder.build(parent: Instance): Folder
 	local placedTrees: { Vector3 } = {}
 	-- Alleen: Baumreihen hinter den Gehwegen, mit Blumen dazwischen
 	for i, sp in spokes do
-		local t0, t1 = hitT(sp.origin, sp.dir, cc.FenceRadius - 6), hitT(sp.origin, sp.dir, cc.PromenadeOuter + 8)
+		local t0, t1 = hitT(sp.origin, sp.dir, cc.FenceRadius - 6), hitT(sp.origin, sp.dir, cc.PromenadeOuter + cc.AlleyStart)
 		local cf = CFrame.lookAt(sp.origin, sp.origin + sp.dir)
 		local lateral = cfg.RoadWidth / 2 + cc.SidewalkWidth + 4
 		for _, side in { -1, 1 } do

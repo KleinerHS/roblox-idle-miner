@@ -25,7 +25,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 15 | Rare Drops & Mining Luck | TESTING_REQUIRED (15a, D-045) |
 | 16 | Verkauf & Spätspiel-Geld | TESTING_REQUIRED (16a, D-046) |
 | 17 | Icons | TESTING_REQUIRED (17a Erz- und Barren-Icons, 17b Kategorie-Icons) |
-| 18 | Fahrzeuge aus Felix' Modellen | TESTING_REQUIRED (18a: 4 Fahrzeuge; 18b: Durchfahr-Verladestraße, D-052; 18c: Lastzug mit echten Anhängern, D-053) |
+| 18 | Fahrzeuge aus Felix' Modellen, Map-Mitte | TESTING_REQUIRED (18a: 4 Fahrzeuge; 18b: Durchfahr-Verladestraße, D-052; 18c: Lastzug mit echten Anhängern, D-053; 18d–18g Nachbesserungen, Startauto, Verkaufskreis; 18h Mitte D-057; 18i LKW-Laden D-058; 18j Kreisel D-059; 18k Shops D-060; 18l Lastzüge im Kreisel D-061) |
 
 ## Setup – Details
 
@@ -775,6 +775,36 @@ Selbsttest (Play): zu Fuß mit 200 Erz im Rucksack in den Kreis → 1.523 $ + XP
 | Shops mittig zwischen den Straßen, parallel zum Sektor, mit Vorplatz | `LayoutConfig` (Offsets, SectorAngle), `*ShopBuilder` | TESTING_REQUIRED |
 
 Selbsttest (Play): Mitte von oben und aus der Perspektive geprüft, keine Teile auf Straßen/Kreisverkehr, Verkaufskreis weiter in der Map-Mitte, keine Fehler in der Konsole.
+
+### 18i (Version 0.48.0, 2026-10-22) – LKW-Laden (D-058)
+
+| System | Dateien / Instanzen | Status |
+|---|---|---|
+| Shop „TRUCKS“: Halle 112 × 132, 5 Stellplätze (Box Truck, Tipper Road Train, Grain Road Train, 2 × „Coming soon“), Tresen E; LKW nur noch dort, Autohaus nur Pickup/Cargo Van/High-Roof Van | `World/TruckShopBuilder.luau`, `ShopService`, `ShopController`, `Vehicles` | TESTING_REQUIRED |
+
+### 18j (Version 0.49.0, 2026-10-25) – Größerer Kreisel, LKW-Laden an der Mitte (D-059)
+
+| System | Dateien / Instanzen | Status |
+|---|---|---|
+| Kreisel-Fahrbahn 40–86 (46 breit), Promenade 86–104, Shops und Deko nach außen | `LayoutConfig`, `EnvironmentBuilder`, `CenterBuilder` | TESTING_REQUIRED |
+| LKW-Laden im Sektor zwischen Plot 4 und 5 so weit innen wie möglich, großer Parkplatz zwischen Plot 5 und 6, Garten hinter dem Teich | `LayoutConfig.TruckShop`, `TruckShopBuilder`, `CenterBuilder` | TESTING_REQUIRED |
+
+### 18k (Version 0.50.0, 2026-10-25) – Pickaxe- und Drill-Shop größer (D-060)
+
+| System | Dateien / Instanzen | Status |
+|---|---|---|
+| Equipment-Shop 64 × 22 × 44, Machine-Shop 72 × 24 × 54 mit Markisen, Dachschildern, Fahnen, Pflanzen, Podesten | `EquipmentShopBuilder`, `MachineShopBuilder`, `World/ShopDecor.luau` | TESTING_REQUIRED |
+
+### 18l (Version 0.50.1, 2026-10-25) – Lastzüge fahren frei durch den Kreisel (D-061)
+
+| System | Dateien / Instanzen | Status |
+|---|---|---|
+| Promenade: Sitzecke je Sektor in der Mitte (Bänke, Laternen, Beete) statt Deko an den Einmündungen; Gehweg-Laternen ab r = 149, Alleebäume ab r = 124 | `CenterBuilder`, `LayoutConfig.Center` | TESTING_REQUIRED |
+| Zufahrt LKW-Laden bis an den Kreisverkehr, Korridor frei von Deko | `TruckShopBuilder.drivewayLength`, `CenterBuilder` | TESTING_REQUIRED |
+| Dritte Holzhütte von der Straße zu Plot 2 weg | `LayoutConfig.Environment.Cabins` | TESTING_REQUIRED |
+| Prüfwerkzeuge: Draufsicht ohne Studio (`tools/topdown`), Schleppkurven-Simulation (`tools/roundabout_sweep.py`) | `tools/` | IMPLEMENTED |
+
+Selbsttest (ohne Studio): Draufsicht aus dem echten Code gerendert; Simulation mit allen kollidierenden Teilen, 2 Lastzüge × 6 Einfahrten × rechts/geradeaus/links × 3 Fahrlinien: keine Berührung, knappster Abstand 1,5 Studs (Laternenfuß), innerste Anhängerkante r ≈ 45 (Fahrbahn ab 40). Luau-Syntax geprüft. Play-Test in Studio steht noch aus.
 
 Schritte: 12a alle Minen/Erze/Barren über zentrale Kurven · 12b weitere Spitzhacken, Rucksäcke, Drills, Fahrzeuge, Ausbaustufen (offen).
 

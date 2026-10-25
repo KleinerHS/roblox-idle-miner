@@ -73,6 +73,23 @@ function TruckShopBuilder.frame(): CFrame
 	return CFrame.lookAt(pos, pos - Vector3.new(math.cos(a), 0, -math.sin(a)))
 end
 
+-- Länge der Zufahrt vom Vorplatz bis an den Kreisverkehr (D-061), entlang der Hallenachse
+function TruckShopBuilder.drivewayLength(): number
+	local cfg = LayoutConfig.TruckShop
+	local c = LayoutConfig.MapCenter
+	local o = TruckShopBuilder.frame()
+	local start = (o * CFrame.new(0, 0, -cfg.Size.Z / 2 - cfg.ApronDepth)).Position
+	local p = Vector2.new(start.X - c.X, start.Z - c.Z)
+	local d = Vector2.new(o.LookVector.X, o.LookVector.Z).Unit
+	local b = p:Dot(d)
+	local disc = b * b - (p:Dot(p) - LayoutConfig.RoundaboutOuter ^ 2)
+	if disc < 0 then
+		return cfg.DrivewayLength
+	end
+	-- 1 Stud in die Fahrbahn hinein, damit keine Lücke bleibt
+	return -b - math.sqrt(disc) + 1
+end
+
 -- Ausstellungs-LKW mit allen Anhängern (verankert)
 local function displayTruck(parent: Instance, def: Vehicles.VehicleDefinition, cf: CFrame)
 	local model = VehicleModelBuilder.build(def, cf, false)
@@ -246,7 +263,7 @@ function TruckShopBuilder.build(parent: Instance): Model
 	local apron = cfg.ApronDepth
 	local forecourt = part(model, "Forecourt", Vector3.new(W, 0.2, apron), o * CFrame.new(0, 0.1, -hd - apron / 2), ASPHALT, Enum.Material.Asphalt)
 	forecourt.CanCollide = false
-	local driveLen = cfg.DrivewayLength
+	local driveLen = TruckShopBuilder.drivewayLength()
 	local drive = part(model, "Driveway", Vector3.new(cfg.DrivewayWidth, 0.2, driveLen), o * CFrame.new(0, 0.1, -hd - apron - driveLen / 2 + 1), ASPHALT, Enum.Material.Asphalt)
 	drive.CanCollide = false
 	for _, side in { -1, 1 } do

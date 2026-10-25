@@ -46,3 +46,7 @@ Nach Änderungen an Economy, Inventory, Save, Trading oder Prestige die betroffe
 - [ ] 0.27.0: Fahrzeug auf Stellplatz 1/2 → Rüssel fährt über der Ladefläche aus, Beladen läuft, Lampe grün/blau, Anzeige stimmt
 - [ ] 0.29.0: Fahrzeug schief/zu weit vorne → Anzeige „Move forward/back“; mittig → Rüssel fährt bis kurz über die Ladefläche, steigt mit der Ladung, fährt beim Vollwerden/Wegfahren ein
 - [ ] Phase 18g: Verkaufskreis – Fahrzeug durchfahren verkauft alles sofort, zu Fuß Rucksack, kein Fenster; Tresen-Tests 2d/6 ersetzt (D-056)
+- [ ] Phase 18i: LKW nur im LKW-Laden kaufbar (Tresen E → TRUCKS), Autohaus zeigt nur kleine Autos (D-058)
+- [ ] Phase 18j/18l: Grain Road Train und Tipper Road Train fahren von jeder Einfahrt rechts, geradeaus und links durch den Kreisel, ohne Bänke, Laternen, Beete oder Bäume zu treffen (D-059, D-061)
+- [ ] Phase 18l: Zufahrt vom Kreisel in den LKW-Laden frei befahrbar; keine Hütte auf einer Straße
+- [ ] Phase 18k: Pickaxe- und Drill-Shop – Tresen (E) funktioniert, nichts ragt ineinander (D-060)

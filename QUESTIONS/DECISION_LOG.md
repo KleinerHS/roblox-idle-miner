@@ -373,3 +373,14 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 **Source:** Felix, 2026-10-22/25 („der Pickaxe- und Drill-Shop muss auch größer und einladender wirken … fang erst mal an, verbessern können wir immer noch“; „mach weiter“)
 **Decision:** Equipment-Shop 64 × 22 × 44 (vorher 40 × 16 × 30), Machine-Shop 72 × 24 × 54 (vorher 52 × 18 × 40), beide etwas weiter außen, damit die Parkplätze davor Platz haben. Neuer Baustein `World/ShopDecor.luau` (gestreifte Markisen, beleuchtete Dachschilder in runder Schrift, Fahnen, Pflanzkübel, Podeste mit Spot). Equipment: große Schaufenster mit blau-weißen Markisen, Dachschild „PICKAXES“, Riesen-Spitzhacke auf dem Dach, Teppich und drei Podeste mit den besten Spitzhacken, Bank und Pflanzen vor der Tür, mehr Licht. Machine: breiteres Tor (28 × 16), Dachschild „DRILLS & MACHINES“, orange-schwarzes Vordach, Fassadenstrahler, Fahnen, Pflanzen und ein Drill auf beleuchtetem Podest vor dem Shop.
 **Affected systems:** EquipmentShopBuilder, MachineShopBuilder, ShopDecor, LayoutConfig
+
+## D-061 – Lastzüge fahren frei durch den Kreisel
+
+**Source:** Felix, 2026-10-25 („… damit man mit den großen LKWs den Kreisel fahren kann“), Prüfung durch Claude nach D-059/D-060
+**Decision:** Schleppkurven-Simulation (`tools/roundabout_sweep.py`, echte Achs- und Kupplungsmaße aus `assets/VehicleBodies.rbxm`, alle 6 Einfahrten, rechts/geradeaus/links, Fahrlinien r = 64/72/80) zeigte: Die Fahrbahn 40–86 reicht (innerste Anhängerkante r ≈ 45), aber beim Ein- und Ausfahren ziehen die Anhänger über Promenade und Gehweg und trafen Bänke, Blumenkästen und Laternen an jeder Einmündung. Deshalb:
+- Promenade: statt Deko rundum je Sektor eine Sitzecke in der Sektormitte am äußeren Rand (2 Bänke mit Durchgang in der Mitte, 2 Laternen, 2 Blumenbeete auf der Wiese dahinter); im Sektor des LKW-Ladens keine, dort liegt die Zufahrt.
+- Gehweg-Laternen erst ab r = 149 (Promenade + 45), Alleebäume ab r = 124 (Promenade + 20).
+- Zufahrt zum LKW-Laden reicht jetzt bis an den Kreisverkehr (vorher endete sie 8 Studs vor der Promenade, eine Bank stand mitten in der Einfahrt); Deko bleibt aus dem Korridor.
+- Dritte Holzhütte stand mit der Veranda 5 Studs auf der Straße zu Plot 2 → nach (-80, -178) verschoben.
+Ergebnis mit den echten Teilen (`tools/topdown`): keine Berührung, knappster Abstand 1,5 Studs.
+**Affected systems:** LayoutConfig (Center.RestSpot*, SidewalkLampStart, AlleyStart, Cabins), CenterBuilder, TruckShopBuilder, tools/roundabout_sweep.py, tools/topdown

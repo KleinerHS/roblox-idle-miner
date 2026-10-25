@@ -189,7 +189,7 @@ local LayoutConfig = {
 		Size = Vector3.new(112, 26, 132),
 		Bays = 5,
 		ApronDepth = 16,
-		DrivewayLength = 34,
+		DrivewayLength = 34, -- nur Rückfall: die Zufahrt reicht bis an den Kreisverkehr (D-061)
 		DrivewayWidth = 22,
 	},
 	-- Maximale Entfernung zum Lager-Terminal
@@ -225,7 +225,7 @@ local LayoutConfig = {
 		-- Windrad hinter dem Fahrzeughaus; Holzhütten in den freien Sektoren
 		WaterTower = Vector2.new(120, -210),
 		Windmill = Vector2.new(255, 60),
-		Cabins = { Vector2.new(-75, -150), Vector2.new(-150, 190), Vector2.new(-60, -175) },
+		Cabins = { Vector2.new(-75, -150), Vector2.new(-150, 190), Vector2.new(-80, -178) },
 		-- Freiflächen um die Wahrzeichen (Radius)
 		LandmarkClearance = 24,
 	},
@@ -263,6 +263,15 @@ local LayoutConfig = {
 		BushCount = 220,
 		AlleySpacing = 22,
 		RockCount = 24,
+		-- Lastzüge schneiden beim Ein- und Ausfahren die Ecken über Promenade und Gehweg
+		-- (Schleppkurven-Simulation tools/roundabout_sweep.py, D-061). Deshalb stehen Bänke,
+		-- Laternen und Beete der Promenade nur als Sitzecke in der Sektormitte am äußeren Rand,
+		-- Gehweg-Laternen und Alleebäume beginnen erst so weit hinter der Promenade. TODO_LAYOUT
+		RestSpotInset = 2.5, -- Bänke: Abstand zum äußeren Promenadenrand
+		RestSpotSpread = 6, -- Bänke links/rechts der Sektormitte (Bogenlänge, Mitte bleibt als Durchgang frei)
+		RestSpotLampSpread = 10.5,
+		SidewalkLampStart = 45,
+		AlleyStart = 20,
 	},
 }
 
