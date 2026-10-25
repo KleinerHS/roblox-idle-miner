@@ -154,21 +154,21 @@ local LayoutConfig = {
 	-- Position relativ zu MapCenter; Eingang zeigt zur Platzmitte. TODO_LAYOUT
 	EquipmentShop = {
 		-- D-057: mittig zwischen den Straßen, Parkplatz davor
-		Offset = Vector2.new(-145, 46),
+		Offset = Vector2.new(-167, 46),
 		SectorAngle = 180,
 		Size = Vector3.new(40, 16, 30),
 	},
 	-- Machine-Shop in der Mitte (CENTRAL_AREA_REFERENCE.png: hinten, orange). Liegt zwischen
 	-- den Straßen zu Plot 2 und Plot 3; Rolltor zeigt zur Platzmitte. TODO_LAYOUT
 	MachineShop = {
-		Offset = Vector2.new(35, -153), -- D-057
+		Offset = Vector2.new(46.2, -172), -- D-057, Kreisel größer (2026-10-25)
 		SectorAngle = 60,
 		Size = Vector3.new(52, 18, 40),
 	},
 	-- Fahrzeughaus in der Mitte (CENTRAL_AREA_REFERENCE.png: rechts, rot). Liegt zwischen den
 	-- Straßen zu Plot 3 und Plot 4; Glasfront zeigt zur Platzmitte. TODO_LAYOUT
 	VehicleShop = {
-		Offset = Vector2.new(164, -46), -- D-057
+		Offset = Vector2.new(186, -46), -- D-057, Kreisel größer (2026-10-25)
 		SectorAngle = 0,
 		-- Großer Glas-Showroom (D-027): Breite, Höhe, Tiefe. Phase 12c: Platz für 6 Fahrzeuge
 		-- in zwei Reihen (Felix); bleibt innerhalb des Platzes (CenterPlazaRadius) und frei
@@ -179,13 +179,16 @@ local LayoutConfig = {
 	},
 	-- LKW-Laden etwas außerhalb der Mitte (D-058): hinter dem großen Parkplatz, Eingang zur Mitte,
 	-- fünf Stellplätze für Lastzüge mit allen Anhängern (alle LKW + 2 frei). Zufahrt zum Parkplatz.
+	-- Felix 2026-10-25: so nah an die Mitte wie möglich ohne Straßenkollision (Front bei r ≈ 151,
+	-- dort ist der Sektor zwischen den Straßen gerade breit genug für die Halle)
 	TruckShop = {
-		Offset = Vector2.new(235, 315),
+		Offset = Vector2.new(148.3, 164.9),
 		SectorAngle = -60,
 		Size = Vector3.new(112, 26, 132),
 		Bays = 5,
-		DrivewayLength = 130,
-		DrivewayWidth = 20,
+		ApronDepth = 16,
+		DrivewayLength = 34,
+		DrivewayWidth = 22,
 	},
 	-- Maximale Entfernung zum Lager-Terminal
 	StorageTerminalDistance = 14,
@@ -220,7 +223,7 @@ local LayoutConfig = {
 		-- Windrad hinter dem Fahrzeughaus; Holzhütten in den freien Sektoren
 		WaterTower = Vector2.new(120, -210),
 		Windmill = Vector2.new(255, 60),
-		Cabins = { Vector2.new(-75, -150), Vector2.new(-80, 140), Vector2.new(-60, -175) },
+		Cabins = { Vector2.new(-75, -150), Vector2.new(-150, 190), Vector2.new(-60, -175) },
 		-- Freiflächen um die Wahrzeichen (Radius)
 		LandmarkClearance = 24,
 	},
@@ -236,22 +239,24 @@ local LayoutConfig = {
 	CenterPlazaRadius = 280,
 	-- Kreisverkehr um den Brunnen: Innen-/Außenradius der Fahrbahn
 	RoundaboutInner = 40,
-	RoundaboutOuter = 64,
+	-- Felix 2026-10-25: Fahrbahn so breit wie früher Fahrbahn + Gehweg, damit Lastzüge drehen können
+	RoundaboutOuter = 86,
 	RoadWidth = 28,
 
 	-- Gestaltung der Mitte (D-057, CenterBuilder): Promenade um den Kreisverkehr, Gehwege,
 	-- Parkplätze, Park mit Teich, Garten mit Pavillon, Bäume. Winkel wie PlotAngles. TODO_LAYOUT
 	Center = {
 		Seed = 77,
-		PromenadeOuter = 82,
+		PromenadeOuter = 104,
 		FenceRadius = 272,
 		SidewalkWidth = 5,
 		ShopLotStalls = 12,
-		BigLotAngle = -60,
+		BigLotAngle = -120,
 		BigLotDoubleRows = 3,
 		BigLotMaxStalls = 16,
 		PondAngle = 120,
-		GardenAngle = -120,
+		GardenAngle = 120,
+		GardenRadius = 205,
 		TreeCount = 200,
 		BushCount = 220,
 		AlleySpacing = 22,

@@ -479,11 +479,13 @@ function CenterBuilder.build(parent: Instance): Folder
 		local t = cfg.TruckShop
 		local pos = Vector3.new(c.X + t.Offset.X, TOP, c.Z + t.Offset.Y)
 		local o = CFrame.lookAt(pos, pos - sectorFrame(t.SectorAngle).LookVector)
-		local len = t.DrivewayLength + 24
-		occupy(o * CFrame.new(0, 0, -t.Size.Z / 2 - len / 2), Vector2.new(t.DrivewayWidth, len), 3)
+		-- Halle mit Vorplatz und Zufahrt (die Halle steht seit 2026-10-25 innerhalb des Zauns)
+		occupy(o, Vector2.new(t.Size.X, t.Size.Z), 4)
+		local len = t.DrivewayLength + t.ApronDepth
+		occupy(o * CFrame.new(0, 0, -t.Size.Z / 2 - len / 2), Vector2.new(math.max(t.DrivewayWidth, t.Size.X), len), 3)
 	end
 	for _, pos in cfg.Environment.Cabins do
-		occupy(CFrame.new(c.X + pos.X, TOP, c.Z + pos.Y), Vector2.new(24, 24), 2)
+		occupy(CFrame.new(c.X + pos.X, TOP, c.Z + pos.Y), Vector2.new(24, 24), 6)
 	end
 	for _, pos in { cfg.Environment.WaterTower, cfg.Environment.Windmill } do
 		occupy(CFrame.new(c.X + pos.X, TOP, c.Z + pos.Y), Vector2.new(20, 20), 2)
@@ -563,12 +565,13 @@ function CenterBuilder.build(parent: Instance): Folder
 	end
 	do
 		local frame = sectorFrame(cc.GardenAngle)
-		local r = cc.PromenadeOuter + 34
+		local r = cc.GardenRadius
 		local lo, hi = sectorSpan(frame, r)
 		local cf = frame * CFrame.new((lo + hi) / 2, 0, -r)
 		pavilion(parks, "Pavilion", cf, 16, 10, rng)
-		occupy(cf, Vector2.new(30, 16), 2)
-		path(parks, "GardenPath", (frame * CFrame.new((lo + hi) / 2, 0, -cc.PromenadeOuter)).Position, (cf * CFrame.new(0, 0, 7)).Position)
+		occupy(cf, Vector2.new(40, 22), 4)
+		-- Kiesweg vom Teich (gleicher Sektor) bis zum Pavillon
+		path(parks, "GardenPath", (frame * CFrame.new((lo + hi) / 2, 0, -(cc.PromenadeOuter + 40 + 24))).Position, (cf * CFrame.new(0, 0, 7)).Position)
 		-- Blumenreihen hinter dem Pavillon
 		for k = 1, 3 do
 			local bedCF = cf * CFrame.new(0, 0, -14 - k * 6)

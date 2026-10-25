@@ -243,8 +243,8 @@ function TruckShopBuilder.build(parent: Instance): Model
 	prompt.Parent = promptPart
 
 	-- Vorplatz, Zufahrt Richtung Mitte, Pylon und Pflanzen
-	local apron = 24
-	local forecourt = part(model, "Forecourt", Vector3.new(W + 10, 0.2, apron), o * CFrame.new(0, 0.1, -hd - apron / 2), ASPHALT, Enum.Material.Asphalt)
+	local apron = cfg.ApronDepth
+	local forecourt = part(model, "Forecourt", Vector3.new(W, 0.2, apron), o * CFrame.new(0, 0.1, -hd - apron / 2), ASPHALT, Enum.Material.Asphalt)
 	forecourt.CanCollide = false
 	local driveLen = cfg.DrivewayLength
 	local drive = part(model, "Driveway", Vector3.new(cfg.DrivewayWidth, 0.2, driveLen), o * CFrame.new(0, 0.1, -hd - apron - driveLen / 2 + 1), ASPHALT, Enum.Material.Asphalt)
@@ -253,13 +253,13 @@ function TruckShopBuilder.build(parent: Instance): Model
 		local edge = part(model, `DriveLine{side}`, Vector3.new(0.4, 0.05, driveLen), o * CFrame.new(side * (cfg.DrivewayWidth / 2 - 1), 0.23, -hd - apron - driveLen / 2 + 1), WHITE, Enum.Material.SmoothPlastic)
 		edge.CanCollide = false
 	end
-	local pylonCF = o * CFrame.new(hw + 4, 0, -hd - apron + 4)
+	local pylonCF = o * CFrame.new(hw - 4, 0, -hd - apron + 3)
 	part(model, "PylonBase", Vector3.new(4, 0.6, 4), pylonCF * CFrame.new(0, 0.3, 0), WALL_DARK, Enum.Material.Concrete)
 	local pylon = part(model, "Pylon", Vector3.new(4, 18, 1.6), pylonCF * CFrame.new(0, 9.6, 0), ORANGE, Enum.Material.SmoothPlastic)
 	surfaceText(pylon, "T\nR\nU\nC\nK\nS", WHITE)
-	for k, px in { -hw - 4, hw + 10 } do
-		part(model, `Planter{k}`, Vector3.new(4, 2, 4), o * CFrame.new(px, 1, -hd - 4), WALL_DARK, Enum.Material.Concrete)
-		local plant = part(model, `Plant{k}`, Vector3.new(4.6, 4.6, 4.6), o * CFrame.new(px, 4, -hd - 4), GREEN, Enum.Material.Grass)
+	for k, px in { -hw + 4, -hw / 2 - 16, hw / 2 + 16 } do
+		part(model, `Planter{k}`, Vector3.new(4, 2, 4), o * CFrame.new(px, 1, -hd - 3), WALL_DARK, Enum.Material.Concrete)
+		local plant = part(model, `Plant{k}`, Vector3.new(4.6, 4.6, 4.6), o * CFrame.new(px, 4, -hd - 3), GREEN, Enum.Material.Grass)
 		plant.Shape = Enum.PartType.Ball
 	end
 

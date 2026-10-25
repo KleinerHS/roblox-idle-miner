@@ -116,7 +116,7 @@ local function makeBlockers(lakes: { Vector3 }): { Blocker }
 			local a = math.rad(t.SectorAngle)
 			local o = CFrame.lookAt(pos, pos - Vector3.new(math.cos(a), 0, -math.sin(a)))
 			local l = o:PointToObjectSpace(p)
-			return math.abs(l.X) < t.Size.X / 2 + 22 and l.Z < t.Size.Z / 2 + 16 and l.Z > -t.Size.Z / 2 - 24 - t.DrivewayLength
+			return math.abs(l.X) < t.Size.X / 2 + 22 and l.Z < t.Size.Z / 2 + 16 and l.Z > -t.Size.Z / 2 - t.ApronDepth - t.DrivewayLength
 		end,
 		-- Platz in der Mitte
 		function(p)
