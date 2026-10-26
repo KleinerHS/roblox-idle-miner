@@ -16,6 +16,7 @@ local LayoutConfig = require(Shared.Config.LayoutConfig)
 local Vehicles = require(Shared.Definitions.Vehicles)
 
 local VehicleModelBuilder = require(script.Parent.VehicleModelBuilder)
+local ShopInterior = require(script.Parent.ShopInterior)
 
 local TruckShopBuilder = {}
 
@@ -135,7 +136,7 @@ function TruckShopBuilder.build(parent: Instance): Model
 	local bayW = (W - 12) / bays
 	for i = 0, bays do
 		local x = -hw + 6 + i * bayW
-		local line = part(model, `BayLine{i}`, Vector3.new(0.4, 0.05, D - 14), o * CFrame.new(x, floorTop + 0.03, 4), YELLOW, Enum.Material.SmoothPlastic)
+		local line = part(model, `BayLine{i}`, Vector3.new(0.4, 0.05, D - 29), o * CFrame.new(x, floorTop + 0.03, -7.5), YELLOW, Enum.Material.SmoothPlastic)
 		line.CanCollide = false
 	end
 
@@ -224,7 +225,7 @@ function TruckShopBuilder.build(parent: Instance): Model
 			surfaceText(stand, def.DisplayName:upper(), WHITE)
 		else
 			surfaceText(stand, "COMING SOON", ORANGE)
-			local plate = part(display, `FreeBay{b}`, Vector3.new(bayW - 4, 0.08, D - 30), o * CFrame.new(bx, floorTop + 0.05, 8), Color3.fromRGB(100, 104, 108), Enum.Material.SmoothPlastic)
+			local plate = part(display, `FreeBay{b}`, Vector3.new(bayW - 4, 0.08, D - 39), o * CFrame.new(bx, floorTop + 0.05, -4.5), Color3.fromRGB(100, 104, 108), Enum.Material.SmoothPlastic)
 			plate.CanCollide = false
 		end
 		for k, z in { -hd + 26, 0, hd - 26 } do
@@ -279,6 +280,64 @@ function TruckShopBuilder.build(parent: Instance): Model
 		local plant = part(model, `Plant{k}`, Vector3.new(4.6, 4.6, 4.6), o * CFrame.new(px, 4, -hd - 3), GREEN, Enum.Material.Grass)
 		plant.Shape = Enum.PartType.Ball
 	end
+
+	-- Innenausbau wie ein echter Nutzfahrzeug-Händler (D-063): hinten Verkaufsplätze, Lounge mit
+	-- Kaffee und Fernseher, Ersatzteiltheke mit Regal; Reifenstapel und Poster an den Seiten.
+	-- Die Stellplätze (auch die zwei freien) bleiben frei für Lastzüge.
+	local inside = Instance.new("Folder")
+	inside.Name = "Interior"
+	inside.Parent = model
+	local rng = Random.new(65)
+	local DARK = Color3.fromRGB(30, 32, 36)
+	local ceilingY = roofY - 0.6
+	local signY = roofY - 6
+	local backZ = hd - 1.2
+	local goods = { ORANGE, YELLOW, Color3.fromRGB(60, 110, 190), Color3.fromRGB(190, 50, 40), WALL }
+
+	-- Kundenzone hinten: heller Boden
+	ShopInterior.rug(inside, "CustomerFloor", o * CFrame.new(0, floorTop, hd - 11), W - 4, 20, Color3.fromRGB(196, 192, 184))
+	part(inside, "ZoneLine", Vector3.new(W - 4, 0.05, 0.5), o * CFrame.new(0, floorTop + 0.06, hd - 21), YELLOW, Enum.Material.SmoothPlastic).CanCollide = false
+
+	-- Verkaufsplätze
+	for k, x in { -30, -10, 10 } do
+		local deskCF = o * CFrame.new(x, floorTop, hd - 14)
+		ShopInterior.desk(inside, `SalesDesk{k}`, deskCF, WHITE, ORANGE_DARK)
+		ShopInterior.officeChair(inside, `StaffChair{k}`, deskCF * CFrame.new(0, 0, 2.8) * CFrame.Angles(0, math.rad(180), 0), DARK)
+		for _, dx in { -1.6, 1.6 } do
+			ShopInterior.officeChair(inside, `GuestChair{k}{dx}`, deskCF * CFrame.new(dx, 0, -3), ORANGE_DARK)
+		end
+	end
+	ShopInterior.hangingSign(inside, "SalesSign", o * CFrame.new(-10, signY, hd - 14), "FLEET SALES", ORANGE, WHITE, 12, ceilingY)
+	ShopInterior.brochureStand(inside, "Brochures", o * CFrame.new(0, floorTop, hd - 20), { ORANGE, WHITE, DARK })
+	ShopInterior.plant(inside, "SalesPlant", o * CFrame.new(-20, floorTop, hd - 8), 6)
+
+	-- Lounge hinten links (lokal +X)
+	ShopInterior.sofa(inside, "LoungeSofa", o * CFrame.new(38, floorTop, hd - 6) * CFrame.Angles(0, 0, 0), 10, DARK)
+	ShopInterior.coffeeTable(inside, "LoungeTable", o * CFrame.new(38, floorTop, hd - 11))
+	for k, dx in { -6, 6 } do
+		ShopInterior.armchair(inside, `LoungeChair{k}`, o * CFrame.new(38 + dx, floorTop, hd - 15) * CFrame.Angles(0, math.rad(180 + (if dx < 0 then 30 else -30)), 0), ORANGE_DARK)
+	end
+	ShopInterior.tv(inside, "LoungeTV", o * CFrame.new(38, 11, backZ), 10, "🚛 ROAD TRAINS", ORANGE_DARK)
+	ShopInterior.coffeeCorner(inside, "Coffee", o * CFrame.new(24, floorTop, hd - 2.4))
+	ShopInterior.hangingSign(inside, "LoungeSign", o * CFrame.new(38, signY, hd - 12), "LOUNGE", DARK, ORANGE, 8, ceilingY)
+
+	-- Ersatzteiltheke hinten rechts (lokal −X) mit Regalwand
+	local partsCF = o * CFrame.new(-42, floorTop, hd - 10)
+	part(inside, "PartsCounter", Vector3.new(14, 3.6, 2.6), partsCF * CFrame.new(0, 1.8, 0), FRAME, Enum.Material.Metal)
+	part(inside, "PartsCounterTop", Vector3.new(14.4, 0.3, 3), partsCF * CFrame.new(0, 3.75, 0), ORANGE_DARK, Enum.Material.Metal)
+	ShopInterior.officeChair(inside, "PartsChair", partsCF * CFrame.new(2, 0, 3) * CFrame.Angles(0, math.rad(180), 0), DARK)
+	ShopInterior.wallShelf(inside, "PartsShelf", o * CFrame.new(-42, floorTop, backZ - 0.2), 20, 4, goods, rng)
+	ShopInterior.hangingSign(inside, "PartsSign", o * CFrame.new(-42, signY, hd - 10), "PARTS & TIRES", YELLOW, DARK, 12, ceilingY)
+
+	-- Seitenwände: Reifenstapel zwischen den Hallenträgern, Poster
+	for _, side in { -1, 1 } do
+		for k, z in { -30, 0, 30 } do
+			ShopInterior.tireStack(inside, `Tires{side}{k}`, o * CFrame.new(side * (hw - 3.4), floorTop, z), 4, 1.9)
+		end
+		ShopInterior.poster(inside, `Poster{side}`, o * CFrame.new(side * (hw - 1.1), 12, -15) * CFrame.Angles(0, math.rad(side * 90), 0), 8, 10, if side > 0 then "BUILT\nTO HAUL" else "MORE\nCARGO!", if side > 0 then ORANGE else DARK, WHITE)
+	end
+	ShopInterior.clock(inside, "Clock", o * CFrame.new(0, 14, backZ))
+	ShopInterior.exitSign(inside, "ExitSign", o * CFrame.new(-hw / 2, floorTop + wallH - 3.8, -hd + 0.6) * CFrame.Angles(0, math.rad(180), 0))
 
 	model.ModelStreamingMode = Enum.ModelStreamingMode.Atomic
 	model.Parent = parent

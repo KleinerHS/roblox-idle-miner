@@ -17,6 +17,7 @@ local Drills = require(Shared.Definitions.Drills)
 
 local DrillModelBuilder = require(script.Parent.DrillModelBuilder)
 local ShopDecor = require(script.Parent.ShopDecor)
+local ShopInterior = require(script.Parent.ShopInterior)
 
 local MachineShopBuilder = {}
 
@@ -412,20 +413,104 @@ function MachineShopBuilder.build(parent: Instance): Model
 	-- Eingangsmatte
 	part(deco, "EntranceMat", Vector3.new(12, 0.08, 4), o * CFrame.new(0, 0.64, -D / 2 + 3), STEEL_DARK, Enum.Material.Fabric)
 
-	-- Hallenstrahler
-	for i, z in { -D / 4, D / 4 } do
-		for j, x in { -W / 4, W / 4 } do
-			part(model, `LampWire{i}_{j}`, Vector3.new(0.1, 1.6, 0.1), o * CFrame.new(x, H - 1.9, z), STEEL_DARK, Enum.Material.Metal)
-			local shade = part(model, `LampShade{i}_{j}`, Vector3.new(0.6, 2.4, 2.4), o * CFrame.new(x, H - 2.9, z) * CFrame.Angles(0, 0, math.rad(90)), STEEL, Enum.Material.Metal)
-			shade.Shape = Enum.PartType.Cylinder
-			local bulb = part(model, `Lamp{i}_{j}`, Vector3.new(1.4, 0.2, 1.4), o * CFrame.new(x, H - 3.25, z), LIGHT, Enum.Material.Neon)
-			local light = Instance.new("SpotLight")
-			light.Face = Enum.NormalId.Bottom
-			light.Range = 24
-			light.Angle = 100
-			light.Brightness = 1.4
-			light.Color = LIGHT
-			light.Parent = bulb
+	-- Innenausbau wie ein echter Maschinenhändler (D-063): Showroom vorne, weitere Drills auf
+	-- Podesten, Verkaufsplätze, Wartebereich mit Kaffee, Ersatzteiltheke hinten rechts,
+	-- Servicebereich hinten links, Hängeschilder, Bodenmarkierungen, Hallenbeleuchtung.
+	local inside = Instance.new("Folder")
+	inside.Name = "Interior"
+	inside.Parent = model
+	local rng2 = Random.new(64)
+	local DARK = Color3.fromRGB(30, 32, 36)
+	local signY = H - 5
+	local goods = { ORANGE, HAZARD_YELLOW, Color3.fromRGB(60, 110, 190), Color3.fromRGB(190, 50, 40), STEEL_LIGHT_C }
+
+	-- Bodenzonen: Gehweg-Linien und Servicebereich
+	ShopInterior.rug(inside, "ServiceFloor", o * CFrame.new(W / 2 - 13, 0.6, D / 2 - 12), 22, 20, Color3.fromRGB(96, 98, 102))
+	local serviceText = part(inside, "ServiceFloorText", Vector3.new(14, 0.05, 3), o * CFrame.new(W / 2 - 13, 0.64, D / 2 - 20), Color3.fromRGB(96, 98, 102), Enum.Material.SmoothPlastic)
+	serviceText.CanCollide = false
+	ShopInterior.text(serviceText, "SERVICE AREA", HAZARD_YELLOW, Enum.NormalId.Top, true)
+
+	-- Weitere Drills (Stufe 4–6) auf Podesten im vorderen Showroom
+	for k = 4, math.min(6, #Drills.List) do
+		local def = Drills.List[k]
+		local x = W / 2 - 30 + (k - 4) * 10
+		local top = ShopDecor.podium(inside, `DrillPodium{k}`, o * CFrame.new(x, 0.6, -D / 2 + 16), 3.4, ORANGE, H - 3)
+		local d = DrillModelBuilder.build(def, top * CFrame.new(0, 0.2, 0))
+		d.Parent = inside
+		local plate = part(inside, `DrillPlate{k}`, Vector3.new(5, 1.1, 0.2), top * CFrame.new(0, -0.4, -3.8) * CFrame.Angles(math.rad(-20), 0, 0), STEEL_DARK, Enum.Material.SmoothPlastic)
+		surfaceText(plate, def.DisplayName:upper(), WHITE)
+	end
+	ShopInterior.hangingSign(inside, "ShowroomSign", o * CFrame.new(0, signY, -2), "SHOWROOM", ORANGE, WHITE, 12, H - 1)
+
+	-- Verkaufsplätze an der rechten Wand (lokal −X): Schreibtisch, Mitarbeiter, zwei Kundenstühle
+	for k, z in { -6, 8 } do
+		local deskCF = o * CFrame.new(-W / 2 + 9, 0.6, z) * CFrame.Angles(0, math.rad(-90), 0)
+		ShopInterior.desk(inside, `SalesDesk{k}`, deskCF, WHITE, ORANGE_DARK)
+		ShopInterior.officeChair(inside, `StaffChair{k}`, deskCF * CFrame.new(0, 0, 2.8) * CFrame.Angles(0, math.rad(180), 0), STEEL_DARK)
+		for _, dx in { -1.6, 1.6 } do
+			ShopInterior.officeChair(inside, `GuestChair{k}{dx}`, deskCF * CFrame.new(dx, 0, -3), Color3.fromRGB(160, 70, 30))
+		end
+	end
+	ShopInterior.hangingSign(inside, "SalesSign", o * CFrame.new(-W / 2 + 11, signY, 1) * CFrame.Angles(0, math.rad(90), 0), "SALES", STEEL_DARK, ORANGE, 8, H - 1)
+	ShopInterior.poster(inside, "PosterPower", o * CFrame.new(-W / 2 + t + 0.25, 10, -6) * CFrame.Angles(0, math.rad(-90), 0), 6, 7, "MORE\nPOWER!", ORANGE, WHITE)
+	ShopInterior.poster(inside, "PosterDrill", o * CFrame.new(-W / 2 + t + 0.25, 10, 8) * CFrame.Angles(0, math.rad(-90), 0), 6, 7, "DRILL\nDEEPER", STEEL_DARK, HAZARD_YELLOW)
+	ShopInterior.brochureStand(inside, "Brochures", o * CFrame.new(-W / 2 + 16, 0.6, 1) * CFrame.Angles(0, math.rad(-90), 0), { ORANGE, HAZARD_YELLOW, WHITE })
+	ShopInterior.plant(inside, "SalesPlant", o * CFrame.new(-W / 2 + 4, 0.6, 15), 6)
+
+	-- Wartebereich vorne rechts neben der Kasse: Sessel, Tisch, Kaffee, Fernseher
+	local wait = o * CFrame.new(-W / 2 + 12, 0.6, -D / 2 + 17)
+	for k, dx in { -4, 0, 4 } do
+		ShopInterior.armchair(inside, `WaitChair{k}`, wait * CFrame.new(dx, 0, 2.5) * CFrame.Angles(0, math.rad(180), 0), Color3.fromRGB(70, 74, 80))
+	end
+	ShopInterior.coffeeTable(inside, "WaitTable", wait * CFrame.new(0, 0, -1.5))
+	ShopInterior.coffeeCorner(inside, "Coffee", o * CFrame.new(-W / 2 + 26, 0.6, -D / 2 + 3) * CFrame.Angles(0, math.rad(180), 0))
+	ShopInterior.tv(inside, "WaitTV", o * CFrame.new(-W / 2 + t + 0.3, 9, -D / 2 + 17) * CFrame.Angles(0, math.rad(-90), 0), 8, "⚙ NEW: " .. Drills.List[math.min(#Drills.List, 6)].DisplayName:upper(), ORANGE_DARK)
+
+	-- Ersatzteiltheke hinten rechts mit Regalwand
+	local partsCF = o * CFrame.new(-W / 2 + 12, 0.6, D / 2 - 12)
+	part(inside, "PartsCounter", Vector3.new(14, 3.6, 2.6), partsCF * CFrame.new(0, 1.8, 0), STEEL_DARK, Enum.Material.Metal)
+	part(inside, "PartsCounterTop", Vector3.new(14.4, 0.3, 3), partsCF * CFrame.new(0, 3.75, 0), ORANGE_DARK, Enum.Material.Metal)
+	part(inside, "PartsBell", Vector3.new(0.6, 0.4, 0.6), partsCF * CFrame.new(-5, 4.1, -0.6), HAZARD_YELLOW, Enum.Material.Metal)
+	ShopInterior.officeChair(inside, "PartsChair", partsCF * CFrame.new(2, 0, 3) * CFrame.Angles(0, math.rad(180), 0), STEEL_DARK)
+	ShopInterior.wallShelf(inside, "PartsShelf", o * CFrame.new(-W / 2 + 12, 0.6, D / 2 - t - 1.1), 20, 4, goods, rng2)
+	ShopInterior.hangingSign(inside, "PartsSign", o * CFrame.new(-W / 2 + 12, signY, D / 2 - 12), "PARTS", HAZARD_YELLOW, DARK, 8, H - 1)
+
+	-- Servicebereich hinten links: Drill auf Hebebühne, Werkzeugwagen, Reifen/Ersatzteile
+	local service = o * CFrame.new(W / 2 - 13, 0.6, D / 2 - 11)
+	part(inside, "LiftBase", Vector3.new(10, 0.6, 12), service * CFrame.new(0, 0.3, 0), HAZARD_YELLOW, Enum.Material.Metal)
+	for _, dx in { -4.2, 4.2 } do
+		part(inside, `LiftArm{dx}`, Vector3.new(0.8, 3, 10), service * CFrame.new(dx, 2.1, 0), STEEL, Enum.Material.Metal)
+	end
+	part(inside, "LiftDeck", Vector3.new(9.4, 0.4, 11), service * CFrame.new(0, 3.8, 0), STEEL_DARK, Enum.Material.DiamondPlate)
+	local serviced = DrillModelBuilder.build(Drills.List[1], service * CFrame.new(0, 4, 0) * CFrame.Angles(0, math.rad(90), 0))
+	serviced.Name = "ServiceDrill"
+	serviced.Parent = inside
+	ShopInterior.tireStack(inside, "SpareWheels", service * CFrame.new(-8.5, 0, -6), 3, 1.4)
+	ShopInterior.hangingSign(inside, "ServiceSign", o * CFrame.new(W / 2 - 13, signY, D / 2 - 22), "SERVICE", STEEL_DARK, HAZARD_YELLOW, 9, H - 1)
+
+	-- Eingang: Notausgang-Schild, Pflanzen, Uhr
+	ShopInterior.exitSign(inside, "ExitSign", o * CFrame.new(0, doorH + 2.4, -D / 2 + t + 0.2) * CFrame.Angles(0, math.rad(180), 0))
+	ShopInterior.plant(inside, "EntrancePlantL", o * CFrame.new(doorW / 2 + 3, 0.6, -D / 2 + 3), 5)
+	ShopInterior.plant(inside, "EntrancePlantR", o * CFrame.new(-doorW / 2 - 3, 0.6, -D / 2 + 3), 5)
+	ShopInterior.clock(inside, "Clock", o * CFrame.new(0, H - 6, D / 2 - t - 0.5))
+
+	-- Hallenstrahler-Raster
+	for ix = -2, 2 do
+		for iz = -2, 2 do
+			local x, z = ix * (W / 5.5), iz * (D / 5.5)
+			local lamp = part(inside, `HighBay{ix}_{iz}`, Vector3.new(2.4, 0.3, 2.4), o * CFrame.new(x, H - 2.2, z), LIGHT, Enum.Material.Neon)
+			lamp.CanCollide = false
+			lamp.CastShadow = false
+			part(inside, `HighBayHood{ix}_{iz}`, Vector3.new(3, 0.8, 3), o * CFrame.new(x, H - 1.7, z), STEEL_DARK, Enum.Material.Metal).CanCollide = false
+			if (ix + iz) % 2 == 0 then
+				local light = Instance.new("SpotLight")
+				light.Face = Enum.NormalId.Bottom
+				light.Range = 26
+				light.Angle = 100
+				light.Brightness = 1
+				light.Color = LIGHT
+				light.Parent = lamp
+			end
 		end
 	end
 

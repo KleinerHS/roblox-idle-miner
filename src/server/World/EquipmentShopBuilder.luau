@@ -17,6 +17,7 @@ local Pickaxes = require(Shared.Definitions.Pickaxes)
 local Backpacks = require(Shared.Definitions.Backpacks)
 
 local ShopDecor = require(script.Parent.ShopDecor)
+local ShopInterior = require(script.Parent.ShopInterior)
 
 local EquipmentShopBuilder = {}
 
@@ -65,10 +66,11 @@ local function surfaceText(target: BasePart, text: string, color: Color3)
 end
 
 -- Ausstellungs-Spitzhacke an der Wand (Kopf oben, leicht schräg)
-local function displayPickaxe(parent: Instance, cf: CFrame, headColor: Color3)
-	part(parent, "Handle", Vector3.new(0.3, 3.6, 0.3), cf, WOOD, Enum.Material.Wood)
-	part(parent, "Head", Vector3.new(3, 0.35, 0.35), cf * CFrame.new(0, 1.7, 0), headColor, Enum.Material.Metal)
-	part(parent, "Hook", Vector3.new(0.6, 0.2, 0.6), cf * CFrame.new(0, 1.2, 0.3), METAL, Enum.Material.Metal)
+local function displayPickaxe(parent: Instance, cf: CFrame, headColor: Color3, scale: number?)
+	local s = scale or 1
+	part(parent, "Handle", Vector3.new(0.3, 3.6, 0.3) * s, cf, WOOD, Enum.Material.Wood)
+	part(parent, "Head", Vector3.new(3, 0.35, 0.35) * s, cf * CFrame.new(0, 1.7 * s, 0), headColor, Enum.Material.Metal)
+	part(parent, "Hook", Vector3.new(0.6, 0.2, 0.6) * s, cf * CFrame.new(0, 1.2 * s, 0.3 * s), METAL, Enum.Material.Metal)
 end
 
 -- Ausstellungs-Rucksack (Größe wächst mit der Kapazität)
@@ -166,64 +168,37 @@ function EquipmentShopBuilder.build(parent: Instance): Model
 		part(model, `BenchLeg{dx}`, Vector3.new(0.3, 1.4, 1.4), benchCF * CFrame.new(dx, 0.7, 0), METAL, Enum.Material.Metal)
 	end
 
-	-- Innen: Teppich und Podeste mit den drei besten Spitzhacken
-	part(model, "Rug", Vector3.new(W * 0.45, 0.08, 12), o * CFrame.new(0, 0.64, -D / 2 + 12), Color3.fromRGB(150, 60, 50), Enum.Material.Fabric)
-	local best = {}
-	for i = #Pickaxes.List, math.max(1, #Pickaxes.List - 2), -1 do
-		table.insert(best, Pickaxes.List[i])
-	end
-	for k, def in best do
-		local x = (k - 2) * 10
-		local top = ShopDecor.podium(model, `Podium{k}`, o * CFrame.new(x, 0.6, -D / 2 + 12), 2.2, BLUE, H - 2)
-		displayPickaxe(model, top * CFrame.new(0, 2.2, 0) * CFrame.Angles(0, 0, math.rad(12)), def.HeadColor)
-		local plate = part(model, `PodiumPlate{k}`, Vector3.new(3.6, 0.9, 0.2), top * CFrame.new(0, -0.5, -2.3) * CFrame.Angles(math.rad(-20), 0, 0), BLUE_DARK, Enum.Material.SmoothPlastic)
-		surfaceText(plate, def.DisplayName:upper(), WHITE)
-	end
+	-- Innenausbau wie ein echter Fachmarkt (D-063): Eingang mit Diebstahlsicherung und Körben,
+	-- Kassen vorne, Neuheiten-Podeste, Gangregale mit Hängeschildern, Rucksack-Abteilung mit
+	-- Puppen, große Spitzhacken-Wand hinten, Personaltür, Poster, Uhr, Rasterdecke.
+	local inside = Instance.new("Folder")
+	inside.Name = "Interior"
+	inside.Parent = model
+	local rng = Random.new(63)
+	local ceilingY = H - 0.4
+	local goods = { BLUE, Color3.fromRGB(240, 196, 40), Color3.fromRGB(200, 70, 50), Color3.fromRGB(70, 74, 80), Color3.fromRGB(230, 230, 226), Color3.fromRGB(60, 130, 80) }
 
-	-- Spitzhacken an der Rückwand (eine pro Stufe)
-	local racks = Instance.new("Folder")
-	racks.Name = "PickaxeDisplay"
-	racks.Parent = model
-	part(racks, "RackBoard", Vector3.new(W - 6, 5, 0.4), o * CFrame.new(0, 8.5, D / 2 - t - 0.5), WOOD_DARK, Enum.Material.Wood)
-	local count = #Pickaxes.List
-	for i, def in Pickaxes.List do
-		local x = -((count - 1) * 4) / 2 + (i - 1) * 4
-		local holder = Instance.new("Folder")
-		holder.Name = def.Id
-		holder.Parent = racks
-		displayPickaxe(holder, o * CFrame.new(x, 8.5, D / 2 - t - 0.9) * CFrame.Angles(0, 0, math.rad(12)), def.HeadColor)
+	-- Boden: Fliesen im Eingang und an den Kassen, Holz im Verkaufsraum
+	ShopInterior.rug(inside, "EntranceTiles", o * CFrame.new(0, 0.6, -D / 2 + 7), W - 2 * t, 12, Color3.fromRGB(200, 196, 188))
+	ShopInterior.rug(inside, "EntranceMat", o * CFrame.new(0, 0.62, -D / 2 + 3), doorW, 4, Color3.fromRGB(40, 44, 52))
+	for _, side in { -1, 1 } do
+		ShopInterior.securityGate(inside, `SecurityGate{side}`, o * CFrame.new(side * (doorW / 2 + 0.6), 0.6, -D / 2 + 6))
 	end
+	ShopInterior.basketStack(inside, "Baskets", o * CFrame.new(doorW / 2 + 4, 0.6, -D / 2 + 4), BLUE)
+	ShopInterior.basketStack(inside, "Baskets2", o * CFrame.new(doorW / 2 + 6.2, 0.6, -D / 2 + 4), Color3.fromRGB(200, 70, 50))
+	ShopInterior.exitSign(inside, "ExitSign", o * CFrame.new(0, doorH + 1.2, -D / 2 + t + 0.2) * CFrame.Angles(0, math.rad(180), 0))
 
-	-- Rucksäcke auf einem Tisch an der linken Wand
-	local tables = Instance.new("Folder")
-	tables.Name = "BackpackDisplay"
-	tables.Parent = model
-	part(tables, "Table", Vector3.new(4, 0.4, 22), o * CFrame.new(W / 2 - 4, 3.2, 2), WOOD, Enum.Material.Wood)
-	for _, z in { -8, 12 } do
-		part(tables, `TableLeg{z}`, Vector3.new(3.4, 3, 0.4), o * CFrame.new(W / 2 - 4, 1.5, z), WOOD_DARK, Enum.Material.Wood)
-	end
-	-- Rucksäcke nebeneinander nach Breite verteilt (alle Stufen auf 22 Studs Tisch)
-	local widths, total = {}, 0
-	for i in Backpacks.List do
-		widths[i] = 1.65 * backpackScale(i)
-		total += widths[i]
-	end
-	local gap = math.max(0.2, (21 - total) / math.max(1, #Backpacks.List - 1))
-	local z = 2 - 10.5
-	for i, def in Backpacks.List do
-		local holder = Instance.new("Folder")
-		holder.Name = def.Id
-		holder.Parent = tables
-		displayBackpack(holder, o * CFrame.new(W / 2 - 4, 3.4, z + widths[i] / 2) * CFrame.Angles(0, math.rad(-90), 0), i)
-		z += widths[i] + gap
-	end
+	-- Kassen vorne rechts (lokal −X); an Kasse 1 der Shop-Prompt
+	local checkoutA = o * CFrame.new(-W / 2 + 22, 0.6, -D / 2 + 13)
+	local checkoutB = o * CFrame.new(-W / 2 + 12, 0.6, -D / 2 + 13)
+	ShopInterior.checkout(inside, "Checkout1", checkoutA, BLUE, rng)
+	ShopInterior.checkout(inside, "Checkout2", checkoutB, BLUE, rng)
+	ShopInterior.officeChair(inside, "CashierChair1", checkoutA * CFrame.new(-2.6, 0, 2.4) * CFrame.Angles(0, math.rad(90), 0), BLUE_DARK)
+	ShopInterior.officeChair(inside, "CashierChair2", checkoutB * CFrame.new(-2.6, 0, 2.4) * CFrame.Angles(0, math.rad(90), 0), BLUE_DARK)
+	ShopInterior.hangingSign(inside, "CheckoutSign", o * CFrame.new(-W / 2 + 17, ceilingY - 4, -D / 2 + 13), "CHECKOUT", BLUE_DARK, WHITE, 12, ceilingY)
+	ShopInterior.queue(inside, "Queue", o * CFrame.new(-W / 2 + 26.5, 0.6, -D / 2 + 17), 3, 3, BLUE)
 
-	-- Tresen rechts mit Shop-Prompt
-	local counterCF = o * CFrame.new(-W / 2 + 6, 0, 4)
-	part(model, "Counter", Vector3.new(3, 3.6, 12), counterCF * CFrame.new(0, 2.1, 0), WOOD_DARK, Enum.Material.Wood)
-	part(model, "CounterTop", Vector3.new(3.6, 0.3, 12.6), counterCF * CFrame.new(0, 4.05, 0), BLUE_DARK, Enum.Material.SmoothPlastic)
-	part(model, "Register", Vector3.new(1.2, 1.2, 1.6), counterCF * CFrame.new(0, 4.8, -3), METAL, Enum.Material.Metal)
-	local promptPart = part(model, "CounterPromptPart", Vector3.new(2, 4, 4), counterCF * CFrame.new(2.6, 3, 0), WHITE, Enum.Material.SmoothPlastic)
+	local promptPart = part(model, "CounterPromptPart", Vector3.new(3, 4, 4), checkoutA * CFrame.new(2.8, 2.4, 0), WHITE, Enum.Material.SmoothPlastic)
 	promptPart.Transparency = 1
 	promptPart.CanCollide = false
 	promptPart.CanQuery = false
@@ -237,14 +212,108 @@ function EquipmentShopBuilder.build(parent: Instance): Model
 	prompt:SetAttribute("ShopId", "equipment")
 	prompt.Parent = promptPart
 
-	for i, x in { -W / 3, -W / 9, W / 9, W / 3 } do
-		local lamp = part(model, `Lamp{i}`, Vector3.new(4, 0.3, 1.4), o * CFrame.new(x, H - 0.5, 0), LIGHT, Enum.Material.Neon)
-		local light = Instance.new("PointLight")
-		light.Range = 22
-		light.Brightness = 1
-		light.Color = LIGHT
-		light.Parent = lamp
+	-- Neuheiten: drei Podeste mit den besten Spitzhacken mitten im Eingangsbereich
+	ShopInterior.rug(inside, "FeatureRug", o * CFrame.new(6, 0.66, -D / 2 + 15), 26, 9, Color3.fromRGB(150, 60, 50))
+	local best = {}
+	for i = #Pickaxes.List, math.max(1, #Pickaxes.List - 2), -1 do
+		table.insert(best, Pickaxes.List[i])
 	end
+	for k, def in best do
+		local x = 6 + (k - 2) * 8
+		local top = ShopDecor.podium(inside, `Podium{k}`, o * CFrame.new(x, 0.6, -D / 2 + 15), 2.2, BLUE, H - 2)
+		displayPickaxe(inside, top * CFrame.new(0, 2.8, 0) * CFrame.Angles(0, 0, math.rad(8)), def.HeadColor, 1.6)
+		local plate = part(inside, `PodiumPlate{k}`, Vector3.new(3.6, 0.9, 0.2), top * CFrame.new(0, -0.5, -2.3) * CFrame.Angles(math.rad(-20), 0, 0), BLUE_DARK, Enum.Material.SmoothPlastic)
+		surfaceText(plate, def.DisplayName:upper(), WHITE)
+	end
+	ShopInterior.hangingSign(inside, "NewSign", o * CFrame.new(6, ceilingY - 4, -D / 2 + 15), "★ NEW ARRIVALS ★", Color3.fromRGB(200, 60, 50), WHITE, 14, ceilingY)
+
+	-- Gangregale mit Hängeschildern
+	local aisles = { { x = -14, label = "TOOLS" }, { x = -3, label = "SAFETY" }, { x = 8, label = "LIGHTS" } }
+	for i, aisle in aisles do
+		ShopInterior.gondola(inside, `Gondola{i}`, o * CFrame.new(aisle.x, 0.6, 6), 18, 7, goods, rng)
+		ShopInterior.hangingSign(inside, `AisleSign{i}`, o * CFrame.new(aisle.x + 5.5, ceilingY - 3.5, -3), aisle.label, BLUE, WHITE, 6, ceilingY)
+	end
+	-- Helme oben auf dem mittleren Regal
+	for k = 1, 5 do
+		ShopInterior.helmet(inside, `ShelfHelmet{k}`, o * CFrame.new(-3, 7.6, -2 + k * 3), ({ Color3.fromRGB(240, 196, 40), Color3.fromRGB(230, 230, 226), Color3.fromRGB(220, 110, 40) })[(k - 1) % 3 + 1])
+	end
+
+	-- Rucksack-Abteilung an der linken Wand (lokal +X): Puppen vorne, Tisch mit allen Stufen dahinter
+	ShopInterior.hangingSign(inside, "BackpackSign", o * CFrame.new(W / 2 - 9, ceilingY - 4, 4) * CFrame.Angles(0, math.rad(90), 0), "BACKPACKS", Color3.fromRGB(70, 96, 70), WHITE, 12, ceilingY)
+	for k, z in { -12, -6, 0 } do
+		local back = ShopInterior.mannequin(inside, `Mannequin{k}`, o * CFrame.new(W / 2 - 11, 0.6, z) * CFrame.Angles(0, math.rad(-90), 0), CANVAS[k], Color3.fromRGB(240, 196, 40))
+		displayBackpack(inside, back * CFrame.new(0, -1.6, 0.2) * CFrame.Angles(0, math.rad(180), 0), #Backpacks.List - 3 + k)
+	end
+	ShopInterior.wallShelf(inside, "GearShelf", o * CFrame.new(W / 2 - t - 1.1, 0.6, 14) * CFrame.Angles(0, math.rad(90), 0), 22, 4, goods, rng)
+
+	-- Spitzhacken-Wand hinten: große Hacken, je ein Spot, Preisschild mit Namen
+	local racks = Instance.new("Folder")
+	racks.Name = "PickaxeDisplay"
+	racks.Parent = model
+	part(racks, "RackBoard", Vector3.new(W - 10, 9, 0.4), o * CFrame.new(0, 9.5, D / 2 - t - 0.5), WOOD_DARK, Enum.Material.Wood)
+	local header = part(racks, "RackHeader", Vector3.new(W - 10, 2.2, 0.3), o * CFrame.new(0, 15.2, D / 2 - t - 0.6), BLUE, Enum.Material.SmoothPlastic)
+	ShopInterior.text(header, "⛏  PICKAXES  ·  FROM STARTER TO LEGENDARY", WHITE, Enum.NormalId.Front)
+	local count = #Pickaxes.List
+	local spacing = math.min(7, (W - 14) / count)
+	for i, def in Pickaxes.List do
+		local x = -((count - 1) * spacing) / 2 + (i - 1) * spacing
+		local holder = Instance.new("Folder")
+		holder.Name = def.Id
+		holder.Parent = racks
+		displayPickaxe(holder, o * CFrame.new(x, 9.2, D / 2 - t - 1) * CFrame.Angles(0, 0, math.rad(12)), def.HeadColor, 1.7)
+		local tag = part(holder, "Tag", Vector3.new(spacing - 1.2, 0.9, 0.1), o * CFrame.new(x, 5.6, D / 2 - t - 0.8), WHITE, Enum.Material.SmoothPlastic)
+		ShopInterior.text(tag, def.DisplayName, BLUE_DARK, Enum.NormalId.Front, true)
+		local spot = part(holder, "Spot", Vector3.new(1, 0.3, 1), o * CFrame.new(x, ceilingY - 0.3, D / 2 - 5), LIGHT, Enum.Material.Neon)
+		spot.CanCollide = false
+		local light = Instance.new("SpotLight")
+		light.Face = Enum.NormalId.Bottom
+		light.Range = 20
+		light.Angle = 40
+		light.Brightness = 1.2
+		light.Color = LIGHT
+		light.Parent = spot
+	end
+	-- Rucksack-Tisch vor der linken hinteren Ecke
+	local tables = Instance.new("Folder")
+	tables.Name = "BackpackDisplay"
+	tables.Parent = model
+	local tableCF = o * CFrame.new(W / 2 - 12, 0, 16)
+	part(tables, "Table", Vector3.new(4, 0.4, 22), tableCF * CFrame.new(0, 3.2, 0), WOOD, Enum.Material.Wood)
+	for _, z in { -10, 10 } do
+		part(tables, `TableLeg{z}`, Vector3.new(3.4, 3, 0.4), tableCF * CFrame.new(0, 1.5, z), WOOD_DARK, Enum.Material.Wood)
+	end
+	local widths, total = {}, 0
+	for i in Backpacks.List do
+		widths[i] = 1.65 * backpackScale(i)
+		total += widths[i]
+	end
+	local gap = math.max(0.2, (21 - total) / math.max(1, #Backpacks.List - 1))
+	local z = -10.5
+	for i, def in Backpacks.List do
+		local holder = Instance.new("Folder")
+		holder.Name = def.Id
+		holder.Parent = tables
+		displayBackpack(holder, tableCF * CFrame.new(0, 3.4, z + widths[i] / 2) * CFrame.Angles(0, math.rad(-90), 0), i)
+		z += widths[i] + gap
+	end
+
+	-- Hinten rechts: Probierecke mit Fels, Personaltür, Poster, Uhr
+	local rock = part(inside, "TryRock", Vector3.new(6, 4, 5), o * CFrame.new(-W / 2 + 10, 2.6, 16) * CFrame.Angles(0.2, 0.6, 0.1), Color3.fromRGB(110, 106, 100), Enum.Material.Rock)
+	rock.CanCollide = true
+	displayPickaxe(inside, o * CFrame.new(-W / 2 + 10, 5.6, 16) * CFrame.Angles(math.rad(25), 0, math.rad(-30)), Color3.fromRGB(150, 210, 230), 1.5)
+	local trySign = part(inside, "TrySign", Vector3.new(5, 1.4, 0.2), o * CFrame.new(-W / 2 + 10, 2.4, 11.6) * CFrame.Angles(math.rad(-15), 0, 0), Color3.fromRGB(240, 196, 40), Enum.Material.SmoothPlastic)
+	ShopInterior.text(trySign, "TRY IT!", Color3.fromRGB(26, 27, 30), Enum.NormalId.Front)
+	ShopInterior.door(inside, "StaffDoor", o * CFrame.new(-W / 2 + t + 0.2, 0.6, 22) * CFrame.Angles(0, math.rad(-90), 0), "STAFF ONLY", Color3.fromRGB(70, 74, 80))
+	ShopInterior.poster(inside, "PosterDeeper", o * CFrame.new(-W / 2 + t + 0.2, 9, 4) * CFrame.Angles(0, math.rad(-90), 0), 6, 8, "MINE\nDEEPER!", Color3.fromRGB(200, 70, 50), WHITE)
+	ShopInterior.poster(inside, "PosterSafety", o * CFrame.new(-W / 2 + t + 0.2, 9, -6) * CFrame.Angles(0, math.rad(-90), 0), 6, 8, "SAFETY\nFIRST", Color3.fromRGB(240, 196, 40), Color3.fromRGB(26, 27, 30))
+	ShopInterior.clock(inside, "Clock", o * CFrame.new(-W / 2 + 22, 15.5, D / 2 - t - 0.5))
+	ShopInterior.plant(inside, "PlantFrontL", o * CFrame.new(W / 2 - 3, 0.6, -D / 2 + 3), 6)
+	ShopInterior.plant(inside, "PlantFrontR", o * CFrame.new(-W / 2 + 3, 0.6, -D / 2 + 3), 6)
+	ShopInterior.plant(inside, "PlantBack", o * CFrame.new(W / 2 - 3, 0.6, D / 2 - 3), 6)
+
+	-- Rasterdecke mit Lichtpanels
+	part(inside, "Ceiling", Vector3.new(W - 2 * t, 0.3, D - 2 * t), o * CFrame.new(0, H - 0.15, 0), Color3.fromRGB(230, 230, 226), Enum.Material.SmoothPlastic)
+	ShopInterior.ceilingLights(inside, "CeilingLights", o * CFrame.new(0, 0, 0), W - 8, D - 8, H - 0.4, 12, LIGHT)
 
 	model.ModelStreamingMode = Enum.ModelStreamingMode.Atomic
 	model.Parent = parent

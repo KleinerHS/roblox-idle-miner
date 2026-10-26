@@ -16,6 +16,7 @@ local LayoutConfig = require(Shared.Config.LayoutConfig)
 local Vehicles = require(Shared.Definitions.Vehicles)
 
 local VehicleModelBuilder = require(script.Parent.VehicleModelBuilder)
+local ShopInterior = require(script.Parent.ShopInterior)
 
 local VehicleShopBuilder = {}
 
@@ -274,6 +275,82 @@ function VehicleShopBuilder.build(parent: Instance): Model
 	surfaceText(pylon, "🚚", WHITE)
 	local pylonLabel = part(model, "PylonLabel", Vector3.new(2.2, 6, 0.1), pylonCF * CFrame.new(0, 5, -0.66), RED_DARK, Enum.Material.SmoothPlastic)
 	surfaceText(pylonLabel, "V\nE\nH\nI\nC\nL\nE\nS", WHITE)
+
+	-- Innenausbau wie ein echtes Autohaus (D-063): Empfang am Eingang, Verkaufsplätze,
+	-- Übergabezone, Lounge mit Kaffee, TV und Kinderecke, Schlüsselkasten, Prospekte, Licht.
+	local inside = Instance.new("Folder")
+	inside.Name = "Interior"
+	inside.Parent = model
+	local floorTop = 0.6
+	local ceilingY = 0.6 + H - 0.2
+	local signY = H - 4
+
+	-- Empfang vorne links (lokal +X)
+	local reception = o * CFrame.new(22, floorTop, -hd + 7)
+	part(inside, "ReceptionDesk", Vector3.new(12, 3.6, 3), reception * CFrame.new(0, 1.8, 0), WHITE, Enum.Material.SmoothPlastic)
+	part(inside, "ReceptionTop", Vector3.new(12.6, 0.3, 3.6), reception * CFrame.new(0, 3.75, 0), DARK, Enum.Material.Marble)
+	part(inside, "ReceptionStripe", Vector3.new(12, 0.5, 0.1), reception * CFrame.new(0, 2.8, -1.55), RED, Enum.Material.Neon)
+	ShopInterior.officeChair(inside, "ReceptionChair", reception * CFrame.new(0, 0, 3) * CFrame.Angles(0, math.rad(180), 0), DARK)
+	part(inside, "ReceptionScreen", Vector3.new(2.4, 1.5, 0.15), reception * CFrame.new(-2, 4.7, 0.6), DARK, Enum.Material.SmoothPlastic)
+	ShopInterior.hangingSign(inside, "WelcomeSign", reception * CFrame.new(0, signY - floorTop, 0), "WELCOME", RED, WHITE, 10, ceilingY)
+	for k, x in { -30, 30 } do
+		ShopInterior.brochureStand(inside, `Brochures{k}`, o * CFrame.new(x, floorTop, -hd + 4), { RED, WHITE, DARK })
+	end
+
+	-- Verkaufsplätze hinten: Schreibtisch, Mitarbeiter, zwei Kundenstühle, Pflanze dazwischen
+	for k, x in { -34, -14, 14, 34 } do
+		local deskCF = o * CFrame.new(x, floorTop, 12)
+		ShopInterior.desk(inside, `SalesDesk{k}`, deskCF, WHITE, RED_DARK)
+		ShopInterior.officeChair(inside, `StaffChair{k}`, deskCF * CFrame.new(0, 0, 2.8) * CFrame.Angles(0, math.rad(180), 0), DARK)
+		for _, dx in { -1.6, 1.6 } do
+			ShopInterior.officeChair(inside, `GuestChair{k}{dx}`, deskCF * CFrame.new(dx, 0, -3), Color3.fromRGB(150, 40, 36))
+		end
+	end
+	for k, x in { -24, 24 } do
+		ShopInterior.plant(inside, `SalesPlant{k}`, o * CFrame.new(x, floorTop, 12), 6)
+	end
+	ShopInterior.hangingSign(inside, "SalesSign", o * CFrame.new(-24, signY, 12), "SALES", DARK, WHITE, 8, ceilingY)
+	ShopInterior.hangingSign(inside, "SalesSign2", o * CFrame.new(24, signY, 12), "FINANCING", DARK, WHITE, 10, ceilingY)
+
+	-- Übergabezone in der Mitte hinten
+	local delivery = o * CFrame.new(0, floorTop, 24)
+	ShopInterior.rug(inside, "DeliveryZone", delivery, 16, 12, Color3.fromRGB(60, 62, 68))
+	local deliveryText = part(inside, "DeliveryText", Vector3.new(12, 0.05, 2.6), delivery * CFrame.new(0, 0.1, -4), Color3.fromRGB(60, 62, 68), Enum.Material.SmoothPlastic)
+	deliveryText.CanCollide = false
+	ShopInterior.text(deliveryText, "VEHICLE DELIVERY", Color3.fromRGB(250, 214, 60), Enum.NormalId.Top, true)
+	for _, dx in { -8, 8 } do
+		for _, dz in { -6, 6 } do
+			local post = part(inside, `DeliveryPost{dx}{dz}`, Vector3.new(0.3, 3, 0.3), delivery * CFrame.new(dx, 1.5, dz), STEEL, Enum.Material.Metal)
+			post.CanCollide = false
+		end
+	end
+	ShopInterior.hangingSign(inside, "DeliverySign", delivery * CFrame.new(0, signY - floorTop, 0), "🎉 DELIVERY", RED, WHITE, 10, ceilingY)
+
+	-- Lounge hinten links erweitern: Kaffee, Fernseher, Sessel, Kinderecke
+	ShopInterior.coffeeCorner(inside, "Coffee", o * CFrame.new(-hw + 26, floorTop, hd - 2.4))
+	ShopInterior.tv(inside, "LoungeTV", o * CFrame.new(-hw + 10, 10, hd - 1.2), 9, "🚗 COMPANY FLEET", RED_DARK)
+	for k, dx in { -6, 6 } do
+		ShopInterior.armchair(inside, `LoungeChair{k}`, o * CFrame.new(-hw + 10 + dx, floorTop, hd - 15) * CFrame.Angles(0, math.rad(if dx < 0 then -30 else 30), 0), DARK)
+	end
+	ShopInterior.hangingSign(inside, "LoungeSign", o * CFrame.new(-hw + 14, signY, hd - 12), "LOUNGE", DARK, WHITE, 8, ceilingY)
+	local kids = o * CFrame.new(-hw + 10, floorTop, 18)
+	ShopInterior.rug(inside, "KidsRug", kids, 8, 8, Color3.fromRGB(80, 160, 210))
+	part(inside, "KidsTable", Vector3.new(3, 1.6, 2), kids * CFrame.new(0, 0.8, 0), Color3.fromRGB(250, 214, 60), Enum.Material.SmoothPlastic)
+	for i = 1, 6 do
+		local block = part(inside, `ToyBlock{i}`, Vector3.new(0.8, 0.8, 0.8), kids * CFrame.new(-2.5 + (i % 3) * 0.9, 0.4 + math.floor(i / 4) * 0.8, 2.2), Color3.fromHSV(i / 6, 0.7, 0.95), Enum.Material.SmoothPlastic)
+		block.CanCollide = false
+	end
+	local toyCar = part(inside, "ToyCar", Vector3.new(1.6, 0.7, 0.9), kids * CFrame.new(1, 1.95, 0), RED, Enum.Material.SmoothPlastic)
+	toyCar.CanCollide = false
+
+	-- Kasse hinten rechts: Schlüsselkasten und Poster dahinter
+	ShopInterior.keyCabinet(inside, "KeyCabinet", o * CFrame.new(hw - 20, 7, hd - 1.2))
+	ShopInterior.poster(inside, "PosterService", o * CFrame.new(hw - 30, 9, hd - 1.15), 6, 8, "SERVICE\n& PARTS", DARK, WHITE)
+	ShopInterior.clock(inside, "Clock", o * CFrame.new(hw - 11, H - 3, hd - 1.2))
+	ShopInterior.exitSign(inside, "ExitSign", o * CFrame.new(0, 13.4, -hd + 0.6) * CFrame.Angles(0, math.rad(180), 0))
+
+	-- Deckenlicht-Raster
+	ShopInterior.ceilingLights(inside, "CeilingLights", o, W - 10, D - 10, ceilingY, 14, LIGHT)
 
 	model.ModelStreamingMode = Enum.ModelStreamingMode.Atomic
 	model.Parent = parent

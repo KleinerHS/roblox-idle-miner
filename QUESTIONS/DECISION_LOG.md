@@ -390,3 +390,14 @@ Ergebnis mit den echten Teilen (`tools/topdown`): keine Berührung, knappster Ab
 **Source:** Felix, 2026-10-26 („mach den Pickaxe- und Drill-Shop und auch den normalen Autoladen etwas größer“)
 **Decision:** Alle drei rund 25 % größer, Front bleibt an derselben Stelle (Parkplätze und Promenade unverändert), die Hallen wachsen nach hinten: Equipment-Shop 80 × 24 × 55 (vorher 64 × 22 × 44), Machine-Shop 90 × 26 × 68 (vorher 72 × 24 × 54), Autohaus 112 × 24 × 85 (vorher 90 × 22 × 68). Drehteller im Autohaus wachsen mit der Halle mit. Abstand zu den Straßen bleibt ≥ 22 Studs von der Straßenmitte, nichts überschneidet sich (Draufsicht-Prüfung).
 **Affected systems:** LayoutConfig (EquipmentShop, MachineShop, VehicleShop), VehicleShopBuilder
+
+## D-063 – Läden innen wie echte Geschäfte
+
+**Source:** Felix, 2026-10-26 („versuch jetzt noch mal alle Läden von innen zu überarbeiten, orientier dich an echten Läden vom Innenaufbau und allem, und überarbeite die kleinen Details“)
+**Decision:** Neuer Baukasten `World/ShopInterior.luau` (Gondelregale, Wandregale, Kassen mit Laufband, Schreibtische, Bürostühle, Sessel, Sofa, Kaffee-Ecke, Prospektständer, Hängeschilder, Poster, Uhr, Notausgang-Schild, Diebstahlsicherung, Körbe, Puppen, Helme, Schlüsselkasten, Fernseher, Lichtraster, Reifenstapel, Türen).
+- **Pickaxe-Shop:** Eingang mit Diebstahlsicherung und Körben, zwei Kassen mit Warteschlange (Shop-Prompt an Kasse 1), Neuheiten-Podeste, drei Gangregale (Tools/Safety/Lights) mit Helmen, Rucksack-Abteilung mit Puppen und Tisch, große Spitzhacken-Wand mit Namensschildern und Spots, Probier-Fels, Personaltür, Poster, Uhr, Rasterdecke.
+- **Drill-Shop:** Stufen 4–6 auf Podesten im Showroom, zwei Verkaufsplätze, Wartebereich mit Sesseln, Kaffee und TV, Ersatzteiltheke mit Regal, Servicebereich mit Hebebühne, Hallenstrahler-Raster.
+- **Autohaus:** Empfang am Eingang, vier Verkaufsplätze (Sales/Financing), Übergabezone, Lounge mit Kaffee, TV, Sesseln und Kinderecke, Schlüsselkasten, Prospekte, Deckenlichter.
+- **LKW-Laden:** Kundenzone hinten mit drei Verkaufsplätzen, Lounge, Ersatzteiltheke mit Regal, Reifenstapel und Poster an den Seiten. Die fünf Stellplätze, auch die zwei freien, bleiben frei.
+- **Kleine Korrekturen:** Gangmarkierungen und freie Stellflächen im LKW-Laden enden vor der Kundenzone, Ausstellungs-Spitzhacken größer.
+**Affected systems:** ShopInterior, EquipmentShopBuilder, MachineShopBuilder, VehicleShopBuilder, TruckShopBuilder
