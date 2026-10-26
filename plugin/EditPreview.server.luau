@@ -80,6 +80,8 @@ local function build(folder: Folder, world: Instance, shared: Instance)
 	local EquipmentShopBuilder = require(world:FindFirstChild("EquipmentShopBuilder") :: ModuleScript) :: any
 	local MachineShopBuilder = require(world:FindFirstChild("MachineShopBuilder") :: ModuleScript) :: any
 	local VehicleShopBuilder = require(world:FindFirstChild("VehicleShopBuilder") :: ModuleScript) :: any
+	local TruckShopBuilder = require(world:FindFirstChild("TruckShopBuilder") :: ModuleScript) :: any
+	local CenterBuilder = require(world:FindFirstChild("CenterBuilder") :: ModuleScript) :: any
 
 	-- Plots (wie PlotService), Plot 1 mit allen Bauschritten (wie BuildingService)
 	local plots = Instance.new("Folder")
@@ -115,9 +117,11 @@ local function build(folder: Folder, world: Instance, shared: Instance)
 		end
 	end
 	PlotBuilder.buildCenterPlaceholder(plots)
-	require(world:FindFirstChild("EnvironmentBuilder") :: ModuleScript).build(folder)
+	local environment = require(world:FindFirstChild("EnvironmentBuilder") :: ModuleScript).build(folder)
+	-- Gestaltung der Map-Mitte wie PlotService (D-057)
+	CenterBuilder.build(environment)
 
-	-- Stadtmitte (wie SellingService/ShopService: Verkauf, Equipment, Machines, Vehicles)
+	-- Stadtmitte (wie SellingService/ShopService: Verkaufskreis, Equipment, Machines, Vehicles, Trucks)
 	local center = Instance.new("Folder")
 	center.Name = "Center"
 	center.Parent = folder
@@ -125,6 +129,7 @@ local function build(folder: Folder, world: Instance, shared: Instance)
 	EquipmentShopBuilder.build(center)
 	MachineShopBuilder.build(center)
 	VehicleShopBuilder.build(center)
+	TruckShopBuilder.build(center)
 
 	-- Minenräume unter den Plots (wie ElevatorService), mit Mine 01 eingerichtet
 	local shafts = Instance.new("Folder")
