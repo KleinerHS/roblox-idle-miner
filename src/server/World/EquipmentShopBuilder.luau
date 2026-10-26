@@ -244,7 +244,8 @@ function EquipmentShopBuilder.build(parent: Instance): Model
 		local back = ShopInterior.mannequin(inside, `Mannequin{k}`, o * CFrame.new(W / 2 - 11, 0.6, z) * CFrame.Angles(0, math.rad(-90), 0), CANVAS[k], Color3.fromRGB(240, 196, 40))
 		displayBackpack(inside, back * CFrame.new(0, -1.6, 0.2) * CFrame.Angles(0, math.rad(180), 0), #Backpacks.List - 3 + k)
 	end
-	ShopInterior.wallShelf(inside, "GearShelf", o * CFrame.new(W / 2 - t - 1.1, 0.6, 14) * CFrame.Angles(0, math.rad(90), 0), 22, 4, goods, rng)
+	-- endet vor der Pflanze in der hinteren Ecke
+	ShopInterior.wallShelf(inside, "GearShelf", o * CFrame.new(W / 2 - t - 1.1, 0.6, 12.5) * CFrame.Angles(0, math.rad(90), 0), 19, 4, goods, rng)
 
 	-- Spitzhacken-Wand hinten: große Hacken, je ein Spot, Preisschild mit Namen
 	local racks = Instance.new("Folder")
@@ -273,13 +274,13 @@ function EquipmentShopBuilder.build(parent: Instance): Model
 		light.Color = LIGHT
 		light.Parent = spot
 	end
-	-- Rucksack-Tisch vor der linken hinteren Ecke
+	-- Rucksack-Tisch vor der linken hinteren Ecke, endet vor der Spitzhacken-Wand
 	local tables = Instance.new("Folder")
 	tables.Name = "BackpackDisplay"
 	tables.Parent = model
-	local tableCF = o * CFrame.new(W / 2 - 12, 0, 16)
-	part(tables, "Table", Vector3.new(4, 0.4, 22), tableCF * CFrame.new(0, 3.2, 0), WOOD, Enum.Material.Wood)
-	for _, z in { -10, 10 } do
+	local tableCF = o * CFrame.new(W / 2 - 12, 0, 14)
+	part(tables, "Table", Vector3.new(4, 0.4, 20), tableCF * CFrame.new(0, 3.2, 0), WOOD, Enum.Material.Wood)
+	for _, z in { -9, 9 } do
 		part(tables, `TableLeg{z}`, Vector3.new(3.4, 3, 0.4), tableCF * CFrame.new(0, 1.5, z), WOOD_DARK, Enum.Material.Wood)
 	end
 	local widths, total = {}, 0
@@ -287,8 +288,8 @@ function EquipmentShopBuilder.build(parent: Instance): Model
 		widths[i] = 1.65 * backpackScale(i)
 		total += widths[i]
 	end
-	local gap = math.max(0.2, (21 - total) / math.max(1, #Backpacks.List - 1))
-	local z = -10.5
+	local gap = math.max(0.2, (19 - total) / math.max(1, #Backpacks.List - 1))
+	local z = -9.5
 	for i, def in Backpacks.List do
 		local holder = Instance.new("Folder")
 		holder.Name = def.Id

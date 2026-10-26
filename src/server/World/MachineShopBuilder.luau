@@ -455,7 +455,7 @@ function MachineShopBuilder.build(parent: Instance): Model
 	ShopInterior.poster(inside, "PosterPower", o * CFrame.new(-W / 2 + t + 0.25, 10, -6) * CFrame.Angles(0, math.rad(-90), 0), 6, 7, "MORE\nPOWER!", ORANGE, WHITE)
 	ShopInterior.poster(inside, "PosterDrill", o * CFrame.new(-W / 2 + t + 0.25, 10, 8) * CFrame.Angles(0, math.rad(-90), 0), 6, 7, "DRILL\nDEEPER", STEEL_DARK, HAZARD_YELLOW)
 	ShopInterior.brochureStand(inside, "Brochures", o * CFrame.new(-W / 2 + 16, 0.6, 1) * CFrame.Angles(0, math.rad(-90), 0), { ORANGE, HAZARD_YELLOW, WHITE })
-	ShopInterior.plant(inside, "SalesPlant", o * CFrame.new(-W / 2 + 4, 0.6, 15), 6)
+	ShopInterior.plant(inside, "SalesPlant", o * CFrame.new(-W / 2 + 4, 0.6, 17.5), 6) -- hinter der Ölwanne
 
 	-- Wartebereich vorne rechts neben der Kasse: Sessel, Tisch, Kaffee, Fernseher
 	local wait = o * CFrame.new(-W / 2 + 12, 0.6, -D / 2 + 17)
@@ -463,7 +463,7 @@ function MachineShopBuilder.build(parent: Instance): Model
 		ShopInterior.armchair(inside, `WaitChair{k}`, wait * CFrame.new(dx, 0, 2.5) * CFrame.Angles(0, math.rad(180), 0), Color3.fromRGB(70, 74, 80))
 	end
 	ShopInterior.coffeeTable(inside, "WaitTable", wait * CFrame.new(0, 0, -1.5))
-	ShopInterior.coffeeCorner(inside, "Coffee", o * CFrame.new(-W / 2 + 26, 0.6, -D / 2 + 3) * CFrame.Angles(0, math.rad(180), 0))
+	ShopInterior.coffeeCorner(inside, "Coffee", o * CFrame.new(-W / 2 + 21, 0.6, -D / 2 + 3) * CFrame.Angles(0, math.rad(180), 0)) -- neben der Eingangspflanze
 	ShopInterior.tv(inside, "WaitTV", o * CFrame.new(-W / 2 + t + 0.3, 9, -D / 2 + 17) * CFrame.Angles(0, math.rad(-90), 0), 8, "⚙ NEW: " .. Drills.List[math.min(#Drills.List, 6)].DisplayName:upper(), ORANGE_DARK)
 
 	-- Ersatzteiltheke hinten rechts mit Regalwand

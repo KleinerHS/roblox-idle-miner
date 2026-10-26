@@ -826,6 +826,8 @@ Selbsttest (ohne Studio): Draufsicht mit und ohne Dach geprüft, keine Überschn
 
 Selbsttest: alle vier Läden im Bearbeitungsmodus von oben und innen angeschaut; im Play bauen sich alle ohne Fehler auf, alle vier Tresen-Prompts vorhanden, Pickaxe-Kasse öffnet das Shop-Fenster.
 
+0.51.1 – Überschneidungsprüfung aller Teile (tools/topdown): fünf Stellen behoben. Rucksack-Tisch ragte in die Spitzhacken-Wand, Wandregal in die Pflanze (Pickaxe-Shop); Pflanze stand in der Ölwanne, Kaffeetheke in der Eingangspflanze (Drill-Shop); LKW-Tresen stand auf der Infotafel von Stellplatz 5, jetzt an der Seitenwand. Danach keine ungewollten Überschneidungen mehr.
+
 ## Phase 12 – Content Expansion – Details
 
 Schritte: 12a alle Minen/Erze/Barren über zentrale Kurven · 12b weitere Spitzhacken, Rucksäcke, Drills, Fahrzeuge, Ausbaustufen (offen).

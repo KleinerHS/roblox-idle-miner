@@ -241,8 +241,9 @@ function TruckShopBuilder.build(parent: Instance): Model
 		end
 	end
 
-	-- Tresen vorne rechts (zwischen Glasfront und erstem Stellplatz)
-	local counterCF = o * CFrame.new(hw - 12, floorTop, -hd + 6)
+	-- Tresen vorne rechts an der Seitenwand neben Stellplatz 5, Front zur Halle
+	-- (vorher mitten auf der Infotafel von Stellplatz 5)
+	local counterCF = o * CFrame.new(hw - 4, floorTop, -hd + 12) * CFrame.Angles(0, math.rad(90), 0)
 	part(model, "Counter", Vector3.new(10, 3.6, 3), counterCF * CFrame.new(0, 1.8, 0), WHITE, Enum.Material.SmoothPlastic)
 	part(model, "CounterTop", Vector3.new(10.6, 0.3, 3.6), counterCF * CFrame.new(0, 3.75, 0), FRAME, Enum.Material.Marble)
 	part(model, "CounterStripe", Vector3.new(10, 0.6, 0.1), counterCF * CFrame.new(0, 2.6, -1.55), ORANGE, Enum.Material.Neon)
