@@ -161,7 +161,7 @@ function VehicleShopBuilder.build(parent: Instance): Model
 	ledSub.Font = Enum.Font.GothamBold
 	ledSub.TextScaled = true
 	ledSub.TextColor3 = Color3.fromRGB(230, 230, 230)
-	ledSub.Text = "Pickups · Vans · Trucks"
+	ledSub.Text = "Pickups · Vans"
 	ledSub.Parent = gradient
 
 	-- Schlanke Stützen an den Ecken
