@@ -814,6 +814,20 @@ Selbsttest (ohne Studio): Draufsicht aus dem echten Code gerendert; Simulation m
 
 Selbsttest (ohne Studio): Draufsicht mit und ohne Dach geprüft, keine Überschneidung mit Straßen, Laternen, Parkplätzen, Hütten, Wasserturm oder Windrad; Luau-Syntax geprüft.
 
+### 18n (Version 0.51.0, 2026-10-26) – Läden innen wie echte Geschäfte (D-063)
+
+| System | Dateien / Instanzen | Status |
+|---|---|---|
+| Einrichtungs-Baukasten | `World/ShopInterior.luau` | TESTING_REQUIRED |
+| Pickaxe-Shop innen (Kassen, Gangregale, Rucksack-Abteilung, Spitzhacken-Wand, Probier-Fels …) | `EquipmentShopBuilder` | TESTING_REQUIRED |
+| Drill-Shop innen (Podeste, Verkauf, Wartebereich, Ersatzteile, Service) | `MachineShopBuilder` | TESTING_REQUIRED |
+| Autohaus innen (Empfang, Verkauf, Übergabe, Lounge, Kinderecke) | `VehicleShopBuilder` | TESTING_REQUIRED |
+| LKW-Laden innen (Verkauf, Lounge, Ersatzteile, Reifen) | `TruckShopBuilder` | TESTING_REQUIRED |
+
+Selbsttest: alle vier Läden im Bearbeitungsmodus von oben und innen angeschaut; im Play bauen sich alle ohne Fehler auf, alle vier Tresen-Prompts vorhanden, Pickaxe-Kasse öffnet das Shop-Fenster.
+
+## Phase 12 – Content Expansion – Details
+
 Schritte: 12a alle Minen/Erze/Barren über zentrale Kurven · 12b weitere Spitzhacken, Rucksäcke, Drills, Fahrzeuge, Ausbaustufen (offen).
 
 ### 12a – Minen 09–100, Erze, Barren (Version 0.19.0) – TESTING_REQUIRED
