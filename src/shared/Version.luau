@@ -4,6 +4,6 @@
 
 return {
 	Game = "Roblox Idle Miner",
-	Version = "0.50.1",
-	Phase = "Phase 18l – Lastzüge fahren frei durch den Kreisel",
+	Version = "0.50.2",
+	Phase = "Phase 18m – Shops größer",
 }

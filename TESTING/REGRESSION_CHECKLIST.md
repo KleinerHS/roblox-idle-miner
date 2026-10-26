@@ -50,3 +50,4 @@ Nach Änderungen an Economy, Inventory, Save, Trading oder Prestige die betroffe
 - [ ] Phase 18j/18l: Grain Road Train und Tipper Road Train fahren von jeder Einfahrt rechts, geradeaus und links durch den Kreisel, ohne Bänke, Laternen, Beete oder Bäume zu treffen (D-059, D-061)
 - [ ] Phase 18l: Zufahrt vom Kreisel in den LKW-Laden frei befahrbar; keine Hütte auf einer Straße
 - [ ] Phase 18k: Pickaxe- und Drill-Shop – Tresen (E) funktioniert, nichts ragt ineinander (D-060)
+- [ ] Phase 18m: Pickaxe-, Drill-Shop und Autohaus größer – Tresen (E) erreichbar, Ausstellungsstücke stehen frei, nichts ragt ineinander (D-062)

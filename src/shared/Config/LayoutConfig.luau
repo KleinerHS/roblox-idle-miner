@@ -154,28 +154,29 @@ local LayoutConfig = {
 	-- Position relativ zu MapCenter; Eingang zeigt zur Platzmitte. TODO_LAYOUT
 	EquipmentShop = {
 		-- D-057: mittig zwischen den Straßen, Parkplatz davor
-		Offset = Vector2.new(-171, 46),
+		Offset = Vector2.new(-176.5, 46), -- 2026-10-26: Front bleibt, Halle wächst nach hinten
 		SectorAngle = 180,
-		-- D-060: größer und einladender (vorher 40 × 16 × 30)
-		Size = Vector3.new(64, 22, 44),
+		-- D-060: größer und einladender (vorher 40 × 16 × 30); D-062: nochmals größer (vorher 64 × 22 × 44)
+		Size = Vector3.new(80, 24, 55),
 	},
 	-- Machine-Shop in der Mitte (CENTRAL_AREA_REFERENCE.png: hinten, orange). Liegt zwischen
 	-- den Straßen zu Plot 2 und Plot 3; Rolltor zeigt zur Platzmitte. TODO_LAYOUT
 	MachineShop = {
-		Offset = Vector2.new(48.2, -175.4), -- D-057/D-060
+		Offset = Vector2.new(51.7, -181.5), -- D-057/D-060/D-062 (Front bleibt)
 		SectorAngle = 60,
-		-- D-060: größer und einladender (vorher 52 × 18 × 40)
-		Size = Vector3.new(72, 24, 54),
+		-- D-060: größer und einladender (vorher 52 × 18 × 40); D-062: nochmals größer (vorher 72 × 24 × 54)
+		Size = Vector3.new(90, 26, 68),
 	},
 	-- Fahrzeughaus in der Mitte (CENTRAL_AREA_REFERENCE.png: rechts, rot). Liegt zwischen den
 	-- Straßen zu Plot 3 und Plot 4; Glasfront zeigt zur Platzmitte. TODO_LAYOUT
 	VehicleShop = {
-		Offset = Vector2.new(186, -46), -- D-057, Kreisel größer (2026-10-25)
+		Offset = Vector2.new(194.5, -46), -- D-057, Kreisel größer (2026-10-25), D-062 (Front bleibt)
 		SectorAngle = 0,
 		-- Großer Glas-Showroom (D-027): Breite, Höhe, Tiefe. Phase 12c: Platz für 6 Fahrzeuge
 		-- in zwei Reihen (Felix); bleibt innerhalb des Platzes (CenterPlazaRadius) und frei
 		-- vom Machine-Shop.
-		Size = Vector3.new(90, 22, 68),
+		-- D-062: größer (vorher 90 × 22 × 68)
+		Size = Vector3.new(112, 24, 85),
 		-- Höchstzahl ausgestellter Fahrzeuge (zwei Reihen à drei)
 		DisplaySlots = 6,
 	},

@@ -25,7 +25,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 15 | Rare Drops & Mining Luck | TESTING_REQUIRED (15a, D-045) |
 | 16 | Verkauf & Spätspiel-Geld | TESTING_REQUIRED (16a, D-046) |
 | 17 | Icons | TESTING_REQUIRED (17a Erz- und Barren-Icons, 17b Kategorie-Icons) |
-| 18 | Fahrzeuge aus Felix' Modellen, Map-Mitte | TESTING_REQUIRED (18a: 4 Fahrzeuge; 18b: Durchfahr-Verladestraße, D-052; 18c: Lastzug mit echten Anhängern, D-053; 18d–18g Nachbesserungen, Startauto, Verkaufskreis; 18h Mitte D-057; 18i LKW-Laden D-058; 18j Kreisel D-059; 18k Shops D-060; 18l Lastzüge im Kreisel D-061) |
+| 18 | Fahrzeuge aus Felix' Modellen, Map-Mitte | TESTING_REQUIRED (18a: 4 Fahrzeuge; 18b: Durchfahr-Verladestraße, D-052; 18c: Lastzug mit echten Anhängern, D-053; 18d–18g Nachbesserungen, Startauto, Verkaufskreis; 18h Mitte D-057; 18i LKW-Laden D-058; 18j Kreisel D-059; 18k Shops D-060; 18l Lastzüge im Kreisel D-061; 18m Shops größer D-062) |
 
 ## Setup – Details
 
@@ -805,6 +805,14 @@ Selbsttest (Play): Mitte von oben und aus der Perspektive geprüft, keine Teile 
 | Prüfwerkzeuge: Draufsicht ohne Studio (`tools/topdown`), Schleppkurven-Simulation (`tools/roundabout_sweep.py`) | `tools/` | IMPLEMENTED |
 
 Selbsttest (ohne Studio): Draufsicht aus dem echten Code gerendert; Simulation mit allen kollidierenden Teilen, 2 Lastzüge × 6 Einfahrten × rechts/geradeaus/links × 3 Fahrlinien: keine Berührung, knappster Abstand 1,5 Studs (Laternenfuß), innerste Anhängerkante r ≈ 45 (Fahrbahn ab 40). Luau-Syntax geprüft. Play-Test in Studio steht noch aus.
+
+### 18m (Version 0.50.2, 2026-10-26) – Pickaxe-, Drill-Shop und Autohaus größer (D-062)
+
+| System | Dateien / Instanzen | Status |
+|---|---|---|
+| Equipment-Shop 80 × 24 × 55, Machine-Shop 90 × 26 × 68, Autohaus 112 × 24 × 85; Front bleibt, Halle wächst nach hinten; Drehteller skalieren mit | `LayoutConfig`, `VehicleShopBuilder` | TESTING_REQUIRED |
+
+Selbsttest (ohne Studio): Draufsicht mit und ohne Dach geprüft, keine Überschneidung mit Straßen, Laternen, Parkplätzen, Hütten, Wasserturm oder Windrad; Luau-Syntax geprüft.
 
 Schritte: 12a alle Minen/Erze/Barren über zentrale Kurven · 12b weitere Spitzhacken, Rucksäcke, Drills, Fahrzeuge, Ausbaustufen (offen).
 

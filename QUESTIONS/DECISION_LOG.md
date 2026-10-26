@@ -384,3 +384,9 @@ IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und 
 - Dritte Holzhütte stand mit der Veranda 5 Studs auf der Straße zu Plot 2 → nach (-80, -178) verschoben.
 Ergebnis mit den echten Teilen (`tools/topdown`): keine Berührung, knappster Abstand 1,5 Studs.
 **Affected systems:** LayoutConfig (Center.RestSpot*, SidewalkLampStart, AlleyStart, Cabins), CenterBuilder, TruckShopBuilder, tools/roundabout_sweep.py, tools/topdown
+
+## D-062 – Pickaxe-, Drill-Shop und Autohaus nochmals größer
+
+**Source:** Felix, 2026-10-26 („mach den Pickaxe- und Drill-Shop und auch den normalen Autoladen etwas größer“)
+**Decision:** Alle drei rund 25 % größer, Front bleibt an derselben Stelle (Parkplätze und Promenade unverändert), die Hallen wachsen nach hinten: Equipment-Shop 80 × 24 × 55 (vorher 64 × 22 × 44), Machine-Shop 90 × 26 × 68 (vorher 72 × 24 × 54), Autohaus 112 × 24 × 85 (vorher 90 × 22 × 68). Drehteller im Autohaus wachsen mit der Halle mit. Abstand zu den Straßen bleibt ≥ 22 Studs von der Straßenmitte, nichts überschneidet sich (Draufsicht-Prüfung).
+**Affected systems:** LayoutConfig (EquipmentShop, MachineShop, VehicleShop), VehicleShopBuilder

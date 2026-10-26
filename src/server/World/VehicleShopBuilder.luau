@@ -196,8 +196,9 @@ function VehicleShopBuilder.build(parent: Instance): Model
 	-- Zwei Reihen à drei Drehteller (max. DisplaySlots Fahrzeuge). Fahrzeuge stehen quer, damit
 	-- auch die langen LKW nebeneinander passen; Infotafel vor jedem Drehteller.
 	local slots = cfg.DisplaySlots
-	local columnX = { -29, 0, 29 }
-	local rowZ = { -15, 11 }
+	-- Lage wächst mit der Hallengröße (ursprünglich für 90 × 68: x ±29, z -15/11)
+	local columnX = { -hw * 0.64, 0, hw * 0.64 }
+	local rowZ = { -hd * 0.44, hd * 0.32 }
 	-- Nur die kleinen Fahrzeuge werden ausgestellt (Felix 2026-10-18), LKW stehen nur im Katalog
 	local shown = {}
 	for _, def in Vehicles.List do
