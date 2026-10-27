@@ -61,7 +61,8 @@ function ToolBuilder.buildPickaxe(def: Pickaxes.PickaxeDefinition): Tool
 			end
 		end
 		model.Parent = tool
-		tool.Grip = CFrame.Angles(math.rad(90), 0, 0)
+		-- Stiel aufrecht in der Hand, Kopf oben, Spitzen nach vorne/hinten (Felix 2026-10-28)
+		tool.Grip = CFrame.new()
 		return tool
 	end
 

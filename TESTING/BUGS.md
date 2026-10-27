@@ -192,3 +192,14 @@ Nicht verschoben: eine Rohr-Aufhänger-Gruppe weit außerhalb der Halle (Workspa
 **Nachtrag 0.51.8 (Felix-Screenshot 2026-10-27):** Neben der Fahrbahnkante blieb zwischen Ausrundung und Kreiselrand ein schmaler Pflasterkeil (sah wie Spitzen aus). Jetzt füllt je Seite ein Rechteck den Bereich unter dem Bogen bis zum Kreiselrand; Prüfskript findet keine Pflasterspitzen mehr zwischen Asphaltflächen.
 **Nachtrag 0.51.9 (gleicher Screenshot, Kerbe an der Promenadenecke):** Die Einfahrt der Shop-Parkplätze (18 Studs lang, mittig auf der Fahrgasse) ragte bis 6 Studs über das Gehwegende in die Promenade und lag über dem Pflaster → Asphalt-Kerbe. Jetzt wird sie gekürzt, bis beide Ecken am Promenadenrand liegen; darunter liegt die ungekürzte Fläche knapp unter dem Pflaster (wie das Vorfeld), damit die Kante rund bleibt und kein Gras durchscheint. Draufsicht aller 3 Shop-Parkplätze ohne Kerbe und ohne Gras; die untere Fläche liegt nirgends sichtbar auf dem Gehweg (kein Flackern).
 **Likely system:** Umgebung (EnvironmentBuilder, CenterBuilder)
+
+## BUG-017 – Spitzhacke wird falsch gehalten
+
+**Severity:** Low
+**Status:** Fixed (TESTING_REQUIRED)
+**Build:** 0.54.1
+**Gemeldet:** Felix, 2026-10-28 (Screenshot: Hacke waagerecht nach vorne wie eine Lanze)
+**Ursache:** Der Griff des neuen 3D-Werkzeugs (D-071) übernahm die Drehung des alten Platzhalters (`Grip` 90° um X); dadurch zeigte der Stiel nach vorne statt nach oben.
+**Fix:** `Grip` neutral (`CFrame.new()`): Stiel aufrecht, Hand im unteren Griffbereich (22 % der Höhe), Kopf oben, Spitzen nach vorne/hinten. Nur das 3D-Werkzeug betroffen, der Platzhalter ohne Vorlage bleibt unverändert.
+**Regression geprüft:** Play: Werkzeug ausgerüstet, Haltung von vorne und von der Seite angeschaut; keine Fehler in der Konsole.
+**Likely system:** ToolBuilder

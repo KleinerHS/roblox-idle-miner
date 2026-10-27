@@ -848,7 +848,7 @@ Selbsttest (ohne Studio, tools/topdown): Draufsicht aller Parkplätze; Überschn
 | 25 Stufen mit neuen IDs und englischen Namen, alte Werte als Anker, Zwischenstufen TODO_BALANCE | `Pickaxes.luau` (`LegacyIds`, Feld `Model`) | TESTING_REQUIRED |
 | Spielstand v12: alte Spitzhacken-IDs → neue Stufe mit denselben Werten | `DataSchema.luau` | TESTING_REQUIRED |
 | 3D-Vorlagen der 25 Hacken | Place-Datei: `ServerStorage.Vendor.Pickaxes` – **Place speichern!** Sicherung `assets/Pickaxes.rbxm` (Rücktest 195 Objekte, 0 Abweichungen) | TESTING_REQUIRED |
-| Werkzeug in der Hand aus der Vorlage (unsichtbarer Griff bei 22 % der Höhe, Kopf vorne/hinten wie bisher) | `PickaxeModels.luau` (neu), `ToolBuilder.luau` | TESTING_REQUIRED |
+| Werkzeug in der Hand aus der Vorlage (unsichtbarer Griff bei 22 % der Höhe); 0.54.1: Stiel aufrecht, Kopf oben (BUG-017) | `PickaxeModels.luau` (neu), `ToolBuilder.luau` | TESTING_REQUIRED |
 | Podium-Ansicht zeigt die Vorlagen (Breitseite zur Kamera) | `ShowcaseItems.luau` | TESTING_REQUIRED |
 | Spitzhacken-Wand: alle 25 in zwei Reihen (13 + 12), Stufe 1 oben links, Namensschild je Hacke | `EquipmentShopBuilder.luau` | TESTING_REQUIRED |
 
