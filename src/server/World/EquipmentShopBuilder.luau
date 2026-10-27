@@ -212,32 +212,53 @@ function EquipmentShopBuilder.build(parent: Instance): Model
 	prompt:SetAttribute("ShopId", "equipment")
 	prompt.Parent = promptPart
 
-	-- Podium für die Shop-Ansicht (D-070): leer; beim Einkaufen setzt der Client das gewählte Item
-	-- darauf und die Kamera auf „ShowcaseCamera“
-	ShopInterior.rug(inside, "FeatureRug", o * CFrame.new(6, 0.66, -D / 2 + 18), 16, 12, Color3.fromRGB(150, 60, 50))
-	local top = ShopDecor.podium(inside, "ShowcasePodium", o * CFrame.new(6, 0.6, -D / 2 + 18), 3.4, BLUE, H - 2)
+	-- Podium für die Shop-Ansicht (D-070): Marmorsäule mitten im Laden, leer; beim Einkaufen setzt
+	-- der Client das gewählte Item darauf und die Kamera auf „ShowcaseCamera“ (Felix 2026-10-27:
+	-- Regale dahinter weg, mittiger, nicht leuchtend, wie eine Marmor-/Quarzsäule)
+	local MARBLE = Color3.fromRGB(236, 234, 230)
+	local GOLD = Color3.fromRGB(200, 170, 100)
+	local px, pz = 0, 2
+	local base = o * CFrame.new(px, 0.6, pz)
+	local function cyl(name: string, h: number, r: number, y: number, color: Color3, mat: Enum.Material)
+		local c = part(inside, name, Vector3.new(h, r * 2, r * 2), base * CFrame.new(0, y + h / 2, 0) * CFrame.Angles(0, 0, math.rad(90)), color, mat)
+		c.Shape = Enum.PartType.Cylinder
+		return c
+	end
+	ShopInterior.rug(inside, "ShowcaseRug", base, 18, 18, Color3.fromRGB(150, 60, 50))
+	cyl("PodiumStep", 0.5, 5.2, 0, MARBLE, Enum.Material.Marble)
+	cyl("PodiumBase", 0.7, 4.2, 0.5, MARBLE, Enum.Material.Marble)
+	cyl("PodiumBaseTrim", 0.15, 4.25, 1.2, GOLD, Enum.Material.Metal)
+	cyl("PodiumShaft", 2.6, 3.2, 1.35, MARBLE, Enum.Material.Marble)
+	-- Kanneluren (senkrechte Rillen) an der Säule
+	for k = 0, 15 do
+		local a = math.rad(k * 22.5)
+		local flute = part(inside, `PodiumFlute{k}`, Vector3.new(0.25, 2.4, 0.25), base * CFrame.Angles(0, a, 0) * CFrame.new(0, 2.65, -3.15), Color3.fromRGB(214, 212, 206), Enum.Material.Marble)
+		flute.CanCollide = false
+	end
+	cyl("PodiumCapTrim", 0.15, 3.65, 3.95, GOLD, Enum.Material.Metal)
+	cyl("PodiumCap", 0.6, 3.8, 4.1, MARBLE, Enum.Material.Marble)
+	local top = base * CFrame.new(0, 4.7, 0)
 	local spot = part(model, "ShowcaseSpot", Vector3.new(1, 1, 1), top, WHITE, Enum.Material.SmoothPlastic)
 	spot.Transparency = 1
 	spot.CanCollide = false
 	spot.CanQuery = false
 	spot:SetAttribute("ShopId", "equipment")
-	local camPos = (o * CFrame.new(6, 8.5, -D / 2 + 1.5)).Position
-	local camPart = part(model, "ShowcaseCamera", Vector3.new(1, 1, 1), CFrame.lookAt(camPos, top.Position + Vector3.new(0, 5.6, 0)), WHITE, Enum.Material.SmoothPlastic)
+	-- Spot von der Decke aufs Podium (sichtbares Licht nur als Beleuchtung, keine Leuchtfläche)
+	local lampCF = base * CFrame.new(0, H - 1.2, 0)
+	local lamp = part(inside, "ShowcaseLamp", Vector3.new(1.6, 0.4, 1.6), lampCF, Color3.fromRGB(40, 42, 46), Enum.Material.Metal)
+	lamp.CanCollide = false
+	local light = Instance.new("SpotLight")
+	light.Face = Enum.NormalId.Bottom
+	light.Range = H
+	light.Angle = 40
+	light.Brightness = 2.5
+	light.Color = LIGHT
+	light.Parent = lamp
+	local camPos = (base * CFrame.new(0, 10, -19)).Position
+	local camPart = part(model, "ShowcaseCamera", Vector3.new(1, 1, 1), CFrame.lookAt(camPos, top.Position + Vector3.new(0, 1.8, 0)), WHITE, Enum.Material.SmoothPlastic)
 	camPart.Transparency = 1
 	camPart.CanCollide = false
 	camPart.CanQuery = false
-	ShopInterior.hangingSign(inside, "NewSign", o * CFrame.new(6, ceilingY - 3, -D / 2 + 18), "★ SHOWCASE ★", Color3.fromRGB(200, 60, 50), WHITE, 12, ceilingY)
-
-	-- Gangregale mit Hängeschildern
-	local aisles = { { x = -14, label = "TOOLS" }, { x = -3, label = "SAFETY" }, { x = 8, label = "LIGHTS" } }
-	for i, aisle in aisles do
-		ShopInterior.gondola(inside, `Gondola{i}`, o * CFrame.new(aisle.x, 0.6, 6), 18, 7, goods, rng)
-		ShopInterior.hangingSign(inside, `AisleSign{i}`, o * CFrame.new(aisle.x + 5.5, ceilingY - 3.5, -3), aisle.label, BLUE, WHITE, 6, ceilingY)
-	end
-	-- Helme oben auf dem mittleren Regal
-	for k = 1, 5 do
-		ShopInterior.helmet(inside, `ShelfHelmet{k}`, o * CFrame.new(-3, 7.6, -2 + k * 3), ({ Color3.fromRGB(240, 196, 40), Color3.fromRGB(230, 230, 226), Color3.fromRGB(220, 110, 40) })[(k - 1) % 3 + 1])
-	end
 
 	-- Rucksack-Abteilung an der linken Wand (lokal +X): Puppen vorne, Tisch mit allen Stufen dahinter
 	ShopInterior.hangingSign(inside, "BackpackSign", o * CFrame.new(W / 2 - 9, ceilingY - 4, 4) * CFrame.Angles(0, math.rad(90), 0), "BACKPACKS", Color3.fromRGB(70, 96, 70), WHITE, 12, ceilingY)

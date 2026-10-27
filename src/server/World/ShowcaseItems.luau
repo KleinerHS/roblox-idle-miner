@@ -107,7 +107,7 @@ function ShowcaseItems.build()
 	for i, def in Pickaxes.List do
 		local m = pickaxe(def, i)
 		-- groß genug für die Kamera-Ansicht
-		m:ScaleTo(1.2)
+		m:ScaleTo(1.5)
 		m.Parent = picks
 	end
 	local packs = folder("backpack")
