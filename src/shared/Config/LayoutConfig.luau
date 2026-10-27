@@ -253,9 +253,14 @@ local LayoutConfig = {
 		PromenadeOuter = 104,
 		FenceRadius = 272,
 		SidewalkWidth = 5,
-		ShopLotStalls = 12,
+		-- Parkplätze (Felix 2026-10-27): Lücken groß genug für die fahrbaren Autos (High-Roof Van
+		-- 10 × 26), Shop-Parkplätze reichen von Gehweg zu Gehweg
+		StallWidth = 12,
+		StallDepth = 24,
+		LotAisle = 12,
+		ShopLotStalls = 6,
 		BigLotAngle = -120,
-		BigLotDoubleRows = 3,
+		BigLotDoubleRows = 2,
 		BigLotMaxStalls = 16,
 		PondAngle = 120,
 		GardenAngle = 120,

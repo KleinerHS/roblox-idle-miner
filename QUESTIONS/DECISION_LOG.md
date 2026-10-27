@@ -401,3 +401,9 @@ Ergebnis mit den echten Teilen (`tools/topdown`): keine Berührung, knappster Ab
 - **LKW-Laden:** Kundenzone hinten mit drei Verkaufsplätzen, Lounge, Ersatzteiltheke mit Regal, Reifenstapel und Poster an den Seiten. Die fünf Stellplätze, auch die zwei freien, bleiben frei.
 - **Kleine Korrekturen:** Gangmarkierungen und freie Stellflächen im LKW-Laden enden vor der Kundenzone, Ausstellungs-Spitzhacken größer.
 **Affected systems:** ShopInterior, EquipmentShopBuilder, MachineShopBuilder, VehicleShopBuilder, TruckShopBuilder
+
+## D-064 – Shop-Parkplätze an die Straßen angebunden, große Lücken
+
+**Source:** Felix, 2026-10-27 („die kleinen Parkplätze vor den Läden sind nicht an die Straße angebunden, die Deko davor muss weg und die Parkplätze minimal größer, sodass nach dem Bürgersteig direkt der Parkplatz anfängt; außerdem sind die Parklücken viel zu klein … angemessene Größe für die im Spiel fahrbaren Autos“)
+**Decision:** Die Parkplätze vor den drei Shops reichen jetzt von Gehweg zu Gehweg (an beide Straßen angebunden) und von der Promenade bis zum Vorplatz des Shops. Bäume, Laternen-Inseln, Bänke und Beete auf und vor der Fläche sind entfernt. Pro Shop eine Reihe mit 6 Lücken à 12 × 24 Studs vor dem Shop, davor eine breite Fahrgasse quer zwischen den Straßen. Der große Parkplatz nutzt dieselbe Lückengröße (2 Doppelreihen). Maße in `LayoutConfig.Center` (StallWidth, StallDepth, LotAisle).
+**Affected systems:** CenterBuilder, LayoutConfig
