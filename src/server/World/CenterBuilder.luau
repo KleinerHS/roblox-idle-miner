@@ -824,7 +824,7 @@ function CenterBuilder.build(parent: Instance): Folder
 		local cf = if typeof(sector) == "number"
 			then CFrame.lookAt(pos, pos - sectorFrame(sector).LookVector)
 			else CFrame.lookAt(pos, Vector3.new(c.X, TOP, c.Z))
-		occupy(cf, Vector2.new(shop.Size.X, shop.Size.Z), 4)
+		occupy(cf, Vector2.new(shop.Size.X, shop.Size.Z), 8) -- Rand 8: Kiefernkronen (Radius bis 6,6) sonst in der Wand
 		-- Vorplatz mit Blumenkästen links und rechts vom Eingang
 		local front = cf * CFrame.new(0, 0, -shop.Size.Z / 2 - 4)
 		flat(folder, "Forecourt", Vector2.new(shop.Size.X, 8), front, TOP + 0.04, PAVING, Enum.Material.Pavement)

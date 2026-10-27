@@ -295,8 +295,8 @@ function MachineShopBuilder.build(parent: Instance): Model
 	end
 	part(tools, "BottleChain", Vector3.new(0.1, 0.1, 2.6), o * CFrame.new(wallX - 0.45, 3, -15.6), STEEL_DARK, Enum.Material.Metal)
 
-	-- Kasse direkt rechts hinter dem Eingang (lokal −X; Rückmeldung Felix)
-	local counterCF = o * CFrame.new(-W / 2 + 5, 0, -D / 2 + 9)
+	-- Kasse direkt rechts neben dem Eingang (lokal −X), Bedienseite zum Tor (Felix 2026-10-27)
+	local counterCF = o * CFrame.new(-doorW / 2 - 5, 0, -D / 2 + 8)
 	part(model, "Counter", Vector3.new(3, 3.6, 9), counterCF * CFrame.new(0, 2.4, 0), STEEL_DARK, Enum.Material.Metal)
 	part(model, "CounterTop", Vector3.new(3.6, 0.3, 9.6), counterCF * CFrame.new(0, 4.35, 0), ORANGE_DARK, Enum.Material.Metal)
 	part(model, "CounterStripe", Vector3.new(0.05, 0.5, 9), counterCF * CFrame.new(1.53, 3.6, 0), HAZARD_YELLOW, Enum.Material.SmoothPlastic)

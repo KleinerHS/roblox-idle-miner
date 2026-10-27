@@ -162,10 +162,11 @@ local LayoutConfig = {
 	-- Machine-Shop in der Mitte (CENTRAL_AREA_REFERENCE.png: hinten, orange). Liegt zwischen
 	-- den Straßen zu Plot 2 und Plot 3; Rolltor zeigt zur Platzmitte. TODO_LAYOUT
 	MachineShop = {
-		Offset = Vector2.new(51.7, -181.5), -- D-057/D-060/D-062 (Front bleibt)
+		Offset = Vector2.new(54.2, -185.83), -- D-057/D-060/D-062/D-069 (Front bleibt)
 		SectorAngle = 60,
 		-- D-060: größer und einladender (vorher 52 × 18 × 40); D-062: nochmals größer (vorher 72 × 24 × 54)
-		Size = Vector3.new(90, 26, 68),
+		-- D-069 (Felix 2026-10-27): seitlich und hinten je eine Baumbreite mehr (vorher 90 × 26 × 68)
+		Size = Vector3.new(110, 26, 78),
 	},
 	-- Fahrzeughaus in der Mitte (CENTRAL_AREA_REFERENCE.png: rechts, rot). Liegt zwischen den
 	-- Straßen zu Plot 3 und Plot 4; Glasfront zeigt zur Platzmitte. TODO_LAYOUT
