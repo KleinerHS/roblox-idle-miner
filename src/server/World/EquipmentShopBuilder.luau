@@ -188,17 +188,25 @@ function EquipmentShopBuilder.build(parent: Instance): Model
 	ShopInterior.basketStack(inside, "Baskets2", o * CFrame.new(doorW / 2 + 6.2, 0.6, -D / 2 + 4), Color3.fromRGB(200, 70, 50))
 	ShopInterior.exitSign(inside, "ExitSign", o * CFrame.new(0, doorH + 1.2, -D / 2 + t + 0.2) * CFrame.Angles(0, math.rad(180), 0))
 
-	-- Kassen vorne rechts (lokal −X); an Kasse 1 der Shop-Prompt
-	local checkoutA = o * CFrame.new(-W / 2 + 22, 0.6, -D / 2 + 13)
-	local checkoutB = o * CFrame.new(-W / 2 + 12, 0.6, -D / 2 + 13)
-	ShopInterior.checkout(inside, "Checkout1", checkoutA, BLUE, rng)
-	ShopInterior.checkout(inside, "Checkout2", checkoutB, BLUE, rng)
-	ShopInterior.officeChair(inside, "CashierChair1", checkoutA * CFrame.new(-2.6, 0, 2.4) * CFrame.Angles(0, math.rad(90), 0), BLUE_DARK)
-	ShopInterior.officeChair(inside, "CashierChair2", checkoutB * CFrame.new(-2.6, 0, 2.4) * CFrame.Angles(0, math.rad(90), 0), BLUE_DARK)
-	ShopInterior.hangingSign(inside, "CheckoutSign", o * CFrame.new(-W / 2 + 17, ceilingY - 4, -D / 2 + 13), "CHECKOUT", BLUE_DARK, WHITE, 12, ceilingY)
-	ShopInterior.queue(inside, "Queue", o * CFrame.new(-W / 2 + 26.5, 0.6, -D / 2 + 17), 3, 3, BLUE)
+	-- Ein kleiner Verkaufstresen rechts vom Eingang (lokal −X) mit Verkäufer dahinter
+	-- (Felix 2026-10-27: statt zwei Supermarktkassen). Kundenseite zeigt zur Ladenmitte (+X).
+	local deskCF = o * CFrame.new(-doorW / 2 - 9, 0.6, -D / 2 + 9) * CFrame.Angles(0, math.rad(-90), 0)
+	part(inside, "Desk", Vector3.new(9, 3.4, 2.8), deskCF * CFrame.new(0, 1.7, 0), WOOD_DARK, Enum.Material.WoodPlanks)
+	part(inside, "DeskFront", Vector3.new(9.1, 2.2, 0.1), deskCF * CFrame.new(0, 1.7, -1.45), BLUE, Enum.Material.SmoothPlastic)
+	part(inside, "DeskTop", Vector3.new(9.6, 0.3, 3.4), deskCF * CFrame.new(0, 3.55, 0), WOOD, Enum.Material.Wood)
+	part(inside, "Register", Vector3.new(1.4, 0.9, 1.2), deskCF * CFrame.new(2.6, 4.15, 0.4), Color3.fromRGB(40, 42, 46), Enum.Material.Metal)
+	part(inside, "RegisterScreen", Vector3.new(1.2, 0.8, 0.1), deskCF * CFrame.new(2.6, 4.9, 0.2) * CFrame.Angles(math.rad(-20), 0, 0), Color3.fromRGB(60, 150, 210), Enum.Material.Neon)
+	local bell = part(inside, "Bell", Vector3.new(0.4, 0.6, 0.6), deskCF * CFrame.new(0.6, 3.95, -0.8) * CFrame.Angles(0, 0, math.rad(90)), Color3.fromRGB(210, 180, 90), Enum.Material.Metal)
+	bell.Shape = Enum.PartType.Cylinder
+	displayPickaxe(inside, deskCF * CFrame.new(-2.8, 5, 0.6) * CFrame.Angles(0, 0, math.rad(20)), Color3.fromRGB(150, 210, 230), 0.8)
+	ShopInterior.plant(inside, "DeskPlant", deskCF * CFrame.new(-4, 3.7, 0.6), 2.2)
+	ShopInterior.helmet(inside, "DeskHelmet", deskCF * CFrame.new(-0.9, 3.7, 0.5), Color3.fromRGB(240, 196, 40))
+	ShopInterior.clerk(inside, "Clerk", deskCF * CFrame.new(0, 0, 2.6), BLUE)
+	ShopInterior.hangingSign(inside, "CheckoutSign", deskCF * CFrame.new(0, ceilingY - 4.6, 0), "PAY HERE", BLUE_DARK, WHITE, 8, ceilingY)
+	local checkoutA = deskCF * CFrame.new(0, 0, -3.2) * CFrame.Angles(0, math.rad(90), 0)
+	local _ = rng
 
-	local promptPart = part(model, "CounterPromptPart", Vector3.new(3, 4, 4), checkoutA * CFrame.new(2.8, 2.4, 0), WHITE, Enum.Material.SmoothPlastic)
+	local promptPart = part(model, "CounterPromptPart", Vector3.new(3, 4, 4), checkoutA * CFrame.new(0, 2.4, 0), WHITE, Enum.Material.SmoothPlastic)
 	promptPart.Transparency = 1
 	promptPart.CanCollide = false
 	promptPart.CanQuery = false

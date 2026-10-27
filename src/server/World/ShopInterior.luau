@@ -416,4 +416,51 @@ function ShopInterior.tireStack(parent: Instance, name: string, cf: CFrame, coun
 	end
 end
 
+-- Verkäufer hinter dem Tresen (Felix 2026-10-27): Roblox-Figur aus einer HumanoidDescription,
+-- verankert, ohne Namensschild; Blick nach lokal -Z. Fällt bei Fehler auf eine Klötzchenfigur zurück.
+function ShopInterior.clerk(parent: Instance, name: string, cf: CFrame, shirt: Color3)
+	local ok, rig = pcall(function()
+		local desc = Instance.new("HumanoidDescription")
+		desc.HeadColor = Color3.fromRGB(234, 184, 146)
+		desc.LeftArmColor = desc.HeadColor
+		desc.RightArmColor = desc.HeadColor
+		desc.LeftLegColor = Color3.fromRGB(40, 44, 52)
+		desc.RightLegColor = desc.LeftLegColor
+		desc.TorsoColor = shirt
+		return game:GetService("Players"):CreateHumanoidModelFromDescription(desc, Enum.HumanoidRigType.R15)
+	end)
+	if ok and rig then
+		rig.Name = name
+		local hum = rig:FindFirstChildOfClass("Humanoid")
+		if hum then
+			hum.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+			hum.HealthDisplayType = Enum.HumanoidHealthDisplayType.AlwaysOff
+		end
+		for _, d in rig:GetDescendants() do
+			if d:IsA("BasePart") then
+				d.Anchored = true
+				d.CanCollide = false
+				d.CanQuery = false
+			end
+		end
+		local hrp = rig:FindFirstChild("HumanoidRootPart") :: BasePart?
+		local hip = if hum then hum.HipHeight else 2
+		if hrp then
+			rig.PrimaryPart = hrp
+			rig:PivotTo(cf * CFrame.new(0, hip + hrp.Size.Y / 2, 0))
+		end
+		rig.Parent = parent
+		return
+	end
+	-- Rückfall: einfache Figur
+	local m = model(parent, name)
+	local skin = Color3.fromRGB(234, 184, 146)
+	part(m, "Legs", Vector3.new(1.8, 2.4, 1), cf * CFrame.new(0, 1.2, 0), Color3.fromRGB(40, 44, 52))
+	part(m, "Torso", Vector3.new(2, 2, 1), cf * CFrame.new(0, 3.4, 0), shirt)
+	for _, x in { -1.3, 1.3 } do
+		part(m, `Arm{x}`, Vector3.new(0.6, 2, 0.6), cf * CFrame.new(x, 3.4, 0), skin)
+	end
+	part(m, "Head", Vector3.new(1.2, 1.2, 1.2), cf * CFrame.new(0, 5, 0), skin)
+end
+
 return table.freeze(ShopInterior)
