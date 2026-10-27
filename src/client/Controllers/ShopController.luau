@@ -874,6 +874,11 @@ function ShopController.Init()
 	build()
 	buildShowcase()
 	Net.on("OpenShop", open)
+	-- Zurücksetzen der Figur (Esc → Reset) während der Podium-Ansicht: Kamera und Steuerung
+	-- sonst dauerhaft gesperrt
+	player.CharacterAdded:Connect(function()
+		exitShowcase()
+	end)
 end
 
 function ShopController.Start() end
