@@ -4,6 +4,6 @@
 
 return {
 	Game = "Roblox Idle Miner",
-	Version = "0.53.3",
-	Phase = "Phase 18o – Shop-Parkplätze",
+	Version = "0.54.0",
+	Phase = "Phase 18p – Spitzhacken-Pack",
 }

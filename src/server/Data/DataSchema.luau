@@ -1,5 +1,5 @@
 --!strict
--- Datenschema v11: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
+-- Datenschema v12: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
 -- Regeln:
 --  * Defaults gibt es nur hier.
 --  * Jede Strukturänderung erhöht CURRENT_VERSION und bekommt eine Migration
@@ -15,7 +15,7 @@ local Backpacks = require(Shared.Definitions.Backpacks)
 local Mines = require(Shared.Definitions.Mines)
 local Types = require(Shared.Types)
 
-local CURRENT_VERSION = 11
+local CURRENT_VERSION = 12
 
 local DataSchema = {
 	CurrentVersion = CURRENT_VERSION,
@@ -204,6 +204,21 @@ local MIGRATIONS: { [number]: (data: { [string]: any }) -> () } = {
 	[10] = function(data)
 		data.Equipment = data.Equipment or {}
 		data.Equipment.LuckLevel = data.Equipment.LuckLevel or 0
+	end,
+	-- v11 → v12: neue Spitzhacken-Stufen (D-071), alte IDs auf die Stufe mit denselben Werten
+	[11] = function(data)
+		local eq = data.Equipment
+		if typeof(eq) ~= "table" then
+			return
+		end
+		local owned = {}
+		for id, v in eq.OwnedPickaxes or {} do
+			owned[Pickaxes.LegacyIds[id] or id] = v
+		end
+		eq.OwnedPickaxes = owned
+		if typeof(eq.EquippedPickaxe) == "string" then
+			eq.EquippedPickaxe = Pickaxes.LegacyIds[eq.EquippedPickaxe] or eq.EquippedPickaxe
+		end
 	end,
 }
 

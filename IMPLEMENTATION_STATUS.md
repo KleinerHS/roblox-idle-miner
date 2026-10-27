@@ -25,7 +25,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 15 | Rare Drops & Mining Luck | TESTING_REQUIRED (15a, D-045) |
 | 16 | Verkauf & Spätspiel-Geld | TESTING_REQUIRED (16a, D-046) |
 | 17 | Icons | TESTING_REQUIRED (17a Erz- und Barren-Icons, 17b Kategorie-Icons) |
-| 18 | Fahrzeuge aus Felix' Modellen, Map-Mitte | TESTING_REQUIRED (18a: 4 Fahrzeuge; 18b: Durchfahr-Verladestraße, D-052; 18c: Lastzug mit echten Anhängern, D-053; 18d–18g Nachbesserungen, Startauto, Verkaufskreis; 18h Mitte D-057; 18i LKW-Laden D-058; 18j Kreisel D-059; 18k Shops D-060; 18l Lastzüge im Kreisel D-061; 18m Shops größer D-062; 18n Läden innen D-063; 18o Parkplätze D-064/D-065/D-067) |
+| 18 | Fahrzeuge aus Felix' Modellen, Map-Mitte | TESTING_REQUIRED (18a: 4 Fahrzeuge; 18b: Durchfahr-Verladestraße, D-052; 18c: Lastzug mit echten Anhängern, D-053; 18d–18g Nachbesserungen, Startauto, Verkaufskreis; 18h Mitte D-057; 18i LKW-Laden D-058; 18j Kreisel D-059; 18k Shops D-060; 18l Lastzüge im Kreisel D-061; 18m Shops größer D-062; 18n Läden innen D-063; 18o Parkplätze D-064/D-065/D-067; 18p Podium D-070; 18q Spitzhacken-Pack D-071) |
 
 ## Setup – Details
 
@@ -840,6 +840,19 @@ Selbsttest: alle vier Läden im Bearbeitungsmodus von oben und innen angeschaut;
 | 0.51.6: Vorfeld der Shop-Parkplätze liegt unter dem Promenadenpflaster, die runde Kante verdeckt die Stufen der Asphaltstreifen (Nachtrag zu BUG-015) | `CenterBuilder` (`shopLot`) | TESTING_REQUIRED |
 
 Selbsttest (ohne Studio, tools/topdown): Draufsicht aller Parkplätze; Überschneidungsprüfung Asphalt gegen alle Teile: nichts steht mehr auf den Parkplätzen (vorher: Asphalt unter Shop-Fronten, Fahnen, Pylon, Schau-Drill, einer Gehweg-Laterne, einem Baum; großer Parkplatz auf Hütte 2 und Zaun). Lastzug-Simulation am Kreisel erneut gerechnet.
+
+### 18q (Version 0.54.0, 2026-10-27) – 25 Spitzhacken aus dem Pickaxe-Pack (D-071)
+
+| System | Dateien / Instanzen | Status |
+|---|---|---|
+| 25 Stufen mit neuen IDs und englischen Namen, alte Werte als Anker, Zwischenstufen TODO_BALANCE | `Pickaxes.luau` (`LegacyIds`, Feld `Model`) | TESTING_REQUIRED |
+| Spielstand v12: alte Spitzhacken-IDs → neue Stufe mit denselben Werten | `DataSchema.luau` | TESTING_REQUIRED |
+| 3D-Vorlagen der 25 Hacken | Place-Datei: `ServerStorage.Vendor.Pickaxes` – **Place speichern!** Sicherung `assets/Pickaxes.rbxm` (Rücktest 195 Objekte, 0 Abweichungen) | TESTING_REQUIRED |
+| Werkzeug in der Hand aus der Vorlage (unsichtbarer Griff bei 22 % der Höhe, Kopf vorne/hinten wie bisher) | `PickaxeModels.luau` (neu), `ToolBuilder.luau` | TESTING_REQUIRED |
+| Podium-Ansicht zeigt die Vorlagen (Breitseite zur Kamera) | `ShowcaseItems.luau` | TESTING_REQUIRED |
+| Spitzhacken-Wand: alle 25 in zwei Reihen (13 + 12), Stufe 1 oben links, Namensschild je Hacke | `EquipmentShopBuilder.luau` | TESTING_REQUIRED |
+
+Selbsttest per Studio-MCP: Play ohne Fehler; Felix' Spielstand auf v12 umgestellt (ausgerüstet Iron Pickaxe); Hacke in der Hand aus dem Mesh-Modell; Wand mit 25 Hacken in richtiger Reihenfolge; Podium zeigt Gold Pickaxe (nächste Stufe) mit Power 2 → 3.
 
 ## Phase 12 – Content Expansion – Details
 

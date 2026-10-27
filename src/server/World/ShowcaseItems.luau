@@ -8,6 +8,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Pickaxes = require(Shared.Definitions.Pickaxes)
 local Backpacks = require(Shared.Definitions.Backpacks)
+local PickaxeModels = require(script.Parent.PickaxeModels)
 
 local ShowcaseItems = {}
 
@@ -105,9 +106,17 @@ function ShowcaseItems.build()
 	end
 	local picks = folder("pickaxe")
 	for i, def in Pickaxes.List do
-		local m = pickaxe(def, i)
-		-- groß genug für die Kamera-Ansicht
-		m:ScaleTo(1.5)
+		-- 3D-Vorlage aus dem Pack (D-071), Höhe wie in der Vorlage (4–6,4 Studs); sonst Platzhalter
+		local m = PickaxeModels.clone(def)
+		if m then
+			m:ScaleTo(m:GetScale() * 1.6)
+			-- Kopf liegt entlang X: Pivot drehen, damit die Kamera zuerst die Breitseite sieht
+			m.WorldPivot = m.WorldPivot * CFrame.Angles(0, math.rad(90), 0)
+		else
+			m = pickaxe(def, i)
+			-- groß genug für die Kamera-Ansicht
+			m:ScaleTo(1.5)
+		end
 		m.Parent = picks
 	end
 	local packs = folder("backpack")

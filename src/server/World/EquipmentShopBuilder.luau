@@ -17,6 +17,7 @@ local Pickaxes = require(Shared.Definitions.Pickaxes)
 local Backpacks = require(Shared.Definitions.Backpacks)
 
 local ShopDecor = require(script.Parent.ShopDecor)
+local PickaxeModels = require(script.Parent.PickaxeModels)
 local ShopInterior = require(script.Parent.ShopInterior)
 
 local EquipmentShopBuilder = {}
@@ -277,32 +278,47 @@ function EquipmentShopBuilder.build(parent: Instance): Model
 	-- endet vor der Pflanze in der hinteren Ecke
 	ShopInterior.wallShelf(inside, "GearShelf", o * CFrame.new(W / 2 - t - 1.1, 0.6, 12.5) * CFrame.Angles(0, math.rad(90), 0), 19, 4, goods, rng)
 
-	-- Spitzhacken-Wand hinten: große Hacken, je ein Spot, Preisschild mit Namen
+	-- Spitzhacken-Wand hinten: alle Stufen in zwei Reihen (D-071: 3D-Modelle aus dem Pack),
+	-- Preisschild mit Namen, Spots über der oberen Reihe
 	local racks = Instance.new("Folder")
 	racks.Name = "PickaxeDisplay"
 	racks.Parent = model
-	part(racks, "RackBoard", Vector3.new(W - 10, 9, 0.4), o * CFrame.new(0, 9.5, D / 2 - t - 0.5), WOOD_DARK, Enum.Material.Wood)
+	part(racks, "RackBoard", Vector3.new(W - 10, 11.4, 0.4), o * CFrame.new(0, 8.6, D / 2 - t - 0.5), WOOD_DARK, Enum.Material.Wood)
 	local header = part(racks, "RackHeader", Vector3.new(W - 10, 2.2, 0.3), o * CFrame.new(0, 15.2, D / 2 - t - 0.6), BLUE, Enum.Material.SmoothPlastic)
 	ShopInterior.text(header, "⛏  PICKAXES  ·  FROM STARTER TO LEGENDARY", WHITE, Enum.NormalId.Front)
 	local count = #Pickaxes.List
-	local spacing = math.min(7, (W - 14) / count)
+	local perRow = math.ceil(count / 2)
+	local spacing = math.min(7, (W - 14) / perRow)
+	local rowBase = { 9.2, 3.6 } -- Unterkante der Hacke je Reihe
+	local rowHeight = 4.1
 	for i, def in Pickaxes.List do
-		local x = -((count - 1) * spacing) / 2 + (i - 1) * spacing
+		local row = if i <= perRow then 1 else 2
+		local inRow = if row == 1 then perRow else count - perRow
+		local k = if row == 1 then i else i - perRow
+		-- lokal +X ist vom Gang aus links: Stufe 1 oben links
+		local x = ((inRow - 1) * spacing) / 2 - (k - 1) * spacing
+		local y = rowBase[row]
 		local holder = Instance.new("Folder")
 		holder.Name = def.Id
 		holder.Parent = racks
-		displayPickaxe(holder, o * CFrame.new(x, 9.2, D / 2 - t - 1) * CFrame.Angles(0, 0, math.rad(12)), def.HeadColor, 1.7)
-		local tag = part(holder, "Tag", Vector3.new(spacing - 1.2, 0.9, 0.1), o * CFrame.new(x, 5.6, D / 2 - t - 0.8), WHITE, Enum.Material.SmoothPlastic)
+		-- Kopf zeigt vom Gang aus gesehen nach rechts oben
+		local cf = o * CFrame.new(x, y + 0.6, D / 2 - t - 1.1) * CFrame.Angles(0, math.rad(180), 0) * CFrame.Angles(0, 0, math.rad(-8))
+		if not PickaxeModels.place(def, holder, cf, rowHeight) then
+			displayPickaxe(holder, o * CFrame.new(x, y + 2.4, D / 2 - t - 1) * CFrame.Angles(0, 0, math.rad(12)), def.HeadColor, 1.1)
+		end
+		local tag = part(holder, "Tag", Vector3.new(spacing - 0.6, 0.6, 0.1), o * CFrame.new(x, y + 0.1, D / 2 - t - 0.8), WHITE, Enum.Material.SmoothPlastic)
 		ShopInterior.text(tag, def.DisplayName, BLUE_DARK, Enum.NormalId.Front, true)
-		local spot = part(holder, "Spot", Vector3.new(1, 0.3, 1), o * CFrame.new(x, ceilingY - 0.3, D / 2 - 5), LIGHT, Enum.Material.Neon)
-		spot.CanCollide = false
-		local light = Instance.new("SpotLight")
-		light.Face = Enum.NormalId.Bottom
-		light.Range = 20
-		light.Angle = 40
-		light.Brightness = 1.2
-		light.Color = LIGHT
-		light.Parent = spot
+		if row == 1 and k % 2 == 1 then
+			local spot = part(holder, "Spot", Vector3.new(1, 0.3, 1), o * CFrame.new(x, ceilingY - 0.3, D / 2 - 5), LIGHT, Enum.Material.Neon)
+			spot.CanCollide = false
+			local light = Instance.new("SpotLight")
+			light.Face = Enum.NormalId.Bottom
+			light.Range = 22
+			light.Angle = 45
+			light.Brightness = 1.2
+			light.Color = LIGHT
+			light.Parent = spot
+		end
 	end
 	-- Rucksack-Tisch vor der linken hinteren Ecke, endet vor der Spitzhacken-Wand
 	local tables = Instance.new("Folder")
