@@ -414,18 +414,20 @@ local function shopLotAisle(spec: ShopLotSpec): number
 	return (spec.rIn + spec.rOut - LayoutConfig.Center.StallDepth) / 2
 end
 
--- Einfahrt je Seite: Mitte auf der Gehweg-Innenkante, Richtung zur Straße, Richtung der Straße
-local function shopLotDriveways(spec: ShopLotSpec): { { cf: CFrame, size: Vector2 } }
-	local frame = spec.frame
-	local d = shopLotAisle(spec)
+type Driveway = { cf: CFrame, size: Vector2 }
+
+-- Einfahrten über den Gehweg bei Radius d im Sektor: Mitte auf der Gehweg-Innenkante, quer zum
+-- Gehweg bis an die Fahrbahn, entlang der Straße DRIVEWAY_WIDTH breit. sides: -1 links, 1 rechts.
+local function drivewaysAt(frame: CFrame, d: number, sides: { number }): { Driveway }
 	local lo, hi, loDir, hiDir = sidewalkSpan(frame, d)
 	local out = {}
-	for _, info in { { x = lo, dir = loDir, sgn = -1 }, { x = hi, dir = hiDir, sgn = 1 } } do
-		local dir = info.dir
+	for _, sgn in sides do
+		local x = if sgn < 0 then lo else hi
+		local dir = if sgn < 0 then loDir else hiDir
 		if dir.Magnitude > 0.5 then
-			local p = (frame * CFrame.new(info.x, 0, -d)).Position
+			local p = (frame * CFrame.new(x, 0, -d)).Position
 			local n = Vector2.new(-dir.Y, dir.X)
-			if n:Dot(flat2(frame.RightVector)) * info.sgn < 0 then
+			if n:Dot(flat2(frame.RightVector)) * sgn < 0 then
 				n = -n
 			end
 			local n3 = Vector3.new(n.X, 0, n.Y)
@@ -436,6 +438,10 @@ local function shopLotDriveways(spec: ShopLotSpec): { { cf: CFrame, size: Vector
 		end
 	end
 	return out
+end
+
+local function shopLotDriveways(spec: ShopLotSpec): { Driveway }
+	return drivewaysAt(spec.frame, shopLotAisle(spec), { -1, 1 })
 end
 
 local function occupyShopLot(spec: ShopLotSpec)
@@ -602,7 +608,7 @@ local function sidewalks(parent: Instance)
 				local z = -len / 2 + (k - 0.5) * (len / count) + (if side > 0 then 8 else -8)
 				local lampCF = cf * CFrame.new(side * (cfg.RoadWidth / 2 + w - 1), 0, z)
 				-- nicht im Bereich, über den die Anhänger beim Abbiegen fahren (D-061)
-				if flat2(lampCF.Position - c).Magnitude >= cfg.Center.PromenadeOuter + cfg.Center.SidewalkLampStart then
+				if flat2(lampCF.Position - c).Magnitude >= cfg.Center.PromenadeOuter + cfg.Center.SidewalkLampStart and not inRect(lampCF.Position) then
 					EnvironmentBuilder.streetLamp(folder, `Lamp{i}{side}{k}`, lampCF * CFrame.Angles(0, math.rad(if side > 0 then 90 else -90), 0))
 				end
 			end
@@ -667,6 +673,98 @@ local function path(parent: Instance, name: string, from: Vector3, to: Vector3)
 	flat(parent, name, Vector2.new(5, len), CFrame.lookAt(Vector3.new(mid.X, TOP, mid.Z), Vector3.new(to.X, TOP, to.Z)), TOP + 0.03, GRAVEL, Enum.Material.Pebble)
 end
 
+-- Großer Parkplatz (D-067): Module nach außen gestaffelt (Fahrgasse mit Lücken links und rechts),
+-- jede Fahrgasse läuft als Zufahrt seitlich bis an die Gehwege und über eine Einfahrt auf die
+-- Straße. Eine Seite entfällt nur, wenn dort eine Hütte im Weg steht.
+type BigLotModule = { cf: CFrame, stalls: number, r0: number, lo: number, hi: number }
+type BigLotLane = { side: number, xNear: number, xEdge: number, d: number, wideD: number, xWide: number }
+local function bigLotLayout(): ({ BigLotModule }, { BigLotLane }, { Driveway })
+	local cfg = LayoutConfig
+	local cc = cfg.Center
+	local c = cfg.MapCenter
+	local frame = sectorFrame(cc.BigLotAngle)
+	local inner = cc.PromenadeOuter + 10
+	local block = 2 * cc.StallDepth + cc.LotAisle
+	local cabins = {}
+	for _, pos in cfg.Environment.Cabins do
+		local rel = Vector3.new(c.X + pos.X, TOP, c.Z + pos.Y) - frame.Position
+		table.insert(cabins, Vector2.new(rel:Dot(frame.RightVector), rel:Dot(frame.LookVector)))
+	end
+	local modules, lanes, driveways = {}, {}, {}
+	for row = 1, cc.BigLotModules do
+		-- jedes Modul so breit, wie der Sektor dort Platz hat
+		local r0 = inner + (row - 1) * block
+		local lo1, hi1 = sectorSpan(frame, r0)
+		local lo2, hi2 = sectorSpan(frame, r0 + block)
+		local lo, hi = math.max(lo1, lo2), math.min(hi1, hi2)
+		-- Außenecken bleiben mindestens 6 Studs innerhalb des Zauns
+		local maxHalf = math.sqrt(math.max((cc.FenceRadius - 6) ^ 2 - (r0 + block) ^ 2, 0))
+		lo, hi = math.max(lo, -maxHalf), math.min(hi, maxHalf)
+		-- Hütten (24 × 24) bleiben frei: Modul seitlich davor enden lassen
+		for _, cab in cabins do
+			if cab.Y + 16 > r0 and cab.Y - 16 < r0 + block then
+				if cab.X < (lo + hi) / 2 then
+					lo = math.max(lo, cab.X + 16)
+				else
+					hi = math.min(hi, cab.X - 16)
+				end
+			end
+		end
+		local stalls = math.min(cc.BigLotMaxStalls, math.floor((hi - lo - 14) / cc.StallWidth))
+		if stalls >= 3 then
+			local mid = (lo + hi) / 2
+			table.insert(modules, { cf = frame * CFrame.new(mid, 0, -(r0 + block / 2)), stalls = stalls, r0 = r0, lo = lo, hi = hi })
+			-- Zufahrten links und rechts entlang der Fahrgasse bis an die Gehwegkante
+			local d = r0 + cc.StallDepth + cc.LotAisle / 2
+			local dA, dB = d - cc.LotAisle / 2, d + cc.LotAisle / 2
+			local loA, hiA = sidewalkSpan(frame, dA)
+			local loB, hiB = sidewalkSpan(frame, dB)
+			local halfW = cc.StallWidth * stalls / 2 + 7
+			local sides = {}
+			for _, sgn in { -1, 1 } do
+				local xEdge = mid + sgn * halfW
+				local xA = if sgn < 0 then loA else hiA
+				local xB = if sgn < 0 then loB else hiB
+				-- Rechteck bis zur näheren Gehwegkante, Dreieck bis zur weiteren
+				local xNear = if sgn < 0 then math.max(xA, xB) else math.min(xA, xB)
+				local xWide = if sgn < 0 then math.min(xA, xB) else math.max(xA, xB)
+				local wideD = if xWide == xA then dA else dB
+				local blocked = (xNear - xEdge) * sgn < 0
+				for _, cab in cabins do
+					local x0, x1 = math.min(xWide, xEdge), math.max(xWide, xEdge)
+					if cab.Y + 14 > dA and cab.Y - 14 < dB and cab.X + 14 > x0 and cab.X - 14 < x1 then
+						blocked = true
+					end
+				end
+				if not blocked then
+					table.insert(lanes, { side = sgn, xNear = xNear, xEdge = xEdge, d = d, wideD = wideD, xWide = xWide })
+					table.insert(sides, sgn)
+				end
+			end
+			for _, dw in drivewaysAt(frame, d, sides) do
+				table.insert(driveways, dw)
+			end
+		end
+	end
+	return modules, lanes, driveways
+end
+
+local function occupyBigLot()
+	local cc = LayoutConfig.Center
+	local frame = sectorFrame(cc.BigLotAngle)
+	local modules, lanes, driveways = bigLotLayout()
+	for _, m in modules do
+		occupy(m.cf, Vector2.new(m.stalls * cc.StallWidth + 14, 2 * cc.StallDepth + cc.LotAisle), 2)
+	end
+	for _, l in lanes do
+		local x0, x1 = math.min(l.xWide, l.xEdge), math.max(l.xWide, l.xEdge)
+		occupy(frame * CFrame.new((x0 + x1) / 2, 0, -l.d), Vector2.new(x1 - x0, cc.LotAisle), 2)
+	end
+	for _, dw in driveways do
+		occupy(dw.cf, dw.size, 1)
+	end
+end
+
 function CenterBuilder.build(parent: Instance): Folder
 	local cfg = LayoutConfig
 	local cc = cfg.Center
@@ -721,6 +819,9 @@ function CenterBuilder.build(parent: Instance): Folder
 		occupy(CFrame.new(c.X + pos.X, TOP, c.Z + pos.Y), Vector2.new(20, 20), 2)
 	end
 
+	-- Großer Parkplatz mit Zufahrten: vor Promenade, Gehweg-Laternen, Zaun und Bäumen belegen
+	occupyBigLot()
+
 	promenade(folder, rng)
 	sidewalks(folder)
 	fence(folder)
@@ -732,43 +833,38 @@ function CenterBuilder.build(parent: Instance): Folder
 	for i, spec in shopLots do
 		shopLot(lots, `ShopLot{i}`, spec)
 	end
-	-- Großer Parkplatz im freien Sektor
+	-- Großer Parkplatz im freien Sektor (D-067)
 	do
 		local frame = sectorFrame(cc.BigLotAngle)
 		local inner = cc.PromenadeOuter + 10
-		local block = 2 * cc.StallDepth + cc.LotAisle
-		local firstLo, firstHi = 0, 0
-		for row = 1, cc.BigLotModules do
-			-- Module Rücken an Rücken; jedes so breit, wie der Sektor dort Platz hat
-			local r0 = inner + (row - 1) * block
-			local lo1, hi1 = sectorSpan(frame, r0)
-			local lo2, hi2 = sectorSpan(frame, r0 + block)
-			local lo, hi = math.max(lo1, lo2), math.min(hi1, hi2)
-			-- Außenecken bleiben mindestens 6 Studs innerhalb des Zauns
-			local maxHalf = math.sqrt(math.max((cc.FenceRadius - 6) ^ 2 - (r0 + block) ^ 2, 0))
-			lo, hi = math.max(lo, -maxHalf), math.min(hi, maxHalf)
-			-- Hütten (24 × 24) bleiben frei: Modul seitlich davor enden lassen
-			for _, pos in cfg.Environment.Cabins do
-				local rel = Vector3.new(c.X + pos.X, TOP, c.Z + pos.Y) - frame.Position
-				local x = rel:Dot(frame.RightVector)
-				local d = rel:Dot(frame.LookVector)
-				if d + 16 > r0 and d - 16 < r0 + block then
-					if x < (lo + hi) / 2 then
-						lo = math.max(lo, x + 16)
-					else
-						hi = math.min(hi, x - 16)
-					end
-				end
+		local modules, lanes, driveways = bigLotLayout()
+		for row, mod in modules do
+			parkingLot(lots, `BigLot{row}`, mod.cf, mod.stalls, 6000 + row * 10, rng)
+		end
+		local lanesFolder = Instance.new("Model")
+		lanesFolder.Name = "BigLotAccess"
+		for k, l in lanes do
+			local function at(x: number, d: number): Vector3
+				return (frame * CFrame.new(x, 0, -d)).Position
 			end
-			if row == 1 then
-				firstLo, firstHi = lo, hi
-			end
-			local stalls = math.min(cc.BigLotMaxStalls, math.floor((hi - lo - 14) / cc.StallWidth))
-			if stalls >= 3 then
-				parkingLot(lots, `BigLot{row}`, frame * CFrame.new((lo + hi) / 2, 0, -(r0 + block / 2)), stalls, 6000 + row * 10, rng)
+			-- Zufahrt: Rechteck bis zur näheren Gehwegkante, Dreieck bis an die schräge Kante
+			local x0, x1 = math.min(l.xNear, l.xEdge), math.max(l.xNear, l.xEdge)
+			flat(lanesFolder, `Lane{k}`, Vector2.new(x1 - x0 + 0.1, cc.LotAisle), frame * CFrame.new((x0 + x1) / 2, 0, -l.d), TOP + 0.04, ASPHALT, Enum.Material.Asphalt)
+			local narrowD = if l.wideD < l.d then l.d + cc.LotAisle / 2 else l.d - cc.LotAisle / 2
+			flatTriangle(lanesFolder, `LaneEdge{k}`, at(l.xNear, l.wideD), at(l.xNear, narrowD), at(l.xWide, l.wideD), TOP + 0.04, ASPHALT, Enum.Material.Asphalt)
+			-- Mittellinie gestrichelt, damit die Zufahrt als Straße lesbar ist
+			local len = math.abs(l.xEdge - l.xNear)
+			local dashes = math.floor(len / 8)
+			for j = 1, dashes do
+				local x = l.xEdge + l.side * (j - 0.5) * (len / dashes)
+				flat(lanesFolder, `Dash{k}_{j}`, Vector2.new(3, 0.3), frame * CFrame.new(x, 0, -l.d), TOP + 0.07, LINE_WHITE, Enum.Material.SmoothPlastic)
 			end
 		end
-		local _ = firstLo
+		for k, dw in driveways do
+			flat(lanesFolder, `Driveway{k}`, dw.size, dw.cf, TOP + 0.045, ASPHALT, Enum.Material.Asphalt)
+		end
+		lanesFolder.Parent = lots
+		local firstHi = if modules[1] then modules[1].hi else 0
 		local sign = part(lots, "BigLotSign", Vector3.new(0.4, 6, 0.4), frame * CFrame.new(firstHi - 4, 3, -(inner - 3)), STEEL, Enum.Material.Metal)
 		local board = part(lots, "BigLotBoard", Vector3.new(4, 4, 0.3), sign.CFrame * CFrame.new(0, 3.5, 0), Color3.fromRGB(40, 92, 170), Enum.Material.SmoothPlastic)
 		local gui = Instance.new("SurfaceGui")

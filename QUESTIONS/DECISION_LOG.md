@@ -419,3 +419,9 @@ Ergebnis mit den echten Teilen (`tools/topdown`): keine Berührung, knappster Ab
 **Source:** Felix, 2026-10-27 („ist es dumm, die Map wirklich direkt in der Entwicklerumgebung zu bauen … ich finde es etwas nervig“; Vorschlag automatische Vorschau: „ja kannst du machen“)
 **Decision:** Die Welt wird weiter per Code gebaut (6 gleiche Plots, schnelle Umbauten, Versionskontrolle); Hand-Deko geht über Layouts wie das HallLayout. Das Plugin „Idle Miner Preview“ baut die Vorschau jetzt automatisch: beim Öffnen von Studio und neu, sobald neuer Code in `ServerScriptService.World` oder `ReplicatedStorage.Shared` ankommt (1,5 s Ruhe abgewartet). Der Knopf „World Preview“ schaltet die automatische Vorschau an/aus; die Einstellung bleibt über Neustarts erhalten.
 **Affected systems:** plugin/EditPreview.server.luau, README
+
+## D-067 – Großer Parkplatz an die Straßen angebunden
+
+**Source:** Felix, 2026-10-27 („ja überarbeite ihn auch“, auf die Frage, ob der große Parkplatz wie die Shop-Parkplätze an die Straße angebunden werden soll)
+**Decision:** Jede Fahrgasse der beiden Module läuft als Zufahrt (12 Studs breit, gestrichelte Mittellinie) seitlich bis an die Gehwegkante beider Nachbarstraßen, mit Einfahrt über den Gehweg. Eine Seite entfällt nur, wenn eine Hütte im Weg stünde (derzeit keine). Parkplatz, Zufahrten und Einfahrten werden vor Promenade, Laternen, Zaun und Bäumen belegt; Gehweg-Laternen stehen nicht mehr auf Einfahrten.
+**Affected systems:** CenterBuilder (`bigLotLayout`, `drivewaysAt`, `sidewalks`)
