@@ -41,6 +41,7 @@ local MESSAGES: { [string]: string } = {
 	ITEM_PURCHASED = "{Name} purchased and equipped!",
 	DRILL_PURCHASED = "{Name} purchased! Place it in a mine.",
 	VEHICLE_PURCHASED = "{Name} purchased! Get it at the glowing ring in your garage.",
+	TRUCK_PURCHASED = "{Name} purchased! It is waiting on the road in front of the truck shop.",
 	GARAGE_REQUIRED = "Build the Garage first.",
 	BAYS_FULL = "Both garage bays are taken. Park one of your vehicles first.",
 	VEHICLE_FULL = "Your vehicle is full!",

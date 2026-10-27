@@ -109,6 +109,19 @@ function TruckShopBuilder.spawnCFrame(): CFrame
 	return CFrame.lookAt(pos, pos + Vector3.new(u.X, 0, u.Z))
 end
 
+-- Bereich, den ein gekaufter LKW samt Anhängern auf der Zufahrt belegt (Prüfung vor dem Spawn)
+function TruckShopBuilder.spawnArea(): (CFrame, Vector3)
+	local cfg = LayoutConfig.TruckShop
+	local start, u = driveAxis()
+	local front = (TruckShopBuilder.spawnCFrame().Position - start):Dot(u) + cfg.SpawnFrontOffset + 6
+	-- hinten 6 Studs auf den Vorplatz hinein (dort steht das Heck des längsten Lastzugs)
+	local mid = start + u * (front / 2 - 3)
+	local y = LayoutConfig.GroundY + 6
+	local area = CFrame.lookAt(Vector3.new(mid.X, y, mid.Z), Vector3.new(mid.X + u.X, y, mid.Z + u.Z))
+	local size = Vector3.new(cfg.DrivewayWidth - 4, 10, front + 6)
+	return area, size
+end
+
 -- Ausstellungs-LKW mit allen Anhängern (verankert)
 local function displayTruck(parent: Instance, def: Vehicles.VehicleDefinition, cf: CFrame)
 	local model = VehicleModelBuilder.build(def, cf, false)

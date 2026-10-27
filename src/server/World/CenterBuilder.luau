@@ -846,7 +846,8 @@ function CenterBuilder.build(parent: Instance): Folder
 		local pos = Vector3.new(c.X + t.Offset.X, TOP, c.Z + t.Offset.Y)
 		local o = CFrame.lookAt(pos, pos - sectorFrame(t.SectorAngle).LookVector)
 		-- Halle mit Vorplatz und Zufahrt (die Halle steht seit 2026-10-25 innerhalb des Zauns)
-		occupy(o, Vector2.new(t.Size.X, t.Size.Z), 4)
+		-- Rand 8: Kronen der Kiefern (Radius bis 6,6) ragen sonst durch die Hallenwand
+		occupy(o, Vector2.new(t.Size.X, t.Size.Z), 8)
 		occupy(o * CFrame.new(0, 0, -t.Size.Z / 2 - t.ApronDepth / 2), Vector2.new(t.Size.X, t.ApronDepth), 3)
 		-- Zufahrt bis an den Kreisverkehr: auch Promenaden-Deko bleibt draußen (D-061)
 		local len = TruckShopBuilder.drivewayLength()

@@ -787,6 +787,14 @@ function VehicleService.SpawnPurchased(player: Player, vehicleId: string, floorC
 	return model
 end
 
+-- Steht in diesem Bereich schon ein Fahrzeug (oder Anhänger)? Gegen Spawnen ineinander.
+function VehicleService.IsAreaFree(area: CFrame, size: Vector3): boolean
+	local params = OverlapParams.new()
+	params.FilterType = Enum.RaycastFilterType.Include
+	params.FilterDescendantsInstances = { folder() }
+	return #workspace:GetPartBoundsInBox(area, size, params) == 0
+end
+
 function VehicleService.GetModel(player: Player, vehicleId: string): Model?
 	return spawned[player] and spawned[player][vehicleId]
 end

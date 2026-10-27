@@ -257,12 +257,17 @@ local function buyVehicle(player: Player, typeId: unknown)
 	end)
 	DataService.RequestSave(player)
 	Log.debug(TAG, `{player.Name} kauft {def.Id} ({newId}) für {def.Price}`)
-	RemoteService.FireClient("Notify", player, { Kind = "Success", Code = "VEHICLE_PURCHASED", Args = { Name = def.DisplayName } })
-	-- LKW stehen nach dem Kauf auf der Zufahrt vor dem LKW-Laden (Felix 2026-10-27)
+	-- LKW stehen nach dem Kauf auf der Zufahrt vor dem LKW-Laden (Felix 2026-10-27). Ist die
+	-- Zufahrt belegt (anderes Fahrzeug) oder der Platz in der Garage voll, wartet er in der Garage.
 	if def.Dealer == "truck" then
 		task.spawn(function()
-			VehicleService.SpawnPurchased(player, newId, TruckShopBuilder.spawnCFrame())
+			local spawnCF = TruckShopBuilder.spawnCFrame()
+			local model = if VehicleService.IsAreaFree(TruckShopBuilder.spawnArea()) then VehicleService.SpawnPurchased(player, newId, spawnCF) else nil
+			local code = if model then "TRUCK_PURCHASED" else "VEHICLE_PURCHASED"
+			RemoteService.FireClient("Notify", player, { Kind = "Success", Code = code, Args = { Name = def.DisplayName } })
 		end)
+	else
+		RemoteService.FireClient("Notify", player, { Kind = "Success", Code = "VEHICLE_PURCHASED", Args = { Name = def.DisplayName } })
 	end
 	return Result.ok(newId)
 end
