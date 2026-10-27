@@ -395,6 +395,19 @@ local function plazaRoads(parent: Instance)
 			local function at(px: number, w: number): Vector3
 				return (cf * CFrame.new(px, 0, w - R)).Position
 			end
+			-- Unterhalb des Bogens bis zum Kreiselrand auffüllen (sonst bleibt neben der Fahrbahnkante
+			-- ein schmaler Pflasterkeil stehen, BUG-016 Nachtrag)
+			local minW, maxE = math.huge, 0
+			for _, pt in pts do
+				minW = math.min(minW, pt.Y)
+				maxE = math.max(maxE, side * (pt.X - xe))
+			end
+			local xFar = math.max(math.abs(xe), math.abs(xe + side * maxE))
+			local wRing = math.sqrt(math.max(outer ^ 2 - xFar ^ 2, 0)) - 0.5
+			if wRing < minW then
+				local rectCF = CFrame.new(at(xe + side * maxE / 2, (wRing + minW) / 2)) * (cf - cf.Position)
+				part(folder, `FilletBase{plotId}_{side}`, Vector3.new(maxE, 0.1, minW - wRing + 0.02), rectCF + Vector3.new(0, y - 0.05 - rectCF.Y, 0), ASPHALT_RING, Enum.Material.Asphalt).CanCollide = false
+			end
 			for k = 1, #pts - 1 do
 				local A, B = pts[k], pts[k + 1]
 				local eA, eB = side * (A.X - xe), side * (B.X - xe)
