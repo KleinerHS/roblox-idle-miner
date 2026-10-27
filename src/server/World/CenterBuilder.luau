@@ -404,8 +404,6 @@ local function shopLotSpec(shop: any): ShopLotSpec
 	return { frame = frame, rIn = cc.PromenadeOuter + 0.5, rOut = front - 8 }
 end
 
--- Vorfeld zwischen Parkplatz und Promenade (bis zu so viele Studs vor der Parkplatzkante)
-local APRON_MAX = 16
 -- Einfahrt über den Gehweg: Breite entlang der Straße
 local DRIVEWAY_WIDTH = 18
 
@@ -444,6 +442,47 @@ local function shopLotDriveways(spec: ShopLotSpec): { Driveway }
 	return drivewaysAt(spec.frame, shopLotAisle(spec), { -1, 1 })
 end
 
+-- Bogen des Vorfelds: Punkte (x, d) auf dem Promenadenrand zwischen den beiden Gehwegkanten
+type ApronGeometry = { arc: { Vector2 }, dMin: number }
+local function apronGeometry(spec: ShopLotSpec): ApronGeometry
+	local cc = LayoutConfig.Center
+	local R = cc.PromenadeOuter - 0.8
+	local loIn, hiIn = sidewalkSpan(spec.frame, spec.rIn)
+	local loOut, hiOut = sidewalkSpan(spec.frame, spec.rOut)
+	local depth = spec.rOut - spec.rIn
+	local slopeLo = (loIn - loOut) / depth
+	local slopeHi = (hiOut - hiIn) / depth
+	local function lineLo(d: number): number
+		return loIn + slopeLo * (spec.rIn - d)
+	end
+	local function lineHi(d: number): number
+		return hiIn - slopeHi * (spec.rIn - d)
+	end
+	-- Schnitt Gehwegkante / Kreis per Bisektion
+	local function meet(line: (number) -> number): number
+		local a, b = 0, spec.rIn
+		for _ = 1, 40 do
+			local m = (a + b) / 2
+			if line(m) ^ 2 + m * m > R * R then
+				b = m
+			else
+				a = m
+			end
+		end
+		return (a + b) / 2
+	end
+	local dLo, dHi = meet(lineLo), meet(lineHi)
+	local xLo, xHi = lineLo(dLo), lineHi(dHi)
+	local thLo, thHi = math.atan2(xLo, dLo), math.atan2(xHi, dHi)
+	local steps = math.max(4, math.ceil(math.abs(thHi - thLo) / math.rad(1.5)))
+	local arc = {}
+	for k = 0, steps do
+		local th = thLo + (thHi - thLo) * k / steps
+		table.insert(arc, Vector2.new(math.sin(th) * R, math.cos(th) * R))
+	end
+	return { arc = arc, dMin = math.min(dLo, dHi, R * math.cos(math.max(math.abs(thLo), math.abs(thHi)))) }
+end
+
 local function occupyShopLot(spec: ShopLotSpec)
 	local loIn, hiIn = sidewalkSpan(spec.frame, spec.rIn)
 	local loOut, hiOut = sidewalkSpan(spec.frame, spec.rOut)
@@ -451,7 +490,8 @@ local function occupyShopLot(spec: ShopLotSpec)
 	local depth = spec.rOut - spec.rIn
 	occupy(spec.frame * CFrame.new((lo + hi) / 2, 0, -(spec.rIn + depth / 2)), Vector2.new(hi - lo, depth), 1)
 	-- Vorfeld bis zur Promenade: keine Bänke/Beete dazwischen
-	occupy(spec.frame * CFrame.new((loIn + hiIn) / 2, 0, -(spec.rIn - APRON_MAX / 2)), Vector2.new(hiIn - loIn, APRON_MAX), 1)
+	local apronDepth = spec.rIn - apronGeometry(spec).dMin
+	occupy(spec.frame * CFrame.new((loIn + hiIn) / 2, 0, -(spec.rIn - apronDepth / 2)), Vector2.new(hiIn - loIn, apronDepth), 1)
 	for _, dw in shopLotDriveways(spec) do
 		occupy(dw.cf, dw.size, 1)
 	end
@@ -481,50 +521,25 @@ local function shopLot(parent: Instance, name: string, spec: ShopLotSpec)
 	for k, dw in shopLotDriveways(spec) do
 		flat(m, `Driveway{k}`, dw.size, dw.cf, TOP + 0.07, ASPHALT, Enum.Material.Asphalt)
 	end
-	-- Vorfeld: Asphalt in schmalen Streifen bis an den Rand der Promenade (Kreisbogen), seitlich
-	-- nie über die Gehwegkante; dort schließt je ein Dreieck entlang der Gehwegkante ab. Liegt unter
-	-- dem Promenadenpflaster, damit dessen runde Kante die Stufen der Streifen verdeckt.
-	local R = cc.PromenadeOuter + 0.4
-	local slopeLo = (loIn - loOut) / depth
-	local slopeHi = (hiOut - hiIn) / depth
-	local dMin = spec.rIn - APRON_MAX
-	local function lineLo(d: number): number
-		return loIn + slopeLo * (spec.rIn - d)
-	end
-	local function lineHi(d: number): number
-		return hiIn - slopeHi * (spec.rIn - d)
-	end
-	-- wo die Gehwegkante den Promenadenrand trifft (höchstens APRON_MAX vor dem Parkplatz)
-	local function meet(line: (number) -> number): number
-		local d = spec.rIn
-		while d > dMin and line(d) ^ 2 + d * d > R * R do
-			d -= 0.25
+	-- Vorfeld bis an den runden Rand der Promenade (Felix 2026-10-27: kein Gras, runde statt
+	-- eckige Kante): Fläche zwischen den Gehwegkanten, der Parkplatzkante und dem Kreisbogen,
+	-- exakt aus Rechtecken und Dreiecken. Liegt knapp unter dem Pflaster.
+	local ap = apronGeometry(spec)
+	local yA = TOP + 0.035
+	local pts = ap.arc
+	for k = 1, #pts - 1 do
+		local A, B = pts[k], pts[k + 1]
+		local dHi = math.max(A.Y, B.Y)
+		if spec.rIn - dHi > 0.01 then
+			flat(m, `Apron{k}`, Vector2.new(B.X - A.X + 0.01, spec.rIn - dHi + 0.05), frame * CFrame.new((A.X + B.X) / 2, 0, -(dHi + spec.rIn) / 2), yA, ASPHALT, Enum.Material.Asphalt)
 		end
-		return math.max(d, dMin)
+		local hiP = if A.Y > B.Y then A else B
+		local loP = if A.Y > B.Y then B else A
+		flatTriangle(m, `ApronTri{k}`, at(loP.X, hiP.Y), at(hiP.X, hiP.Y), at(loP.X, loP.Y), yA, ASPHALT, Enum.Material.Asphalt)
 	end
-	local dLo, dHi = meet(lineLo), meet(lineHi)
-	flatTriangle(m, "ApronEdge1", at(lineLo(dLo), spec.rIn), at(loIn, spec.rIn), at(lineLo(dLo), dLo), TOP + 0.028, ASPHALT, Enum.Material.Asphalt)
-	flatTriangle(m, "ApronEdge2", at(lineHi(dHi), spec.rIn), at(hiIn, spec.rIn), at(lineHi(dHi), dHi), TOP + 0.028, ASPHALT, Enum.Material.Asphalt)
-	local x = lineLo(dLo)
-	local xEnd = lineHi(dHi)
-	local k = 0
-	while x < xEnd - 0.01 do
-		k += 1
-		local x1 = math.min(x + 4, xEnd)
-		local far = math.max(math.abs(x), math.abs(x1))
-		local dStart = math.max(math.sqrt(math.max(R * R - far * far, 0)), dMin)
-		-- nicht über die Gehwegkanten (die Lücke daneben deckt das Dreieck ab)
-		if slopeLo > 0.01 then
-			dStart = math.max(dStart, spec.rIn - (x - loIn) / slopeLo)
-		end
-		if slopeHi > 0.01 then
-			dStart = math.max(dStart, spec.rIn - (hiIn - x1) / slopeHi)
-		end
-		if dStart < spec.rIn - 0.2 then
-			flat(m, `Apron{k}`, Vector2.new(x1 - x, spec.rIn - dStart + 0.3), frame * CFrame.new((x + x1) / 2, 0, -(dStart + spec.rIn) / 2), TOP + 0.028, ASPHALT, Enum.Material.Asphalt)
-		end
-		x = x1
-	end
+	-- Keile entlang der Gehwegkanten (zwischen Bogenende und Parkplatzecke)
+	flatTriangle(m, "ApronEdge1", at(pts[1].X, spec.rIn), at(loIn, spec.rIn), at(pts[1].X, pts[1].Y), yA, ASPHALT, Enum.Material.Asphalt)
+	flatTriangle(m, "ApronEdge2", at(pts[#pts].X, spec.rIn), at(hiIn, spec.rIn), at(pts[#pts].X, pts[#pts].Y), yA, ASPHALT, Enum.Material.Asphalt)
 	-- Lückenreihe vor dem Shop (Fahrzeugfront zum Shop), an den Enden Platz zum Einbiegen
 	local rowIn = spec.rOut - cc.StallDepth
 	local lo, hi = sidewalkSpan(frame, rowIn)
@@ -601,7 +616,8 @@ local function sidewalks(parent: Instance)
 	for i, s in spokes do
 		local d = s.dir
 		-- t-Bereich: vom Platzrand bis zur Promenade
-		local t0, t1 = hitT(s.origin, d, cfg.CenterPlazaRadius), hitT(s.origin, d, cfg.Center.PromenadeOuter)
+		-- Beginn genau am geraden Ende der Zufahrt (PlotBuilder), sonst bleibt ein Spalt (Felix 2026-10-27)
+		local t0, t1 = cfg.PlotRingRadius - cfg.CenterPlazaRadius - 0.5, hitT(s.origin, d, cfg.Center.PromenadeOuter)
 		local len = t1 - t0
 		local mid = s.origin + d * ((t0 + t1) / 2)
 		local cf = CFrame.lookAt(mid, mid + d)

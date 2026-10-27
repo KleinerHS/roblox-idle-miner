@@ -294,6 +294,29 @@ local function roadDetails(parent: Instance, plotId: number)
 	end
 end
 
+-- Flaches Dreieck mit rechtem Winkel bei c (WedgePart), Oberkante bei topY
+local function wedgeFlat(parent: Instance, name: string, c: Vector3, a: Vector3, b: Vector3, topY: number, color: Color3)
+	local u, v = a - c, b - c
+	local la, lb = u.Magnitude, v.Magnitude
+	if la < 0.02 or lb < 0.02 then
+		return
+	end
+	u, v = u.Unit, v.Unit
+	local zAxis, yAxis = -u, v
+	local center = c + u * (la / 2) + v * (lb / 2)
+	local w = Instance.new("WedgePart")
+	w.Name = name
+	w.Anchored = true
+	w.CanTouch = false
+	w.CanCollide = false
+	w.CanQuery = false
+	w.Size = Vector3.new(0.1, lb, la)
+	w.CFrame = CFrame.fromMatrix(Vector3.new(center.X, topY - 0.05, center.Z), yAxis:Cross(zAxis), yAxis, zAxis)
+	w.Color = color
+	w.Material = Enum.Material.Asphalt
+	w.Parent = parent
+end
+
 -- Kreisverkehr um den Verkaufskreis und Speichen bis zum Platzrand, in Verlängerung der Zufahrten
 local function plazaRoads(parent: Instance)
 	local folder = Instance.new("Folder")
@@ -317,33 +340,76 @@ local function plazaRoads(parent: Instance)
 		local dash = part(folder, `RingDash{i}`, Vector3.new(0.5, 0.04, segLen * 0.6), cf, LINE_WHITE, Enum.Material.SmoothPlastic)
 		dash.CanCollide = false
 	end
-	-- Speichen: Fortsetzung jeder Zufahrt (gleiche Linie) vom Platzrand bis in den Ring
+	-- Speichen: Fortsetzung jeder Zufahrt (gleiche Linie) vom Platzrand bis in den Ring.
+	-- Felix 2026-10-27: nahtlos an die Zufahrt (gerades Ende statt Kreisbogen, kein Zebrastreifen)
+	-- und mit runden Ausrundungen in den Kreisel; den Übergang sieht man nur an den Markierungen.
+	local ASPHALT_RING = Color3.fromRGB(58, 60, 64)
+	local FILLET = 14
+	local hw = cfg.RoadWidth / 2
 	for plotId = 1, GameConfig.MaxPlots do
 		local cf = plotCFrame(plotId)
 		local R = cfg.PlotRingRadius
 		local x = cfg.DoorCenterX
-		local zEdge = math.sqrt(cfg.CenterPlazaRadius ^ 2 - x ^ 2) - R
-		local zRing = math.sqrt((outer - 3) ^ 2 - x ^ 2) - R
+		-- Zufahrt (PlotBuilder) endet bei Z = CenterPlazaRadius - R; 1 Stud Überlappung
+		local zEdge = cfg.CenterPlazaRadius - R + 1
+		-- Ende so, dass auch die äußere Ecke noch im Kreisel liegt (sonst ragte sie über die Promenade)
+		local zRing = math.sqrt((outer - 1) ^ 2 - (math.abs(x) + cfg.RoadWidth / 2) ^ 2) - R
 		local length = zEdge - zRing
 		local zMid = (zEdge + zRing) / 2
-		part(folder, `Spoke{plotId}`, Vector3.new(cfg.RoadWidth, 0.1, length), cf * CFrame.new(x, roadTop - 0.02, zMid), Color3.fromRGB(58, 60, 64), Enum.Material.Asphalt).CanCollide = false
-		-- Mittellinie erst hinter dem Zebrastreifen
-		local z = zEdge - 10
+		part(folder, `Spoke{plotId}`, Vector3.new(cfg.RoadWidth, 0.1, length), cf * CFrame.new(x, roadTop - 0.02, zMid), ASPHALT_RING, Enum.Material.Asphalt).CanCollide = false
+		-- Mittellinie bis an den Kreisel
+		local zCenterRing = math.sqrt(outer ^ 2 - x ^ 2) - R
+		local z = zEdge - 4
 		local n = 0
-		while z - 6 > zRing + 4 do
+		while z - 6 > zCenterRing + 2 do
 			n += 1
 			local dash = part(folder, `SpokeDash{plotId}_{n}`, Vector3.new(0.5, 0.04, 6), cf * CFrame.new(x, roadTop + 0.05, z - 3), LINE_YELLOW, Enum.Material.SmoothPlastic)
 			dash.CanCollide = false
 			z -= 12
 		end
 		for _, side in { -1, 1 } do
-			local edge = part(folder, `SpokeEdge{plotId}_{side}`, Vector3.new(0.4, 0.04, length), cf * CFrame.new(x + side * (cfg.RoadWidth / 2 - 1.2), roadTop + 0.05, zMid), LINE_WHITE, Enum.Material.SmoothPlastic)
+			-- Ausrundung: Kreis mit Radius FILLET berührt Fahrbahnkante und Kreiselrand
+			local xe = x + side * hw
+			local xc = xe + side * FILLET
+			local wc = math.sqrt((outer + FILLET) ^ 2 - xc ^ 2)
+			-- Randlinie endet, wo die Ausrundung beginnt
+			local zStart = wc - R
+			local edgeLen = zEdge - zStart
+			local edge = part(folder, `SpokeEdge{plotId}_{side}`, Vector3.new(0.4, 0.04, edgeLen), cf * CFrame.new(x + side * (hw - 1.2), roadTop + 0.05, (zEdge + zStart) / 2), LINE_WHITE, Enum.Material.SmoothPlastic)
 			edge.CanCollide = false
-		end
-		-- Zebrastreifen am Platzrand
-		for k = -5, 5 do
-			local stripe = part(folder, `Crossing{plotId}_{k}`, Vector3.new(1.2, 0.04, 5), cf * CFrame.new(x + k * 2.4, roadTop + 0.05, zEdge - 6), LINE_WHITE, Enum.Material.SmoothPlastic)
-			stripe.CanCollide = false
+			-- Bogenpunkte von der Kante (Richtung -side) bis zum Berührpunkt am Kreisel
+			local a0 = math.atan2(0, -side)
+			local a1 = math.atan2(-wc, -xc)
+			if side > 0 and a1 < a0 then
+				a1 += 2 * math.pi
+			elseif side < 0 and a1 > a0 then
+				a1 -= 2 * math.pi
+			end
+			local steps = 16
+			local pts = {}
+			for k = 0, steps do
+				local a = a0 + (a1 - a0) * k / steps
+				table.insert(pts, Vector2.new(xc + math.cos(a) * FILLET, wc + math.sin(a) * FILLET))
+			end
+			local y = roadTop - 0.01
+			local function at(px: number, w: number): Vector3
+				return (cf * CFrame.new(px, 0, w - R)).Position
+			end
+			for k = 1, #pts - 1 do
+				local A, B = pts[k], pts[k + 1]
+				local eA, eB = side * (A.X - xe), side * (B.X - xe)
+				local eMin = math.min(eA, eB)
+				local wHi, wLo = math.max(A.Y, B.Y), math.min(A.Y, B.Y)
+				if eMin > 0.01 and wHi - wLo > 0.01 then
+					local rectCF = CFrame.new((at(xe + side * eMin / 2, (wHi + wLo) / 2))) * (cf - cf.Position)
+					part(folder, `Fillet{plotId}_{side}_{k}`, Vector3.new(eMin, 0.1, wHi - wLo + 0.01), rectCF + Vector3.new(0, y - 0.05 - rectCF.Y, 0), ASPHALT_RING, Enum.Material.Asphalt).CanCollide = false
+				end
+				-- Dreieck zwischen den beiden Bogenpunkten (rechter Winkel an der Ecke)
+				local outerP = if eA > eB then A else B
+				local innerP = if eA > eB then B else A
+				local corner = Vector2.new(xe + side * eMin, outerP.Y)
+				wedgeFlat(folder, `FilletTri{plotId}_{side}_{k}`, at(corner.X, corner.Y), at(outerP.X, outerP.Y), at(innerP.X, innerP.Y), y, ASPHALT_RING)
+			end
 		end
 	end
 end

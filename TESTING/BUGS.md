@@ -179,3 +179,14 @@ Nicht verschoben: eine Rohr-Aufhänger-Gruppe weit außerhalb der Halle (Workspa
 **Fix:** Kreisel samt Insel ist eine einzige runde Fläche; Promenade sind zwei runde Flächen (Kante, Pflaster) und reicht unter den Kreisel. Feste Höhenstufen (Abstand ≥ 0,01): Wiese = Platzfläche selbst (keine zweite Rasenscheibe), Promenadenkante +0.015, Gehweg +0.03, Pflaster +0.04, Vorfeld +0.05, Kreisel/Parkplatz +0.06, Zufahrten +0.07, Speichen +0.09, Markierungen darüber. Mittellinie der Speichen beginnt hinter dem Zebrastreifen.
 **Regression geprüft:** Play: Prüfskript findet keine gleich hohen Überlappungen mehr bei Straßen/Belägen (nur noch weiße Linien untereinander), Strahltest über die ganze Kreisel- und Promenadenfläche ohne Lücke; Ansicht schräg auf den Kreisel ohne Nähte.
 **Likely system:** Umgebung (EnvironmentBuilder, CenterBuilder, PlotBuilder)
+
+## BUG-016 – Speichen komisch am Kreisel, Lücke am Platzrand, Gras und eckige Kante am Shop-Parkplatz
+
+**Severity:** Low
+**Status:** Fixed (TESTING_REQUIRED)
+**Build:** 0.51.7
+**Gemeldet:** Felix, 2026-10-27 (3 Screenshots: Straße soll durchgehend in den Kreisel übergehen; Lücke mit Zebrastreifen am Platzrand; Gras und eckige Rundung zwischen Shop-Parkplatz und Promenade, bei allen Läden)
+**Ursache:** (1) Speichen endeten als gerades Rechteck im Kreisel, dessen äußere Ecke über die Promenade ragte; keine Ausrundung, Randlinien liefen bis in den Kreisel. (2) Speiche und Gehweg begannen auf dem Platzkreis, die gerade Zufahrt endete ~3 Studs davor → Graslücke; dazu ein Zebrastreifen. (3) Das Vorfeld bestand aus 4-Stud-Streifen (eckige Kante) und war auf 16 Studs begrenzt, daher blieb ein Grasdreieck.
+**Fix:** (1) Runde Ausrundungen (Radius 14) zwischen jeder Fahrbahnkante und dem Kreisel, Speiche endet so, dass beide Ecken im Kreisel liegen, Randlinien enden am Beginn der Ausrundung, Mittellinie am Kreisel. (2) Speiche und Gehweg beginnen genau am geraden Ende der Zufahrt (1 bzw. 0,5 Stud Überlappung), Zebrastreifen entfernt. (3) Vorfeld exakt bis zum Promenadenkreis aus Rechtecken und Dreiecken (1,5°-Schritte, keine Begrenzung), Keile entlang der Gehwegkanten.
+**Regression geprüft:** Play: Einmündungen rund, keine Pflasterspitzen über der Fahrbahn; Platzrand nahtlos ohne Zebrastreifen; Vorfeld vor Pickaxe- und Drill-Shop rund und ohne Gras; keine Fehler in der Konsole.
+**Likely system:** Umgebung (EnvironmentBuilder, CenterBuilder)
