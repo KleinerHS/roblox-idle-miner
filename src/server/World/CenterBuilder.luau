@@ -412,7 +412,8 @@ local function shopLotAisle(spec: ShopLotSpec): number
 	return (spec.rIn + spec.rOut - LayoutConfig.Center.StallDepth) / 2
 end
 
-type Driveway = { cf: CFrame, size: Vector2 }
+-- base: ungekürzte Einfahrt, liegt unter dem Pflaster und füllt bis an den runden Promenadenrand
+type Driveway = { cf: CFrame, size: Vector2, base: CFrame? }
 
 -- Einfahrten über den Gehweg bei Radius d im Sektor: Mitte auf der Gehweg-Innenkante, quer zum
 -- Gehweg bis an die Fahrbahn, entlang der Straße DRIVEWAY_WIDTH breit. sides: -1 links, 1 rechts.
@@ -431,8 +432,22 @@ local function drivewaysAt(frame: CFrame, d: number, sides: { number }): { Drive
 			local n3 = Vector3.new(n.X, 0, n.Y)
 			local depth = LayoutConfig.Center.SidewalkWidth + 0.6
 			local center = p + n3 * (depth / 2 - 0.3)
-			local cf = CFrame.lookAt(center, center + Vector3.new(dir.X, 0, dir.Y))
-			table.insert(out, { cf = cf, size = Vector2.new(depth, DRIVEWAY_WIDTH) })
+			-- Nicht über das Gehwegende in die Promenade ragen (sonst Asphalt-Kerbe im Pflaster):
+			-- beide inneren Ecken müssen außerhalb des Promenadenrands bleiben.
+			local dir3 = Vector3.new(dir.X, 0, dir.Y)
+			local reach = math.huge
+			for _, side in { -1, 1 } do
+				local corner = center + n3 * (side * depth / 2)
+				reach = math.min(reach, hitT(corner, dir3, LayoutConfig.Center.PromenadeOuter))
+			end
+			local excess = DRIVEWAY_WIDTH / 2 - reach
+			local base: CFrame? = nil
+			if excess > 0 then
+				base = CFrame.lookAt(center, center + dir3)
+				center -= dir3 * excess
+			end
+			local cf = CFrame.lookAt(center, center + dir3)
+			table.insert(out, { cf = cf, size = Vector2.new(depth, DRIVEWAY_WIDTH), base = base })
 		end
 	end
 	return out
@@ -520,6 +535,11 @@ local function shopLot(parent: Instance, name: string, spec: ShopLotSpec)
 	-- Einfahrten über den Gehweg (liegen knapp über dem Gehweg, unter der Fahrbahn)
 	for k, dw in shopLotDriveways(spec) do
 		flat(m, `Driveway{k}`, dw.size, dw.cf, TOP + 0.07, ASPHALT, Enum.Material.Asphalt)
+		local base = dw.base
+		if base then
+			-- wie das Vorfeld knapp unter dem Pflaster: runde Kante, kein Grasdreieck
+			flat(m, `DrivewayBase{k}`, dw.size, base, TOP + 0.035, ASPHALT, Enum.Material.Asphalt)
+		end
 	end
 	-- Vorfeld bis an den runden Rand der Promenade (Felix 2026-10-27: kein Gras, runde statt
 	-- eckige Kante): Fläche zwischen den Gehwegkanten, der Parkplatzkante und dem Kreisbogen,
