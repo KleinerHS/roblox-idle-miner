@@ -25,7 +25,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 15 | Rare Drops & Mining Luck | TESTING_REQUIRED (15a, D-045) |
 | 16 | Verkauf & Spätspiel-Geld | TESTING_REQUIRED (16a, D-046) |
 | 17 | Icons | TESTING_REQUIRED (17a Erz- und Barren-Icons, 17b Kategorie-Icons) |
-| 18 | Fahrzeuge aus Felix' Modellen, Map-Mitte | TESTING_REQUIRED (18a: 4 Fahrzeuge; 18b: Durchfahr-Verladestraße, D-052; 18c: Lastzug mit echten Anhängern, D-053; 18d–18g Nachbesserungen, Startauto, Verkaufskreis; 18h Mitte D-057; 18i LKW-Laden D-058; 18j Kreisel D-059; 18k Shops D-060; 18l Lastzüge im Kreisel D-061; 18m Shops größer D-062) |
+| 18 | Fahrzeuge aus Felix' Modellen, Map-Mitte | TESTING_REQUIRED (18a: 4 Fahrzeuge; 18b: Durchfahr-Verladestraße, D-052; 18c: Lastzug mit echten Anhängern, D-053; 18d–18g Nachbesserungen, Startauto, Verkaufskreis; 18h Mitte D-057; 18i LKW-Laden D-058; 18j Kreisel D-059; 18k Shops D-060; 18l Lastzüge im Kreisel D-061; 18m Shops größer D-062; 18n Läden innen D-063; 18o Shop-Parkplätze D-064/D-065) |
 
 ## Setup – Details
 
@@ -827,6 +827,17 @@ Selbsttest (ohne Studio): Draufsicht mit und ohne Dach geprüft, keine Überschn
 Selbsttest: alle vier Läden im Bearbeitungsmodus von oben und innen angeschaut; im Play bauen sich alle ohne Fehler auf, alle vier Tresen-Prompts vorhanden, Pickaxe-Kasse öffnet das Shop-Fenster.
 
 0.51.1 – Überschneidungsprüfung aller Teile (tools/topdown): fünf Stellen behoben. Rucksack-Tisch ragte in die Spitzhacken-Wand, Wandregal in die Pflanze (Pickaxe-Shop); Pflanze stand in der Ölwanne, Kaffeetheke in der Eingangspflanze (Drill-Shop); LKW-Tresen stand auf der Infotafel von Stellplatz 5, jetzt an der Seitenwand. Danach keine ungewollten Überschneidungen mehr.
+
+### 18o (Version 0.51.2 / 0.51.3, 2026-10-27) – Shop-Parkplätze an die Straße (D-064, D-065)
+
+| System | Dateien / Instanzen | Status |
+|---|---|---|
+| Shop-Parkplätze von Gehweg zu Gehweg, exakt an der Gehwegkante (Dreiecke statt schräger Streifen), je Seite eine Einfahrt über den Gehweg zur Straße, Vorfeld bis zur Promenade; keine Deko auf der Fläche | `CenterBuilder` (`sidewalkSpan`, `flatTriangle`, `shopLot`) | TESTING_REQUIRED |
+| Lücken 13 × 29 Studs (größtes Auto High-Roof Van 9,7 × 26,4); 5–6 Lücken je Shop, an den Enden Platz zum Einbiegen | `LayoutConfig.Center` | TESTING_REQUIRED |
+| Großer Parkplatz: 2 Module (Fahrgasse mit Lückenreihe links und rechts), Ecken mind. 6 Studs im Zaun, Hütten bleiben frei | `CenterBuilder` (`parkingLot`), `LayoutConfig.Center.BigLotModules` | TESTING_REQUIRED |
+| Pylon (Autohaus) und Schau-Drill (Drill-Shop) auf den Vorplatz versetzt | `VehicleShopBuilder`, `MachineShopBuilder` | TESTING_REQUIRED |
+
+Selbsttest (ohne Studio, tools/topdown): Draufsicht aller Parkplätze; Überschneidungsprüfung Asphalt gegen alle Teile: nichts steht mehr auf den Parkplätzen (vorher: Asphalt unter Shop-Fronten, Fahnen, Pylon, Schau-Drill, einer Gehweg-Laterne, einem Baum; großer Parkplatz auf Hütte 2 und Zaun). Lastzug-Simulation am Kreisel erneut gerechnet.
 
 ## Phase 12 – Content Expansion – Details
 

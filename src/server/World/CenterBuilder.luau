@@ -301,43 +301,100 @@ end
 -- ---------------------------------------------------------------------------------------------
 -- Teile der Mitte
 
--- Parkplatz: Reihen quer zur Sektorrichtung, Stellplatz- und Gassenmaße aus LayoutConfig.Center.
--- frame zeigt mit LookVector nach außen; doubleRows Doppelreihen (Rücken an Rücken).
-local function parkingLot(parent: Instance, name: string, frame: CFrame, stalls: number, doubleRows: number, rng: Random)
+-- Parkplatz-Modul: Fahrgasse in der Mitte, links und rechts davon je eine Lückenreihe (Fahrzeugfront
+-- nach außen). Maße aus LayoutConfig.Center; frame zeigt mit LookVector nach außen.
+local function parkingLot(parent: Instance, name: string, frame: CFrame, stalls: number, seed: number, rng: Random)
 	local m = Instance.new("Model")
 	m.Name = name
 	local cc = LayoutConfig.Center
 	local stallW, stallD, aisle = cc.StallWidth, cc.StallDepth, cc.LotAisle
 	local width = stalls * stallW
-	local depth = doubleRows * stallD * 2 + (doubleRows + 1) * aisle
+	local depth = 2 * stallD + aisle
 	flat(m, "Asphalt", Vector2.new(width + 14, depth), frame, TOP + 0.04, ASPHALT, Enum.Material.Asphalt)
-	-- Bordstein ringsum (flach), Inseln mit Bäumen an den Reihenenden
-	local z = -depth / 2 + aisle
-	for row = 1, doubleRows do
-		for half = 0, 1 do
-			local rowZ = z + half * stallD
-			for i = 0, stalls do
-				local x = -width / 2 + i * stallW
-				flat(m, `Line{row}_{half}_{i}`, Vector2.new(0.3, stallD - 0.6), frame * CFrame.new(x, 0, rowZ + stallD / 2), TOP + 0.06, LINE_WHITE, Enum.Material.SmoothPlastic)
+	for half = 0, 1 do
+		local rowZ = -depth / 2 + half * (stallD + aisle)
+		for i = 0, stalls do
+			local x = -width / 2 + i * stallW
+			flat(m, `Line{half}_{i}`, Vector2.new(0.3, stallD - 0.6), frame * CFrame.new(x, 0, rowZ + stallD / 2), TOP + 0.06, LINE_WHITE, Enum.Material.SmoothPlastic)
+		end
+		-- Abschlusslinie am hinteren Ende der Lücken
+		local backZ = if half == 0 then rowZ + 0.3 else rowZ + stallD - 0.3
+		flat(m, `Back{half}`, Vector2.new(width, 0.3), frame * CFrame.new(0, 0, backZ), TOP + 0.06, LINE_WHITE, Enum.Material.SmoothPlastic)
+		-- Inseln mit Bäumen an den Reihenenden, die Fahrgasse bleibt an beiden Enden offen
+		for _, side in { -1, 1 } do
+			local islandCF = frame * CFrame.new(side * (width / 2 + 3.6), 0, rowZ + stallD / 2)
+			part(m, `Island{half}{side}`, Vector3.new(5.6, 0.5, stallD - 1), islandCF * CFrame.new(0, 0.25, 0), PAVING_DARK, Enum.Material.Concrete)
+			part(m, `IslandGrass{half}{side}`, Vector3.new(4.8, 0.1, stallD - 1.8), islandCF * CFrame.new(0, 0.53, 0), GRASS, Enum.Material.Grass)
+			EnvironmentBuilder.pine(m, seed + half * 3 + (side + 1), islandCF.Position + Vector3.new(0, 0.5, 0), rng:NextNumber(0.6, 0.8), rng)
+			if half == 1 then
+				EnvironmentBuilder.streetLamp(m, `Lamp{side}`, islandCF * CFrame.new(0, 0.5, -stallD / 2 + 1.5) * CFrame.Angles(0, math.rad(side * 90), 0))
 			end
 		end
-		flat(m, `Mid{row}`, Vector2.new(width, 0.3), frame * CFrame.new(0, 0, z + stallD), TOP + 0.06, LINE_WHITE, Enum.Material.SmoothPlastic)
-		for _, side in { -1, 1 } do
-			local islandCF = frame * CFrame.new(side * (width / 2 + 3.6), 0, z + stallD)
-			part(m, `Island{row}{side}`, Vector3.new(5.6, 0.5, stallD * 2 - 1), islandCF * CFrame.new(0, 0.25, 0), PAVING_DARK, Enum.Material.Concrete)
-			part(m, `IslandGrass{row}{side}`, Vector3.new(4.8, 0.1, stallD * 2 - 1.8), islandCF * CFrame.new(0, 0.53, 0), GRASS, Enum.Material.Grass)
-			EnvironmentBuilder.pine(m, 6000 + row * 10 + (side + 1), islandCF.Position + Vector3.new(0, 0.5, 0), rng:NextNumber(0.6, 0.8), rng)
-			EnvironmentBuilder.streetLamp(m, `Lamp{row}{side}`, islandCF * CFrame.new(0, 0.5, stallD - 1.5) * CFrame.Angles(0, math.rad(side * 90), 0))
-		end
-		z += stallD * 2 + aisle
 	end
 	m.Parent = parent
 	occupy(frame, Vector2.new(width + 14, depth), 2)
 end
 
--- Shop-Parkplatz (Felix 2026-10-27): reicht von Gehweg zu Gehweg (an beide Straßen angebunden),
--- von der Promenade bis vor den Vorplatz des Shops; eine Reihe großer Lücken vor dem Shop, davor
--- die Fahrgasse quer zwischen den beiden Straßen. Keine Deko auf der Fläche.
+-- Innenkanten der Gehwege links und rechts im Sektor bei Radius r, exakt senkrecht zur Speiche
+-- gemessen (sectorSpan misst seitlich und rechnet mit Sicherheitsabstand). Liefert auch die
+-- Richtung der jeweiligen Speiche.
+local function sidewalkSpan(frame: CFrame, r: number): (number, number, Vector2, Vector2)
+	local f, right = flat2(frame.LookVector), flat2(frame.RightVector)
+	local o = flat2(frame.Position)
+	local lo, hi = -math.huge, math.huge
+	local loDir = Vector2.new(0, 0)
+	local hiDir = Vector2.new(0, 0)
+	for _, s in spokes do
+		local d = flat2(s.dir)
+		local denom = f:Dot(d)
+		local t = if math.abs(denom) > 0.05 then (r - f:Dot(flat2(s.origin) - o)) / denom else math.huge
+		if t >= s.tStart and t <= s.tEnd then
+			local p = flat2(s.origin) + d * t
+			local lat = right:Dot(p - o)
+			local n = Vector2.new(-d.Y, d.X)
+			local edge = (LayoutConfig.RoadWidth / 2 + LayoutConfig.Center.SidewalkWidth) / math.max(math.abs(right:Dot(n)), 0.2)
+			if lat > 0 then
+				if lat - edge < hi then
+					hi, hiDir = lat - edge, d
+				end
+			elseif lat + edge > lo then
+				lo, loDir = lat + edge, d
+			end
+		end
+	end
+	return lo, hi, loDir, hiDir
+end
+
+-- Flaches rechtwinkliges Dreieck (WedgePart liegend): rechter Winkel bei c, Katheten c→a und c→b
+local function flatTriangle(parent: Instance, name: string, c: Vector3, a: Vector3, b: Vector3, topY: number, color: Color3, material: Enum.Material): BasePart?
+	local u, v = a - c, b - c
+	local la, lb = u.Magnitude, v.Magnitude
+	if la < 0.05 or lb < 0.05 then
+		return nil
+	end
+	u, v = u.Unit, v.Unit
+	-- WedgePart: rechter Winkel bei lokal (-Y/2, +Z/2), Kathete nach -Z und nach +Y
+	local zAxis, yAxis = -u, v
+	local center = c + u * (la / 2) + v * (lb / 2)
+	local w = Instance.new("WedgePart")
+	w.Name = name
+	w.Anchored = true
+	w.CanTouch = false
+	w.CanCollide = false
+	w.CanQuery = false
+	w.Size = Vector3.new(0.1, lb, la)
+	w.CFrame = CFrame.fromMatrix(Vector3.new(center.X, topY - 0.05, center.Z), yAxis:Cross(zAxis), yAxis, zAxis)
+	w.Color = color
+	w.Material = material
+	w.TopSurface = Enum.SurfaceType.Smooth
+	w.BottomSurface = Enum.SurfaceType.Smooth
+	w.Parent = parent
+	return w
+end
+
+-- Shop-Parkplatz (Felix 2026-10-27): reicht von Gehweg zu Gehweg, von der Promenade bis vor den
+-- Vorplatz des Shops; eine Reihe großer Lücken vor dem Shop, davor die Fahrgasse. Je Seite eine
+-- Einfahrt über den Gehweg zur Straße. Keine Deko auf der Fläche.
 type ShopLotSpec = { frame: CFrame, rIn: number, rOut: number }
 local function shopLotSpec(shop: any): ShopLotSpec
 	local cc = LayoutConfig.Center
@@ -349,14 +406,49 @@ end
 
 -- Vorfeld zwischen Parkplatz und Promenade (bis zu so viele Studs vor der Parkplatzkante)
 local APRON_MAX = 16
+-- Einfahrt über den Gehweg: Breite entlang der Straße
+local DRIVEWAY_WIDTH = 18
+
+-- Mitte der Fahrgasse (radial), dort liegen die Einfahrten
+local function shopLotAisle(spec: ShopLotSpec): number
+	return (spec.rIn + spec.rOut - LayoutConfig.Center.StallDepth) / 2
+end
+
+-- Einfahrt je Seite: Mitte auf der Gehweg-Innenkante, Richtung zur Straße, Richtung der Straße
+local function shopLotDriveways(spec: ShopLotSpec): { { cf: CFrame, size: Vector2 } }
+	local frame = spec.frame
+	local d = shopLotAisle(spec)
+	local lo, hi, loDir, hiDir = sidewalkSpan(frame, d)
+	local out = {}
+	for _, info in { { x = lo, dir = loDir, sgn = -1 }, { x = hi, dir = hiDir, sgn = 1 } } do
+		local dir = info.dir
+		if dir.Magnitude > 0.5 then
+			local p = (frame * CFrame.new(info.x, 0, -d)).Position
+			local n = Vector2.new(-dir.Y, dir.X)
+			if n:Dot(flat2(frame.RightVector)) * info.sgn < 0 then
+				n = -n
+			end
+			local n3 = Vector3.new(n.X, 0, n.Y)
+			local depth = LayoutConfig.Center.SidewalkWidth + 0.6
+			local center = p + n3 * (depth / 2 - 0.3)
+			local cf = CFrame.lookAt(center, center + Vector3.new(dir.X, 0, dir.Y))
+			table.insert(out, { cf = cf, size = Vector2.new(depth, DRIVEWAY_WIDTH) })
+		end
+	end
+	return out
+end
 
 local function occupyShopLot(spec: ShopLotSpec)
-	local lo, hi = sectorSpan(spec.frame, spec.rOut, 0)
+	local loIn, hiIn = sidewalkSpan(spec.frame, spec.rIn)
+	local loOut, hiOut = sidewalkSpan(spec.frame, spec.rOut)
+	local lo, hi = math.min(loIn, loOut), math.max(hiIn, hiOut)
 	local depth = spec.rOut - spec.rIn
 	occupy(spec.frame * CFrame.new((lo + hi) / 2, 0, -(spec.rIn + depth / 2)), Vector2.new(hi - lo, depth), 1)
 	-- Vorfeld bis zur Promenade: keine Bänke/Beete dazwischen
-	local loIn, hiIn = sectorSpan(spec.frame, spec.rIn, 0)
 	occupy(spec.frame * CFrame.new((loIn + hiIn) / 2, 0, -(spec.rIn - APRON_MAX / 2)), Vector2.new(hiIn - loIn, APRON_MAX), 1)
+	for _, dw in shopLotDriveways(spec) do
+		occupy(dw.cf, dw.size, 1)
+	end
 end
 
 local function shopLot(parent: Instance, name: string, spec: ShopLotSpec)
@@ -364,54 +456,82 @@ local function shopLot(parent: Instance, name: string, spec: ShopLotSpec)
 	local m = Instance.new("Model")
 	m.Name = name
 	local frame = spec.frame
-	local loIn, hiIn = sectorSpan(frame, spec.rIn, 0)
-	local loOut, hiOut = sectorSpan(frame, spec.rOut, 0)
-	local depth = spec.rOut - spec.rIn
-	-- Mittelfläche (Breite an der schmalsten Stelle) und Keile entlang der Gehwege
-	flat(m, "Asphalt", Vector2.new(hiIn - loIn, depth), frame * CFrame.new((loIn + hiIn) / 2, 0, -(spec.rIn + depth / 2)), TOP + 0.04, ASPHALT, Enum.Material.Asphalt)
-	for side, pair in { { loIn, loOut }, { hiIn, hiOut } } do
-		local a = (frame * CFrame.new(pair[1], 0, -spec.rIn)).Position
-		local b = (frame * CFrame.new(pair[2], 0, -spec.rOut)).Position
-		local len = (b - a).Magnitude
-		local extra = math.abs(pair[2] - pair[1]) + 1
-		local along = CFrame.lookAt((a + b) / 2, b)
-		-- Streifen liegt mit der Außenkante genau an der Gehwegkante
-		local inward = frame.RightVector * (if side == 1 then 1 else -1)
-		local perp = along.RightVector
-		if perp:Dot(inward) < 0 then
-			perp = -perp
-		end
-		flat(m, `Edge{side}`, Vector2.new(extra, len + 0.6), along.Rotation + (along.Position + perp * (extra / 2)), TOP + 0.045, ASPHALT, Enum.Material.Asphalt)
+	local function at(x: number, d: number): Vector3
+		return (frame * CFrame.new(x, 0, -d)).Position
 	end
-	-- Vorfeld: Asphalt in schmalen Streifen bis an den Rand der Promenade (Kreisbogen)
+	local loIn, hiIn = sidewalkSpan(frame, spec.rIn)
+	local loOut, hiOut = sidewalkSpan(frame, spec.rOut)
+	local depth = spec.rOut - spec.rIn
+	-- Mittelfläche (Breite an der schmalsten Stelle), Dreiecke bis genau an die Gehwegkanten
+	local mLo, mHi = math.max(loIn, loOut), math.min(hiIn, hiOut)
+	flat(m, "Asphalt", Vector2.new(mHi - mLo, depth), frame * CFrame.new((mLo + mHi) / 2, 0, -(spec.rIn + depth / 2)), TOP + 0.04, ASPHALT, Enum.Material.Asphalt)
+	local wideR = if loOut < loIn then spec.rOut else spec.rIn
+	local narrowR = if wideR == spec.rOut then spec.rIn else spec.rOut
+	flatTriangle(m, "Edge1", at(mLo, wideR), at(mLo, narrowR), at(math.min(loIn, loOut), wideR), TOP + 0.04, ASPHALT, Enum.Material.Asphalt)
+	wideR = if hiOut > hiIn then spec.rOut else spec.rIn
+	narrowR = if wideR == spec.rOut then spec.rIn else spec.rOut
+	flatTriangle(m, "Edge2", at(mHi, wideR), at(mHi, narrowR), at(math.max(hiIn, hiOut), wideR), TOP + 0.04, ASPHALT, Enum.Material.Asphalt)
+	-- Einfahrten über den Gehweg (liegen knapp über dem Gehweg, unter der Fahrbahn)
+	for k, dw in shopLotDriveways(spec) do
+		flat(m, `Driveway{k}`, dw.size, dw.cf, TOP + 0.045, ASPHALT, Enum.Material.Asphalt)
+	end
+	-- Vorfeld: Asphalt in schmalen Streifen bis an den Rand der Promenade (Kreisbogen), seitlich
+	-- nie über die Gehwegkante; dort schließt je ein Dreieck entlang der Gehwegkante ab
 	local R = cc.PromenadeOuter
-	local x = loIn
+	local slopeLo = (loIn - loOut) / depth
+	local slopeHi = (hiOut - hiIn) / depth
+	local dMin = spec.rIn - APRON_MAX
+	local function lineLo(d: number): number
+		return loIn + slopeLo * (spec.rIn - d)
+	end
+	local function lineHi(d: number): number
+		return hiIn - slopeHi * (spec.rIn - d)
+	end
+	-- wo die Gehwegkante den Promenadenrand trifft (höchstens APRON_MAX vor dem Parkplatz)
+	local function meet(line: (number) -> number): number
+		local d = spec.rIn
+		while d > dMin and line(d) ^ 2 + d * d > R * R do
+			d -= 0.25
+		end
+		return math.max(d, dMin)
+	end
+	local dLo, dHi = meet(lineLo), meet(lineHi)
+	flatTriangle(m, "ApronEdge1", at(lineLo(dLo), spec.rIn), at(loIn, spec.rIn), at(lineLo(dLo), dLo), TOP + 0.04, ASPHALT, Enum.Material.Asphalt)
+	flatTriangle(m, "ApronEdge2", at(lineHi(dHi), spec.rIn), at(hiIn, spec.rIn), at(lineHi(dHi), dHi), TOP + 0.04, ASPHALT, Enum.Material.Asphalt)
+	local x = lineLo(dLo)
+	local xEnd = lineHi(dHi)
 	local k = 0
-	while x < hiIn - 0.01 do
+	while x < xEnd - 0.01 do
 		k += 1
-		local x1 = math.min(x + 4, hiIn)
+		local x1 = math.min(x + 4, xEnd)
 		local far = math.max(math.abs(x), math.abs(x1))
-		local dRing = math.sqrt(math.max(R * R - far * far, 0))
-		local dStart = math.max(dRing, spec.rIn - APRON_MAX)
+		local dStart = math.max(math.sqrt(math.max(R * R - far * far, 0)), dMin)
+		-- nicht über die Gehwegkanten (die Lücke daneben deckt das Dreieck ab)
+		if slopeLo > 0.01 then
+			dStart = math.max(dStart, spec.rIn - (x - loIn) / slopeLo)
+		end
+		if slopeHi > 0.01 then
+			dStart = math.max(dStart, spec.rIn - (hiIn - x1) / slopeHi)
+		end
 		if dStart < spec.rIn - 0.2 then
 			flat(m, `Apron{k}`, Vector2.new(x1 - x + 0.05, spec.rIn - dStart + 0.3), frame * CFrame.new((x + x1) / 2, 0, -(dStart + spec.rIn) / 2), TOP + 0.04, ASPHALT, Enum.Material.Asphalt)
 		end
 		x = x1
 	end
-	-- Lückenreihe vor dem Shop (Fahrzeugfront zum Shop), Breite an der inneren Kante der Reihe
+	-- Lückenreihe vor dem Shop (Fahrzeugfront zum Shop), an den Enden Platz zum Einbiegen
 	local rowIn = spec.rOut - cc.StallDepth
-	local lo, hi = sectorSpan(frame, rowIn, 0)
-	local stalls = math.min(cc.ShopLotStalls, math.floor((hi - lo - 4) / cc.StallWidth))
+	local lo, hi = sidewalkSpan(frame, rowIn)
+	local stalls = math.min(cc.ShopLotStalls, math.floor((hi - lo - 16) / cc.StallWidth))
 	local width = stalls * cc.StallWidth
 	local mid = (lo + hi) / 2
 	for i = 0, stalls do
-		local x = mid - width / 2 + i * cc.StallWidth
-		flat(m, `Line{i}`, Vector2.new(0.4, cc.StallDepth - 1), frame * CFrame.new(x, 0, -(rowIn + cc.StallDepth / 2 - 0.3)), TOP + 0.07, LINE_WHITE, Enum.Material.SmoothPlastic)
+		local lx = mid - width / 2 + i * cc.StallWidth
+		flat(m, `Line{i}`, Vector2.new(0.4, cc.StallDepth - 1), frame * CFrame.new(lx, 0, -(rowIn + cc.StallDepth / 2 - 0.3)), TOP + 0.07, LINE_WHITE, Enum.Material.SmoothPlastic)
 	end
 	flat(m, "RowLine", Vector2.new(width, 0.4), frame * CFrame.new(mid, 0, -(spec.rOut - 0.4)), TOP + 0.07, LINE_WHITE, Enum.Material.SmoothPlastic)
-	-- Pfeile in der Fahrgasse (Einbahn-Richtung egal, nur Orientierung)
-	for k, x in { mid - width / 4, mid + width / 4 } do
-		local arrow = flat(m, `Arrow{k}`, Vector2.new(5, 1.4), frame * CFrame.new(x, 0, -(spec.rIn + (rowIn - spec.rIn) / 2)), TOP + 0.07, LINE_WHITE, Enum.Material.SmoothPlastic)
+	-- Pfeile in der Fahrgasse (nur Orientierung)
+	for j, ax in { mid - width / 4, mid + width / 4 } do
+		local arrow = flat(m, `Arrow{j}`, Vector2.new(5, 1.4), frame * CFrame.new(ax, 0, -shopLotAisle(spec)), TOP + 0.07, LINE_WHITE, Enum.Material.SmoothPlastic)
 		arrow.Transparency = 0.2
 	end
 	m.Parent = parent
@@ -614,22 +734,38 @@ function CenterBuilder.build(parent: Instance): Folder
 	end
 	-- Großer Parkplatz im freien Sektor
 	do
-		-- Doppelreihen nach außen gestaffelt; jede so breit, wie der Sektor dort Platz hat
 		local frame = sectorFrame(cc.BigLotAngle)
 		local inner = cc.PromenadeOuter + 10
-		local block = 2 * cc.StallDepth + 2 * cc.LotAisle
+		local block = 2 * cc.StallDepth + cc.LotAisle
 		local firstLo, firstHi = 0, 0
-		for row = 1, cc.BigLotDoubleRows do
-			local r0 = inner + (row - 1) * (block - cc.LotAisle)
+		for row = 1, cc.BigLotModules do
+			-- Module Rücken an Rücken; jedes so breit, wie der Sektor dort Platz hat
+			local r0 = inner + (row - 1) * block
 			local lo1, hi1 = sectorSpan(frame, r0)
 			local lo2, hi2 = sectorSpan(frame, r0 + block)
 			local lo, hi = math.max(lo1, lo2), math.min(hi1, hi2)
+			-- Außenecken bleiben mindestens 6 Studs innerhalb des Zauns
+			local maxHalf = math.sqrt(math.max((cc.FenceRadius - 6) ^ 2 - (r0 + block) ^ 2, 0))
+			lo, hi = math.max(lo, -maxHalf), math.min(hi, maxHalf)
+			-- Hütten (24 × 24) bleiben frei: Modul seitlich davor enden lassen
+			for _, pos in cfg.Environment.Cabins do
+				local rel = Vector3.new(c.X + pos.X, TOP, c.Z + pos.Y) - frame.Position
+				local x = rel:Dot(frame.RightVector)
+				local d = rel:Dot(frame.LookVector)
+				if d + 16 > r0 and d - 16 < r0 + block then
+					if x < (lo + hi) / 2 then
+						lo = math.max(lo, x + 16)
+					else
+						hi = math.min(hi, x - 16)
+					end
+				end
+			end
 			if row == 1 then
 				firstLo, firstHi = lo, hi
 			end
 			local stalls = math.min(cc.BigLotMaxStalls, math.floor((hi - lo - 14) / cc.StallWidth))
 			if stalls >= 3 then
-				parkingLot(lots, `BigLot{row}`, frame * CFrame.new((lo + hi) / 2, 0, -(r0 + block / 2)) * CFrame.Angles(0, math.rad(180), 0), stalls, 1, rng)
+				parkingLot(lots, `BigLot{row}`, frame * CFrame.new((lo + hi) / 2, 0, -(r0 + block / 2)), stalls, 6000 + row * 10, rng)
 			end
 		end
 		local _ = firstLo

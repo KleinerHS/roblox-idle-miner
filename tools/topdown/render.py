@@ -46,12 +46,13 @@ for top, name, shape, (sx, sy, sz), (px, py, pz), r, c, t in parts:
             dr.ellipse([x - rad * S, y - rad * S, x + rad * S, y + rad * S], fill=fill)
             continue
     pts = []
+    # WedgePart: Querschnitt (Y, Z) ist das Dreieck (-Y,-Z), (-Y,+Z), (+Y,+Z)
+    yz = [(-sy / 2, -sz / 2), (-sy / 2, sz / 2), (sy / 2, sz / 2)] if shape == "Wedge" else [(a, b) for a in (-sy / 2, sy / 2) for b in (-sz / 2, sz / 2)]
     for dx in (-sx / 2, sx / 2):
-        for dy in (-sy / 2, sy / 2):
-            for dz in (-sz / 2, sz / 2):
-                wx = px + r[0] * dx + r[1] * dy + r[2] * dz
-                wz = pz + r[6] * dx + r[7] * dy + r[8] * dz
-                pts.append((round(wx, 2), round(wz, 2)))
+        for dy, dz in yz:
+            wx = px + r[0] * dx + r[1] * dy + r[2] * dz
+            wz = pz + r[6] * dx + r[7] * dy + r[8] * dz
+            pts.append((round(wx, 2), round(wz, 2)))
     h = hull(pts)
     if len(h) >= 3:
         dr.polygon([to_px(*p) for p in h], fill=fill)

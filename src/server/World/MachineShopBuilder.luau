@@ -182,9 +182,10 @@ function MachineShopBuilder.build(parent: Instance): Model
 		ShopDecor.flag(model, `Flag{side}`, o * CFrame.new(side * (W / 2 + 3), 0, -D / 2 - 2), if side > 0 then ORANGE else STEEL_DARK)
 		ShopDecor.planter(model, `DoorPlanter{side}`, o * CFrame.new(side * (doorW / 2 + 2.5), 0.6, -D / 2 - 2), 2.6)
 	end
+	-- Schau-Drill auf dem Vorplatz (bleibt vom Parkplatz davor frei, D-065)
 	do
 		local showDef = Drills.List[math.min(#Drills.List, 3)]
-		local top = ShopDecor.podium(model, "Showcase", o * CFrame.new(W / 2 - 10, 0, -D / 2 - 6), 3.2, ORANGE, H - 2)
+		local top = ShopDecor.podium(model, "Showcase", o * CFrame.new(W / 2 - 11, 0, -D / 2 - 4), 3.2, ORANGE, H - 2)
 		local show = DrillModelBuilder.build(showDef, top * CFrame.new(0, 0.2, 0))
 		show.Name = "ShowcaseDrill"
 		show.Parent = model

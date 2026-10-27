@@ -407,3 +407,9 @@ Ergebnis mit den echten Teilen (`tools/topdown`): keine Berührung, knappster Ab
 **Source:** Felix, 2026-10-27 („die kleinen Parkplätze vor den Läden sind nicht an die Straße angebunden, die Deko davor muss weg und die Parkplätze minimal größer, sodass nach dem Bürgersteig direkt der Parkplatz anfängt; außerdem sind die Parklücken viel zu klein … angemessene Größe für die im Spiel fahrbaren Autos“)
 **Decision:** Die Parkplätze vor den drei Shops reichen jetzt von Gehweg zu Gehweg (an beide Straßen angebunden) und von der Promenade bis zum Vorplatz des Shops. Bäume, Laternen-Inseln, Bänke und Beete auf und vor der Fläche sind entfernt. Pro Shop eine Reihe mit 6 Lücken à 12 × 24 Studs vor dem Shop, davor eine breite Fahrgasse quer zwischen den Straßen. Der große Parkplatz nutzt dieselbe Lückengröße (2 Doppelreihen). Maße in `LayoutConfig.Center` (StallWidth, StallDepth, LotAisle).
 **Affected systems:** CenterBuilder, LayoutConfig
+
+## D-065 – Parkplätze: Lücken 13 × 29, exakte Ränder, Einfahrten
+
+**Source:** Nachprüfung von D-064 gegen Felix' Wunsch vom 2026-10-27 („angemessene Größe für die im Spiel fahrbaren Autos“, „nach dem Bürgersteig direkt der Parkplatz“, „an die Straße angebunden“)
+**Decision:** Lücken 13 × 29 Studs statt 12 × 24, weil High-Roof Van (9,7 × 26,4) und Cargo Van (9,8 × 25,3) nicht in 24 Studs passten. Die Parkplatzränder liegen exakt an der Gehweg-Innenkante (rechtwinklige Dreiecke statt schräger Streifen, die unter Shop-Fronten, Fahnen und eine Laterne ragten); je Seite eine Einfahrt über den Gehweg auf Höhe der Fahrgasse. Großer Parkplatz neu als zwei Module (Fahrgasse mit Lücken beidseitig), damit er mit den tieferen Lücken in den Zaun passt; Hütten bleiben frei. Pylon des Autohauses und Schau-Drill des Drill-Shops stehen jetzt auf dem Vorplatz statt auf dem Parkplatz.
+**Affected systems:** CenterBuilder, LayoutConfig, VehicleShopBuilder, MachineShopBuilder, tools/topdown (WedgePart in Draufsicht)

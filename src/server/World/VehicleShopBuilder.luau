@@ -268,8 +268,8 @@ function VehicleShopBuilder.build(parent: Instance): Model
 		plant.Shape = Enum.PartType.Ball
 	end
 
-	-- Pylon vor dem Eingang
-	local pylonCF = o * CFrame.new(hw - 6, 0, -hd - 9)
+	-- Pylon vor dem Eingang, auf dem Vorplatz neben dem Blumenbeet (Parkplatz davor bleibt frei, D-065)
+	local pylonCF = o * CFrame.new(hw - 10, 0, -hd - 4)
 	part(model, "PylonBase", Vector3.new(3, 0.6, 3), pylonCF * CFrame.new(0, 0.3, 0), DARK, Enum.Material.Concrete)
 	local pylon = part(model, "Pylon", Vector3.new(2.4, 12, 1.2), pylonCF * CFrame.new(0, 6.6, 0), RED, Enum.Material.SmoothPlastic)
 	surfaceText(pylon, "🚚", WHITE)

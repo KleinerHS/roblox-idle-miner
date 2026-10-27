@@ -83,7 +83,7 @@ for _, d in workspace:GetDescendants() do
 			local c = d.Color
 			local r = cf.r
 			print(string.format("P|%s|%s|%.3f,%.3f,%.3f|%.3f,%.3f,%.3f|%.5f,%.5f,%.5f,%.5f,%.5f,%.5f,%.5f,%.5f,%.5f|%.3f,%.3f,%.3f|%.2f|%s|%s|%s",
-				tostring(d.Name), tostring(d.Shape or "Block"), s.X, s.Y, s.Z, cf.X, cf.Y, cf.Z, r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9], c.R, c.G, c.B, d.Transparency or 0, tostring(d.Material),
+				tostring(d.Name), if d.ClassName == "WedgePart" then "Wedge" else tostring(d.Shape or "Block"), s.X, s.Y, s.Z, cf.X, cf.Y, cf.Z, r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9], c.R, c.G, c.B, d.Transparency or 0, tostring(d.Material),
 				if d.CanCollide == false then "0" else "1", d.Parent and d.Parent:GetFullName() or "?"))
 			count += 1
 		end

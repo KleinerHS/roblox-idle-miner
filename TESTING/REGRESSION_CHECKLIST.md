@@ -51,3 +51,5 @@ Nach Änderungen an Economy, Inventory, Save, Trading oder Prestige die betroffe
 - [ ] Phase 18l: Zufahrt vom Kreisel in den LKW-Laden frei befahrbar; keine Hütte auf einer Straße
 - [ ] Phase 18k: Pickaxe- und Drill-Shop – Tresen (E) funktioniert, nichts ragt ineinander (D-060)
 - [ ] Phase 18m: Pickaxe-, Drill-Shop und Autohaus größer – Tresen (E) erreichbar, Ausstellungsstücke stehen frei, nichts ragt ineinander (D-062)
+- [ ] Phase 18o: Mit Cargo Van und High-Roof Van von beiden Straßen über die Einfahrt auf jeden Shop-Parkplatz fahren und vorwärts in eine Lücke einparken (passt mit Abstand); nichts steht auf dem Asphalt, Gehweg-Rand sauber (D-064, D-065)
+- [ ] Phase 18o: Großer Parkplatz – Lücken gleich groß, Hütte daneben frei, Zaun nicht berührt
