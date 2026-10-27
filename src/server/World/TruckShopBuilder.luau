@@ -266,7 +266,7 @@ function TruckShopBuilder.build(parent: Instance): Model
 	local forecourt = part(model, "Forecourt", Vector3.new(W, 0.2, apron), o * CFrame.new(0, 0.1, -hd - apron / 2), ASPHALT, Enum.Material.Asphalt)
 	forecourt.CanCollide = false
 	local driveLen = TruckShopBuilder.drivewayLength()
-	local drive = part(model, "Driveway", Vector3.new(cfg.DrivewayWidth, 0.2, driveLen), o * CFrame.new(0, 0.1, -hd - apron - driveLen / 2 + 1), ASPHALT, Enum.Material.Asphalt)
+	local drive = part(model, "Driveway", Vector3.new(cfg.DrivewayWidth, 0.2, driveLen), o * CFrame.new(0, 0.08, -hd - apron - driveLen / 2 + 1), ASPHALT, Enum.Material.Asphalt)
 	drive.CanCollide = false
 	for _, side in { -1, 1 } do
 		local edge = part(model, `DriveLine{side}`, Vector3.new(0.4, 0.05, driveLen), o * CFrame.new(side * (cfg.DrivewayWidth / 2 - 1), 0.23, -hd - apron - driveLen / 2 + 1), WHITE, Enum.Material.SmoothPlastic)

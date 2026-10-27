@@ -427,7 +427,7 @@ function MachineShopBuilder.build(parent: Instance): Model
 
 	-- Bodenzonen: Gehweg-Linien und Servicebereich
 	ShopInterior.rug(inside, "ServiceFloor", o * CFrame.new(W / 2 - 13, 0.6, D / 2 - 12), 22, 20, Color3.fromRGB(96, 98, 102))
-	local serviceText = part(inside, "ServiceFloorText", Vector3.new(14, 0.05, 3), o * CFrame.new(W / 2 - 13, 0.64, D / 2 - 20), Color3.fromRGB(96, 98, 102), Enum.Material.SmoothPlastic)
+	local serviceText = part(inside, "ServiceFloorText", Vector3.new(14, 0.05, 3), o * CFrame.new(W / 2 - 13, 0.68, D / 2 - 20), Color3.fromRGB(96, 98, 102), Enum.Material.SmoothPlastic)
 	serviceText.CanCollide = false
 	ShopInterior.text(serviceText, "SERVICE AREA", HAZARD_YELLOW, Enum.NormalId.Top, true)
 

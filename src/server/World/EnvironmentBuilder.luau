@@ -302,22 +302,21 @@ local function plazaRoads(parent: Instance)
 	local cfg = LayoutConfig
 	local c = cfg.MapCenter
 	local inner, outer = cfg.RoundaboutInner, cfg.RoundaboutOuter
+	-- Höhen getrennt, damit nichts flackert (BUG-015): Promenade TOP+0.03, Kreisel TOP+0.06,
+	-- Speichen TOP+0.09, Markierungen jeweils darüber
 	local roadTop = TOP + 0.06
-	-- Ring aus tangentialen Segmenten
+	-- Kreisel samt Insel als EINE runde Fläche (vorher 64 überlappende Stücke: Flackern und
+	-- ein feiner Spalt am Inselrand). Darauf der grüne Verkaufskreis (SellingBuilder, D-056).
+	disc(folder, "Ring", outer, 0.1, c.X, c.Z, roadTop, Color3.fromRGB(58, 60, 64), Enum.Material.Asphalt).CanCollide = false
 	local segments = 64
 	local mid = (inner + outer) / 2
-	local segLen = 2 * math.pi * outer / segments + 0.6
-	for i = 1, segments do
+	local segLen = 2 * math.pi * mid / segments
+	for i = 2, segments, 2 do
 		local a = (i - 0.5) / segments * math.pi * 2
-		local cf = CFrame.new(c.X + math.cos(a) * mid, roadTop - 0.05, c.Z + math.sin(a) * mid) * CFrame.Angles(0, -a, 0)
-		part(folder, `Ring{i}`, Vector3.new(outer - inner, 0.1, segLen), cf, Color3.fromRGB(58, 60, 64), Enum.Material.Asphalt).CanCollide = false
-		if i % 2 == 0 then
-			local dash = part(folder, `RingDash{i}`, Vector3.new(0.5, 0.04, segLen * 0.6), cf * CFrame.new(0, 0.07, 0), LINE_WHITE, Enum.Material.SmoothPlastic)
-			dash.CanCollide = false
-		end
+		local cf = CFrame.new(c.X + math.cos(a) * mid, roadTop + 0.02, c.Z + math.sin(a) * mid) * CFrame.Angles(0, -a, 0)
+		local dash = part(folder, `RingDash{i}`, Vector3.new(0.5, 0.04, segLen * 0.6), cf, LINE_WHITE, Enum.Material.SmoothPlastic)
+		dash.CanCollide = false
 	end
-	-- Insel: flach und befahrbar, darauf der grüne Verkaufskreis (SellingBuilder, D-056)
-	disc(folder, "Island", inner, 0.1, c.X, c.Z, roadTop, Color3.fromRGB(58, 60, 64), Enum.Material.Asphalt).CanCollide = false
 	-- Speichen: Fortsetzung jeder Zufahrt (gleiche Linie) vom Platzrand bis in den Ring
 	for plotId = 1, GameConfig.MaxPlots do
 		local cf = plotCFrame(plotId)
@@ -327,22 +326,23 @@ local function plazaRoads(parent: Instance)
 		local zRing = math.sqrt((outer - 3) ^ 2 - x ^ 2) - R
 		local length = zEdge - zRing
 		local zMid = (zEdge + zRing) / 2
-		part(folder, `Spoke{plotId}`, Vector3.new(cfg.RoadWidth, 0.1, length), cf * CFrame.new(x, roadTop - 0.04, zMid), Color3.fromRGB(58, 60, 64), Enum.Material.Asphalt).CanCollide = false
-		local z = zEdge - 4
+		part(folder, `Spoke{plotId}`, Vector3.new(cfg.RoadWidth, 0.1, length), cf * CFrame.new(x, roadTop - 0.02, zMid), Color3.fromRGB(58, 60, 64), Enum.Material.Asphalt).CanCollide = false
+		-- Mittellinie erst hinter dem Zebrastreifen
+		local z = zEdge - 10
 		local n = 0
 		while z - 6 > zRing + 4 do
 			n += 1
-			local dash = part(folder, `SpokeDash{plotId}_{n}`, Vector3.new(0.5, 0.04, 6), cf * CFrame.new(x, roadTop + 0.03, z - 3), LINE_YELLOW, Enum.Material.SmoothPlastic)
+			local dash = part(folder, `SpokeDash{plotId}_{n}`, Vector3.new(0.5, 0.04, 6), cf * CFrame.new(x, roadTop + 0.05, z - 3), LINE_YELLOW, Enum.Material.SmoothPlastic)
 			dash.CanCollide = false
 			z -= 12
 		end
 		for _, side in { -1, 1 } do
-			local edge = part(folder, `SpokeEdge{plotId}_{side}`, Vector3.new(0.4, 0.04, length), cf * CFrame.new(x + side * (cfg.RoadWidth / 2 - 1.2), roadTop + 0.03, zMid), LINE_WHITE, Enum.Material.SmoothPlastic)
+			local edge = part(folder, `SpokeEdge{plotId}_{side}`, Vector3.new(0.4, 0.04, length), cf * CFrame.new(x + side * (cfg.RoadWidth / 2 - 1.2), roadTop + 0.05, zMid), LINE_WHITE, Enum.Material.SmoothPlastic)
 			edge.CanCollide = false
 		end
 		-- Zebrastreifen am Platzrand
 		for k = -5, 5 do
-			local stripe = part(folder, `Crossing{plotId}_{k}`, Vector3.new(1.2, 0.04, 5), cf * CFrame.new(x + k * 2.4, roadTop + 0.03, zEdge - 6), LINE_WHITE, Enum.Material.SmoothPlastic)
+			local stripe = part(folder, `Crossing{plotId}_{k}`, Vector3.new(1.2, 0.04, 5), cf * CFrame.new(x + k * 2.4, roadTop + 0.05, zEdge - 6), LINE_WHITE, Enum.Material.SmoothPlastic)
 			stripe.CanCollide = false
 		end
 	end

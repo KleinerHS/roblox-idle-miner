@@ -168,3 +168,14 @@ Nicht verschoben: eine Rohr-Aufhänger-Gruppe weit außerhalb der Halle (Workspa
 **Fix:** Federung vorne/hinten 42/46, Dämpfung 22,5/25 (im Stoßtest schwingt er nach ~0,8 s aus statt ~2 s, höhere Werte wurden instabil). Neuer Kühlergrill (`Body.Grille`, dunkler Rahmen mit Chromstreben). Lichtgläser wieder wie im Original. Dazu auf Felix' Wunsch: Scheiben des Ladebereichs überlackiert (Attribut `PaintedOver`), Markenlogo an der Hecktür entfernt (D-026).
 **Regression geprüft:** Geradeausfahrt bis 32 Studs/s ohne Schaukeln (Rollwinkel < 0,5°), Bremsen ruhig; Vorlage per Export/Rücktest gesichert.
 **Likely system:** Fahrzeuge (A-Chassis-Tune, Place-Vorlage)
+
+## BUG-015 – Straßen in der Mitte flackern, Spalt im Kreisel
+
+**Severity:** Low
+**Status:** Fixed (TESTING_REQUIRED)
+**Build:** 0.51.5
+**Gemeldet:** Felix, 2026-10-27 („in der Mitte buggen noch ein paar Straßen übereinander, und im Kreis um die Mitte ist noch ein Spalt in der Straße“)
+**Ursache:** (1) Der Kreisel bestand aus 64 Stücken, die sich auf exakt gleicher Höhe überlappten (256 Überlappungen) → Flackern. (2) Speichen lagen nur 0,01 über dem Kreisel. (3) Runde Insel und eckige Kreisel-Stücke schlossen nicht dicht → feiner Spalt am Inselrand; ebenso Promenade aus überlappenden Stücken. (4) Parkplatz-Flächen, Zufahrten, Gehwege, Rasenscheibe und Promenade lagen teils auf gleicher Höhe übereinander.
+**Fix:** Kreisel samt Insel ist eine einzige runde Fläche; Promenade sind zwei runde Flächen (Kante, Pflaster) und reicht unter den Kreisel. Feste Höhenstufen (Abstand ≥ 0,01): Wiese = Platzfläche selbst (keine zweite Rasenscheibe), Promenadenkante +0.015, Gehweg +0.03, Pflaster +0.04, Vorfeld +0.05, Kreisel/Parkplatz +0.06, Zufahrten +0.07, Speichen +0.09, Markierungen darüber. Mittellinie der Speichen beginnt hinter dem Zebrastreifen.
+**Regression geprüft:** Play: Prüfskript findet keine gleich hohen Überlappungen mehr bei Straßen/Belägen (nur noch weiße Linien untereinander), Strahltest über die ganze Kreisel- und Promenadenfläche ohne Lücke; Ansicht schräg auf den Kreisel ohne Nähte.
+**Likely system:** Umgebung (EnvironmentBuilder, CenterBuilder, PlotBuilder)

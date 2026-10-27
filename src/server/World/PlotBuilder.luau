@@ -284,8 +284,9 @@ function PlotBuilder.buildCenterPlaceholder(parent: Instance)
 	plaza.Size = Vector3.new(1, diameter, diameter)
 	plaza.CFrame = CFrame.new(center.X, LayoutConfig.GroundY + 0.5, center.Z) * CFrame.Angles(0, 0, math.rad(90))
 	-- Pflaster wie im Referenzbild (Phase 13a); Brunnen/Beete baut EnvironmentBuilder
-	plaza.Color = Color3.fromRGB(150, 146, 138)
-	plaza.Material = Enum.Material.Pavement
+	-- Wiese der Mitte (BUG-015: keine zweite Rasenscheibe mehr darüber, die flackerte)
+	plaza.Color = Color3.fromRGB(98, 146, 72)
+	plaza.Material = Enum.Material.Grass
 	plaza.Parent = parent
 end
 

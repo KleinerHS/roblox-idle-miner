@@ -470,20 +470,20 @@ local function shopLot(parent: Instance, name: string, spec: ShopLotSpec)
 	local depth = spec.rOut - spec.rIn
 	-- Mittelfläche (Breite an der schmalsten Stelle), Dreiecke bis genau an die Gehwegkanten
 	local mLo, mHi = math.max(loIn, loOut), math.min(hiIn, hiOut)
-	flat(m, "Asphalt", Vector2.new(mHi - mLo, depth), frame * CFrame.new((mLo + mHi) / 2, 0, -(spec.rIn + depth / 2)), TOP + 0.04, ASPHALT, Enum.Material.Asphalt)
+	flat(m, "Asphalt", Vector2.new(mHi - mLo, depth), frame * CFrame.new((mLo + mHi) / 2, 0, -(spec.rIn + depth / 2)), TOP + 0.06, ASPHALT, Enum.Material.Asphalt)
 	local wideR = if loOut < loIn then spec.rOut else spec.rIn
 	local narrowR = if wideR == spec.rOut then spec.rIn else spec.rOut
-	flatTriangle(m, "Edge1", at(mLo, wideR), at(mLo, narrowR), at(math.min(loIn, loOut), wideR), TOP + 0.04, ASPHALT, Enum.Material.Asphalt)
+	flatTriangle(m, "Edge1", at(mLo, wideR), at(mLo, narrowR), at(math.min(loIn, loOut), wideR), TOP + 0.06, ASPHALT, Enum.Material.Asphalt)
 	wideR = if hiOut > hiIn then spec.rOut else spec.rIn
 	narrowR = if wideR == spec.rOut then spec.rIn else spec.rOut
-	flatTriangle(m, "Edge2", at(mHi, wideR), at(mHi, narrowR), at(math.max(hiIn, hiOut), wideR), TOP + 0.04, ASPHALT, Enum.Material.Asphalt)
+	flatTriangle(m, "Edge2", at(mHi, wideR), at(mHi, narrowR), at(math.max(hiIn, hiOut), wideR), TOP + 0.06, ASPHALT, Enum.Material.Asphalt)
 	-- Einfahrten über den Gehweg (liegen knapp über dem Gehweg, unter der Fahrbahn)
 	for k, dw in shopLotDriveways(spec) do
-		flat(m, `Driveway{k}`, dw.size, dw.cf, TOP + 0.045, ASPHALT, Enum.Material.Asphalt)
+		flat(m, `Driveway{k}`, dw.size, dw.cf, TOP + 0.07, ASPHALT, Enum.Material.Asphalt)
 	end
 	-- Vorfeld: Asphalt in schmalen Streifen bis an den Rand der Promenade (Kreisbogen), seitlich
 	-- nie über die Gehwegkante; dort schließt je ein Dreieck entlang der Gehwegkante ab
-	local R = cc.PromenadeOuter
+	local R = cc.PromenadeOuter + 0.4
 	local slopeLo = (loIn - loOut) / depth
 	local slopeHi = (hiOut - hiIn) / depth
 	local dMin = spec.rIn - APRON_MAX
@@ -502,8 +502,8 @@ local function shopLot(parent: Instance, name: string, spec: ShopLotSpec)
 		return math.max(d, dMin)
 	end
 	local dLo, dHi = meet(lineLo), meet(lineHi)
-	flatTriangle(m, "ApronEdge1", at(lineLo(dLo), spec.rIn), at(loIn, spec.rIn), at(lineLo(dLo), dLo), TOP + 0.04, ASPHALT, Enum.Material.Asphalt)
-	flatTriangle(m, "ApronEdge2", at(lineHi(dHi), spec.rIn), at(hiIn, spec.rIn), at(lineHi(dHi), dHi), TOP + 0.04, ASPHALT, Enum.Material.Asphalt)
+	flatTriangle(m, "ApronEdge1", at(lineLo(dLo), spec.rIn), at(loIn, spec.rIn), at(lineLo(dLo), dLo), TOP + 0.028, ASPHALT, Enum.Material.Asphalt)
+	flatTriangle(m, "ApronEdge2", at(lineHi(dHi), spec.rIn), at(hiIn, spec.rIn), at(lineHi(dHi), dHi), TOP + 0.028, ASPHALT, Enum.Material.Asphalt)
 	local x = lineLo(dLo)
 	local xEnd = lineHi(dHi)
 	local k = 0
@@ -520,7 +520,7 @@ local function shopLot(parent: Instance, name: string, spec: ShopLotSpec)
 			dStart = math.max(dStart, spec.rIn - (hiIn - x1) / slopeHi)
 		end
 		if dStart < spec.rIn - 0.2 then
-			flat(m, `Apron{k}`, Vector2.new(x1 - x + 0.05, spec.rIn - dStart + 0.3), frame * CFrame.new((x + x1) / 2, 0, -(dStart + spec.rIn) / 2), TOP + 0.04, ASPHALT, Enum.Material.Asphalt)
+			flat(m, `Apron{k}`, Vector2.new(x1 - x, spec.rIn - dStart + 0.3), frame * CFrame.new((x + x1) / 2, 0, -(dStart + spec.rIn) / 2), TOP + 0.05, ASPHALT, Enum.Material.Asphalt)
 		end
 		x = x1
 	end
@@ -532,12 +532,12 @@ local function shopLot(parent: Instance, name: string, spec: ShopLotSpec)
 	local mid = (lo + hi) / 2
 	for i = 0, stalls do
 		local lx = mid - width / 2 + i * cc.StallWidth
-		flat(m, `Line{i}`, Vector2.new(0.4, cc.StallDepth - 1), frame * CFrame.new(lx, 0, -(rowIn + cc.StallDepth / 2 - 0.3)), TOP + 0.07, LINE_WHITE, Enum.Material.SmoothPlastic)
+		flat(m, `Line{i}`, Vector2.new(0.4, cc.StallDepth - 1), frame * CFrame.new(lx, 0, -(rowIn + cc.StallDepth / 2 - 0.3)), TOP + 0.08, LINE_WHITE, Enum.Material.SmoothPlastic)
 	end
-	flat(m, "RowLine", Vector2.new(width, 0.4), frame * CFrame.new(mid, 0, -(spec.rOut - 0.4)), TOP + 0.07, LINE_WHITE, Enum.Material.SmoothPlastic)
+	flat(m, "RowLine", Vector2.new(width, 0.4), frame * CFrame.new(mid, 0, -(spec.rOut - 0.4)), TOP + 0.08, LINE_WHITE, Enum.Material.SmoothPlastic)
 	-- Pfeile in der Fahrgasse (nur Orientierung)
 	for j, ax in { mid - width / 4, mid + width / 4 } do
-		local arrow = flat(m, `Arrow{j}`, Vector2.new(5, 1.4), frame * CFrame.new(ax, 0, -shopLotAisle(spec)), TOP + 0.07, LINE_WHITE, Enum.Material.SmoothPlastic)
+		local arrow = flat(m, `Arrow{j}`, Vector2.new(5, 1.4), frame * CFrame.new(ax, 0, -shopLotAisle(spec)), TOP + 0.08, LINE_WHITE, Enum.Material.SmoothPlastic)
 		arrow.Transparency = 0.2
 	end
 	m.Parent = parent
@@ -550,8 +550,11 @@ local function promenade(parent: Instance, rng: Random)
 	local folder = Instance.new("Folder")
 	folder.Name = "Promenade"
 	folder.Parent = parent
-	annulus(folder, "Ring", cfg.RoundaboutOuter, cc.PromenadeOuter, TOP + 0.03, COBBLE, Enum.Material.Cobblestone, 72)
-	annulus(folder, "Edge", cc.PromenadeOuter - 0.6, cc.PromenadeOuter + 0.4, TOP + 0.05, PAVING_DARK, Enum.Material.Concrete, 72)
+	-- Promenade als zwei runde Flächen statt überlappender Stücke (BUG-015: Flackern, Spalt am
+	-- Kreisel): dunkle Kante unten, Pflaster darüber; der Kreisel (TOP+0.06) liegt obendrauf.
+	local c3 = Vector3.new(c.X, 0, c.Z)
+	disc(folder, "Edge", cc.PromenadeOuter + 0.4, 0.1, c3, TOP + 0.015, PAVING_DARK, Enum.Material.Concrete).CanCollide = false
+	disc(folder, "Ring", cc.PromenadeOuter - 0.6, 0.1, c3, TOP + 0.04, COBBLE, Enum.Material.Cobblestone).CanCollide = false
 	-- Sitzecke je Sektor (D-061): nur in der Sektormitte am äußeren Rand, denn an den Ein- und
 	-- Ausfahrten fahren die Anhänger der Lastzüge über die Promenade. Zwei Bänke mit Blick ins
 	-- Grüne, Laternen außen, Blumenbeete dahinter auf der Wiese; die Mitte bleibt als Durchgang frei.
@@ -775,7 +778,7 @@ function CenterBuilder.build(parent: Instance): Folder
 	table.clear(rects)
 
 	-- Wiese über der alten Pflasterfläche
-	disc(folder, "Lawn", cfg.CenterPlazaRadius, 0.1, Vector3.new(c.X, 0, c.Z), TOP + 0.01, GRASS, Enum.Material.Grass).CanCollide = false
+	-- Wiese: die Platzfläche selbst ist grün (PlotBuilder.buildCenterPlaceholder, BUG-015)
 
 	-- Belegte Flächen: Shops (Eingang zur Mitte), Hütten, Wahrzeichen
 	for _, shop in { cfg.EquipmentShop, cfg.MachineShop, cfg.VehicleShop } do
@@ -849,9 +852,9 @@ function CenterBuilder.build(parent: Instance): Folder
 			end
 			-- Zufahrt: Rechteck bis zur näheren Gehwegkante, Dreieck bis an die schräge Kante
 			local x0, x1 = math.min(l.xNear, l.xEdge), math.max(l.xNear, l.xEdge)
-			flat(lanesFolder, `Lane{k}`, Vector2.new(x1 - x0 + 0.1, cc.LotAisle), frame * CFrame.new((x0 + x1) / 2, 0, -l.d), TOP + 0.04, ASPHALT, Enum.Material.Asphalt)
+			flat(lanesFolder, `Lane{k}`, Vector2.new(x1 - x0 + 0.1, cc.LotAisle), frame * CFrame.new((x0 + x1) / 2, 0, -l.d), TOP + 0.05, ASPHALT, Enum.Material.Asphalt)
 			local narrowD = if l.wideD < l.d then l.d + cc.LotAisle / 2 else l.d - cc.LotAisle / 2
-			flatTriangle(lanesFolder, `LaneEdge{k}`, at(l.xNear, l.wideD), at(l.xNear, narrowD), at(l.xWide, l.wideD), TOP + 0.04, ASPHALT, Enum.Material.Asphalt)
+			flatTriangle(lanesFolder, `LaneEdge{k}`, at(l.xNear, l.wideD), at(l.xNear, narrowD), at(l.xWide, l.wideD), TOP + 0.035, ASPHALT, Enum.Material.Asphalt)
 			-- Mittellinie gestrichelt, damit die Zufahrt als Straße lesbar ist
 			local len = math.abs(l.xEdge - l.xNear)
 			local dashes = math.floor(len / 8)
@@ -861,7 +864,7 @@ function CenterBuilder.build(parent: Instance): Folder
 			end
 		end
 		for k, dw in driveways do
-			flat(lanesFolder, `Driveway{k}`, dw.size, dw.cf, TOP + 0.045, ASPHALT, Enum.Material.Asphalt)
+			flat(lanesFolder, `Driveway{k}`, dw.size, dw.cf, TOP + 0.06, ASPHALT, Enum.Material.Asphalt)
 		end
 		lanesFolder.Parent = lots
 		local firstHi = if modules[1] then modules[1].hi else 0
