@@ -68,7 +68,7 @@ Die Spielwelt wird zur Laufzeit vom Server-Code gebaut (`src/server/World`). Im 
 rojo build plugin.project.json -o "$env:LOCALAPPDATA\Roblox\Plugins\IdleMinerPreview.rbxm"
 ```
 
-Studio neu starten → Reiter **Plugins** → Toolbar „Idle Miner“ → **World Preview**. Die Vorschau liegt in `Workspace.EditPreview` (Archivable = false): Sie wird nicht gespeichert und beim Play nicht mitkopiert. Plot 1 wird voll ausgebaut gezeigt, die anderen Plots leer, darunter die Minenräume mit Mine 01. Jeder Klick baut mit dem aktuellen Code neu auf. Nach Code-Änderungen also einmal aus- und wieder einschalten.
+Studio neu starten → Reiter **Plugins** → Toolbar „Idle Miner“ → **World Preview**. Die Vorschau liegt in `Workspace.EditPreview` (Archivable = false): Sie wird nicht gespeichert und beim Play nicht mitkopiert. Plot 1 wird voll ausgebaut gezeigt, die anderen Plots leer, darunter die Minenräume mit Mine 01. Die Vorschau ist automatisch an: Sie steht beim Öffnen von Studio da und baut sich neu auf, sobald neuer Code über Rojo ankommt. Der Knopf schaltet sie an/aus (Einstellung bleibt gespeichert).
 
 ## Arbeitsweise
 

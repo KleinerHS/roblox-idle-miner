@@ -413,3 +413,9 @@ Ergebnis mit den echten Teilen (`tools/topdown`): keine Berührung, knappster Ab
 **Source:** Nachprüfung von D-064 gegen Felix' Wunsch vom 2026-10-27 („angemessene Größe für die im Spiel fahrbaren Autos“, „nach dem Bürgersteig direkt der Parkplatz“, „an die Straße angebunden“)
 **Decision:** Lücken 13 × 29 Studs statt 12 × 24, weil High-Roof Van (9,7 × 26,4) und Cargo Van (9,8 × 25,3) nicht in 24 Studs passten. Die Parkplatzränder liegen exakt an der Gehweg-Innenkante (rechtwinklige Dreiecke statt schräger Streifen, die unter Shop-Fronten, Fahnen und eine Laterne ragten); je Seite eine Einfahrt über den Gehweg auf Höhe der Fahrgasse. Großer Parkplatz neu als zwei Module (Fahrgasse mit Lücken beidseitig), damit er mit den tieferen Lücken in den Zaun passt; Hütten bleiben frei. Pylon des Autohauses und Schau-Drill des Drill-Shops stehen jetzt auf dem Vorplatz statt auf dem Parkplatz.
 **Affected systems:** CenterBuilder, LayoutConfig, VehicleShopBuilder, MachineShopBuilder, tools/topdown (WedgePart in Draufsicht)
+
+## D-066 – Map bleibt im Code, Vorschau automatisch
+
+**Source:** Felix, 2026-10-27 („ist es dumm, die Map wirklich direkt in der Entwicklerumgebung zu bauen … ich finde es etwas nervig“; Vorschlag automatische Vorschau: „ja kannst du machen“)
+**Decision:** Die Welt wird weiter per Code gebaut (6 gleiche Plots, schnelle Umbauten, Versionskontrolle); Hand-Deko geht über Layouts wie das HallLayout. Das Plugin „Idle Miner Preview“ baut die Vorschau jetzt automatisch: beim Öffnen von Studio und neu, sobald neuer Code in `ServerScriptService.World` oder `ReplicatedStorage.Shared` ankommt (1,5 s Ruhe abgewartet). Der Knopf „World Preview“ schaltet die automatische Vorschau an/aus; die Einstellung bleibt über Neustarts erhalten.
+**Affected systems:** plugin/EditPreview.server.luau, README

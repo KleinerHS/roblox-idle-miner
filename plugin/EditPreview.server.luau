@@ -209,13 +209,89 @@ local function refreshButton()
 	button:SetActive(existing() ~= nil)
 end
 
+-- Automatische Vorschau (Felix 2026-10-27): ist sie eingeschaltet, steht die Welt beim Öffnen
+-- von Studio sofort da und wird neu gebaut, sobald neuer Code ankommt (Rojo ändert Skripte in
+-- ServerScriptService.World oder ReplicatedStorage.Shared). Der Knopf schaltet sie an/aus; die
+-- Einstellung bleibt über Studio-Neustarts erhalten.
+local AUTO_SETTING = "IdleMinerAutoPreview"
+local auto = plugin:GetSetting(AUTO_SETTING)
+if auto == nil then
+	auto = true
+end
+
+local function rebuild()
+	remove()
+	create()
+	refreshButton()
+end
+
 button.Click:Connect(function()
 	if existing() then
+		auto = false
 		remove()
 	else
+		auto = true
 		create()
 	end
+	plugin:SetSetting(AUTO_SETTING, auto)
 	refreshButton()
+end)
+
+-- Code-Änderungen beobachten und gesammelt (nach kurzer Ruhe) neu bauen
+local pending = false
+local lastChange = 0
+local function onCodeChanged()
+	if not auto then
+		return
+	end
+	lastChange = os.clock()
+	if pending then
+		return
+	end
+	pending = true
+	task.spawn(function()
+		while os.clock() - lastChange < 1.5 do
+			task.wait(0.5)
+		end
+		pending = false
+		if auto and not RunService:IsRunning() then
+			print("[Idle Miner Preview] Neuer Code erkannt – Welt wird neu aufgebaut")
+			rebuild()
+		end
+	end)
+end
+
+local watched: { [Instance]: boolean } = {}
+local function watchScript(d: Instance)
+	if d:IsA("LuaSourceContainer") and not watched[d] then
+		watched[d] = true
+		d:GetPropertyChangedSignal("Source"):Connect(onCodeChanged)
+	end
+end
+local function watchRoot(root: Instance)
+	for _, d in root:GetDescendants() do
+		watchScript(d)
+	end
+	root.DescendantAdded:Connect(function(d)
+		watchScript(d)
+		onCodeChanged()
+	end)
+	root.DescendantRemoving:Connect(onCodeChanged)
+end
+
+task.spawn(function()
+	-- warten, bis Rojo den Code geliefert hat (oder er in der Place liegt)
+	local world = ServerScriptService:WaitForChild("World", 60)
+	local shared = ReplicatedStorage:WaitForChild("Shared", 60)
+	if not (world and shared) then
+		return
+	end
+	watchRoot(world)
+	watchRoot(shared)
+	task.wait(2)
+	if auto and not existing() then
+		rebuild()
+	end
 end)
 
 -- Hallen-Layout anlegen: kompletter Ausbau von Plot 1 (je Bauschritt ein Model, Außenbereich als
