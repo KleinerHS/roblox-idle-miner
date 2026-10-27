@@ -837,6 +837,7 @@ Selbsttest: alle vier Läden im Bearbeitungsmodus von oben und innen angeschaut;
 | Großer Parkplatz: 2 Module (Fahrgasse mit Lückenreihe links und rechts), Ecken mind. 6 Studs im Zaun, Hütten bleiben frei | `CenterBuilder` (`parkingLot`), `LayoutConfig.Center.BigLotModules` | TESTING_REQUIRED |
 | Pylon (Autohaus) und Schau-Drill (Drill-Shop) auf den Vorplatz versetzt | `VehicleShopBuilder`, `MachineShopBuilder` | TESTING_REQUIRED |
 | 0.51.4: Großer Parkplatz an beide Straßen angebunden – 4 Zufahrten entlang der Fahrgassen mit Mittellinie und Einfahrt über den Gehweg; keine Laterne auf Einfahrten (D-067) | `CenterBuilder` (`bigLotLayout`) | TESTING_REQUIRED |
+| 0.51.6: Vorfeld der Shop-Parkplätze liegt unter dem Promenadenpflaster, die runde Kante verdeckt die Stufen der Asphaltstreifen (Nachtrag zu BUG-015) | `CenterBuilder` (`shopLot`) | TESTING_REQUIRED |
 
 Selbsttest (ohne Studio, tools/topdown): Draufsicht aller Parkplätze; Überschneidungsprüfung Asphalt gegen alle Teile: nichts steht mehr auf den Parkplätzen (vorher: Asphalt unter Shop-Fronten, Fahnen, Pylon, Schau-Drill, einer Gehweg-Laterne, einem Baum; großer Parkplatz auf Hütte 2 und Zaun). Lastzug-Simulation am Kreisel erneut gerechnet.
 

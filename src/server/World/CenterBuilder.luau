@@ -482,7 +482,8 @@ local function shopLot(parent: Instance, name: string, spec: ShopLotSpec)
 		flat(m, `Driveway{k}`, dw.size, dw.cf, TOP + 0.07, ASPHALT, Enum.Material.Asphalt)
 	end
 	-- Vorfeld: Asphalt in schmalen Streifen bis an den Rand der Promenade (Kreisbogen), seitlich
-	-- nie über die Gehwegkante; dort schließt je ein Dreieck entlang der Gehwegkante ab
+	-- nie über die Gehwegkante; dort schließt je ein Dreieck entlang der Gehwegkante ab. Liegt unter
+	-- dem Promenadenpflaster, damit dessen runde Kante die Stufen der Streifen verdeckt.
 	local R = cc.PromenadeOuter + 0.4
 	local slopeLo = (loIn - loOut) / depth
 	local slopeHi = (hiOut - hiIn) / depth
@@ -520,7 +521,7 @@ local function shopLot(parent: Instance, name: string, spec: ShopLotSpec)
 			dStart = math.max(dStart, spec.rIn - (hiIn - x1) / slopeHi)
 		end
 		if dStart < spec.rIn - 0.2 then
-			flat(m, `Apron{k}`, Vector2.new(x1 - x, spec.rIn - dStart + 0.3), frame * CFrame.new((x + x1) / 2, 0, -(dStart + spec.rIn) / 2), TOP + 0.05, ASPHALT, Enum.Material.Asphalt)
+			flat(m, `Apron{k}`, Vector2.new(x1 - x, spec.rIn - dStart + 0.3), frame * CFrame.new((x + x1) / 2, 0, -(dStart + spec.rIn) / 2), TOP + 0.028, ASPHALT, Enum.Material.Asphalt)
 		end
 		x = x1
 	end
