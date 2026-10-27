@@ -850,7 +850,8 @@ function CenterBuilder.build(parent: Instance): Folder
 		occupy(o * CFrame.new(0, 0, -t.Size.Z / 2 - t.ApronDepth / 2), Vector2.new(t.Size.X, t.ApronDepth), 3)
 		-- Zufahrt bis an den Kreisverkehr: auch Promenaden-Deko bleibt draußen (D-061)
 		local len = TruckShopBuilder.drivewayLength()
-		occupy(o * CFrame.new(0, 0, -t.Size.Z / 2 - t.ApronDepth - len / 2), Vector2.new(t.DrivewayWidth, len), 3)
+		-- inkl. Ausrundungen und Ausschwenkkurven
+		occupy(o * CFrame.new(0, 0, -t.Size.Z / 2 - t.ApronDepth - len / 2), Vector2.new(t.DrivewayWidth + 2 * t.RingFillet, len), 3)
 	end
 	for _, pos in cfg.Environment.Cabins do
 		occupy(CFrame.new(c.X + pos.X, TOP, c.Z + pos.Y), Vector2.new(24, 24), 6)

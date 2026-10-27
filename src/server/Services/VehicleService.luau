@@ -756,6 +756,37 @@ function VehicleService.SpawnAt(player: Player, vehicleId: string, floorCF: CFra
 	return spawnAtBay(player, record, floorCF)
 end
 
+-- Frisch gekauftes Fahrzeug direkt an einer Stelle abstellen (LKW-Laden, Felix 2026-10-27):
+-- bekommt einen Stellplatz (Lastzüge: den Lastzug-Platz) wie beim Ausparken und steht dann an
+-- floorCF. Kein freier Platz → nichts passiert, das Fahrzeug wartet in der Garage.
+function VehicleService.SpawnPurchased(player: Player, vehicleId: string, floorCF: CFrame): Model?
+	local data = DataService.Get(player)
+	local record = data and data.Vehicles.Owned[vehicleId]
+	if not (data and record) then
+		return nil
+	end
+	if not record.Bay then
+		local bay = freeBay(data, record.Type)
+		if not bay then
+			return nil
+		end
+		DataService.Mutate(player, function(d)
+			d.Vehicles.Owned[vehicleId].Bay = bay
+		end)
+		DataService.RequestSave(player)
+	end
+	local current = DataService.Get(player)
+	local fresh = current and current.Vehicles.Owned[vehicleId]
+	if not fresh then
+		return nil
+	end
+	local model = spawnAtBay(player, fresh, floorCF)
+	if model then
+		VehicleService.VehiclesChanged:Fire(player)
+	end
+	return model
+end
+
 function VehicleService.GetModel(player: Player, vehicleId: string): Model?
 	return spawned[player] and spawned[player][vehicleId]
 end

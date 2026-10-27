@@ -184,14 +184,22 @@ local LayoutConfig = {
 	-- fünf Stellplätze für Lastzüge mit allen Anhängern (alle LKW + 2 frei). Zufahrt zum Parkplatz.
 	-- Felix 2026-10-25: so nah an die Mitte wie möglich ohne Straßenkollision (Front bei r ≈ 151,
 	-- dort ist der Sektor zwischen den Straßen gerade breit genug für die Halle)
+	-- Felix 2026-10-27: weiter nach außen, damit ein gekaufter Lastzug (~100 Studs) auf der Zufahrt
+	-- vor dem Laden spawnen kann; Halle 22 Studs tiefer für die Kundenzone vorne
 	TruckShop = {
-		Offset = Vector2.new(148.3, 164.9),
+		Offset = Vector2.new(175.3, 211.7),
 		SectorAngle = -60,
-		Size = Vector3.new(112, 26, 132),
+		Size = Vector3.new(112, 26, 154),
 		Bays = 5,
+		FrontZone = 22,
 		ApronDepth = 16,
 		DrivewayLength = 34, -- nur Rückfall: die Zufahrt reicht bis an den Kreisverkehr (D-061)
-		DrivewayWidth = 22,
+		DrivewayWidth = 28,
+		RingFillet = 14,
+		FlareFillet = 8,
+		-- Spawn: Front so weit vor dem Kreiselrand, Abstand Front zu Pivot der Zugmaschine
+		SpawnRingGap = 4,
+		SpawnFrontOffset = 14,
 	},
 	-- Maximale Entfernung zum Lager-Terminal
 	StorageTerminalDistance = 14,

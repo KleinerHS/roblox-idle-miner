@@ -28,6 +28,7 @@ local EquipmentShopBuilder = require(script.Parent.Parent.World.EquipmentShopBui
 local MachineShopBuilder = require(script.Parent.Parent.World.MachineShopBuilder)
 local VehicleShopBuilder = require(script.Parent.Parent.World.VehicleShopBuilder)
 local TruckShopBuilder = require(script.Parent.Parent.World.TruckShopBuilder)
+local VehicleService = require(script.Parent.VehicleService)
 local DataService = require(script.Parent.DataService)
 local MiningService = require(script.Parent.MiningService)
 local WorkerService = require(script.Parent.WorkerService)
@@ -257,6 +258,12 @@ local function buyVehicle(player: Player, typeId: unknown)
 	DataService.RequestSave(player)
 	Log.debug(TAG, `{player.Name} kauft {def.Id} ({newId}) für {def.Price}`)
 	RemoteService.FireClient("Notify", player, { Kind = "Success", Code = "VEHICLE_PURCHASED", Args = { Name = def.DisplayName } })
+	-- LKW stehen nach dem Kauf auf der Zufahrt vor dem LKW-Laden (Felix 2026-10-27)
+	if def.Dealer == "truck" then
+		task.spawn(function()
+			VehicleService.SpawnPurchased(player, newId, TruckShopBuilder.spawnCFrame())
+		end)
+	end
 	return Result.ok(newId)
 end
 

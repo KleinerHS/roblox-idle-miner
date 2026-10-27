@@ -1,8 +1,8 @@
 --!strict
 -- LKW-Laden etwas außerhalb der Mitte (D-058, Felix 2026-10-22: „ein LKW-Laden, der etwas außerhalb
 -- der Mitte ist; genug Platz, um alle LKWs auszustellen, und noch 2 extra Plätze“).
--- Große Halle mit Glasfront und fünf langen Stellplätzen (Lastzüge mit allen Anhängern), Tresen
--- vorne rechts, Vorplatz mit Zufahrt zum großen Parkplatz. Ausstellungsstücke verankert, ohne Scripts.
+-- Große Halle mit Glasfront und fünf langen Stellplätzen (Lastzüge mit allen Anhängern), Kundenzone
+-- mit einem Tresen vorne, Vorplatz mit Zufahrt bis in den Kreisverkehr (dort spawnt ein gekaufter LKW). Ausstellungsstücke verankert, ohne Scripts.
 --
 -- Vereinbarte Namen/Attribute:
 --   Model "TruckShop"
@@ -17,6 +17,7 @@ local Vehicles = require(Shared.Definitions.Vehicles)
 
 local VehicleModelBuilder = require(script.Parent.VehicleModelBuilder)
 local ShopInterior = require(script.Parent.ShopInterior)
+local RoadFillet = require(script.Parent.RoadFillet)
 
 local TruckShopBuilder = {}
 
@@ -74,21 +75,38 @@ function TruckShopBuilder.frame(): CFrame
 	return CFrame.lookAt(pos, pos - Vector3.new(math.cos(a), 0, -math.sin(a)))
 end
 
--- Länge der Zufahrt vom Vorplatz bis an den Kreisverkehr (D-061), entlang der Hallenachse
-function TruckShopBuilder.drivewayLength(): number
+-- Zufahrt: Startpunkt (Mitte der Vorplatzkante), Richtung zum Kreisel, quer
+local function driveAxis(): (Vector3, Vector3, Vector3)
 	local cfg = LayoutConfig.TruckShop
-	local c = LayoutConfig.MapCenter
 	local o = TruckShopBuilder.frame()
 	local start = (o * CFrame.new(0, 0, -cfg.Size.Z / 2 - cfg.ApronDepth)).Position
-	local p = Vector2.new(start.X - c.X, start.Z - c.Z)
-	local d = Vector2.new(o.LookVector.X, o.LookVector.Z).Unit
-	local b = p:Dot(d)
-	local disc = b * b - (p:Dot(p) - LayoutConfig.RoundaboutOuter ^ 2)
-	if disc < 0 then
+	return start, o.LookVector, o.RightVector
+end
+
+-- Länge der Zufahrt vom Vorplatz bis in den Kreisverkehr: so weit, dass beide Ecken der Fahrbahn
+-- im Kreisel liegen (Felix 2026-10-27: wie die anderen Straßen angebunden)
+function TruckShopBuilder.drivewayLength(): number
+	local cfg = LayoutConfig.TruckShop
+	local start, u, n = driveAxis()
+	local c = LayoutConfig.MapCenter
+	local e1 = RoadFillet.ringEntry(start, u, n, -cfg.DrivewayWidth / 2, c, LayoutConfig.RoundaboutOuter - 1)
+	local e2 = RoadFillet.ringEntry(start, u, n, cfg.DrivewayWidth / 2, c, LayoutConfig.RoundaboutOuter - 1)
+	if not (e1 and e2) then
 		return cfg.DrivewayLength
 	end
-	-- 1 Stud in die Fahrbahn hinein, damit keine Lücke bleibt
-	return -b - math.sqrt(disc) + 1
+	return math.max(e1, e2)
+end
+
+-- Spawnpunkt nach dem Kauf (Felix 2026-10-27): auf der Zufahrt vor dem Laden, Front zum
+-- Kreisel; Boden-CFrame für die Fahrzeugvorlage (Pivot unter der Hinterachse der Zugmaschine)
+function TruckShopBuilder.spawnCFrame(): CFrame
+	local cfg = LayoutConfig.TruckShop
+	local start, u = driveAxis()
+	local c = LayoutConfig.MapCenter
+	local toRing = RoadFillet.ringEntry(start, u, Vector3.zero, 0, c, LayoutConfig.RoundaboutOuter + cfg.SpawnRingGap) or 60
+	local pos = start + u * (toRing - cfg.SpawnFrontOffset)
+	pos = Vector3.new(pos.X, LayoutConfig.GroundY + 1.09, pos.Z)
+	return CFrame.lookAt(pos, pos + Vector3.new(u.X, 0, u.Z))
 end
 
 -- Ausstellungs-LKW mit allen Anhängern (verankert)
@@ -134,9 +152,12 @@ function TruckShopBuilder.build(parent: Instance): Model
 	local floorTop = 0.6
 	local bays = cfg.Bays
 	local bayW = (W - 12) / bays
+	-- Kundenzone vorne (Felix 2026-10-27: Tresen vor den LKW, nicht ganz hinten)
+	local FZ = cfg.FrontZone
+	local bayStart, bayEnd = -hd + FZ, hd - 6
 	for i = 0, bays do
 		local x = -hw + 6 + i * bayW
-		local line = part(model, `BayLine{i}`, Vector3.new(0.4, 0.05, D - 29), o * CFrame.new(x, floorTop + 0.03, -7.5), YELLOW, Enum.Material.SmoothPlastic)
+		local line = part(model, `BayLine{i}`, Vector3.new(0.4, 0.05, bayEnd - bayStart), o * CFrame.new(x, floorTop + 0.03, (bayStart + bayEnd) / 2), YELLOW, Enum.Material.SmoothPlastic)
 		line.CanCollide = false
 	end
 
@@ -217,18 +238,18 @@ function TruckShopBuilder.build(parent: Instance): Model
 	for b = 1, bays do
 		local bx = -hw + 6 + (b - 0.5) * bayW
 		local def = trucks[b]
-		local front = o * CFrame.new(bx, floorTop, -hd + 18)
-		local stand = part(display, `InfoStand{b}`, Vector3.new(10, 2.6, 0.3), o * CFrame.new(bx, floorTop + 2.4, -hd + 6) * CFrame.Angles(math.rad(-15), 0, 0), FRAME, Enum.Material.SmoothPlastic)
-		part(display, `InfoStandPost{b}`, Vector3.new(0.4, 2, 0.4), o * CFrame.new(bx, floorTop + 1, -hd + 6.2), WALL_DARK, Enum.Material.Metal)
+		local front = o * CFrame.new(bx, floorTop, bayStart + 18)
+		local stand = part(display, `InfoStand{b}`, Vector3.new(10, 2.6, 0.3), o * CFrame.new(bx, floorTop + 2.4, bayStart - 1) * CFrame.Angles(math.rad(-15), 0, 0), FRAME, Enum.Material.SmoothPlastic)
+		part(display, `InfoStandPost{b}`, Vector3.new(0.4, 2, 0.4), o * CFrame.new(bx, floorTop + 1, bayStart - 0.8), WALL_DARK, Enum.Material.Metal)
 		if def then
 			displayTruck(display, def, front)
 			surfaceText(stand, def.DisplayName:upper(), WHITE)
 		else
 			surfaceText(stand, "COMING SOON", ORANGE)
-			local plate = part(display, `FreeBay{b}`, Vector3.new(bayW - 4, 0.08, D - 39), o * CFrame.new(bx, floorTop + 0.05, -4.5), Color3.fromRGB(100, 104, 108), Enum.Material.SmoothPlastic)
+			local plate = part(display, `FreeBay{b}`, Vector3.new(bayW - 4, 0.08, bayEnd - bayStart - 6), o * CFrame.new(bx, floorTop + 0.05, (bayStart + bayEnd) / 2), Color3.fromRGB(100, 104, 108), Enum.Material.SmoothPlastic)
 			plate.CanCollide = false
 		end
-		for k, z in { -hd + 26, 0, hd - 26 } do
+		for k, z in { bayStart + 14, (bayStart + bayEnd) / 2, bayEnd - 16 } do
 			local spot = part(display, `Spot{b}_{k}`, Vector3.new(2.4, 0.2, 2.4), o * CFrame.new(bx, roofY - 2.2, z), LIGHT, Enum.Material.Neon)
 			spot.CastShadow = false
 			local light = Instance.new("SpotLight")
@@ -241,12 +262,11 @@ function TruckShopBuilder.build(parent: Instance): Model
 		end
 	end
 
-	-- Tresen vorne rechts an der Seitenwand neben Stellplatz 5, Front zur Halle
-	-- (vorher mitten auf der Infotafel von Stellplatz 5)
-	local counterCF = o * CFrame.new(hw - 4, floorTop, -hd + 12) * CFrame.Angles(0, math.rad(90), 0)
-	part(model, "Counter", Vector3.new(10, 3.6, 3), counterCF * CFrame.new(0, 1.8, 0), WHITE, Enum.Material.SmoothPlastic)
-	part(model, "CounterTop", Vector3.new(10.6, 0.3, 3.6), counterCF * CFrame.new(0, 3.75, 0), FRAME, Enum.Material.Marble)
-	part(model, "CounterStripe", Vector3.new(10, 0.6, 0.1), counterCF * CFrame.new(0, 2.6, -1.55), ORANGE, Enum.Material.Neon)
+	-- Ein Verkaufstresen vorne mittig in der Kundenzone, Front zum Eingang (Felix 2026-10-27)
+	local counterCF = o * CFrame.new(0, floorTop, -hd + FZ / 2 + 1)
+	part(model, "Counter", Vector3.new(16, 3.6, 3), counterCF * CFrame.new(0, 1.8, 0), WHITE, Enum.Material.SmoothPlastic)
+	part(model, "CounterTop", Vector3.new(16.6, 0.3, 3.6), counterCF * CFrame.new(0, 3.75, 0), FRAME, Enum.Material.Marble)
+	part(model, "CounterStripe", Vector3.new(16, 0.6, 0.1), counterCF * CFrame.new(0, 2.6, -1.55), ORANGE, Enum.Material.Neon)
 	local promptPart = part(model, "CounterPromptPart", Vector3.new(4, 4, 2), counterCF * CFrame.new(0, 2.4, -2.6), WHITE, Enum.Material.SmoothPlastic)
 	promptPart.Transparency = 1
 	promptPart.CanCollide = false
@@ -265,12 +285,52 @@ function TruckShopBuilder.build(parent: Instance): Model
 	local apron = cfg.ApronDepth
 	local forecourt = part(model, "Forecourt", Vector3.new(W, 0.2, apron), o * CFrame.new(0, 0.1, -hd - apron / 2), ASPHALT, Enum.Material.Asphalt)
 	forecourt.CanCollide = false
+	-- Zufahrt wie die anderen Straßen (Felix 2026-10-27): gleiche Höhe und Markierungen, runde
+	-- Ausrundungen in den Kreisel und Ausschwenkkurven am Vorplatz
 	local driveLen = TruckShopBuilder.drivewayLength()
-	local drive = part(model, "Driveway", Vector3.new(cfg.DrivewayWidth, 0.2, driveLen), o * CFrame.new(0, 0.08, -hd - apron - driveLen / 2 + 1), ASPHALT, Enum.Material.Asphalt)
-	drive.CanCollide = false
+	local dw = cfg.DrivewayWidth
+	local ROAD = Color3.fromRGB(58, 60, 64)
+	local roadTop = LayoutConfig.GroundY + 1.09
+	local zStart = -hd - apron
+	local function atTop(p: BasePart, top: number)
+		p.CFrame = p.CFrame + Vector3.new(0, top - p.Size.Y / 2 - p.Position.Y, 0)
+		p.CanCollide = false
+	end
+	local drive = part(model, "Driveway", Vector3.new(dw, 0.1, driveLen + 1), o * CFrame.new(0, 0, zStart - driveLen / 2 + 0.5), ROAD, Enum.Material.Asphalt)
+	atTop(drive, roadTop)
+	local start, u, n = driveAxis()
+	local c = LayoutConfig.MapCenter
+	local fillets = Instance.new("Folder")
+	fillets.Name = "DrivewayCurves"
+	fillets.Parent = model
+	local filletStart = driveLen
 	for _, side in { -1, 1 } do
-		local edge = part(model, `DriveLine{side}`, Vector3.new(0.4, 0.05, driveLen), o * CFrame.new(side * (cfg.DrivewayWidth / 2 - 1), 0.23, -hd - apron - driveLen / 2 + 1), WHITE, Enum.Material.SmoothPlastic)
-		edge.CanCollide = false
+		local nSide = n * side
+		local E = start + nSide * (dw / 2)
+		-- Kreisel-Seite
+		local sAt = RoadFillet.toRing(fillets, `Ring{side}`, E, u, nSide, c, LayoutConfig.RoundaboutOuter, cfg.RingFillet, roadTop - 0.04, ROAD)
+		if sAt then
+			filletStart = math.min(filletStart, sAt)
+		end
+		-- Vorplatz-Seite: Ausschwenkkurve
+		RoadFillet.toEdge(fillets, `Flare{side}`, E, u, nSide, cfg.FlareFillet, roadTop - 0.005, ROAD)
+	end
+	-- Markierungen: gelbe Mittellinie bis an den Kreisel, weiße Randlinien zwischen den Rundungen
+	local ringAtCenter = RoadFillet.ringEntry(start, u, n, 0, c, LayoutConfig.RoundaboutOuter) or driveLen
+	local zz = 4
+	local k = 0
+	while zz + 6 < ringAtCenter - 2 do
+		k += 1
+		local dash = part(model, `DriveDash{k}`, Vector3.new(0.5, 0.04, 6), o * CFrame.new(0, 0, zStart - zz - 3), YELLOW, Enum.Material.SmoothPlastic)
+		atTop(dash, roadTop + 0.04)
+		zz += 12
+	end
+	local edgeFrom, edgeTo = cfg.FlareFillet, filletStart
+	if edgeTo > edgeFrom then
+		for _, side in { -1, 1 } do
+			local edge = part(model, `DriveLine{side}`, Vector3.new(0.4, 0.04, edgeTo - edgeFrom), o * CFrame.new(side * (dw / 2 - 1.2), 0, zStart - (edgeFrom + edgeTo) / 2), WHITE, Enum.Material.SmoothPlastic)
+			atTop(edge, roadTop + 0.04)
+		end
 	end
 	local pylonCF = o * CFrame.new(hw - 4, 0, -hd - apron + 3)
 	part(model, "PylonBase", Vector3.new(4, 0.6, 4), pylonCF * CFrame.new(0, 0.3, 0), WALL_DARK, Enum.Material.Concrete)
@@ -295,40 +355,26 @@ function TruckShopBuilder.build(parent: Instance): Model
 	local backZ = hd - 1.2
 	local goods = { ORANGE, YELLOW, Color3.fromRGB(60, 110, 190), Color3.fromRGB(190, 50, 40), WALL }
 
-	-- Kundenzone hinten: heller Boden
-	ShopInterior.rug(inside, "CustomerFloor", o * CFrame.new(0, floorTop, hd - 11), W - 4, 20, Color3.fromRGB(196, 192, 184))
-	part(inside, "ZoneLine", Vector3.new(W - 4, 0.05, 0.5), o * CFrame.new(0, floorTop + 0.06, hd - 21), YELLOW, Enum.Material.SmoothPlastic).CanCollide = false
-
-	-- Verkaufsplätze
-	for k, x in { -30, -10, 10 } do
-		local deskCF = o * CFrame.new(x, floorTop, hd - 14)
-		ShopInterior.desk(inside, `SalesDesk{k}`, deskCF, WHITE, ORANGE_DARK)
-		ShopInterior.officeChair(inside, `StaffChair{k}`, deskCF * CFrame.new(0, 0, 2.8) * CFrame.Angles(0, math.rad(180), 0), DARK)
-		for _, dx in { -1.6, 1.6 } do
-			ShopInterior.officeChair(inside, `GuestChair{k}{dx}`, deskCF * CFrame.new(dx, 0, -3), ORANGE_DARK)
-		end
+	-- Kundenzone vorne: heller Boden, Linie zu den Stellplätzen
+	ShopInterior.rug(inside, "CustomerFloor", o * CFrame.new(0, floorTop, -hd + FZ / 2), W - 4, FZ - 2, Color3.fromRGB(196, 192, 184))
+	part(inside, "ZoneLine", Vector3.new(W - 4, 0.05, 0.5), o * CFrame.new(0, floorTop + 0.06, -hd + FZ - 1), YELLOW, Enum.Material.SmoothPlastic).CanCollide = false
+	-- Hinter dem Tresen: Mitarbeiter, Schild; daneben Prospekte und Pflanzen
+	ShopInterior.officeChair(inside, "StaffChair", counterCF * CFrame.new(-3, 0, 3) * CFrame.Angles(0, math.rad(180), 0), DARK)
+	ShopInterior.officeChair(inside, "StaffChair2", counterCF * CFrame.new(3, 0, 3) * CFrame.Angles(0, math.rad(180), 0), DARK)
+	ShopInterior.hangingSign(inside, "SalesSign", counterCF * CFrame.new(0, signY - floorTop, 0), "FLEET SALES", ORANGE, WHITE, 14, ceilingY)
+	ShopInterior.brochureStand(inside, "Brochures", counterCF * CFrame.new(10, 0, -1) * CFrame.Angles(0, math.rad(20), 0), { ORANGE, WHITE, DARK })
+	for k, x in { -12, 12 } do
+		ShopInterior.plant(inside, `CounterPlant{k}`, counterCF * CFrame.new(x, 0, 1), 5)
 	end
-	ShopInterior.hangingSign(inside, "SalesSign", o * CFrame.new(-10, signY, hd - 14), "FLEET SALES", ORANGE, WHITE, 12, ceilingY)
-	ShopInterior.brochureStand(inside, "Brochures", o * CFrame.new(0, floorTop, hd - 20), { ORANGE, WHITE, DARK })
-	ShopInterior.plant(inside, "SalesPlant", o * CFrame.new(-20, floorTop, hd - 8), 6)
-
-	-- Lounge hinten links (lokal +X)
-	ShopInterior.sofa(inside, "LoungeSofa", o * CFrame.new(38, floorTop, hd - 6) * CFrame.Angles(0, 0, 0), 10, DARK)
-	ShopInterior.coffeeTable(inside, "LoungeTable", o * CFrame.new(38, floorTop, hd - 11))
-	for k, dx in { -6, 6 } do
-		ShopInterior.armchair(inside, `LoungeChair{k}`, o * CFrame.new(38 + dx, floorTop, hd - 15) * CFrame.Angles(0, math.rad(180 + (if dx < 0 then 30 else -30)), 0), ORANGE_DARK)
-	end
-	ShopInterior.tv(inside, "LoungeTV", o * CFrame.new(38, 11, backZ), 10, "🚛 ROAD TRAINS", ORANGE_DARK)
-	ShopInterior.coffeeCorner(inside, "Coffee", o * CFrame.new(24, floorTop, hd - 2.4))
-	ShopInterior.hangingSign(inside, "LoungeSign", o * CFrame.new(38, signY, hd - 12), "LOUNGE", DARK, ORANGE, 8, ceilingY)
-
-	-- Ersatzteiltheke hinten rechts (lokal −X) mit Regalwand
-	local partsCF = o * CFrame.new(-42, floorTop, hd - 10)
-	part(inside, "PartsCounter", Vector3.new(14, 3.6, 2.6), partsCF * CFrame.new(0, 1.8, 0), FRAME, Enum.Material.Metal)
-	part(inside, "PartsCounterTop", Vector3.new(14.4, 0.3, 3), partsCF * CFrame.new(0, 3.75, 0), ORANGE_DARK, Enum.Material.Metal)
-	ShopInterior.officeChair(inside, "PartsChair", partsCF * CFrame.new(2, 0, 3) * CFrame.Angles(0, math.rad(180), 0), DARK)
-	ShopInterior.wallShelf(inside, "PartsShelf", o * CFrame.new(-42, floorTop, backZ - 0.2), 20, 4, goods, rng)
-	ShopInterior.hangingSign(inside, "PartsSign", o * CFrame.new(-42, signY, hd - 10), "PARTS & TIRES", YELLOW, DARK, 12, ceilingY)
+	-- Lounge vorne links (lokal +X) in der Ecke
+	local lounge = o * CFrame.new(hw - 10, floorTop, -hd + FZ - 5)
+	ShopInterior.sofa(inside, "LoungeSofa", lounge, 10, DARK)
+	ShopInterior.coffeeTable(inside, "LoungeTable", lounge * CFrame.new(0, 0, -5))
+	ShopInterior.tv(inside, "LoungeTV", o * CFrame.new(hw - 1.2, 10, -hd + FZ / 2) * CFrame.Angles(0, math.rad(90), 0), 9, "🚛 ROAD TRAINS", ORANGE_DARK)
+	-- Kaffee vorne rechts an der Seitenwand
+	ShopInterior.coffeeCorner(inside, "Coffee", o * CFrame.new(-hw + 2.4, floorTop, -hd + FZ / 2) * CFrame.Angles(0, math.rad(-90), 0))
+	local _ = goods
+	local _ = backZ
 
 	-- Seitenwände: Reifenstapel zwischen den Hallenträgern, Poster
 	for _, side in { -1, 1 } do

@@ -20,6 +20,7 @@ local OfflineService = require(script.Parent.OfflineService)
 local VehicleService = require(script.Parent.VehicleService)
 local PlotService = require(script.Parent.PlotService)
 local PlotBuilder = require(script.Parent.Parent.World.PlotBuilder)
+local TruckShopBuilder = require(script.Parent.Parent.World.TruckShopBuilder)
 
 local TAG = "DevService"
 
@@ -231,6 +232,15 @@ function DevService.Init()
 		return if VehicleService.SpawnAt(player, vehicleId, cf) then "ok" else "Fahrzeug nicht ausgeparkt"
 	end
 	placeVehicle.Parent = folder
+	-- Fahrzeug wie nach einem Kauf im LKW-Laden auf dessen Zufahrt stellen (Test):
+	--   game.ServerStorage.DevTools.SpawnAtTruckShop:Invoke(game.Players:GetPlayers()[1], "v11")
+	local spawnTruck = Instance.new("BindableFunction")
+	spawnTruck.Name = "SpawnAtTruckShop"
+	spawnTruck.OnInvoke = function(player: Player, vehicleId: string): string
+		local model = VehicleService.SpawnPurchased(player, vehicleId, TruckShopBuilder.spawnCFrame())
+		return if model then model.Name else "kein freier Stellplatz oder Fahrzeug fehlt"
+	end
+	spawnTruck.Parent = folder
 
 	-- Bauschritt setzen/entfernen (z. B. Garage wieder abbauen):
 	--   game.ServerStorage.DevTools.SetBuilding:Invoke(game.Players:GetPlayers()[1], "build_garage", false)
