@@ -438,3 +438,9 @@ Ergebnis mit den echten Teilen (`tools/topdown`): keine Berührung, knappster Ab
 **Source:** Felix, 2026-10-27 („erweitere bitte den Drill-Shop auch an den Seiten und hinten um eine Baumbreite ungefähr … außerdem soll direkt, wenn man reingeht, rechts die Kasse sein“)
 **Decision:** Machine-Shop 110 × 26 × 78 (vorher 90 × 26 × 68): je 10 Studs pro Seite und hinten, die Front bleibt stehen. Kasse direkt rechts neben dem Tor, Bedienseite zum Eingang. Bäume halten jetzt zu allen drei Shops 8 Studs Abstand (Kronen ragten sonst in die Wände). Abstand zur Straßenmitte weiterhin 26,7 Studs (Straße 14 + Gehweg 5).
 **Affected systems:** LayoutConfig, MachineShopBuilder, CenterBuilder
+
+## D-070 – Podium-Ansicht beim Einkaufen
+
+**Source:** Felix, 2026-10-27 (Idee mit Beispielbild: leeres Podium im Shop, an der Kasse „Kaufen“ → Kamera aufs Podium, unten kleines Menü zum Weiterblättern; Antworten: alle Shops außer LKW-Laden, altes Listenfenster ersetzen, kein Robux-Knopf vorerst, Blättern mit D/E vor und A/Q zurück, durch alle Stufen blättern)
+**Decision:** Schritt 1 im Pickaxe-Shop: leeres, beleuchtetes Podium („ShowcaseSpot“, „ShowcaseCamera“) im Eingangsbereich. Die Kasse öffnet statt der Liste die Podium-Ansicht: Kamera fährt zum Podium, das Item dreht sich, die eigene Figur ist ausgeblendet, Laufen und Prompts sind aus. Unten eine Leiste mit ‹/›, Name, Werten, Stufe x/y, Level-Hinweis und Kaufen/Ausrüsten-Knopf; oben Reiter (Pickaxes/Backpacks) und „Close“. Tasten: D/E/→ weiter, A/Q/← zurück, X/Backspace schließen (Esc öffnet bei Roblox das Menü). Modelle für die Ansicht kommen aus `World/ShowcaseItems.luau` (ReplicatedStorage.ShowcaseModels). Danach Drill-Shop und Autohaus, LKW-Laden behält die Liste.
+**Affected systems:** ShopController, EquipmentShopBuilder, ShowcaseItems, ShopService

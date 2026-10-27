@@ -212,20 +212,21 @@ function EquipmentShopBuilder.build(parent: Instance): Model
 	prompt:SetAttribute("ShopId", "equipment")
 	prompt.Parent = promptPart
 
-	-- Neuheiten: drei Podeste mit den besten Spitzhacken mitten im Eingangsbereich
-	ShopInterior.rug(inside, "FeatureRug", o * CFrame.new(6, 0.66, -D / 2 + 15), 26, 9, Color3.fromRGB(150, 60, 50))
-	local best = {}
-	for i = #Pickaxes.List, math.max(1, #Pickaxes.List - 2), -1 do
-		table.insert(best, Pickaxes.List[i])
-	end
-	for k, def in best do
-		local x = 6 + (k - 2) * 8
-		local top = ShopDecor.podium(inside, `Podium{k}`, o * CFrame.new(x, 0.6, -D / 2 + 15), 2.2, BLUE, H - 2)
-		displayPickaxe(inside, top * CFrame.new(0, 2.8, 0) * CFrame.Angles(0, 0, math.rad(8)), def.HeadColor, 1.6)
-		local plate = part(inside, `PodiumPlate{k}`, Vector3.new(3.6, 0.9, 0.2), top * CFrame.new(0, -0.5, -2.3) * CFrame.Angles(math.rad(-20), 0, 0), BLUE_DARK, Enum.Material.SmoothPlastic)
-		surfaceText(plate, def.DisplayName:upper(), WHITE)
-	end
-	ShopInterior.hangingSign(inside, "NewSign", o * CFrame.new(6, ceilingY - 4, -D / 2 + 15), "★ NEW ARRIVALS ★", Color3.fromRGB(200, 60, 50), WHITE, 14, ceilingY)
+	-- Podium für die Shop-Ansicht (D-070): leer; beim Einkaufen setzt der Client das gewählte Item
+	-- darauf und die Kamera auf „ShowcaseCamera“
+	ShopInterior.rug(inside, "FeatureRug", o * CFrame.new(6, 0.66, -D / 2 + 18), 16, 12, Color3.fromRGB(150, 60, 50))
+	local top = ShopDecor.podium(inside, "ShowcasePodium", o * CFrame.new(6, 0.6, -D / 2 + 18), 3.4, BLUE, H - 2)
+	local spot = part(model, "ShowcaseSpot", Vector3.new(1, 1, 1), top, WHITE, Enum.Material.SmoothPlastic)
+	spot.Transparency = 1
+	spot.CanCollide = false
+	spot.CanQuery = false
+	spot:SetAttribute("ShopId", "equipment")
+	local camPos = (o * CFrame.new(6, 8.5, -D / 2 + 1.5)).Position
+	local camPart = part(model, "ShowcaseCamera", Vector3.new(1, 1, 1), CFrame.lookAt(camPos, top.Position + Vector3.new(0, 5.6, 0)), WHITE, Enum.Material.SmoothPlastic)
+	camPart.Transparency = 1
+	camPart.CanCollide = false
+	camPart.CanQuery = false
+	ShopInterior.hangingSign(inside, "NewSign", o * CFrame.new(6, ceilingY - 3, -D / 2 + 18), "★ SHOWCASE ★", Color3.fromRGB(200, 60, 50), WHITE, 12, ceilingY)
 
 	-- Gangregale mit Hängeschildern
 	local aisles = { { x = -14, label = "TOOLS" }, { x = -3, label = "SAFETY" }, { x = 8, label = "LIGHTS" } }

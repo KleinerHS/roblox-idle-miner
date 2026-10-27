@@ -28,6 +28,7 @@ local EquipmentShopBuilder = require(script.Parent.Parent.World.EquipmentShopBui
 local MachineShopBuilder = require(script.Parent.Parent.World.MachineShopBuilder)
 local VehicleShopBuilder = require(script.Parent.Parent.World.VehicleShopBuilder)
 local TruckShopBuilder = require(script.Parent.Parent.World.TruckShopBuilder)
+local ShowcaseItems = require(script.Parent.Parent.World.ShowcaseItems)
 local VehicleService = require(script.Parent.VehicleService)
 local DataService = require(script.Parent.DataService)
 local MiningService = require(script.Parent.MiningService)
@@ -279,6 +280,8 @@ function ShopService.Init()
 		center.Name = "Center"
 		center.Parent = workspace
 	end
+	-- Vorlagen für die Podium-Ansicht (D-070)
+	ShowcaseItems.build()
 	local shop = EquipmentShopBuilder.build(center :: Instance)
 	counters.equipment = shop:FindFirstChild("CounterPromptPart") :: BasePart
 	local machineShop = MachineShopBuilder.build(center :: Instance)
