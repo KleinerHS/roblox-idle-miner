@@ -10,6 +10,7 @@ local Pickaxes = require(Shared.Definitions.Pickaxes)
 local Backpacks = require(Shared.Definitions.Backpacks)
 local Vehicles = require(Shared.Definitions.Vehicles)
 local PickaxeModels = require(script.Parent.PickaxeModels)
+local BackpackModels = require(script.Parent.BackpackModels)
 local VehicleModelBuilder = require(script.Parent.VehicleModelBuilder)
 
 local ShowcaseItems = {}
@@ -123,8 +124,12 @@ function ShowcaseItems.build()
 	end
 	local packs = folder("backpack")
 	for i, def in Backpacks.List do
-		local m = backpack(def, i)
-		m:ScaleTo(1.3)
+		-- 3D-Vorlage aus dem Pack (D-074), Vorderseite zur Kamera; sonst Platzhalter
+		local m = BackpackModels.standing(def, 2.4)
+		if not m then
+			m = backpack(def, i)
+			m:ScaleTo(1.3)
+		end
 		m.Parent = packs
 	end
 	-- Autohaus (D-072): alle Fahrzeuge des Autohauses (nicht LKW-Laden), Ausstellungsmodell

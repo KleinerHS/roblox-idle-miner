@@ -32,6 +32,7 @@ local ShowcaseItems = require(script.Parent.Parent.World.ShowcaseItems)
 local VehicleService = require(script.Parent.VehicleService)
 local DataService = require(script.Parent.DataService)
 local MiningService = require(script.Parent.MiningService)
+local BackpackVisualService = require(script.Parent.BackpackVisualService)
 local WorkerService = require(script.Parent.WorkerService)
 local RemoteService = require(script.Parent.RemoteService)
 
@@ -83,21 +84,28 @@ local CATEGORIES: { [string]: Category } = {
 	},
 }
 
-local counters: { [string]: BasePart } = {}
+-- Kassen je Shop (der Pickaxe-Shop hat seit D-074 zwei: Spitzhacken und Rucksäcke)
+local counters: { [string]: { BasePart } } = {}
 
 local function isNearShop(player: Player, shopId: string): boolean
-	local counter = counters[shopId]
 	local character = player.Character
 	local root = character and character:FindFirstChild("HumanoidRootPart")
-	if not (counter and root and root:IsA("BasePart")) then
+	if not (root and root:IsA("BasePart")) then
 		return false
 	end
-	return (root.Position - counter.Position).Magnitude <= LayoutConfig.ShopCounterDistance
+	for _, counter in counters[shopId] or {} do
+		if (root.Position - counter.Position).Magnitude <= LayoutConfig.ShopCounterDistance then
+			return true
+		end
+	end
+	return false
 end
 
 local function afterEquip(player: Player, categoryName: string)
 	if categoryName == "pickaxe" then
 		MiningService.RefreshPickaxe(player)
+	elseif categoryName == "backpack" then
+		BackpackVisualService.Refresh(player)
 	end
 end
 
@@ -283,13 +291,13 @@ function ShopService.Init()
 	-- Vorlagen für die Podium-Ansicht (D-070)
 	ShowcaseItems.build()
 	local shop = EquipmentShopBuilder.build(center :: Instance)
-	counters.equipment = shop:FindFirstChild("CounterPromptPart") :: BasePart
+	counters.equipment = { shop:FindFirstChild("CounterPromptPart") :: BasePart, shop:FindFirstChild("BackpackPromptPart") :: BasePart }
 	local machineShop = MachineShopBuilder.build(center :: Instance)
-	counters.machine = machineShop:FindFirstChild("CounterPromptPart") :: BasePart
+	counters.machine = { machineShop:FindFirstChild("CounterPromptPart") :: BasePart }
 	local vehicleShop = VehicleShopBuilder.build(center :: Instance)
-	counters.vehicle = vehicleShop:FindFirstChild("CounterPromptPart") :: BasePart
+	counters.vehicle = { vehicleShop:FindFirstChild("CounterPromptPart") :: BasePart }
 	local truckShop = TruckShopBuilder.build(center :: Instance)
-	counters.truck = truckShop:FindFirstChild("CounterPromptPart") :: BasePart
+	counters.truck = { truckShop:FindFirstChild("CounterPromptPart") :: BasePart }
 
 	RemoteService.OnInvoke("BuyLuck", function(player: Player)
 		-- Nächstes Mining-Luck-Level am Laptop (D-045, Felix 2026-10-18: „in den Laptop verschieben“)
@@ -333,7 +341,8 @@ function ShopService.Start()
 			return
 		end
 		if DataService.IsLoaded(player) and isNearShop(player, shopId) then
-			RemoteService.FireClient("OpenShop", player, { ShopId = shopId })
+			local tab = prompt:GetAttribute("Tab")
+			RemoteService.FireClient("OpenShop", player, { ShopId = shopId, Tab = if typeof(tab) == "string" then tab else nil })
 		end
 	end)
 end

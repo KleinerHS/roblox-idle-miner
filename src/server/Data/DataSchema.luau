@@ -1,5 +1,5 @@
 --!strict
--- Datenschema v12: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
+-- Datenschema v13: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
 -- Regeln:
 --  * Defaults gibt es nur hier.
 --  * Jede Strukturänderung erhöht CURRENT_VERSION und bekommt eine Migration
@@ -15,7 +15,7 @@ local Backpacks = require(Shared.Definitions.Backpacks)
 local Mines = require(Shared.Definitions.Mines)
 local Types = require(Shared.Types)
 
-local CURRENT_VERSION = 12
+local CURRENT_VERSION = 13
 
 local DataSchema = {
 	CurrentVersion = CURRENT_VERSION,
@@ -218,6 +218,21 @@ local MIGRATIONS: { [number]: (data: { [string]: any }) -> () } = {
 		eq.OwnedPickaxes = owned
 		if typeof(eq.EquippedPickaxe) == "string" then
 			eq.EquippedPickaxe = Pickaxes.LegacyIds[eq.EquippedPickaxe] or eq.EquippedPickaxe
+		end
+	end,
+	-- v12 → v13: neue Rucksack-Stufen (D-074), alte IDs auf die Stufe mit denselben Werten
+	[12] = function(data)
+		local eq = data.Equipment
+		if typeof(eq) ~= "table" then
+			return
+		end
+		local owned = {}
+		for id, v in eq.OwnedBackpacks or {} do
+			owned[Backpacks.LegacyIds[id] or id] = v
+		end
+		eq.OwnedBackpacks = owned
+		if typeof(eq.EquippedBackpack) == "string" then
+			eq.EquippedBackpack = Backpacks.LegacyIds[eq.EquippedBackpack] or eq.EquippedBackpack
 		end
 	end,
 }

@@ -765,13 +765,21 @@ local function open(payload: any)
 	if typeof(payload) ~= "table" or SHOP_TABS[payload.ShopId] == nil then
 		return
 	end
+	if scActive then
+		return
+	end
 	if payload.ShopId ~= currentShop then
 		currentShop = payload.ShopId
 		currentTab = SHOP_TABS[currentShop][1][1]
 		buildTabs()
 	end
-	if scActive then
-		return
+	-- Kasse kann einen Reiter vorgeben (Rucksack-Kasse im Pickaxe-Shop, D-074)
+	if typeof(payload.Tab) == "string" then
+		for _, t in SHOP_TABS[currentShop] do
+			if t[1] == payload.Tab then
+				currentTab = payload.Tab
+			end
+		end
 	end
 	-- Shops mit Podium öffnen die Podium-Ansicht statt der Liste (D-070)
 	local spot, camPart = showcaseParts(currentShop)

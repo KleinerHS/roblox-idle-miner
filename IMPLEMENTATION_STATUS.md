@@ -25,7 +25,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 15 | Rare Drops & Mining Luck | TESTING_REQUIRED (15a, D-045) |
 | 16 | Verkauf & Spätspiel-Geld | TESTING_REQUIRED (16a, D-046) |
 | 17 | Icons | TESTING_REQUIRED (17a Erz- und Barren-Icons, 17b Kategorie-Icons) |
-| 18 | Fahrzeuge aus Felix' Modellen, Map-Mitte | TESTING_REQUIRED (18a: 4 Fahrzeuge; 18b: Durchfahr-Verladestraße, D-052; 18c: Lastzug mit echten Anhängern, D-053; 18d–18g Nachbesserungen, Startauto, Verkaufskreis; 18h Mitte D-057; 18i LKW-Laden D-058; 18j Kreisel D-059; 18k Shops D-060; 18l Lastzüge im Kreisel D-061; 18m Shops größer D-062; 18n Läden innen D-063; 18o Parkplätze D-064/D-065/D-067; 18p Podium D-070; 18q Spitzhacken-Pack D-071; 18r Autohaus-Drehteller D-072; 18s großer Parkplatz D-073) |
+| 18 | Fahrzeuge aus Felix' Modellen, Map-Mitte | TESTING_REQUIRED (18a: 4 Fahrzeuge; 18b: Durchfahr-Verladestraße, D-052; 18c: Lastzug mit echten Anhängern, D-053; 18d–18g Nachbesserungen, Startauto, Verkaufskreis; 18h Mitte D-057; 18i LKW-Laden D-058; 18j Kreisel D-059; 18k Shops D-060; 18l Lastzüge im Kreisel D-061; 18m Shops größer D-062; 18n Läden innen D-063; 18o Parkplätze D-064/D-065/D-067; 18p Podium D-070; 18q Spitzhacken-Pack D-071; 18r Autohaus-Drehteller D-072; 18s großer Parkplatz D-073; 18t Rucksack-Pack D-074) |
 
 ## Setup – Details
 
@@ -840,6 +840,20 @@ Selbsttest: alle vier Läden im Bearbeitungsmodus von oben und innen angeschaut;
 | 0.51.6: Vorfeld der Shop-Parkplätze liegt unter dem Promenadenpflaster, die runde Kante verdeckt die Stufen der Asphaltstreifen (Nachtrag zu BUG-015) | `CenterBuilder` (`shopLot`) | TESTING_REQUIRED |
 
 Selbsttest (ohne Studio, tools/topdown): Draufsicht aller Parkplätze; Überschneidungsprüfung Asphalt gegen alle Teile: nichts steht mehr auf den Parkplätzen (vorher: Asphalt unter Shop-Fronten, Fahnen, Pylon, Schau-Drill, einer Gehweg-Laterne, einem Baum; großer Parkplatz auf Hütte 2 und Zaun). Lastzug-Simulation am Kreisel erneut gerechnet.
+
+### 18t (Version 0.57.0, 2026-10-28) – 22 Rucksäcke aus dem Rucksack-Pack (D-074)
+
+| System | Dateien / Instanzen | Status |
+|---|---|---|
+| 22 Stufen (9 ohne, 13 mit Leuchten), alte Werte als Anker, Zwischenstufen TODO_BALANCE | `Backpacks.luau` (`LegacyIds`, `Glow`) | TESTING_REQUIRED |
+| Spielstand v13: alte Rucksack-IDs → neue Stufe mit denselben Werten | `DataSchema.luau` | TESTING_REQUIRED |
+| 3D-Vorlagen der 22 Rucksäcke | Place-Datei: `ServerStorage.Vendor.Backpacks` – **Place speichern!** Sicherung `assets/Backpacks.rbxm` (Rücktest 115 Objekte, 0 Abweichungen) | TESTING_REQUIRED |
+| Rucksack sichtbar auf dem Rücken, wechselt beim Ausrüsten | `BackpackVisualService.luau` (neu), `BackpackModels.luau` (neu), `ShopService.luau` | TESTING_REQUIRED |
+| Glow (Neon + Licht, Bloom nur falls keiner da) | `BackpackModels.applyGlow` | TESTING_REQUIRED |
+| Rucksack-Kasse links vom Eingang, öffnet Podium im Reiter Backpacks; rechte Kasse öffnet Pickaxes | `EquipmentShopBuilder.luau`, `ShopService.luau`, `ShopController.luau` | TESTING_REQUIRED |
+| Podium, Rucksack-Tisch (alle 22) und Puppen mit echten Modellen | `ShowcaseItems.luau`, `EquipmentShopBuilder.luau` | TESTING_REQUIRED |
+
+Selbsttest per Studio-MCP: Play ohne Fehler (25 Services); Felix' Spielstand auf v13 umgestellt (Reinforced → Copper Prospector, 1.000); Rucksack am Rücken sichtbar; Rucksack-Kasse mit Verkäuferin links vom Eingang; Podium öffnet im Reiter Backpacks (Bronze Drill Pack, 4 / 22, 1.000 → 1.750); Tisch mit 22 Modellen, Puppen mit leuchtenden Rucksäcken.
 
 ### 18s (Version 0.56.0, 2026-10-28) – Großer Parkplatz als eine Fläche (D-073)
 

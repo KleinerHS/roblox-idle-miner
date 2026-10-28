@@ -4,6 +4,6 @@
 
 return {
 	Game = "Roblox Idle Miner",
-	Version = "0.56.1",
-	Phase = "Phase 18s – Großer Parkplatz",
+	Version = "0.57.0",
+	Phase = "Phase 18t – Rucksack-Pack",
 }
