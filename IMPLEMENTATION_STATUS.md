@@ -25,7 +25,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 15 | Rare Drops & Mining Luck | TESTING_REQUIRED (15a, D-045) |
 | 16 | Verkauf & Spätspiel-Geld | TESTING_REQUIRED (16a, D-046) |
 | 17 | Icons | TESTING_REQUIRED (17a Erz- und Barren-Icons, 17b Kategorie-Icons) |
-| 18 | Fahrzeuge aus Felix' Modellen, Map-Mitte | TESTING_REQUIRED (18a: 4 Fahrzeuge; 18b: Durchfahr-Verladestraße, D-052; 18c: Lastzug mit echten Anhängern, D-053; 18d–18g Nachbesserungen, Startauto, Verkaufskreis; 18h Mitte D-057; 18i LKW-Laden D-058; 18j Kreisel D-059; 18k Shops D-060; 18l Lastzüge im Kreisel D-061; 18m Shops größer D-062; 18n Läden innen D-063; 18o Parkplätze D-064/D-065/D-067; 18p Podium D-070; 18q Spitzhacken-Pack D-071; 18r Autohaus-Drehteller D-072; 18s großer Parkplatz D-073; 18t Rucksack-Pack D-074) |
+| 18 | Fahrzeuge aus Felix' Modellen, Map-Mitte | TESTING_REQUIRED (18a: 4 Fahrzeuge; 18b: Durchfahr-Verladestraße, D-052; 18c: Lastzug mit echten Anhängern, D-053; 18d–18g Nachbesserungen, Startauto, Verkaufskreis; 18h Mitte D-057; 18i LKW-Laden D-058; 18j Kreisel D-059; 18k Shops D-060; 18l Lastzüge im Kreisel D-061; 18m Shops größer D-062; 18n Läden innen D-063; 18o Parkplätze D-064/D-065/D-067; 18p Podium D-070; 18q Spitzhacken-Pack D-071; 18r Autohaus-Drehteller D-072; 18s großer Parkplatz D-073; 18t Rucksack-Pack D-074; 18u Drill-Pack D-075, Rucksack-Leuchten D-076) |
 
 ## Setup – Details
 
@@ -840,6 +840,19 @@ Selbsttest: alle vier Läden im Bearbeitungsmodus von oben und innen angeschaut;
 | 0.51.6: Vorfeld der Shop-Parkplätze liegt unter dem Promenadenpflaster, die runde Kante verdeckt die Stufen der Asphaltstreifen (Nachtrag zu BUG-015) | `CenterBuilder` (`shopLot`) | TESTING_REQUIRED |
 
 Selbsttest (ohne Studio, tools/topdown): Draufsicht aller Parkplätze; Überschneidungsprüfung Asphalt gegen alle Teile: nichts steht mehr auf den Parkplätzen (vorher: Asphalt unter Shop-Fronten, Fahnen, Pylon, Schau-Drill, einer Gehweg-Laterne, einem Baum; großer Parkplatz auf Hütte 2 und Zaun). Lastzug-Simulation am Kreisel erneut gerechnet.
+
+### 18u (Version 0.58.0, 2026-10-28) – Drill-Pack (D-075) und Rucksack-Leuchten (D-076)
+
+| System | Dateien / Instanzen | Status |
+|---|---|---|
+| 3D-Vorlagen L01–L30 mit Rotor/Rollern und Drehpunkten aus Drill_Config | Place-Datei: `ServerStorage.Vendor.Drills` – **Place speichern!** Sicherung `assets/Drills.rbxm` (Rücktest 408 Objekte, 0 Abweichungen); `Definitions/DrillModels.luau` (neu) | TESTING_REQUIRED |
+| MK1–MK12 mit neuen Modellen, MK13–MK30 neu (Werte TODO_BALANCE) | `Drills.luau` | TESTING_REQUIRED |
+| Drill im Mining-Slot nach echter Länge, Statuslampe, Staub an der Spitze | `DrillModelBuilder.luau` | TESTING_REQUIRED |
+| Bohrkopf dreht um die Bohrachse, ab MK20 Schneidrollen gegenläufig | `DrillAnimController.luau` | TESTING_REQUIRED |
+| Drill-Shop: Drehteller mit Podium-Ansicht (Drills + Förderbänder), Kamera passt sich der Drill-Größe an; nur 4 Deko-Drills | `MachineShopBuilder.luau`, `ShowcaseItems.luau`, `ShopController.luau` | TESTING_REQUIRED |
+| Rucksack-Leuchten nach Stufe (schwach bis 13, dann stärker, Ende überbelichtet) | `BackpackModels.luau` | TESTING_REQUIRED |
+
+Selbsttest per Studio-MCP: Play ohne Fehler; Test-Drill MK25 auf „Running“: Rotor dreht um die Bohrachse ohne zu wandern, Rollen drehen mit; Drill-Shop-Kasse öffnet die Podium-Ansicht (Drill MK1, Kamera 9 Studs statt 24), nichts ragt in den Drehteller, Deko-Drills stoßen an nichts. Bilder konnten nicht geprüft werden (Studio-Ansicht schwarz, Fenster vermutlich minimiert); ein Drill im Mining-Slot wurde nicht im Spiel platziert.
 
 ### 18t (Version 0.57.0, 2026-10-28) – 22 Rucksäcke aus dem Rucksack-Pack (D-074)
 

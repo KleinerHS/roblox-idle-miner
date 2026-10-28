@@ -398,6 +398,7 @@ local scActive = false
 local scIndex = 1
 local scModel: Model? = nil
 local scSpot: BasePart? = nil
+local scCamPart: BasePart? = nil
 local scAngle = 0
 local scRemote: string? = nil
 local scCardId: string? = nil
@@ -430,6 +431,20 @@ local function showcaseModel(card: Card)
 		m:PivotTo(scSpot.CFrame * CFrame.Angles(0, scAngle, 0))
 		m.Parent = workspace.CurrentCamera
 		scModel = m
+		-- Drills sind sehr unterschiedlich groß (D-075): Kamera fährt je nach Größe näher heran
+		local camPart = scCamPart
+		local spot = scSpot :: BasePart
+		if currentTab == "drill" and camPart then
+			local _, size = m:GetBoundingBox()
+			local far = (camPart.Position - spot.Position)
+			local dist = math.clamp(math.max(size.X, size.Z) * 2, 9, far.Magnitude)
+			local target = spot.Position + Vector3.new(0, size.Y * 0.45, 0)
+			local pos = spot.Position + far.Unit * dist
+			TweenService:Create(workspace.CurrentCamera, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { CFrame = CFrame.lookAt(pos, target) }):Play()
+		elseif camPart and currentShop == "machine" then
+			-- Förderbänder: wieder die normale Ansicht
+			TweenService:Create(workspace.CurrentCamera, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { CFrame = camPart.CFrame }):Play()
+		end
 	end
 end
 
@@ -524,6 +539,7 @@ end
 local function enterShowcase(spot: BasePart, camPart: BasePart)
 	scActive = true
 	scSpot = spot
+	scCamPart = camPart
 	scCardId = nil
 	-- mit dem nächsten Upgrade beginnen (eins nach dem ausgerüsteten), sonst vorne
 	scIndex = 1

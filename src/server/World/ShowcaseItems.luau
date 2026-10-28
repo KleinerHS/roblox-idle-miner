@@ -9,9 +9,12 @@ local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Pickaxes = require(Shared.Definitions.Pickaxes)
 local Backpacks = require(Shared.Definitions.Backpacks)
 local Vehicles = require(Shared.Definitions.Vehicles)
+local Drills = require(Shared.Definitions.Drills)
+local Conveyors = require(Shared.Definitions.Conveyors)
 local PickaxeModels = require(script.Parent.PickaxeModels)
 local BackpackModels = require(script.Parent.BackpackModels)
 local VehicleModelBuilder = require(script.Parent.VehicleModelBuilder)
+local DrillModelBuilder = require(script.Parent.DrillModelBuilder)
 
 local ShowcaseItems = {}
 
@@ -156,6 +159,44 @@ function ShowcaseItems.build()
 				warn(`[ShowcaseItems] Fahrzeug {def.Id} nicht gebaut: {m}`)
 			end
 		end
+	end
+	-- Drill-Shop (D-075): alle Drills als 3D-Modell, Breitseite zur Kamera; Förderbänder als
+	-- einfaches Bandstück (Länge wächst mit der Stufe)
+	local drills = folder("drill")
+	for _, def in Drills.List do
+		local ok, m = pcall(DrillModelBuilder.build, def, CFrame.new())
+		if ok and m then
+			for _, d in m:GetDescendants() do
+				if d:IsA("BasePart") then
+					d.Anchored = true
+					d.CanCollide = false
+					d.CanTouch = false
+					d.CanQuery = false
+				elseif d:IsA("ParticleEmitter") or d:IsA("Light") then
+					d:Destroy()
+				end
+			end
+			m.WorldPivot = CFrame.Angles(0, math.rad(90), 0)
+			m.Parent = drills
+		else
+			warn(`[ShowcaseItems] Drill {def.Id} nicht gebaut: {m}`)
+		end
+	end
+	local belts = folder("conveyor")
+	for i, def in Conveyors.List do
+		local m = Instance.new("Model")
+		m.Name = def.Id
+		local len = 8 + i * 1.5
+		part(m, "Frame", Vector3.new(len, 1.4, 3.4), CFrame.new(0, 1.6, 0), METAL, Enum.Material.Metal)
+		part(m, "Belt", Vector3.new(len + 0.2, 0.25, 2.8), CFrame.new(0, 2.4, 0), Color3.fromRGB(40, 40, 44), Enum.Material.Rubber)
+		for _, x in { -len / 2 + 0.8, len / 2 - 0.8 } do
+			for _, z in { -1.3, 1.3 } do
+				part(m, `Leg{x}{z}`, Vector3.new(0.4, 1, 0.4), CFrame.new(x, 0.5, z), METAL, Enum.Material.Metal)
+			end
+		end
+		part(m, "Stripe", Vector3.new(len, 0.3, 0.1), CFrame.new(0, 1.6, -1.75), CANVAS[(i - 1) % #CANVAS + 1], Enum.Material.SmoothPlastic)
+		m.WorldPivot = CFrame.new()
+		m.Parent = belts
 	end
 	root.Parent = ReplicatedStorage
 end

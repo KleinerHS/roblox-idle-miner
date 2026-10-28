@@ -184,36 +184,56 @@ function MachineShopBuilder.build(parent: Instance): Model
 	end
 	-- Schau-Drill auf dem Vorplatz (bleibt vom Parkplatz davor frei, D-065)
 	do
-		local showDef = Drills.List[math.min(#Drills.List, 3)]
-		local top = ShopDecor.podium(model, "Showcase", o * CFrame.new(W / 2 - 11, 0, -D / 2 - 4), 3.2, ORANGE, H - 2)
+		-- D-075: nur noch 3–4 Deko-Drills im Laden; draußen der erste Tricone-Drill
+		local showDef = Drills.List[math.min(#Drills.List, 20)]
+		local top = ShopDecor.podium(model, "FrontPodium", o * CFrame.new(W / 2 - 13, 0, -D / 2 - 5), 5, ORANGE, H - 2)
 		local show = DrillModelBuilder.build(showDef, top * CFrame.new(0, 0.2, 0))
 		show.Name = "ShowcaseDrill"
 		show.Parent = model
-		local plate = part(model, "ShowcasePlate", Vector3.new(5, 1.2, 0.2), top * CFrame.new(0, -0.4, -3.5) * CFrame.Angles(math.rad(-20), 0, 0), STEEL_DARK, Enum.Material.SmoothPlastic)
+		local plate = part(model, "ShowcasePlate", Vector3.new(5, 1.2, 0.2), top * CFrame.new(0, -0.4, -5.3) * CFrame.Angles(math.rad(-20), 0, 0), STEEL_DARK, Enum.Material.SmoothPlastic)
 		surfaceText(plate, showDef.DisplayName:upper(), WHITE)
 	end
 
-	-- Maschinenplattform in der Mitte mit allen drei Drills (Rückmeldung Felix 2026-10-10)
+	-- Großer Drehteller in der Mitte für die Kaufansicht (D-075, wie Pickaxe-Shop und Autohaus):
+	-- leer; an der Kasse setzt der Client den gewählten Drill darauf und die Kamera auf
+	-- „ShowcaseCamera“. Ersetzt die Plattform mit MK1–MK3.
 	local platform = Instance.new("Folder")
 	platform.Name = "DrillDisplay"
 	platform.Parent = model
-	part(platform, "Platform", Vector3.new(32, 1, 22), o * CFrame.new(0, 1.1, 6), CONCRETE_DARK, Enum.Material.Concrete)
-	part(platform, "PlatformTop", Vector3.new(31.4, 0.2, 21.4), o * CFrame.new(0, 1.7, 6), STEEL, Enum.Material.DiamondPlate)
-	hazardStrip(platform, "PlatformEdge", 31.4, o * CFrame.new(0, 1.82, -4.4))
-	-- Vom Eingang aus gesehen links nach rechts: MK1, MK2, MK3 (lokal +X ist links)
-	local slots = { 10.5, 0, -10.5 }
-	-- Ausgestellt sind MK1–MK3 (Plattform hat drei Plätze); höhere Stufen nur im Shop-Fenster
-	for i, def in Drills.List do
-		if i > #slots then
-			break
+	do
+		local ttCF = o * CFrame.new(0, 0.6, 6)
+		local R = 10
+		local function disc(name: string, h: number, r: number, y: number, color: Color3, mat: Enum.Material): Part
+			local c = part(platform, name, Vector3.new(h, r * 2, r * 2), ttCF * CFrame.new(0, y + h / 2, 0) * CFrame.Angles(0, 0, math.rad(90)), color, mat)
+			c.Shape = Enum.PartType.Cylinder
+			return c
 		end
-		local x = slots[i]
-		-- Bohrkopf zeigt zum Eingang
-		local display = DrillModelBuilder.build(def, o * CFrame.new(x, 1.8, 7))
-		display.Parent = platform
-		part(platform, `InfoStandPost{i}`, Vector3.new(0.3, 1.8, 0.3), o * CFrame.new(x - 3, 1.5, -7.2), STEEL_DARK, Enum.Material.Metal)
-		local plate = part(platform, `InfoPlate{i}`, Vector3.new(3.6, 1.2, 0.2), o * CFrame.new(x - 3, 2.6, -7.3) * CFrame.Angles(math.rad(-15), 0, 0), STEEL_DARK, Enum.Material.SmoothPlastic)
-		surfaceText(plate, def.DisplayName:upper(), WHITE)
+		disc("ShowcaseBase", 0.6, R + 0.8, 0, CONCRETE_DARK, Enum.Material.Concrete)
+		local ring = disc("ShowcaseRing", 0.62, R + 0.3, 0, HAZARD_YELLOW, Enum.Material.Neon)
+		ring.Transparency = 0.35
+		disc("ShowcaseDisc", 0.8, R, 0, STEEL, Enum.Material.DiamondPlate)
+		disc("ShowcaseHub", 0.82, 1.6, 0, ORANGE, Enum.Material.Metal)
+		local spot = part(model, "ShowcaseSpot", Vector3.new(1, 1, 1), ttCF * CFrame.new(0, 0.8, 0), WHITE, Enum.Material.SmoothPlastic)
+		spot.Transparency = 1
+		spot.CanCollide = false
+		spot.CanQuery = false
+		spot:SetAttribute("ShopId", "machine")
+		for k, dx in { -6, 0, 6 } do
+			local lamp = part(platform, `ShowcaseLamp{k}`, Vector3.new(2.2, 0.3, 2.2), ttCF * CFrame.new(dx, H - 0.8, 0), LIGHT, Enum.Material.Neon)
+			lamp.CanCollide = false
+			local light = Instance.new("SpotLight")
+			light.Face = Enum.NormalId.Bottom
+			light.Range = H + 2
+			light.Angle = 60
+			light.Brightness = 1.6
+			light.Color = LIGHT
+			light.Parent = lamp
+		end
+		local camPos = (ttCF * CFrame.new(0, 9, -24)).Position
+		local camPart = part(model, "ShowcaseCamera", Vector3.new(1, 1, 1), CFrame.lookAt(camPos, (ttCF * CFrame.new(0, 3, 0)).Position), WHITE, Enum.Material.SmoothPlastic)
+		camPart.Transparency = 1
+		camPart.CanCollide = false
+		camPart.CanQuery = false
 	end
 
 	-- Werkstatt links (lokal +X): zwischen den Wandstützen bei z = 0 und z = D/2 − 1.2
@@ -431,14 +451,14 @@ function MachineShopBuilder.build(parent: Instance): Model
 	serviceText.CanCollide = false
 	ShopInterior.text(serviceText, "SERVICE AREA", HAZARD_YELLOW, Enum.NormalId.Top, true)
 
-	-- Weitere Drills (Stufe 4–6) auf Podesten im vorderen Showroom
-	for k = 4, math.min(6, #Drills.List) do
-		local def = Drills.List[k]
-		local x = W / 2 - 30 + (k - 4) * 10
-		local top = ShopDecor.podium(inside, `DrillPodium{k}`, o * CFrame.new(x, 0.6, -D / 2 + 16), 3.4, ORANGE, H - 3)
+	-- Zwei Deko-Drills auf Podesten im vorderen Showroom (D-075: Laden nur mit 3–4 Drills)
+	for k, tier in { 10, 25 } do
+		local def = Drills.List[math.min(tier, #Drills.List)]
+		local x = W / 2 - 34 + (k - 1) * 16
+		local top = ShopDecor.podium(inside, `DrillPodium{k}`, o * CFrame.new(x, 0.6, -D / 2 + 16), 6, ORANGE, H - 3)
 		local d = DrillModelBuilder.build(def, top * CFrame.new(0, 0.2, 0))
 		d.Parent = inside
-		local plate = part(inside, `DrillPlate{k}`, Vector3.new(5, 1.1, 0.2), top * CFrame.new(0, -0.4, -3.8) * CFrame.Angles(math.rad(-20), 0, 0), STEEL_DARK, Enum.Material.SmoothPlastic)
+		local plate = part(inside, `DrillPlate{k}`, Vector3.new(5, 1.1, 0.2), top * CFrame.new(0, -0.4, -6.4) * CFrame.Angles(math.rad(-20), 0, 0), STEEL_DARK, Enum.Material.SmoothPlastic)
 		surfaceText(plate, def.DisplayName:upper(), WHITE)
 	end
 	ShopInterior.hangingSign(inside, "ShowroomSign", o * CFrame.new(0, signY, -2), "SHOWROOM", ORANGE, WHITE, 12, H - 1)

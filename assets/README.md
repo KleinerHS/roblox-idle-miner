@@ -10,6 +10,7 @@ Sie werden **nicht** von Rojo synchronisiert.
 | `VehicleBodies.rbxm` | `ServerStorage.Vendor.VehicleBodies` – Karosserie-Vorlagen aus Felix' Fahrzeugmodellen (`vehicle_pickup`, `vehicle_van`, `vehicle_boxtruck`, `vehicle_truck`, Lastzug `vehicle_roadtrain` + `vehicle_roadtrain_Trailers` 1–3). **Unvollständig:** die ~130 UnionOperations von `vehicle_truck` (DAF) fehlen, zwei unbenannte MeshParts des Pickups heißen nach dem Einfügen leer statt „ “. Seit 2026-10-21 rostiger Pickup (MaterialVariant `RustyPickupPaint`, kommt per Rojo) und dunkle Scheiben (Attribut `Window`); die Scheiben-Unions von DAF, Scania (Seiten) und FH 540 sind wie alle Unions nicht enthalten | 2026-10-21 |
 | `Pickaxes.rbxm` | `ServerStorage.Vendor.Pickaxes` – 25 Spitzhacken-Vorlagen aus Felix' Pickaxe-Pack (D-071), MeshParts mit Farben/Materialien, Pivot Unterkante Mitte. Rücktest 195 Objekte, 0 Abweichungen | 2026-10-27 |
 | `Backpacks.rbxm` | `ServerStorage.Vendor.Backpacks` – 22 Rucksack-Vorlagen aus Felix' Rucksack-Pack (D-074), MeshParts mit Farben/Materialien, leuchtende Teile Neon + Licht, Pivot = Befestigungspunkt am Rücken. Rücktest 115 Objekte, 0 Abweichungen | 2026-10-28 |
+| `Drills.rbxm` | `ServerStorage.Vendor.Drills` – 30 Drill-Vorlagen L01–L30 aus Felix' Paket Industrial_Drills (D-075), Gruppen Rotor/Roller_01–03 mit Drehpunkten aus Drill_Config. Rücktest 408 Objekte, 0 Abweichungen | 2026-10-28 |
 
 ## Wiederherstellen
 

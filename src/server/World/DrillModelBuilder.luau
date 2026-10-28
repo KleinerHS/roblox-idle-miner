@@ -14,7 +14,10 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local ServerStorage = game:GetService("ServerStorage")
+
 local Drills = require(ReplicatedStorage:WaitForChild("Shared").Definitions.Drills)
+local DrillModels = require(ReplicatedStorage:WaitForChild("Shared").Definitions.DrillModels)
 
 local DrillModelBuilder = {}
 
@@ -67,7 +70,88 @@ local function hazard(parent: Instance, name: string, width: number, height: num
 	end
 end
 
+-- 3D-Vorlage L01–L30 aus Felix' Paket (D-075) in ServerStorage.Vendor.Drills: Pivot = Boden unter
+-- dem Modell-Ursprung, LookVector = Bohrrichtung. Gruppen "Rotor" (dreht um lokales X) und darin
+-- ab L20 "Roller_01..03" (drehen um ihr lokales X), Drehpunkte aus Drill_Config.
+local function template(def: Drills.DrillDefinition): Model?
+	local vendor = ServerStorage:FindFirstChild("Vendor")
+	local folder = vendor and vendor:FindFirstChild("Drills")
+	local t = folder and folder:FindFirstChild(string.format("L%02d", def.Tier))
+	if t and t:IsA("Model") then
+		return t
+	end
+	return nil
+end
+
+-- Statuslampe und Staub/Partikel an eine Vorlage hängen (gleiche Namen wie beim Platzhalter)
+local function addFittings(model: Model, def: Drills.DrillDefinition, cf: CFrame)
+	local e = DrillModels.Data[def.Tier]
+	local size = e.size
+	local tip = DrillModels.tipDistance(def.Tier)
+	local rear = DrillModels.rearDistance(def.Tier)
+	-- Lampe hinten oben auf dem Gehäuse
+	local lamp = part(model, "StatusLight", Vector3.new(0.45, 0.45, 0.45) * math.max(1, size.Y / 3), cf * CFrame.new(-size.Z * 0.25, size.Y + 0.25, rear * 0.6), STATUS_IDLE, Enum.Material.Neon, Enum.PartType.Ball)
+	local light = Instance.new("PointLight")
+	light.Name = "Glow"
+	light.Range = 8
+	light.Brightness = 1.5
+	light.Color = STATUS_IDLE
+	light.Parent = lamp
+	-- Unsichtbarer Träger an der Bohrspitze für Staub und Steinchen (dreht nicht mit)
+	local rotorY = e.groups.Rotor.position.Y
+	local anchor = part(model, "DustAnchor", Vector3.new(0.2, 0.2, 0.2), cf * CFrame.new(0, rotorY, -tip - 0.2), STEEL_DARK)
+	anchor.Transparency = 1
+	local dust = Instance.new("Attachment")
+	dust.Name = "DustPoint"
+	dust.Parent = anchor
+	local s = math.max(0.6, size.Y / 3)
+	local smoke = Instance.new("ParticleEmitter")
+	smoke.Name = "Dust"
+	smoke.Texture = "rbxasset://textures/particles/smoke_main.dds"
+	smoke.Color = ColorSequence.new(Color3.fromRGB(150, 140, 125))
+	smoke.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.8 * s), NumberSequenceKeypoint.new(1, 3 * s) })
+	smoke.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.55), NumberSequenceKeypoint.new(1, 1) })
+	smoke.Lifetime = NumberRange.new(1.2, 2)
+	smoke.Rate = 10
+	smoke.Speed = NumberRange.new(1.5, 3)
+	smoke.SpreadAngle = Vector2.new(60, 60)
+	smoke.Acceleration = Vector3.new(0, 0.6, 0)
+	smoke.LightInfluence = 0.6
+	smoke.Enabled = false
+	smoke.Parent = dust
+	local chips = Instance.new("ParticleEmitter")
+	chips.Name = "Chips"
+	chips.Texture = "rbxasset://textures/particles/sparkles_main.dds"
+	chips.Color = ColorSequence.new(Color3.fromRGB(90, 80, 70))
+	chips.Size = NumberSequence.new(0.18 * s)
+	chips.Lifetime = NumberRange.new(0.5, 0.9)
+	chips.Rate = 18
+	chips.Speed = NumberRange.new(5, 9)
+	chips.SpreadAngle = Vector2.new(70, 70)
+	chips.Acceleration = Vector3.new(0, -30, 0)
+	chips.LightInfluence = 1
+	chips.Enabled = false
+	chips.Parent = dust
+end
+
 function DrillModelBuilder.build(def: Drills.DrillDefinition, cf: CFrame): Model
+	local t = template(def)
+	if t then
+		local model = t:Clone()
+		model.Name = def.Id
+		model:SetAttribute("DrillType", def.Id)
+		for _, d in model:GetDescendants() do
+			if d:IsA("BasePart") then
+				d.Anchored = true
+				-- Gehäuse kollidiert, drehende Teile nicht (Felix' Anleitung)
+				d.CanCollide = not d:IsDescendantOf(model:FindFirstChild("Rotor") :: Instance)
+				d.CanTouch = false
+			end
+		end
+		model:PivotTo(cf)
+		addFittings(model, def, cf)
+		return model
+	end
 	local s = Drills.Scale(def)
 	local body = def.BodyColor
 	local bodyDark = body:Lerp(Color3.new(0, 0, 0), 0.35)
@@ -246,18 +330,27 @@ local SLOT_SIDE_OFFSET = 3
 -- Position eines Drills in einer Abbauzone (MineShaftBuilder "MiningSlotN"):
 -- zone.LookVector zeigt in den Raum, die Erzwand liegt bei lokal +Z = zone.Size.Z / 2.
 -- Ergebnis: Bodenmitte des Drills, LookVector zur Wand, Bohrspitze knapp vor der Wand.
-function DrillModelBuilder.slotCFrame(zone: BasePart, floorY: number, def: Drills.DrillDefinition): CFrame
+-- Abstand Bohrspitze und Auswurf (Rückseite) zum Ursprung: 3D-Vorlage oder Platzhalter
+local function tipAndOutput(def: Drills.DrillDefinition): (number, number)
+	if template(def) then
+		return DrillModels.tipDistance(def.Tier), DrillModels.rearDistance(def.Tier)
+	end
 	local s = Drills.Scale(def)
+	return TIP_Z * s, OUTPUT_Z * s
+end
+
+function DrillModelBuilder.slotCFrame(zone: BasePart, floorY: number, def: Drills.DrillDefinition): CFrame
+	local tip = tipAndOutput(def)
 	local wallZ = zone.Size.Z / 2
-	local spot = zone.CFrame * CFrame.new(SLOT_SIDE_OFFSET, 0, wallZ - TIP_Z * s - 0.6)
+	local spot = zone.CFrame * CFrame.new(SLOT_SIDE_OFFSET, 0, wallZ - tip - 0.6)
 	local pos = Vector3.new(spot.Position.X, floorY, spot.Position.Z)
 	return CFrame.lookAt(pos, pos - zone.CFrame.LookVector)
 end
 
 -- Abholpunkt hinter dem Auswurfschacht (für Transport-Worker), Bodenhöhe
 function DrillModelBuilder.outputPoint(drillCF: CFrame, def: Drills.DrillDefinition): Vector3
-	local s = Drills.Scale(def)
-	return (drillCF * CFrame.new(0, 0, OUTPUT_Z * s + 1.5)).Position
+	local _, out = tipAndOutput(def)
+	return (drillCF * CFrame.new(0, 0, out + 1.5)).Position
 end
 
 -- Statusanzeige (docs/05 §29): Grün = arbeitet, Orange = wartet, Rot = blockiert.

@@ -176,6 +176,224 @@ local list: { DrillDefinition } = {
 		BodyColor = Color3.fromRGB(100, 220, 230),
 		PersistenceClass = "Progression",
 	},
+	-- MK13–MK30 (D-075, Felix 2026-10-28): neue Stufen aus dem Paket Industrial_Drills, hinten
+	-- angehängt. Werte nur fortgeschrieben, die Balance macht Felix später (TODO_BALANCE).
+	{
+		Id = "drill_mk13",
+		DisplayName = "Drill MK13",
+		Tier = 13,
+		RequiredLevel = 100, -- TODO_BALANCE (D-075: hinten angehängt, Balance folgt)
+		Price = 1600000000000, -- TODO_BALANCE: × 2 je Stufe
+		OrePerCycle = 1755, -- TODO_BALANCE: × 1,3 je Stufe → 35,100 Erz/Min
+		CycleSeconds = 3,
+		OutputCapacity = 175500, -- 5 Minuten Produktion
+		BodyColor = Color3.fromRGB(120, 130, 140),
+		PersistenceClass = "Progression",
+	},
+	{
+		Id = "drill_mk14",
+		DisplayName = "Drill MK14",
+		Tier = 14,
+		RequiredLevel = 100, -- TODO_BALANCE (D-075: hinten angehängt, Balance folgt)
+		Price = 3200000000000, -- TODO_BALANCE: × 2 je Stufe
+		OrePerCycle = 2280, -- TODO_BALANCE: × 1,3 je Stufe → 45,600 Erz/Min
+		CycleSeconds = 3,
+		OutputCapacity = 228000, -- 5 Minuten Produktion
+		BodyColor = Color3.fromRGB(150, 90, 60),
+		PersistenceClass = "Progression",
+	},
+	{
+		Id = "drill_mk15",
+		DisplayName = "Drill MK15",
+		Tier = 15,
+		RequiredLevel = 100, -- TODO_BALANCE (D-075: hinten angehängt, Balance folgt)
+		Price = 6400000000000, -- TODO_BALANCE: × 2 je Stufe
+		OrePerCycle = 2965, -- TODO_BALANCE: × 1,3 je Stufe → 59,300 Erz/Min
+		CycleSeconds = 3,
+		OutputCapacity = 296500, -- 5 Minuten Produktion
+		BodyColor = Color3.fromRGB(80, 120, 100),
+		PersistenceClass = "Progression",
+	},
+	{
+		Id = "drill_mk16",
+		DisplayName = "Drill MK16",
+		Tier = 16,
+		RequiredLevel = 100, -- TODO_BALANCE (D-075: hinten angehängt, Balance folgt)
+		Price = 12800000000000, -- TODO_BALANCE: × 2 je Stufe
+		OrePerCycle = 3855, -- TODO_BALANCE: × 1,3 je Stufe → 77,100 Erz/Min
+		CycleSeconds = 3,
+		OutputCapacity = 385500, -- 5 Minuten Produktion
+		BodyColor = Color3.fromRGB(110, 80, 130),
+		PersistenceClass = "Progression",
+	},
+	{
+		Id = "drill_mk17",
+		DisplayName = "Drill MK17",
+		Tier = 17,
+		RequiredLevel = 100, -- TODO_BALANCE (D-075: hinten angehängt, Balance folgt)
+		Price = 25600000000000, -- TODO_BALANCE: × 2 je Stufe
+		OrePerCycle = 5010, -- TODO_BALANCE: × 1,3 je Stufe → 100,200 Erz/Min
+		CycleSeconds = 3,
+		OutputCapacity = 501000, -- 5 Minuten Produktion
+		BodyColor = Color3.fromRGB(60, 110, 150),
+		PersistenceClass = "Progression",
+	},
+	{
+		Id = "drill_mk18",
+		DisplayName = "Drill MK18",
+		Tier = 18,
+		RequiredLevel = 100, -- TODO_BALANCE (D-075: hinten angehängt, Balance folgt)
+		Price = 51200000000000, -- TODO_BALANCE: × 2 je Stufe
+		OrePerCycle = 6515, -- TODO_BALANCE: × 1,3 je Stufe → 130,300 Erz/Min
+		CycleSeconds = 3,
+		OutputCapacity = 651500, -- 5 Minuten Produktion
+		BodyColor = Color3.fromRGB(170, 120, 50),
+		PersistenceClass = "Progression",
+	},
+	{
+		Id = "drill_mk19",
+		DisplayName = "Drill MK19",
+		Tier = 19,
+		RequiredLevel = 100, -- TODO_BALANCE (D-075: hinten angehängt, Balance folgt)
+		Price = 102400000000000, -- TODO_BALANCE: × 2 je Stufe
+		OrePerCycle = 8470, -- TODO_BALANCE: × 1,3 je Stufe → 169,400 Erz/Min
+		CycleSeconds = 3,
+		OutputCapacity = 847000, -- 5 Minuten Produktion
+		BodyColor = Color3.fromRGB(90, 90, 100),
+		PersistenceClass = "Progression",
+	},
+	{
+		Id = "drill_mk20",
+		DisplayName = "Drill MK20",
+		Tier = 20,
+		RequiredLevel = 100, -- TODO_BALANCE (D-075: hinten angehängt, Balance folgt)
+		Price = 204800000000000, -- TODO_BALANCE: × 2 je Stufe
+		OrePerCycle = 11010, -- TODO_BALANCE: × 1,3 je Stufe → 220,200 Erz/Min
+		CycleSeconds = 3,
+		OutputCapacity = 1101000, -- 5 Minuten Produktion
+		BodyColor = Color3.fromRGB(140, 60, 70),
+		PersistenceClass = "Progression",
+	},
+	{
+		Id = "drill_mk21",
+		DisplayName = "Drill MK21",
+		Tier = 21,
+		RequiredLevel = 100, -- TODO_BALANCE (D-075: hinten angehängt, Balance folgt)
+		Price = 409600000000000, -- TODO_BALANCE: × 2 je Stufe
+		OrePerCycle = 14315, -- TODO_BALANCE: × 1,3 je Stufe → 286,300 Erz/Min
+		CycleSeconds = 3,
+		OutputCapacity = 1431500, -- 5 Minuten Produktion
+		BodyColor = Color3.fromRGB(70, 140, 140),
+		PersistenceClass = "Progression",
+	},
+	{
+		Id = "drill_mk22",
+		DisplayName = "Drill MK22",
+		Tier = 22,
+		RequiredLevel = 100, -- TODO_BALANCE (D-075: hinten angehängt, Balance folgt)
+		Price = 819200000000000, -- TODO_BALANCE: × 2 je Stufe
+		OrePerCycle = 18610, -- TODO_BALANCE: × 1,3 je Stufe → 372,200 Erz/Min
+		CycleSeconds = 3,
+		OutputCapacity = 1861000, -- 5 Minuten Produktion
+		BodyColor = Color3.fromRGB(160, 150, 80),
+		PersistenceClass = "Progression",
+	},
+	{
+		Id = "drill_mk23",
+		DisplayName = "Drill MK23",
+		Tier = 23,
+		RequiredLevel = 100, -- TODO_BALANCE (D-075: hinten angehängt, Balance folgt)
+		Price = 1638400000000000, -- TODO_BALANCE: × 2 je Stufe
+		OrePerCycle = 24195, -- TODO_BALANCE: × 1,3 je Stufe → 483,900 Erz/Min
+		CycleSeconds = 3,
+		OutputCapacity = 2419500, -- 5 Minuten Produktion
+		BodyColor = Color3.fromRGB(100, 70, 50),
+		PersistenceClass = "Progression",
+	},
+	{
+		Id = "drill_mk24",
+		DisplayName = "Drill MK24",
+		Tier = 24,
+		RequiredLevel = 100, -- TODO_BALANCE (D-075: hinten angehängt, Balance folgt)
+		Price = 3276800000000000, -- TODO_BALANCE: × 2 je Stufe
+		OrePerCycle = 31455, -- TODO_BALANCE: × 1,3 je Stufe → 629,100 Erz/Min
+		CycleSeconds = 3,
+		OutputCapacity = 3145500, -- 5 Minuten Produktion
+		BodyColor = Color3.fromRGB(60, 80, 120),
+		PersistenceClass = "Progression",
+	},
+	{
+		Id = "drill_mk25",
+		DisplayName = "Drill MK25",
+		Tier = 25,
+		RequiredLevel = 100, -- TODO_BALANCE (D-075: hinten angehängt, Balance folgt)
+		Price = 6553600000000000, -- TODO_BALANCE: × 2 je Stufe
+		OrePerCycle = 40890, -- TODO_BALANCE: × 1,3 je Stufe → 817,800 Erz/Min
+		CycleSeconds = 3,
+		OutputCapacity = 4089000, -- 5 Minuten Produktion
+		BodyColor = Color3.fromRGB(130, 130, 60),
+		PersistenceClass = "Progression",
+	},
+	{
+		Id = "drill_mk26",
+		DisplayName = "Drill MK26",
+		Tier = 26,
+		RequiredLevel = 100, -- TODO_BALANCE (D-075: hinten angehängt, Balance folgt)
+		Price = 13107200000000000, -- TODO_BALANCE: × 2 je Stufe
+		OrePerCycle = 53155, -- TODO_BALANCE: × 1,3 je Stufe → 1,063,100 Erz/Min
+		CycleSeconds = 3,
+		OutputCapacity = 5315500, -- 5 Minuten Produktion
+		BodyColor = Color3.fromRGB(150, 100, 140),
+		PersistenceClass = "Progression",
+	},
+	{
+		Id = "drill_mk27",
+		DisplayName = "Drill MK27",
+		Tier = 27,
+		RequiredLevel = 100, -- TODO_BALANCE (D-075: hinten angehängt, Balance folgt)
+		Price = 26214400000000000, -- TODO_BALANCE: × 2 je Stufe
+		OrePerCycle = 69100, -- TODO_BALANCE: × 1,3 je Stufe → 1,382,000 Erz/Min
+		CycleSeconds = 3,
+		OutputCapacity = 6910000, -- 5 Minuten Produktion
+		BodyColor = Color3.fromRGB(80, 60, 90),
+		PersistenceClass = "Progression",
+	},
+	{
+		Id = "drill_mk28",
+		DisplayName = "Drill MK28",
+		Tier = 28,
+		RequiredLevel = 100, -- TODO_BALANCE (D-075: hinten angehängt, Balance folgt)
+		Price = 52428800000000000, -- TODO_BALANCE: × 2 je Stufe
+		OrePerCycle = 89830, -- TODO_BALANCE: × 1,3 je Stufe → 1,796,600 Erz/Min
+		CycleSeconds = 3,
+		OutputCapacity = 8983000, -- 5 Minuten Produktion
+		BodyColor = Color3.fromRGB(190, 140, 60),
+		PersistenceClass = "Progression",
+	},
+	{
+		Id = "drill_mk29",
+		DisplayName = "Drill MK29",
+		Tier = 29,
+		RequiredLevel = 100, -- TODO_BALANCE (D-075: hinten angehängt, Balance folgt)
+		Price = 104857600000000000, -- TODO_BALANCE: × 2 je Stufe
+		OrePerCycle = 116780, -- TODO_BALANCE: × 1,3 je Stufe → 2,335,600 Erz/Min
+		CycleSeconds = 3,
+		OutputCapacity = 11678000, -- 5 Minuten Produktion
+		BodyColor = Color3.fromRGB(50, 60, 70),
+		PersistenceClass = "Progression",
+	},
+	{
+		Id = "drill_mk30",
+		DisplayName = "Drill MK30",
+		Tier = 30,
+		RequiredLevel = 100, -- TODO_BALANCE (D-075: hinten angehängt, Balance folgt)
+		Price = 209715200000000000, -- TODO_BALANCE: × 2 je Stufe
+		OrePerCycle = 151815, -- TODO_BALANCE: × 1,3 je Stufe → 3,036,300 Erz/Min
+		CycleSeconds = 3,
+		OutputCapacity = 15181500, -- 5 Minuten Produktion
+		BodyColor = Color3.fromRGB(210, 180, 90),
+		PersistenceClass = "Progression",
+	},
 }
 
 local byId: { [string]: DrillDefinition } = {}
@@ -191,7 +409,8 @@ local Drills = {
 	ById = table.freeze(byId),
 }
 
--- Modellgröße: wächst bis MK3, ab MK4 gleich groß (Mining-Slots haben feste Größe)
+-- Modellgröße des alten Platzhalter-Modells (nur ohne 3D-Vorlage): wächst bis MK3, ab MK4 gleich
+-- groß. Seit D-075 bringt jede Stufe ihr 3D-Modell L01–L30 in eigener Größe mit (DrillModels).
 function Drills.Scale(def: DrillDefinition): number
 	return 1 + (math.min(def.Tier, 3) - 1) * 0.25
 end
