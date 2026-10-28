@@ -847,6 +847,7 @@ Selbsttest (ohne Studio, tools/topdown): Draufsicht aller Parkplätze; Überschn
 |---|---|---|
 | Eine Asphaltfläche parallel zu den Gehwegen, dem Zaunbogen folgend, Hütte ausgespart; 4 Lückenreihen, 2 verbundene Fahrgassen | `CenterBuilder.luau` (`bigLotPlan`) | TESTING_REQUIRED |
 | Zwei große Einfahrten (24 Studs) zu beiden Straßen; alte Module, Grüninseln und 4 Zufahrten entfernt | `CenterBuilder.luau`, `LayoutConfig.Center` | TESTING_REQUIRED |
+| 0.56.1: dünner Asphaltstreifen hinter der Hütte (lief bis zur linken Straße) entfernt | `CenterBuilder.luau` (`bigLotPlan`) | TESTING_REQUIRED |
 
 Selbsttest in der Studio-Vorschau: Draufsicht – eine durchgehende Fläche, linke Kante parallel zur Straße, Bäume nicht auf dem Asphalt, Hütte frei; rechte Einfahrt aus der Nähe geprüft (Gehweg unterbrochen, Laterne daneben). Danach trennte Studio die Verbindung, Play-Test steht aus. Hinweis: Weil die alten Inselbäume wegfallen, sind die zufällig verteilten Bäume der Mitte etwas anders verteilt.
 

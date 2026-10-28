@@ -698,19 +698,31 @@ local function bigLotPlan(): BigLotPlan
 	local outer = inner + 2 * (2 * cc.StallDepth + cc.LotAisle)
 	-- Fläche bleibt mindestens 6 Studs innerhalb des Zauns (Kreisbogen, je Höhe d)
 	local fenceR = cc.FenceRadius - 6
+	local CAB = 14 -- halbe Hütte (12) + Abstand
+	-- Hütten: seitliche Lage x und radialer Bereich d0..d1 der Aussparung. Endet die Aussparung
+	-- knapp vor dem Rand der Fläche, reicht sie bis über den Rand (sonst bleibt dort ein dünner
+	-- Streifen, der an der Hütte vorbei bis zur Straße läuft).
 	local cabins = {}
 	for _, pos in cfg.Environment.Cabins do
 		local rel = Vector3.new(c.X + pos.X, TOP, c.Z + pos.Y) - frame.Position
-		table.insert(cabins, Vector2.new(rel:Dot(frame.RightVector), rel:Dot(frame.LookVector)))
+		local x: number = rel:Dot(frame.RightVector)
+		local y: number = rel:Dot(frame.LookVector)
+		local d0, d1 = y - CAB, y + CAB
+		if d0 - inner < 4 then
+			d0 = inner - 1
+		end
+		if outer - d1 < 4 then
+			d1 = outer + 1
+		end
+		table.insert(cabins, { X = x, Y = y, d0 = d0, d1 = d1 })
 	end
-	local CAB = 14 -- halbe Hütte (12) + Abstand
 	-- Kanten der Fläche bei d; cabinD entscheidet, welche Hütten-Aussparung gilt
 	local function edges(d: number, cabinD: number): (number, number)
 		local lo, hi = sidewalkSpan(frame, d)
 		local xMax = math.sqrt(math.max(fenceR ^ 2 - d ^ 2, 0))
 		local L, H = math.max(lo + BIG_LOT_MARGIN, -xMax), math.min(hi - BIG_LOT_MARGIN, xMax)
 		for _, cab in cabins do
-			if cabinD > cab.Y - CAB and cabinD < cab.Y + CAB and cab.X + CAB > L and cab.X - CAB < H then
+			if cabinD > cab.d0 and cabinD < cab.d1 and cab.X + CAB > L and cab.X - CAB < H then
 				if cab.X > (L + H) / 2 then
 					H = math.min(H, cab.X - CAB)
 				else
@@ -728,7 +740,7 @@ local function bigLotPlan(): BigLotPlan
 		table.insert(cuts, inner + (outer - inner) * i / steps)
 	end
 	for _, cab in cabins do
-		for _, d in { cab.Y - CAB, cab.Y + CAB } do
+		for _, d in { cab.d0, cab.d1 } do
 			if d > inner and d < outer then
 				table.insert(cuts, d)
 			end
