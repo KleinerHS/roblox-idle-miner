@@ -103,6 +103,7 @@ function VehicleShopBuilder.build(parent: Instance): Model
 
 	local W, H, D = cfg.Size.X, cfg.Size.Y, cfg.Size.Z
 	local hw, hd = W / 2, D / 2
+	local signY = H - 4
 	local model = Instance.new("Model")
 	model.Name = "VehicleShop"
 
@@ -196,10 +197,10 @@ function VehicleShopBuilder.build(parent: Instance): Model
 	display.Parent = model
 	-- Zwei Reihen à drei Drehteller (max. DisplaySlots Fahrzeuge). Fahrzeuge stehen quer, damit
 	-- auch die langen LKW nebeneinander passen; Infotafel vor jedem Drehteller.
-	local slots = cfg.DisplaySlots
-	-- Lage wächst mit der Hallengröße (ursprünglich für 90 × 68: x ±29, z -15/11)
-	local columnX = { -hw * 0.64, 0, hw * 0.64 }
-	local rowZ = { -hd * 0.44, hd * 0.32 }
+	-- D-072: Mitte gehört dem großen Drehteller der Kaufansicht; ausgestellt wird links und rechts
+	-- vorne und rechts hinten (neben der Übergabezone)
+	local slotXZ = { { hw * 0.64, -hd * 0.44 }, { -hw * 0.64, -hd * 0.44 }, { hw * 0.64, hd * 0.66 } }
+	local slots = math.min(cfg.DisplaySlots, #slotXZ)
 	-- Nur die kleinen Fahrzeuge werden ausgestellt (Felix 2026-10-18), LKW stehen nur im Katalog
 	local shown = {}
 	for _, def in Vehicles.List do
@@ -211,9 +212,7 @@ function VehicleShopBuilder.build(parent: Instance): Model
 		if i > slots then
 			break
 		end
-		local row = math.floor((i - 1) / 3) + 1
-		local x = columnX[(i - 1) % 3 + 1]
-		local z = rowZ[row]
+		local x, z = slotXZ[i][1], slotXZ[i][2]
 		local turntable = part(display, `Turntable{i}`, Vector3.new(0.4, 22, 22), o * CFrame.new(x, 0.8, z) * CFrame.Angles(0, 0, math.rad(90)), Color3.fromRGB(56, 58, 64), Enum.Material.Metal)
 		turntable.Shape = Enum.PartType.Cylinder
 		local ring = part(display, `TurntableRing{i}`, Vector3.new(0.42, 22.6, 22.6), o * CFrame.new(x, 0.78, z) * CFrame.Angles(0, 0, math.rad(90)), RED, Enum.Material.Neon)
@@ -235,14 +234,20 @@ function VehicleShopBuilder.build(parent: Instance): Model
 		light.Parent = spot
 	end
 
-	-- Verkaufstresen hinten rechts mit Prompt, Lounge hinten links
-	local counterCF = o * CFrame.new(hw - 11, 0, hd - 7)
-	part(model, "Counter", Vector3.new(12, 3.6, 3), counterCF * CFrame.new(0, 2.4, 0), WHITE, Enum.Material.SmoothPlastic)
-	part(model, "CounterTop", Vector3.new(12.6, 0.3, 3.6), counterCF * CFrame.new(0, 4.35, 0), DARK, Enum.Material.Marble)
-	part(model, "CounterStripe", Vector3.new(12, 0.6, 0.1), counterCF * CFrame.new(0, 3.2, -1.55), RED, Enum.Material.Neon)
-	part(model, "Screen", Vector3.new(2.6, 1.7, 0.2), counterCF * CFrame.new(-3, 5.4, 0.5), DARK, Enum.Material.SmoothPlastic)
-	part(model, "Screen2", Vector3.new(2.6, 1.7, 0.2), counterCF * CFrame.new(3, 5.4, 0.5), DARK, Enum.Material.SmoothPlastic)
-	local promptPart = part(model, "CounterPromptPart", Vector3.new(4, 4, 2), counterCF * CFrame.new(0, 3, -2.6), WHITE, Enum.Material.SmoothPlastic)
+	-- Verkaufstresen vorne mittig am Eingang mit Verkäufer (D-072, Felix 2026-10-28)
+	local counterCF = o * CFrame.new(0, 0.6, -hd + 10)
+	part(model, "Counter", Vector3.new(14, 3.6, 3), counterCF * CFrame.new(0, 1.8, 0), WHITE, Enum.Material.SmoothPlastic)
+	part(model, "CounterTop", Vector3.new(14.6, 0.3, 3.6), counterCF * CFrame.new(0, 3.75, 0), DARK, Enum.Material.Marble)
+	part(model, "CounterStripe", Vector3.new(14, 0.6, 0.1), counterCF * CFrame.new(0, 2.6, -1.55), RED, Enum.Material.Neon)
+	local screen = part(model, "Screen", Vector3.new(2.6, 1.7, 0.2), counterCF * CFrame.new(-4, 4.8, 0.6) * CFrame.Angles(0, math.rad(180), 0), DARK, Enum.Material.SmoothPlastic)
+	screen.CanCollide = false
+	ShopInterior.plant(model, "CounterPlant", counterCF * CFrame.new(5.6, 3.9, 0.4), 1.8)
+	local keyTray = part(model, "KeyTray", Vector3.new(1.6, 0.15, 1), counterCF * CFrame.new(2.4, 3.97, -0.6), STEEL, Enum.Material.Metal)
+	keyTray.CanCollide = false
+	ShopInterior.officeChair(model, "ClerkChair", counterCF * CFrame.new(3.5, 0, 3.2) * CFrame.Angles(0, math.rad(180), 0), DARK)
+	ShopInterior.clerk(model, "Clerk", counterCF * CFrame.new(0, 0, 2.6), RED)
+	ShopInterior.hangingSign(model, "WelcomeSign", counterCF * CFrame.new(0, signY - 0.6, 0), "WELCOME · BUY HERE", RED, WHITE, 14, 0.6 + H - 0.2)
+	local promptPart = part(model, "CounterPromptPart", Vector3.new(4, 4, 2), counterCF * CFrame.new(0, 2.4, -2.8), WHITE, Enum.Material.SmoothPlastic)
 	promptPart.Transparency = 1
 	promptPart.CanCollide = false
 	promptPart.CanQuery = false
@@ -255,6 +260,44 @@ function VehicleShopBuilder.build(parent: Instance): Model
 	prompt.RequiresLineOfSight = false
 	prompt:SetAttribute("ShopId", "vehicle")
 	prompt.Parent = promptPart
+
+	-- Großer Drehteller hinter dem Tresen: leer; in der Kaufansicht stellt der Client das gewählte
+	-- Fahrzeug darauf und die Kamera auf „ShowcaseCamera“ (wie das Podium im Pickaxe-Shop, D-070)
+	local ttCF = o * CFrame.new(0, 0.6, -hd + 32)
+	local TT_R = 16
+	local function disc(name: string, h: number, r: number, y: number, color: Color3, mat: Enum.Material): Part
+		local c = part(model, name, Vector3.new(h, r * 2, r * 2), ttCF * CFrame.new(0, y + h / 2, 0) * CFrame.Angles(0, 0, math.rad(90)), color, mat)
+		c.Shape = Enum.PartType.Cylinder
+		return c
+	end
+	disc("ShowcaseBase", 0.5, TT_R + 0.8, 0, DARK, Enum.Material.Metal)
+	local glow = disc("ShowcaseRing", 0.52, TT_R + 0.3, 0, RED, Enum.Material.Neon)
+	glow.Transparency = 0.4
+	disc("ShowcaseDisc", 0.7, TT_R, 0, Color3.fromRGB(56, 58, 64), Enum.Material.DiamondPlate)
+	disc("ShowcaseHub", 0.72, 2.4, 0, STEEL, Enum.Material.Metal)
+	local spot = part(model, "ShowcaseSpot", Vector3.new(1, 1, 1), ttCF * CFrame.new(0, 0.7, 0), WHITE, Enum.Material.SmoothPlastic)
+	spot.Transparency = 1
+	spot.CanCollide = false
+	spot.CanQuery = false
+	spot:SetAttribute("ShopId", "vehicle")
+	for k, dx in { -8, 0, 8 } do
+		local lamp = part(model, `ShowcaseLamp{k}`, Vector3.new(2.4, 0.3, 2.4), ttCF * CFrame.new(dx, H - 0.5, 0), LIGHT, Enum.Material.Neon)
+		lamp.CanCollide = false
+		local light = Instance.new("SpotLight")
+		light.Face = Enum.NormalId.Bottom
+		light.Range = H + 4
+		light.Angle = 60
+		light.Brightness = 2
+		light.Color = LIGHT
+		light.Parent = lamp
+	end
+	-- Kamera vor dem Tresen leicht erhöht, Blick über den Verkäufer auf den Drehteller
+	local camPos = (ttCF * CFrame.new(0, 13, -29)).Position
+	local camPart = part(model, "ShowcaseCamera", Vector3.new(1, 1, 1), CFrame.lookAt(camPos, (ttCF * CFrame.new(0, 4, 0)).Position), WHITE, Enum.Material.SmoothPlastic)
+	camPart.Transparency = 1
+	camPart.CanCollide = false
+	camPart.CanQuery = false
+
 	local lounge = o * CFrame.new(-hw + 10, 0, hd - 8)
 	part(model, "SofaBase", Vector3.new(9, 1.4, 3), lounge * CFrame.new(0, 1.3, 0), DARK, Enum.Material.Fabric)
 	part(model, "SofaBack", Vector3.new(9, 2.2, 0.8), lounge * CFrame.new(0, 2.6, 1.1), DARK, Enum.Material.Fabric)
@@ -283,16 +326,8 @@ function VehicleShopBuilder.build(parent: Instance): Model
 	inside.Parent = model
 	local floorTop = 0.6
 	local ceilingY = 0.6 + H - 0.2
-	local signY = H - 4
 
-	-- Empfang vorne links (lokal +X)
-	local reception = o * CFrame.new(22, floorTop, -hd + 7)
-	part(inside, "ReceptionDesk", Vector3.new(12, 3.6, 3), reception * CFrame.new(0, 1.8, 0), WHITE, Enum.Material.SmoothPlastic)
-	part(inside, "ReceptionTop", Vector3.new(12.6, 0.3, 3.6), reception * CFrame.new(0, 3.75, 0), DARK, Enum.Material.Marble)
-	part(inside, "ReceptionStripe", Vector3.new(12, 0.5, 0.1), reception * CFrame.new(0, 2.8, -1.55), RED, Enum.Material.Neon)
-	ShopInterior.officeChair(inside, "ReceptionChair", reception * CFrame.new(0, 0, 3) * CFrame.Angles(0, math.rad(180), 0), DARK)
-	part(inside, "ReceptionScreen", Vector3.new(2.4, 1.5, 0.15), reception * CFrame.new(-2, 4.7, 0.6), DARK, Enum.Material.SmoothPlastic)
-	ShopInterior.hangingSign(inside, "WelcomeSign", reception * CFrame.new(0, signY - floorTop, 0), "WELCOME", RED, WHITE, 10, ceilingY)
+	-- Prospektständer am Eingang (Empfang ist jetzt der Tresen vorne, D-072)
 	for k, x in { -30, 30 } do
 		ShopInterior.brochureStand(inside, `Brochures{k}`, o * CFrame.new(x, floorTop, -hd + 4), { RED, WHITE, DARK })
 	end
@@ -343,7 +378,7 @@ function VehicleShopBuilder.build(parent: Instance): Model
 	local toyCar = part(inside, "ToyCar", Vector3.new(1.6, 0.7, 0.9), kids * CFrame.new(1, 1.95, 0), RED, Enum.Material.SmoothPlastic)
 	toyCar.CanCollide = false
 
-	-- Kasse hinten rechts: Schlüsselkasten und Poster dahinter
+	-- Rückwand rechts: Schlüsselkasten, Poster, Uhr
 	ShopInterior.keyCabinet(inside, "KeyCabinet", o * CFrame.new(hw - 20, 7, hd - 1.2))
 	ShopInterior.poster(inside, "PosterService", o * CFrame.new(hw - 30, 9, hd - 1.15), 6, 8, "SERVICE\n& PARTS", DARK, WHITE)
 	ShopInterior.clock(inside, "Clock", o * CFrame.new(hw - 11, H - 3, hd - 1.2))

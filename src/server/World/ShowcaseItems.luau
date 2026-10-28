@@ -8,7 +8,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Pickaxes = require(Shared.Definitions.Pickaxes)
 local Backpacks = require(Shared.Definitions.Backpacks)
+local Vehicles = require(Shared.Definitions.Vehicles)
 local PickaxeModels = require(script.Parent.PickaxeModels)
+local VehicleModelBuilder = require(script.Parent.VehicleModelBuilder)
 
 local ShowcaseItems = {}
 
@@ -124,6 +126,31 @@ function ShowcaseItems.build()
 		local m = backpack(def, i)
 		m:ScaleTo(1.3)
 		m.Parent = packs
+	end
+	-- Autohaus (D-072): alle Fahrzeuge des Autohauses (nicht LKW-Laden), Ausstellungsmodell
+	-- ohne Sitz/Gelenke; Pivot = Boden unter der Fahrzeugmitte, Breitseite zur Kamera
+	local cars = folder("vehicle")
+	for _, def in Vehicles.List do
+		if def.Dealer ~= "truck" then
+			local ok, m = pcall(VehicleModelBuilder.build, def, CFrame.new(), false)
+			if ok and m then
+				m.Name = def.Id
+				m.WorldPivot = CFrame.Angles(0, math.rad(90), 0)
+				for _, d in m:GetDescendants() do
+					if d:IsA("BasePart") then
+						d.Anchored = true
+						d.CanCollide = false
+						d.CanTouch = false
+						d.CanQuery = false
+					elseif d:IsA("Script") or d:IsA("LocalScript") then
+						d:Destroy()
+					end
+				end
+				m.Parent = cars
+			else
+				warn(`[ShowcaseItems] Fahrzeug {def.Id} nicht gebaut: {m}`)
+			end
+		end
 	end
 	root.Parent = ReplicatedStorage
 end
