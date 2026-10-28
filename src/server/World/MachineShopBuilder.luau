@@ -184,10 +184,11 @@ function MachineShopBuilder.build(parent: Instance): Model
 	end
 	-- Schau-Drill auf dem Vorplatz (bleibt vom Parkplatz davor frei, D-065)
 	do
-		-- D-075: nur noch 3–4 Deko-Drills im Laden; draußen der erste Tricone-Drill
-		local showDef = Drills.List[math.min(#Drills.List, 20)]
+		-- D-075: nur noch 3–4 Deko-Drills im Laden; draußen MK15
+		local showDef = Drills.List[math.min(#Drills.List, 15)]
 		local top = ShopDecor.podium(model, "FrontPodium", o * CFrame.new(W / 2 - 13, 0, -D / 2 - 5), 5, ORANGE, H - 2)
-		local show = DrillModelBuilder.build(showDef, top * CFrame.new(0, 0.2, 0))
+		-- quer zur Fassade, damit der lange Drill nicht in die Wand ragt
+		local show = DrillModelBuilder.build(showDef, top * CFrame.new(0, 0.2, 0) * CFrame.Angles(0, math.rad(90), 0))
 		show.Name = "ShowcaseDrill"
 		show.Parent = model
 		local plate = part(model, "ShowcasePlate", Vector3.new(5, 1.2, 0.2), top * CFrame.new(0, -0.4, -5.3) * CFrame.Angles(math.rad(-20), 0, 0), STEEL_DARK, Enum.Material.SmoothPlastic)
@@ -202,7 +203,7 @@ function MachineShopBuilder.build(parent: Instance): Model
 	platform.Parent = model
 	do
 		local ttCF = o * CFrame.new(0, 0.6, 6)
-		local R = 10
+		local R = 13
 		local function disc(name: string, h: number, r: number, y: number, color: Color3, mat: Enum.Material): Part
 			local c = part(platform, name, Vector3.new(h, r * 2, r * 2), ttCF * CFrame.new(0, y + h / 2, 0) * CFrame.Angles(0, 0, math.rad(90)), color, mat)
 			c.Shape = Enum.PartType.Cylinder
@@ -229,7 +230,7 @@ function MachineShopBuilder.build(parent: Instance): Model
 			light.Color = LIGHT
 			light.Parent = lamp
 		end
-		local camPos = (ttCF * CFrame.new(0, 9, -24)).Position
+		local camPos = (ttCF * CFrame.new(0, 13, -32)).Position
 		local camPart = part(model, "ShowcaseCamera", Vector3.new(1, 1, 1), CFrame.lookAt(camPos, (ttCF * CFrame.new(0, 3, 0)).Position), WHITE, Enum.Material.SmoothPlastic)
 		camPart.Transparency = 1
 		camPart.CanCollide = false
@@ -452,11 +453,11 @@ function MachineShopBuilder.build(parent: Instance): Model
 	ShopInterior.text(serviceText, "SERVICE AREA", HAZARD_YELLOW, Enum.NormalId.Top, true)
 
 	-- Zwei Deko-Drills auf Podesten im vorderen Showroom (D-075: Laden nur mit 3–4 Drills)
-	for k, tier in { 10, 25 } do
+	for k, tier in { 5, 12 } do
 		local def = Drills.List[math.min(tier, #Drills.List)]
 		local x = W / 2 - 34 + (k - 1) * 16
 		local top = ShopDecor.podium(inside, `DrillPodium{k}`, o * CFrame.new(x, 0.6, -D / 2 + 16), 6, ORANGE, H - 3)
-		local d = DrillModelBuilder.build(def, top * CFrame.new(0, 0.2, 0))
+		local d = DrillModelBuilder.build(def, top * CFrame.new(0, 0.2, 0) * CFrame.Angles(0, math.rad(90), 0))
 		d.Parent = inside
 		local plate = part(inside, `DrillPlate{k}`, Vector3.new(5, 1.1, 0.2), top * CFrame.new(0, -0.4, -6.4) * CFrame.Angles(math.rad(-20), 0, 0), STEEL_DARK, Enum.Material.SmoothPlastic)
 		surfaceText(plate, def.DisplayName:upper(), WHITE)

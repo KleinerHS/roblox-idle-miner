@@ -1,7 +1,7 @@
 --!strict
 -- Maße und Drehpunkte der 3D-Drill-Modelle L01–L30 aus Felix' Paket Industrial_Drills
 -- (Drill_Config.luau, D-075). Alle Werte im Quellraum des Modells: +X Bohrrichtung, +Y oben,
--- Ursprung = Boden unter der Maschine. 1 Einheit = 1 Stud (keine zusätzliche Skalierung, Felix).
+-- Ursprung = Boden unter der Maschine. Im Spiel werden die Modelle je Stufe vergrößert (scale).
 -- size/center: Gesamtmaße und Mitte; groups: Drehpunkte (Rotor absolut, Roller relativ zum Rotor),
 -- Quaternion {x, y, z, w}. Rotor und Roller drehen um ihre lokale X-Achse.
 
@@ -264,15 +264,35 @@ function DrillModels.groupFrame(g: Group): CFrame
 	return CFrame.new(g.position) * CFrame.new(0, 0, 0, q[1], q[2], q[3], q[4])
 end
 
--- Abstand Bohrspitze und Rückseite zum Ursprung entlang der Bohrrichtung (Studs)
+-- Größe im Spiel (Felix 2026-10-29, Richtwerte): MK1 so lang wie das gelieferte L15 (6,64),
+-- MK20 so lang wie das alte mittlere Drill-Modell (MK2, 19,6), danach weiter wachsend bis MK30 = 30
+-- Studs. Dazwischen gleichmäßiges (geometrisches) Wachstum der Länge. TODO_LAYOUT
+local LENGTH_FIRST, LENGTH_MID, LENGTH_LAST = 6.64, 19.6, 30
+local MID_TIER = 20
+
+function DrillModels.targetLength(tier: number): number
+	local t = math.clamp(tier, 1, #data)
+	if t <= MID_TIER then
+		return LENGTH_FIRST * (LENGTH_MID / LENGTH_FIRST) ^ ((t - 1) / (MID_TIER - 1))
+	end
+	return LENGTH_MID * (LENGTH_LAST / LENGTH_MID) ^ ((t - MID_TIER) / (#data - MID_TIER))
+end
+
+-- Vergrößerung der Vorlage je Stufe (gleichmäßig in alle Richtungen)
+function DrillModels.scale(tier: number): number
+	local e = data[math.clamp(tier, 1, #data)]
+	return DrillModels.targetLength(tier) / e.size.X
+end
+
+-- Abstand Bohrspitze und Rückseite zum Ursprung entlang der Bohrrichtung (Studs, vergrößert)
 function DrillModels.tipDistance(tier: number): number
 	local e = data[math.clamp(tier, 1, #data)]
-	return e.center.X + e.size.X / 2
+	return (e.center.X + e.size.X / 2) * DrillModels.scale(tier)
 end
 
 function DrillModels.rearDistance(tier: number): number
 	local e = data[math.clamp(tier, 1, #data)]
-	return e.size.X / 2 - e.center.X
+	return (e.size.X / 2 - e.center.X) * DrillModels.scale(tier)
 end
 
 return table.freeze(DrillModels)

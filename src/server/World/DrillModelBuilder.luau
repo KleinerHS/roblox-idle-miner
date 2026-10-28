@@ -86,7 +86,8 @@ end
 -- Statuslampe und Staub/Partikel an eine Vorlage hängen (gleiche Namen wie beim Platzhalter)
 local function addFittings(model: Model, def: Drills.DrillDefinition, cf: CFrame)
 	local e = DrillModels.Data[def.Tier]
-	local size = e.size
+	local k = DrillModels.scale(def.Tier)
+	local size = e.size * k
 	local tip = DrillModels.tipDistance(def.Tier)
 	local rear = DrillModels.rearDistance(def.Tier)
 	-- Lampe hinten oben auf dem Gehäuse
@@ -98,7 +99,7 @@ local function addFittings(model: Model, def: Drills.DrillDefinition, cf: CFrame
 	light.Color = STATUS_IDLE
 	light.Parent = lamp
 	-- Unsichtbarer Träger an der Bohrspitze für Staub und Steinchen (dreht nicht mit)
-	local rotorY = e.groups.Rotor.position.Y
+	local rotorY = e.groups.Rotor.position.Y * k
 	local anchor = part(model, "DustAnchor", Vector3.new(0.2, 0.2, 0.2), cf * CFrame.new(0, rotorY, -tip - 0.2), STEEL_DARK)
 	anchor.Transparency = 1
 	local dust = Instance.new("Attachment")
@@ -148,6 +149,8 @@ function DrillModelBuilder.build(def: Drills.DrillDefinition, cf: CFrame): Model
 				d.CanTouch = false
 			end
 		end
+		-- Größe je Stufe (DrillModels.scale), Pivot bleibt am Boden unter dem Ursprung
+		model:ScaleTo(DrillModels.scale(def.Tier))
 		model:PivotTo(cf)
 		addFittings(model, def, cf)
 		return model
@@ -342,7 +345,14 @@ end
 function DrillModelBuilder.slotCFrame(zone: BasePart, floorY: number, def: Drills.DrillDefinition): CFrame
 	local tip = tipAndOutput(def)
 	local wallZ = zone.Size.Z / 2
-	local spot = zone.CFrame * CFrame.new(SLOT_SIDE_OFFSET, 0, wallZ - tip - 0.6)
+	-- Große Bohrköpfe (ab ~MK22) passen mit Versatz nicht mehr zwischen die Rahmenpfosten
+	-- (Innenkante ±6,35): Versatz so weit verringern, dass der Kopf frei bleibt (D-075)
+	local side = SLOT_SIDE_OFFSET
+	if template(def) then
+		local headHalf = 0.17 * DrillModels.targetLength(def.Tier)
+		side = math.clamp(6 - headHalf, 0, SLOT_SIDE_OFFSET)
+	end
+	local spot = zone.CFrame * CFrame.new(side, 0, wallZ - tip - 0.6)
 	local pos = Vector3.new(spot.Position.X, floorY, spot.Position.Z)
 	return CFrame.lookAt(pos, pos - zone.CFrame.LookVector)
 end
