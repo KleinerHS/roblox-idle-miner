@@ -140,26 +140,14 @@ function EquipmentShopBuilder.build(parent: Instance): Model
 	surfaceText(sign, "PICKAXES · BACKPACKS", WHITE)
 	part(model, "Awning", Vector3.new(doorW + 6, 0.4, 4), o * CFrame.new(0, doorH + 0.8, -D / 2 - 2) * CFrame.Angles(math.rad(-8), 0, 0), BLUE_DARK, Enum.Material.Metal)
 
-	-- Einladend (D-060): großes Dachschild, Riesen-Spitzhacke, Fahnen, Pflanzen, Bank
+	-- Einladend (D-060): großes Dachschild, Fahne, Pflanzen, Bank
 	ShopDecor.roofSign(model, "RoofSign", o * CFrame.new(0, H + 4.8, -D / 2 + 2), W * 0.7, 6, "⛏ PICKAXES", BLUE, WHITE, BLUE_DARK)
-	local giant = o * CFrame.new(W / 2 - 12, H + 0.8, D / 4) * CFrame.Angles(0, math.rad(20), math.rad(-25))
-	local handle = part(model, "GiantPickaxeHandle", Vector3.new(22, 1.6, 1.6), giant * CFrame.new(0, 11, 0) * CFrame.Angles(0, 0, math.rad(90)), WOOD, Enum.Material.Wood)
-	handle.Shape = Enum.PartType.Cylinder
-	part(model, "GiantPickaxeHead", Vector3.new(14, 2.4, 2.4), giant * CFrame.new(0, 21.5, 0), Color3.fromRGB(150, 210, 230), Enum.Material.Metal)
+	-- Riesen-Spitzhacke auf dem Dach entfernt (Felix 2026-10-28)
 	for _, side in { -1, 1 } do
-		local tip = Instance.new("WedgePart")
-		tip.Name = `GiantPickaxeTip{side}`
-		tip.Anchored = true
-		tip.CanTouch = false
-		tip.Size = Vector3.new(2.4, 2.4, 4)
-		tip.CFrame = giant * CFrame.new(side * 9, 21.5, 0) * CFrame.Angles(0, math.rad(side * 90), 0)
-		tip.Color = Color3.fromRGB(150, 210, 230)
-		tip.Material = Enum.Material.Metal
-		tip.Parent = model
-	end
-	part(model, "GiantPickaxeBand", Vector3.new(2.8, 3, 2.8), giant * CFrame.new(0, 21.5, 0), BLUE_DARK, Enum.Material.Metal)
-	for _, side in { -1, 1 } do
-		ShopDecor.flag(model, `Flag{side}`, o * CFrame.new(side * (W / 2 + 3), 0, -D / 2 - 2), if side > 0 then BLUE else WHITE)
+		-- nur noch die weiße Fahne (Flag-1); die blaue (Flag1) hat Felix entfernt (2026-10-28)
+		if side < 0 then
+			ShopDecor.flag(model, `Flag{side}`, o * CFrame.new(side * (W / 2 + 3), 0, -D / 2 - 2), WHITE)
+		end
 		ShopDecor.planter(model, `DoorPlanter{side}`, o * CFrame.new(side * (doorW / 2 + 2.2), 0.6, -D / 2 - 2), 2.6)
 	end
 	local benchCF = o * CFrame.new(-W / 4, 0.6, -D / 2 - 3.5) * CFrame.Angles(0, math.rad(180), 0)
@@ -347,7 +335,7 @@ function EquipmentShopBuilder.build(parent: Instance): Model
 	-- Hinten rechts: Probierecke mit Fels, Personaltür, Poster, Uhr
 	local rock = part(inside, "TryRock", Vector3.new(6, 4, 5), o * CFrame.new(-W / 2 + 10, 2.6, 16) * CFrame.Angles(0.2, 0.6, 0.1), Color3.fromRGB(110, 106, 100), Enum.Material.Rock)
 	rock.CanCollide = true
-	displayPickaxe(inside, o * CFrame.new(-W / 2 + 10, 5.6, 16) * CFrame.Angles(math.rad(25), 0, math.rad(-30)), Color3.fromRGB(150, 210, 230), 1.5)
+	-- Spitzhacke im Fels entfernt (Felix 2026-10-28), Fels und Schild bleiben
 	local trySign = part(inside, "TrySign", Vector3.new(5, 1.4, 0.2), o * CFrame.new(-W / 2 + 10, 2.4, 11.6) * CFrame.Angles(math.rad(-15), 0, 0), Color3.fromRGB(240, 196, 40), Enum.Material.SmoothPlastic)
 	ShopInterior.text(trySign, "TRY IT!", Color3.fromRGB(26, 27, 30), Enum.NormalId.Front)
 	ShopInterior.door(inside, "StaffDoor", o * CFrame.new(-W / 2 + t + 0.2, 0.6, 22) * CFrame.Angles(0, math.rad(-90), 0), "STAFF ONLY", Color3.fromRGB(70, 74, 80))

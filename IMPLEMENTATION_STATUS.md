@@ -863,6 +863,7 @@ Selbsttest per Studio-MCP: Play ohne Fehler, 3 Fahrzeugmodelle in `ShowcaseModel
 | Werkzeug in der Hand aus der Vorlage (unsichtbarer Griff bei 22 % der Höhe); 0.54.1: Stiel aufrecht, Kopf oben (BUG-017) | `PickaxeModels.luau` (neu), `ToolBuilder.luau` | TESTING_REQUIRED |
 | Podium-Ansicht zeigt die Vorlagen (Breitseite zur Kamera) | `ShowcaseItems.luau` | TESTING_REQUIRED |
 | Spitzhacken-Wand: alle 25 in zwei Reihen (13 + 12), Stufe 1 oben links, Namensschild je Hacke | `EquipmentShopBuilder.luau` | TESTING_REQUIRED |
+| 0.55.3: Felix' Änderungen übernommen – Riesen-Spitzhacke auf dem Dach, blaue Fahne und Spitzhacke im Fels entfernt | `EquipmentShopBuilder.luau` | TESTING_REQUIRED |
 
 Selbsttest per Studio-MCP: Play ohne Fehler; Felix' Spielstand auf v12 umgestellt (ausgerüstet Iron Pickaxe); Hacke in der Hand aus dem Mesh-Modell; Wand mit 25 Hacken in richtiger Reihenfolge; Podium zeigt Gold Pickaxe (nächste Stufe) mit Power 2 → 3.
 

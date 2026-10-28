@@ -446,6 +446,7 @@ Ergebnis mit den echten Teilen (`tools/topdown`): keine Berührung, knappster Ab
 **Nachtrag 2026-10-27 (Felix):** Die drei Gangregale hinter dem Podium sind entfernt; das Podium steht jetzt mitten im Laden und ist eine Marmorsäule (Stufe, Sockel, kannelierter Schaft, Abdeckplatte, goldene Zierringe) statt eines leuchtenden Podests, beleuchtet nur von einem Deckenstrahler.
 **Nachtrag 2 (Felix 2026-10-27):** Statt zwei Supermarktkassen ein kleiner Holztresen rechts vom Eingang mit Kasse, Klingel, Mini-Spitzhacke, Helm und Pflanze; dahinter ein Verkäufer (Roblox-Figur, `ShopInterior.clerk`). Der Shop-Prompt sitzt auf der Kundenseite des Tresens.
 **Affected systems:** ShopController, EquipmentShopBuilder, ShowcaseItems, ShopService, ShopInterior
+**Nachtrag 0.55.3 (Felix 2026-10-28, in Studio entfernt und übernommen):** Riesen-Spitzhacke auf dem Dach, blaue Fahne vor der Tür und die Spitzhacke im Probierfels entfallen; weiße Fahne, Fels und „TRY IT!“-Schild bleiben.
 **Nachtrag 0.53.1:** Setzt man die Figur während der Podium-Ansicht zurück (Esc → Reset), schließt die Ansicht automatisch; vorher blieben Kamera und Steuerung gesperrt.
 
 ## D-071 – 25 Spitzhacken aus Felix' Pickaxe-Pack
