@@ -849,6 +849,7 @@ Selbsttest (ohne Studio, tools/topdown): Draufsicht aller Parkplätze; Überschn
 | Großer Drehteller hinter dem Tresen mit `ShowcaseSpot`/`ShowcaseCamera`; Kasse öffnet die Podium-Ansicht | `VehicleShopBuilder.luau`, `ShopController.luau` (unverändert, nutzt D-070) | TESTING_REQUIRED |
 | Fahrzeugmodelle für die Ansicht (alle Autohaus-Fahrzeuge, ohne LKW) | `ShowcaseItems.luau` (`ShowcaseModels.vehicle`) | TESTING_REQUIRED |
 | Ausstellungsfahrzeuge links/rechts vorne und rechts hinten | `VehicleShopBuilder.luau` | TESTING_REQUIRED |
+| 0.55.1: Felix' Änderungen übernommen (Schreibtische und Übergabezone weg, Pflanzen an die Seiten, Bildschirm/Schlüsselablage gedreht); großer Teller hinten mittig mit Box Truck (Hinweis „AT TRUCK SHOP“) | `VehicleShopBuilder.luau` | TESTING_REQUIRED |
 
 Selbsttest per Studio-MCP: Play ohne Fehler, 3 Fahrzeugmodelle in `ShowcaseModels.vehicle`; Kasse öffnet die Ansicht (Pickup, 1 / 3, OWNED), Kamera und Auto an der richtigen Stelle. Bild konnte nicht geprüft werden (Studio-Ansicht schwarz, Fenster vermutlich minimiert); stattdessen geprüft: nichts ragt in den Drehteller, Ausstellungsfahrzeuge stoßen an nichts, Sicht von der Kamera auf das Auto an 11 Punkten frei.
 

@@ -199,7 +199,9 @@ function VehicleShopBuilder.build(parent: Instance): Model
 	-- auch die langen LKW nebeneinander passen; Infotafel vor jedem Drehteller.
 	-- D-072: Mitte gehört dem großen Drehteller der Kaufansicht; ausgestellt wird links und rechts
 	-- vorne und rechts hinten (neben der Übergabezone)
-	local slotXZ = { { hw * 0.64, -hd * 0.44 }, { -hw * 0.64, -hd * 0.44 }, { hw * 0.64, hd * 0.66 } }
+	-- Felix 2026-10-28: dazu ein großer Teller hinten mittig (dort war die Übergabezone) mit dem
+	-- Box Truck als Blickfang; Infotafel verweist auf den LKW-Laden. Dritter Wert = Durchmesser.
+	local slotXZ = { { hw * 0.64, -hd * 0.44, 22 }, { -hw * 0.64, -hd * 0.44, 22 }, { hw * 0.64, hd * 0.66, 22 }, { 0, hd * 0.61, 30 } }
 	local slots = math.min(cfg.DisplaySlots, #slotXZ)
 	-- Nur die kleinen Fahrzeuge werden ausgestellt (Felix 2026-10-18), LKW stehen nur im Katalog
 	local shown = {}
@@ -208,22 +210,27 @@ function VehicleShopBuilder.build(parent: Instance): Model
 			table.insert(shown, def)
 		end
 	end
+	local featured = Vehicles.Get("vehicle_truck")
+	if featured and #shown < #slotXZ then
+		table.insert(shown, featured)
+	end
 	for i, def in shown do
 		if i > slots then
 			break
 		end
-		local x, z = slotXZ[i][1], slotXZ[i][2]
-		local turntable = part(display, `Turntable{i}`, Vector3.new(0.4, 22, 22), o * CFrame.new(x, 0.8, z) * CFrame.Angles(0, 0, math.rad(90)), Color3.fromRGB(56, 58, 64), Enum.Material.Metal)
+		local x, z, dia = slotXZ[i][1], slotXZ[i][2], slotXZ[i][3]
+		local turntable = part(display, `Turntable{i}`, Vector3.new(0.4, dia, dia), o * CFrame.new(x, 0.8, z) * CFrame.Angles(0, 0, math.rad(90)), Color3.fromRGB(56, 58, 64), Enum.Material.Metal)
 		turntable.Shape = Enum.PartType.Cylinder
-		local ring = part(display, `TurntableRing{i}`, Vector3.new(0.42, 22.6, 22.6), o * CFrame.new(x, 0.78, z) * CFrame.Angles(0, 0, math.rad(90)), RED, Enum.Material.Neon)
+		local ring = part(display, `TurntableRing{i}`, Vector3.new(0.42, dia + 0.6, dia + 0.6), o * CFrame.new(x, 0.78, z) * CFrame.Angles(0, 0, math.rad(90)), RED, Enum.Material.Neon)
 		ring.Shape = Enum.PartType.Cylinder
 		ring.Transparency = 0.45
 		local yaw = if i % 2 == 0 then -90 else 90
 		local vehicle = VehicleModelBuilder.build(def, o * CFrame.new(x, 1, z) * CFrame.Angles(0, math.rad(yaw), 0), false)
 		vehicle.Parent = display
-		local plate = part(display, `InfoStand{i}`, Vector3.new(4.2, 1.8, 0.2), o * CFrame.new(x, 2.4, z - 12.6) * CFrame.Angles(math.rad(-15), 0, 0), DARK, Enum.Material.SmoothPlastic)
-		surfaceText(plate, def.DisplayName:upper(), WHITE)
-		part(display, `InfoStandPost{i}`, Vector3.new(0.3, 1.8, 0.3), o * CFrame.new(x, 1.4, z - 12.5), STEEL, Enum.Material.Metal)
+		local standZ = z - dia / 2 - 1.6
+		local plate = part(display, `InfoStand{i}`, Vector3.new(if def.Dealer == "truck" then 6.4 else 4.2, 1.8, 0.2), o * CFrame.new(x, 2.4, standZ) * CFrame.Angles(math.rad(-15), 0, 0), DARK, Enum.Material.SmoothPlastic)
+		surfaceText(plate, if def.Dealer == "truck" then `{def.DisplayName:upper()} · AT TRUCK SHOP` else def.DisplayName:upper(), WHITE)
+		part(display, `InfoStandPost{i}`, Vector3.new(0.3, 1.8, 0.3), o * CFrame.new(x, 1.4, standZ + 0.1), STEEL, Enum.Material.Metal)
 		local spot = part(display, `Spot{i}`, Vector3.new(2.4, 0.2, 2.4), o * CFrame.new(x, 0.6 + H - 0.3, z), LIGHT, Enum.Material.Neon)
 		local light = Instance.new("SpotLight")
 		light.Face = Enum.NormalId.Bottom
@@ -239,10 +246,10 @@ function VehicleShopBuilder.build(parent: Instance): Model
 	part(model, "Counter", Vector3.new(14, 3.6, 3), counterCF * CFrame.new(0, 1.8, 0), WHITE, Enum.Material.SmoothPlastic)
 	part(model, "CounterTop", Vector3.new(14.6, 0.3, 3.6), counterCF * CFrame.new(0, 3.75, 0), DARK, Enum.Material.Marble)
 	part(model, "CounterStripe", Vector3.new(14, 0.6, 0.1), counterCF * CFrame.new(0, 2.6, -1.55), RED, Enum.Material.Neon)
-	local screen = part(model, "Screen", Vector3.new(2.6, 1.7, 0.2), counterCF * CFrame.new(-4, 4.8, 0.6) * CFrame.Angles(0, math.rad(180), 0), DARK, Enum.Material.SmoothPlastic)
+	local screen = part(model, "Screen", Vector3.new(2.6, 1.7, 0.2), counterCF * CFrame.new(-4, 4.8, -0.4) * CFrame.Angles(0, math.rad(-145.2), 0), DARK, Enum.Material.SmoothPlastic)
 	screen.CanCollide = false
 	ShopInterior.plant(model, "CounterPlant", counterCF * CFrame.new(5.6, 3.9, 0.4), 1.8)
-	local keyTray = part(model, "KeyTray", Vector3.new(1.6, 0.15, 1), counterCF * CFrame.new(2.4, 3.97, -0.6), STEEL, Enum.Material.Metal)
+	local keyTray = part(model, "KeyTray", Vector3.new(1.6, 0.15, 1), counterCF * CFrame.new(-3.36, 3.97, 0.7) * CFrame.Angles(0, math.rad(31.9), 0), STEEL, Enum.Material.Metal)
 	keyTray.CanCollide = false
 	ShopInterior.officeChair(model, "ClerkChair", counterCF * CFrame.new(3.5, 0, 3.2) * CFrame.Angles(0, math.rad(180), 0), DARK)
 	ShopInterior.clerk(model, "Clerk", counterCF * CFrame.new(0, 0, 2.6), RED)
@@ -332,33 +339,15 @@ function VehicleShopBuilder.build(parent: Instance): Model
 		ShopInterior.brochureStand(inside, `Brochures{k}`, o * CFrame.new(x, floorTop, -hd + 4), { RED, WHITE, DARK })
 	end
 
-	-- Verkaufsplätze hinten: Schreibtisch, Mitarbeiter, zwei Kundenstühle, Pflanze dazwischen
-	for k, x in { -34, -14, 14, 34 } do
-		local deskCF = o * CFrame.new(x, floorTop, 12)
-		ShopInterior.desk(inside, `SalesDesk{k}`, deskCF, WHITE, RED_DARK)
-		ShopInterior.officeChair(inside, `StaffChair{k}`, deskCF * CFrame.new(0, 0, 2.8) * CFrame.Angles(0, math.rad(180), 0), DARK)
-		for _, dx in { -1.6, 1.6 } do
-			ShopInterior.officeChair(inside, `GuestChair{k}{dx}`, deskCF * CFrame.new(dx, 0, -3), Color3.fromRGB(150, 40, 36))
-		end
-	end
-	for k, x in { -24, 24 } do
-		ShopInterior.plant(inside, `SalesPlant{k}`, o * CFrame.new(x, floorTop, 12), 6)
+	-- Verkaufsplätze entfernt (Felix 2026-10-28); Pflanzen an den Seitenwänden
+	for k, x in { -51, 50 } do
+		ShopInterior.plant(inside, `SalesPlant{k}`, o * CFrame.new(x, floorTop, 4), 6)
 	end
 	ShopInterior.hangingSign(inside, "SalesSign", o * CFrame.new(-24, signY, 12), "SALES", DARK, WHITE, 8, ceilingY)
 	ShopInterior.hangingSign(inside, "SalesSign2", o * CFrame.new(24, signY, 12), "FINANCING", DARK, WHITE, 10, ceilingY)
 
-	-- Übergabezone in der Mitte hinten
+	-- Übergabezone entfernt (Felix 2026-10-28), dort steht jetzt der große Ausstellungsteller
 	local delivery = o * CFrame.new(0, floorTop, 24)
-	ShopInterior.rug(inside, "DeliveryZone", delivery, 16, 12, Color3.fromRGB(60, 62, 68))
-	local deliveryText = part(inside, "DeliveryText", Vector3.new(12, 0.05, 2.6), delivery * CFrame.new(0, 0.1, -4), Color3.fromRGB(60, 62, 68), Enum.Material.SmoothPlastic)
-	deliveryText.CanCollide = false
-	ShopInterior.text(deliveryText, "VEHICLE DELIVERY", Color3.fromRGB(250, 214, 60), Enum.NormalId.Top, true)
-	for _, dx in { -8, 8 } do
-		for _, dz in { -6, 6 } do
-			local post = part(inside, `DeliveryPost{dx}{dz}`, Vector3.new(0.3, 3, 0.3), delivery * CFrame.new(dx, 1.5, dz), STEEL, Enum.Material.Metal)
-			post.CanCollide = false
-		end
-	end
 	ShopInterior.hangingSign(inside, "DeliverySign", delivery * CFrame.new(0, signY - floorTop, 0), "🎉 DELIVERY", RED, WHITE, 10, ceilingY)
 
 	-- Lounge hinten links erweitern: Kaffee, Fernseher, Sessel, Kinderecke
