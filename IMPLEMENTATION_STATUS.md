@@ -25,7 +25,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 15 | Rare Drops & Mining Luck | TESTING_REQUIRED (15a, D-045) |
 | 16 | Verkauf & Spätspiel-Geld | TESTING_REQUIRED (16a, D-046) |
 | 17 | Icons | TESTING_REQUIRED (17a Erz- und Barren-Icons, 17b Kategorie-Icons) |
-| 18 | Fahrzeuge aus Felix' Modellen, Map-Mitte | TESTING_REQUIRED (18a: 4 Fahrzeuge; 18b: Durchfahr-Verladestraße, D-052; 18c: Lastzug mit echten Anhängern, D-053; 18d–18g Nachbesserungen, Startauto, Verkaufskreis; 18h Mitte D-057; 18i LKW-Laden D-058; 18j Kreisel D-059; 18k Shops D-060; 18l Lastzüge im Kreisel D-061; 18m Shops größer D-062; 18n Läden innen D-063; 18o Parkplätze D-064/D-065/D-067; 18p Podium D-070; 18q Spitzhacken-Pack D-071; 18r Autohaus-Drehteller D-072) |
+| 18 | Fahrzeuge aus Felix' Modellen, Map-Mitte | TESTING_REQUIRED (18a: 4 Fahrzeuge; 18b: Durchfahr-Verladestraße, D-052; 18c: Lastzug mit echten Anhängern, D-053; 18d–18g Nachbesserungen, Startauto, Verkaufskreis; 18h Mitte D-057; 18i LKW-Laden D-058; 18j Kreisel D-059; 18k Shops D-060; 18l Lastzüge im Kreisel D-061; 18m Shops größer D-062; 18n Läden innen D-063; 18o Parkplätze D-064/D-065/D-067; 18p Podium D-070; 18q Spitzhacken-Pack D-071; 18r Autohaus-Drehteller D-072; 18s großer Parkplatz D-073) |
 
 ## Setup – Details
 
@@ -840,6 +840,15 @@ Selbsttest: alle vier Läden im Bearbeitungsmodus von oben und innen angeschaut;
 | 0.51.6: Vorfeld der Shop-Parkplätze liegt unter dem Promenadenpflaster, die runde Kante verdeckt die Stufen der Asphaltstreifen (Nachtrag zu BUG-015) | `CenterBuilder` (`shopLot`) | TESTING_REQUIRED |
 
 Selbsttest (ohne Studio, tools/topdown): Draufsicht aller Parkplätze; Überschneidungsprüfung Asphalt gegen alle Teile: nichts steht mehr auf den Parkplätzen (vorher: Asphalt unter Shop-Fronten, Fahnen, Pylon, Schau-Drill, einer Gehweg-Laterne, einem Baum; großer Parkplatz auf Hütte 2 und Zaun). Lastzug-Simulation am Kreisel erneut gerechnet.
+
+### 18s (Version 0.56.0, 2026-10-28) – Großer Parkplatz als eine Fläche (D-073)
+
+| System | Dateien / Instanzen | Status |
+|---|---|---|
+| Eine Asphaltfläche parallel zu den Gehwegen, dem Zaunbogen folgend, Hütte ausgespart; 4 Lückenreihen, 2 verbundene Fahrgassen | `CenterBuilder.luau` (`bigLotPlan`) | TESTING_REQUIRED |
+| Zwei große Einfahrten (24 Studs) zu beiden Straßen; alte Module, Grüninseln und 4 Zufahrten entfernt | `CenterBuilder.luau`, `LayoutConfig.Center` | TESTING_REQUIRED |
+
+Selbsttest in der Studio-Vorschau: Draufsicht – eine durchgehende Fläche, linke Kante parallel zur Straße, Bäume nicht auf dem Asphalt, Hütte frei; rechte Einfahrt aus der Nähe geprüft (Gehweg unterbrochen, Laterne daneben). Danach trennte Studio die Verbindung, Play-Test steht aus. Hinweis: Weil die alten Inselbäume wegfallen, sind die zufällig verteilten Bäume der Mitte etwas anders verteilt.
 
 ### 18r (Version 0.55.0, 2026-10-28) – Autohaus: Tresen vorne, Drehteller-Kaufansicht (D-072)
 

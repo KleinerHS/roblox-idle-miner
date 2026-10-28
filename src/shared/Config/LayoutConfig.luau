@@ -269,9 +269,6 @@ local LayoutConfig = {
 		LotAisle = 12,
 		ShopLotStalls = 6,
 		BigLotAngle = -120,
-		-- Module aus Fahrgasse mit Lückenreihe links und rechts, nach außen gestaffelt
-		BigLotModules = 2,
-		BigLotMaxStalls = 16,
 		PondAngle = 120,
 		GardenAngle = 120,
 		GardenRadius = 205,

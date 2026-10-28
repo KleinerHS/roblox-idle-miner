@@ -462,3 +462,9 @@ Ergebnis mit den echten Teilen (`tools/topdown`): keine Berührung, knappster Ab
 **Affected systems:** VehicleShopBuilder, ShowcaseItems (Ordner `vehicle`)
 **Nachtrag 0.55.1 (Felix 2026-10-28, „ich habe ein paar Sachen entfernt, speicher das bitte so, und hinten in der Mitte soll noch ein Ausstellungsteller sein“):** Übernommen aus Felix' Änderungen in Studio: die 4 Verkaufsschreibtische mit Stühlen und die Übergabezone (Teppich, Schrift, Pfosten) entfallen; die beiden Pflanzen stehen an den Seitenwänden; Bildschirm und Schlüsselablage am Tresen wie von Felix gedreht. Hängeschilder (Sales, Financing, Delivery) bleiben. Neu: großer Ausstellungsteller (30 Studs) hinten mittig mit dem Box Truck als Blickfang, Infotafel „BOX TRUCK · AT TRUCK SHOP“ (im Autohaus nicht kaufbar).
 **Nachtrag 0.55.2 (Felix 2026-10-28, „lass es erst mal leer, wir platzieren später was rein“):** Der Teller hinten mittig bleibt leer (ohne Fahrzeug und Infotafel).
+
+## D-073 – Großer Parkplatz: eine Fläche mit zwei großen Einfahrten
+
+**Source:** Felix, 2026-10-28 („mach bitte die zwei einzelnen Parkplätze zu einem großen mit zwei großen Einfahrten“)
+**Decision:** Statt zwei Modulen mit Grüninseln und vier schmalen Zufahrten (D-067) eine zusammenhängende Asphaltfläche: parallel zu beiden Gehwegen mit 8 Studs Grünstreifen, außen dem Zaunbogen folgend (mind. 6 Studs Abstand), die Hütte bleibt ausgespart. Vier Lückenreihen (13 × 29) mit zwei Fahrgassen; die beiden Mittelreihen stehen Rücken an Rücken und enden 13 Studs vor dem Rand, sodass beide Gassen verbunden sind. Je Straße eine große Einfahrt, 24 Studs breit, über Grünstreifen und Gehweg bis an die Fahrbahn (links auf Höhe der inneren Gasse, rechts auf Höhe der äußeren). Gehweg-Laternen stehen nicht auf den Einfahrten. Config `BigLotModules`/`BigLotMaxStalls` entfällt.
+**Affected systems:** CenterBuilder (`bigLotPlan`, `occupyBigLot`, Aufbau „BigLot“), LayoutConfig.Center
