@@ -199,8 +199,9 @@ function VehicleShopBuilder.build(parent: Instance): Model
 	-- auch die langen LKW nebeneinander passen; Infotafel vor jedem Drehteller.
 	-- D-072: Mitte gehört dem großen Drehteller der Kaufansicht; ausgestellt wird links und rechts
 	-- vorne und rechts hinten (neben der Übergabezone)
-	-- Felix 2026-10-28: dazu ein großer Teller hinten mittig (dort war die Übergabezone) mit dem
-	-- Box Truck als Blickfang; Infotafel verweist auf den LKW-Laden. Dritter Wert = Durchmesser.
+	-- Felix 2026-10-28: dazu ein großer Teller hinten mittig (dort war die Übergabezone), vorerst
+	-- leer ("wir platzieren später was rein"). Teller ohne Fahrzeug bleiben leer, ohne Infotafel.
+	-- Dritter Wert = Durchmesser.
 	local slotXZ = { { hw * 0.64, -hd * 0.44, 22 }, { -hw * 0.64, -hd * 0.44, 22 }, { hw * 0.64, hd * 0.66, 22 }, { 0, hd * 0.61, 30 } }
 	local slots = math.min(cfg.DisplaySlots, #slotXZ)
 	-- Nur die kleinen Fahrzeuge werden ausgestellt (Felix 2026-10-18), LKW stehen nur im Katalog
@@ -210,27 +211,23 @@ function VehicleShopBuilder.build(parent: Instance): Model
 			table.insert(shown, def)
 		end
 	end
-	local featured = Vehicles.Get("vehicle_truck")
-	if featured and #shown < #slotXZ then
-		table.insert(shown, featured)
-	end
-	for i, def in shown do
-		if i > slots then
-			break
-		end
+	for i = 1, slots do
+		local def = shown[i]
 		local x, z, dia = slotXZ[i][1], slotXZ[i][2], slotXZ[i][3]
 		local turntable = part(display, `Turntable{i}`, Vector3.new(0.4, dia, dia), o * CFrame.new(x, 0.8, z) * CFrame.Angles(0, 0, math.rad(90)), Color3.fromRGB(56, 58, 64), Enum.Material.Metal)
 		turntable.Shape = Enum.PartType.Cylinder
 		local ring = part(display, `TurntableRing{i}`, Vector3.new(0.42, dia + 0.6, dia + 0.6), o * CFrame.new(x, 0.78, z) * CFrame.Angles(0, 0, math.rad(90)), RED, Enum.Material.Neon)
 		ring.Shape = Enum.PartType.Cylinder
 		ring.Transparency = 0.45
-		local yaw = if i % 2 == 0 then -90 else 90
-		local vehicle = VehicleModelBuilder.build(def, o * CFrame.new(x, 1, z) * CFrame.Angles(0, math.rad(yaw), 0), false)
-		vehicle.Parent = display
-		local standZ = z - dia / 2 - 1.6
-		local plate = part(display, `InfoStand{i}`, Vector3.new(if def.Dealer == "truck" then 6.4 else 4.2, 1.8, 0.2), o * CFrame.new(x, 2.4, standZ) * CFrame.Angles(math.rad(-15), 0, 0), DARK, Enum.Material.SmoothPlastic)
-		surfaceText(plate, if def.Dealer == "truck" then `{def.DisplayName:upper()} · AT TRUCK SHOP` else def.DisplayName:upper(), WHITE)
-		part(display, `InfoStandPost{i}`, Vector3.new(0.3, 1.8, 0.3), o * CFrame.new(x, 1.4, standZ + 0.1), STEEL, Enum.Material.Metal)
+		if def then
+			local yaw = if i % 2 == 0 then -90 else 90
+			local vehicle = VehicleModelBuilder.build(def, o * CFrame.new(x, 1, z) * CFrame.Angles(0, math.rad(yaw), 0), false)
+			vehicle.Parent = display
+			local standZ = z - dia / 2 - 1.6
+			local plate = part(display, `InfoStand{i}`, Vector3.new(4.2, 1.8, 0.2), o * CFrame.new(x, 2.4, standZ) * CFrame.Angles(math.rad(-15), 0, 0), DARK, Enum.Material.SmoothPlastic)
+			surfaceText(plate, def.DisplayName:upper(), WHITE)
+			part(display, `InfoStandPost{i}`, Vector3.new(0.3, 1.8, 0.3), o * CFrame.new(x, 1.4, standZ + 0.1), STEEL, Enum.Material.Metal)
+		end
 		local spot = part(display, `Spot{i}`, Vector3.new(2.4, 0.2, 2.4), o * CFrame.new(x, 0.6 + H - 0.3, z), LIGHT, Enum.Material.Neon)
 		local light = Instance.new("SpotLight")
 		light.Face = Enum.NormalId.Bottom
