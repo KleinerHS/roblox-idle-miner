@@ -203,7 +203,7 @@ function MachineShopBuilder.build(parent: Instance): Model
 	platform.Parent = model
 	do
 		local ttCF = o * CFrame.new(0, 0.6, 6)
-		local R = 13
+		local R = 16 -- MK30 (30 Studs lang) passt ganz drauf (Felix 2026-10-29: „darf notfalls größer werden“)
 		local function disc(name: string, h: number, r: number, y: number, color: Color3, mat: Enum.Material): Part
 			local c = part(platform, name, Vector3.new(h, r * 2, r * 2), ttCF * CFrame.new(0, y + h / 2, 0) * CFrame.Angles(0, 0, math.rad(90)), color, mat)
 			c.Shape = Enum.PartType.Cylinder

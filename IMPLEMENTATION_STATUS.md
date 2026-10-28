@@ -851,7 +851,7 @@ Selbsttest (ohne Studio, tools/topdown): Draufsicht aller Parkplätze; Überschn
 | Bohrkopf dreht um die Bohrachse, ab MK20 Schneidrollen gegenläufig | `DrillAnimController.luau` | TESTING_REQUIRED |
 | Drill-Shop: Drehteller mit Podium-Ansicht (Drills + Förderbänder), Kamera passt sich der Drill-Größe an; nur 4 Deko-Drills | `MachineShopBuilder.luau`, `ShowcaseItems.luau`, `ShopController.luau` | TESTING_REQUIRED |
 | Rucksack-Leuchten nach Stufe (schwach bis 13, dann stärker, Ende überbelichtet) | `BackpackModels.luau` | TESTING_REQUIRED |
-| 0.58.1: Drills größer (MK1 6,6 → MK20 19,6 → MK30 30 Studs), Slot-Versatz für große Köpfe, Drill-Shop angepasst; alle 30 in beiden Slots kollisionsfrei geprüft | `DrillModels.luau`, `DrillModelBuilder.luau`, `MachineShopBuilder.luau` | TESTING_REQUIRED |
+| 0.58.1: Drills größer (MK1 6,6 → MK20 19,6 → MK30 30 Studs), Slot-Versatz für große Köpfe, Drill-Shop angepasst (0.58.2: Drehteller Radius 16, MK30 passt ganz drauf, Schwenkbereich frei); alle 30 in beiden Slots kollisionsfrei geprüft | `DrillModels.luau`, `DrillModelBuilder.luau`, `MachineShopBuilder.luau` | TESTING_REQUIRED |
 
 Selbsttest per Studio-MCP: Play ohne Fehler; Test-Drill MK25 auf „Running“: Rotor dreht um die Bohrachse ohne zu wandern, Rollen drehen mit; Drill-Shop-Kasse öffnet die Podium-Ansicht (Drill MK1, Kamera 9 Studs statt 24), nichts ragt in den Drehteller, Deko-Drills stoßen an nichts. Bilder konnten nicht geprüft werden (Studio-Ansicht schwarz, Fenster vermutlich minimiert); ein Drill im Mining-Slot wurde nicht im Spiel platziert.
 
