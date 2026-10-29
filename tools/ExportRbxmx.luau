@@ -67,6 +67,15 @@ local function enc(name: string, etype: string, v: any): string?
 			return `<double name="{n}">{num(v, true)}</double>`
 		end
 		return `<float name="{n}">{num(v)}</float>`
+	elseif t == "Content" then
+		-- neuer Werttyp (z. B. SurfaceAppearance.ColorMapContent): als klassische Content-URL unter
+		-- dem älteren Namen ohne „Content“ schreiben (ColorMap), das versteht rojo/rbx-dom
+		local uri = (v :: any).Uri
+		local name = if string.sub(n, -7) == "Content" then string.sub(n, 1, -8) else n
+		if typeof(uri) ~= "string" or uri == "" then
+			return `<Content name="{name}"><null></null></Content>`
+		end
+		return `<Content name="{name}"><url>{esc(uri)}</url></Content>`
 	elseif t == "string" then
 		if etype == "ProtectedString" then
 			return `<ProtectedString name="{n}"><![CDATA[{v:gsub("]]>", "]]]]><![CDATA[>")}]]></ProtectedString>`
@@ -237,6 +246,17 @@ local function export(root: Instance): (string, { string })
 					if s then
 						table.insert(out, s)
 					end
+				end
+			end
+		end
+		-- SurfaceAppearance: Texturkarten werden von der Reflection nicht als serialisiert gemeldet
+		if inst:IsA("SurfaceAppearance") then
+			for _, mapName in { "ColorMap", "NormalMap", "RoughnessMap", "MetalnessMap" } do
+				local ok, value = pcall(function()
+					return (inst :: any)[mapName]
+				end)
+				if ok and typeof(value) == "string" and value ~= "" then
+					table.insert(out, `<Content name="{mapName}"><url>{esc(value)}</url></Content>`)
 				end
 			end
 		end

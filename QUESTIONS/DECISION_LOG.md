@@ -521,3 +521,9 @@ Ergebnis mit den echten Teilen (`tools/topdown`): keine Berührung, knappster Ab
 - Kleine Bildschirme: alle Texte skalieren (Obergrenze Originalgröße, mindestens 7 px), auf Bildschirmen unter 500 px Höhe nutzt der Laptop die volle Höhe.
 **Affected systems:** LaptopController (neu geschrieben), UI/MineOS_Laptop.rbxmx (neu)
 **Nachtrag 0.59.1 (Felix 2026-10-29, „der Schließ-Button soll nicht in der Taskleiste sein, sondern oben rechts; außerdem soll man auch über Esc rauskommen, muss aber nicht dabeistehen“):** Laptop-Schließen sitzt jetzt oben rechts direkt neben dem Laptop (außerhalb, damit es nicht mit dem X der App-Fenster verwechselt wird). Escape schließt den Laptop: Roblox meldet Escape als bereits verarbeitet (eigenes Menü), die frühere Prüfung darauf verhinderte das Schließen; zusätzlich schließt der Laptop, wenn das Roblox-Menü aufgeht. Kein Hinweistext.
+
+## D-080 – Drill-Shop: Verkaufstresen aus Felix' Paket mit Verkäufer
+
+**Source:** Felix, 2026-10-29 („im Game-Ordner ist jetzt auch ein Drill_Shop_Verkaufstresen, ich habe ihn schon importiert … füg ihn ein und stell auch einen Arbeiter dahinter“)
+**Decision:** Vorlage `ServerStorage.Vendor.DrillCounter` aus `Drill_Shop_Counter.glb` (Farben/Materialien aus der GLB: Shop-Orange, Graphit, gebürsteter Stahl, Gummi, Warn-Amber, Tasten, Gold; Bildschirm-Texturen „BUY“ und Terminal als SurfaceAppearance; nur das Gehäuse kollidiert). Der Tresen ersetzt den bisherigen Tresen aus Parts an derselben Stelle rechts am Eingang, gedreht, sodass der BUY-Bildschirm wie bisher zum Gang zeigt; Kasse (Prompt) und Schild „$ CASHIER“ bleiben. Verkäufer (Roblox-Figur, orange) an der Fußposition aus der Paket-Anleitung hinter dem Tresen, Blick zum Kunden. Ohne Vorlage baut der Code den alten Tresen mit Verkäufer.
+**Affected systems:** MachineShopBuilder, assets/DrillCounter.rbxm, tools/ExportRbxmx.luau (Content-Werte und SurfaceAppearance-Texturen werden jetzt mitgesichert)

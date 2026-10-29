@@ -841,6 +841,14 @@ Selbsttest: alle vier Läden im Bearbeitungsmodus von oben und innen angeschaut;
 
 Selbsttest (ohne Studio, tools/topdown): Draufsicht aller Parkplätze; Überschneidungsprüfung Asphalt gegen alle Teile: nichts steht mehr auf den Parkplätzen (vorher: Asphalt unter Shop-Fronten, Fahnen, Pylon, Schau-Drill, einer Gehweg-Laterne, einem Baum; großer Parkplatz auf Hütte 2 und Zaun). Lastzug-Simulation am Kreisel erneut gerechnet.
 
+### 18y (Version 0.59.2, 2026-10-29) – Drill-Shop-Verkaufstresen (D-080)
+
+| System | Dateien / Instanzen | Status |
+|---|---|---|
+| Tresen aus Felix' Paket mit Verkäufer dahinter, BUY-Bildschirm zum Kunden | Place-Datei: `ServerStorage.Vendor.DrillCounter` – **Place speichern!** Sicherung `assets/DrillCounter.rbxm` (Rücktest 28 Objekte, 0 Abweichungen, Bildschirm-Texturen inklusive); `MachineShopBuilder.luau` | TESTING_REQUIRED |
+
+Selbsttest: Play ohne Fehler; Kasse auf der Kundenseite, BUY-Bildschirm zum Kunden, Verkäufer dahinter mit Blick zum Kunden, keine Überschneidungen; Bild geprüft; Podium-Ansicht öffnet wie bisher.
+
 ### 18x (Version 0.59.0, 2026-10-29) – Laptop „Mine OS“ V4 (D-079)
 
 | System | Dateien | Status |

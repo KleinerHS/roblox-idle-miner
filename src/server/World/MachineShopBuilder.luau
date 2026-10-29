@@ -10,6 +10,7 @@
 --   Part  "CounterPromptPart" mit ProximityPrompt "ShopPrompt" (Attribute ShopId = "machine")
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerStorage = game:GetService("ServerStorage")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local LayoutConfig = require(Shared.Config.LayoutConfig)
@@ -345,15 +346,26 @@ function MachineShopBuilder.build(parent: Instance): Model
 
 	-- Kasse direkt rechts neben dem Eingang (lokal −X), Bedienseite zum Tor (Felix 2026-10-27)
 	local counterCF = o * CFrame.new(-doorW / 2 - 5, 0, -D / 2 + 8)
-	part(model, "Counter", Vector3.new(3, 3.6, 9), counterCF * CFrame.new(0, 2.4, 0), STEEL_DARK, Enum.Material.Metal)
-	part(model, "CounterTop", Vector3.new(3.6, 0.3, 9.6), counterCF * CFrame.new(0, 4.35, 0), ORANGE_DARK, Enum.Material.Metal)
-	part(model, "CounterStripe", Vector3.new(0.05, 0.5, 9), counterCF * CFrame.new(1.53, 3.6, 0), HAZARD_YELLOW, Enum.Material.SmoothPlastic)
-	part(model, "Register", Vector3.new(1.2, 0.6, 1.4), counterCF * CFrame.new(0, 4.8, -2.4), STEEL, Enum.Material.Metal)
-	part(model, "MonitorStand", Vector3.new(0.4, 0.8, 0.4), counterCF * CFrame.new(0, 4.9, 1.6), STEEL, Enum.Material.Metal)
-	local monitor = part(model, "Monitor", Vector3.new(0.3, 1.6, 2.4), counterCF * CFrame.new(0, 5.9, 1.6), STEEL_DARK, Enum.Material.SmoothPlastic)
-	local screen = part(model, "MonitorScreen", Vector3.new(0.05, 1.3, 2.1), counterCF * CFrame.new(0.18, 5.9, 1.6), Color3.fromRGB(40, 140, 200), Enum.Material.Neon)
-	screen.Transparency = 0.2
-	monitor.CastShadow = false
+	-- Verkaufstresen aus Felix' Paket Drill_Shop_Verkaufstresen (D-080) mit Verkäufer dahinter.
+	-- Vorlage ServerStorage.Vendor.DrillCounter: Pivot am Boden mittig, −Z = Kundenseite mit dem
+	-- BUY-Bildschirm. Gedreht, damit die Kundenseite wie bisher zum Gang (lokal +X) zeigt.
+	local vendor = ServerStorage:FindFirstChild("Vendor")
+	local counterTemplate = vendor and vendor:FindFirstChild("DrillCounter")
+	if counterTemplate and counterTemplate:IsA("Model") then
+		local deskCF = counterCF * CFrame.new(0, 0.6, 0) * CFrame.Angles(0, math.rad(-90), 0)
+		local desk = counterTemplate:Clone()
+		desk.Name = "Counter"
+		desk:PivotTo(deskCF)
+		desk.Parent = model
+		-- Fußposition laut Paket-Anleitung (Mitarbeiterseite), Blick zum Kunden
+		ShopInterior.clerk(model, "Clerk", deskCF * CFrame.new(-1.65, 0, 2.8), ORANGE)
+	else
+		-- Ersatz ohne Vorlage: der frühere Tresen aus Parts
+		part(model, "Counter", Vector3.new(3, 3.6, 9), counterCF * CFrame.new(0, 2.4, 0), STEEL_DARK, Enum.Material.Metal)
+		part(model, "CounterTop", Vector3.new(3.6, 0.3, 9.6), counterCF * CFrame.new(0, 4.35, 0), ORANGE_DARK, Enum.Material.Metal)
+		part(model, "CounterStripe", Vector3.new(0.05, 0.5, 9), counterCF * CFrame.new(1.53, 3.6, 0), HAZARD_YELLOW, Enum.Material.SmoothPlastic)
+		ShopInterior.clerk(model, "Clerk", counterCF * CFrame.new(-2.8, 0.6, 0) * CFrame.Angles(0, math.rad(-90), 0), ORANGE)
+	end
 	local cashSign = part(model, "CashSign", Vector3.new(6.5, 1.4, 0.2), counterCF * CFrame.new(0, 9, 0), STEEL_DARK, Enum.Material.SmoothPlastic)
 	local signGui = Instance.new("SurfaceGui")
 	signGui.Face = Enum.NormalId.Front
