@@ -11,6 +11,7 @@
 
 local Players = game:GetService("Players")
 local StarterGui = game:GetService("StarterGui")
+local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
@@ -1066,13 +1067,48 @@ local function build()
 			end
 		end
 	end
+	-- Laptop-Schließen oben rechts außerhalb des Bildschirms (Felix 2026-10-29: nicht in der
+	-- Taskleiste); die X der App-Fenster sitzen oben rechts im Bildschirm
+	-- MineOS schneidet Kinder ab (ClipsDescendants): der Knopf hängt deshalb in einem eigenen,
+	-- unsichtbaren Rahmen mit derselben Lage und Größe wie der Laptop
+	local frame = root :: Frame
+	local holder = Instance.new("Frame")
+	holder.Name = "CloseHolder"
+	holder.BackgroundTransparency = 1
+	holder.AnchorPoint = frame.AnchorPoint
+	holder.Position = frame.Position
+	holder.Size = frame.Size
+	holder.ZIndex = 20
+	for _, c in frame:GetChildren() do
+		if c:IsA("UIAspectRatioConstraint") or c:IsA("UISizeConstraint") then
+			c:Clone().Parent = holder
+		end
+	end
+	holder.Parent = g
+	frame:GetPropertyChangedSignal("Size"):Connect(function()
+		holder.Size = frame.Size
+	end)
 	local closeLaptop = find("Taskbar/CloseLaptop")
 	if closeLaptop and closeLaptop:IsA("GuiButton") then
-		closeLaptop.Activated:Connect(close)
+		local cb = closeLaptop :: TextButton
+		cb.Parent = holder
+		cb.AnchorPoint = Vector2.new(0, 0)
+		cb.Position = UDim2.new(1, 8, 0, 0)
+		cb.SizeConstraint = Enum.SizeConstraint.RelativeYY
+		cb.Size = UDim2.fromScale(0.05, 0.05)
+		cb.ZIndex = 20
+		cb.Activated:Connect(close)
 	end
 
-	UserInputService.InputBegan:Connect(function(input, processed)
-		if not processed and input.KeyCode == Enum.KeyCode.Escape and g.Enabled then
+	-- Escape schließt den Laptop. Roblox meldet Escape als „verarbeitet“ (eigenes Menü), deshalb
+	-- ohne diese Prüfung; zusätzlich beim Öffnen des Roblox-Menüs schließen.
+	UserInputService.InputBegan:Connect(function(input)
+		if input.KeyCode == Enum.KeyCode.Escape and g.Enabled then
+			close()
+		end
+	end)
+	GuiService.MenuOpened:Connect(function()
+		if g.Enabled then
 			close()
 		end
 	end)
