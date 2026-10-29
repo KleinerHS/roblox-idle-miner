@@ -203,3 +203,14 @@ Nicht verschoben: eine Rohr-Aufhänger-Gruppe weit außerhalb der Halle (Workspa
 **Fix:** `Grip` neutral (`CFrame.new()`): Stiel aufrecht, Hand im unteren Griffbereich (22 % der Höhe), Kopf oben, Spitzen nach vorne/hinten. Nur das 3D-Werkzeug betroffen, der Platzhalter ohne Vorlage bleibt unverändert.
 **Regression geprüft:** Play: Werkzeug ausgerüstet, Haltung von vorne und von der Seite angeschaut; keine Fehler in der Konsole.
 **Likely system:** ToolBuilder
+
+## BUG-018 – Autohaus: Spalt über Glasscheiben und Türen, Schiebetüren schließen nicht ganz
+
+**Severity:** Low
+**Status:** Fixed (TESTING_REQUIRED)
+**Build:** 0.58.6
+**Gemeldet:** Felix, 2026-10-29 („die Türen haben oben einen kleinen Spalt, genau so wie die großen Glasscheiben rund um das Gebäude; außerdem schließen die Schiebetüren nicht komplett“)
+**Ursache:** (1) In `glassWall` endete das Glas 0,6 Studs unter dem Kopfriegel (Höhe − 1,4 ab Brüstung). (2) Die Türflügel waren 0,1 kürzer als die Öffnung und je 0,3 schmaler als die halbe Tür (0,3 Lücke in der Mitte). (3) Die Tür öffnete im Umkreis von 12 Studs; die Kasse steht 7,2 Studs hinter der Tür, wer dort stand, hielt die Tür offen.
+**Fix:** Glas reicht bis unter den Kopfriegel (alle Glaswände des Autohauses). Flügel genau halb so breit wie die Tür (treffen sich in der Mitte) und 0,4 höher, sodass sie hinter dem Sturz enden. Auslösebereich ist jetzt ein Rechteck direkt vor und hinter der Tür (11 Studs seitlich, 6 Studs tief) statt eines Kreises.
+**Regression geprüft:** Play: 4 Studs vor der Tür → ganz offen; an der Kasse → ganz zu; Spalt zwischen den Flügeln 0; Flügel oben 14,0 über Sturz-Unterkante 13,6; Glas oben 25,15 über Kopfriegel-Unterkante 25,10.
+**Likely system:** VehicleShopBuilder, AutoDoorController

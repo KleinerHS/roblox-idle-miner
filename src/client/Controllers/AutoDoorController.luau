@@ -16,7 +16,7 @@ local TAG = "AutoDoor"
 local OPEN_TIME = 0.6
 
 type Leaf = { part: BasePart, closed: CFrame, dir: number }
-type Door = { model: Model, leaves: { Leaf }, center: Vector3, range: number, slide: number, open: number }
+type Door = { model: Model, leaves: { Leaf }, center: Vector3, range: number, slide: number, open: number, frame: CFrame?, half: Vector3? }
 local doors: { [Model]: Door } = {}
 
 local function track(model: Instance)
@@ -39,7 +39,18 @@ local function track(model: Instance)
 	if #leaves == 0 or typeof(center) ~= "Vector3" or typeof(range) ~= "number" or typeof(slide) ~= "number" then
 		return
 	end
-	doors[model] = { model = model, leaves = leaves, center = center, range = range, slide = slide, open = 0 }
+	local frame = model:GetAttribute("Frame")
+	local half = model:GetAttribute("HalfSize")
+	doors[model] = {
+		model = model,
+		leaves = leaves,
+		center = center,
+		range = range,
+		slide = slide,
+		open = 0,
+		frame = if typeof(frame) == "CFrame" then frame else nil,
+		half = if typeof(half) == "Vector3" then half else nil,
+	}
 end
 
 local function untrack(model: Instance)
@@ -52,8 +63,17 @@ local function someoneNear(door: Door): boolean
 	for _, player in Players:GetPlayers() do
 		local character = player.Character
 		local root = character and character:FindFirstChild("HumanoidRootPart")
-		if root and root:IsA("BasePart") and (root.Position - door.center).Magnitude <= door.range then
-			return true
+		if root and root:IsA("BasePart") then
+			local frame, half = door.frame, door.half
+			if frame and half then
+				-- Rechteck vor/hinter der Tür (Attribute Frame/HalfSize)
+				local l = frame:PointToObjectSpace(root.Position)
+				if math.abs(l.X) <= half.X and math.abs(l.Y) <= half.Y and math.abs(l.Z) <= half.Z then
+					return true
+				end
+			elseif (root.Position - door.center).Magnitude <= door.range then
+				return true
+			end
 		end
 	end
 	return false

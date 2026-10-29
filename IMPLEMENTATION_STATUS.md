@@ -847,6 +847,7 @@ Selbsttest (ohne Studio, tools/topdown): Draufsicht aller Parkplätze; Überschn
 |---|---|---|
 | Eingang 16 breit, keine Pfosten in der Öffnung, Oberlicht aus Glas | `VehicleShopBuilder.luau` | TESTING_REQUIRED |
 | Automatische Glas-Schiebetüren (öffnen ab 12 Studs Abstand, für alle Spieler) | `AutoDoorController.luau` (neu), `VehicleShopBuilder.luau` | TESTING_REQUIRED |
+| 0.58.6: BUG-018 – kein Spalt mehr über Glas und Türen, Flügel schließen ganz, Auslösebereich nur direkt vor/hinter der Tür | `VehicleShopBuilder.luau`, `AutoDoorController.luau` | TESTING_REQUIRED |
 
 Selbsttest per Studio-MCP: Play ohne Fehler; keine Pfosten/Sockel mehr in der Türöffnung; Spieler 40 Studs entfernt → Tür zu, 6 Studs vor der Tür → beide Flügel ganz offen (7,7 Studs).
 

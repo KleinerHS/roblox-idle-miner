@@ -79,7 +79,9 @@ local function glassWall(parent: Instance, name: string, o: CFrame, from: Vector
 		local skip = skipFrom and skipTo and mid > skipFrom and mid < skipTo
 		local center = from + unit * mid
 		if not skip then
-			local glass = part(parent, `{name}Glass{i}`, Vector3.new(step - 0.3, height - 1.4, 0.25), o * CFrame.new(center.X, 0.9 + (height - 1.4) / 2, center.Z) * CFrame.Angles(0, yaw, 0), GLASS, Enum.Material.Glass)
+			-- Glas von der Brüstung bis unter den Kopfriegel (BUG-018: vorher 0,6 Studs Spalt oben)
+			local glassH = height - 0.75
+			local glass = part(parent, `{name}Glass{i}`, Vector3.new(step - 0.3, glassH, 0.25), o * CFrame.new(center.X, 0.9 + glassH / 2, center.Z) * CFrame.Angles(0, yaw, 0), GLASS, Enum.Material.Glass)
 			glass.Transparency = 0.62
 			glass.CastShadow = false
 			part(parent, `{name}Sill{i}`, Vector3.new(step, 0.5, 0.6), o * CFrame.new(center.X, 0.85, center.Z) * CFrame.Angles(0, yaw, 0), FRAME, Enum.Material.SmoothPlastic)
@@ -139,17 +141,19 @@ function VehicleShopBuilder.build(parent: Instance): Model
 	local door = Instance.new("Model")
 	door.Name = "AutoDoor"
 	door.Parent = model
-	local leafW = doorW / 2 - 0.3
+	-- Flügel treffen sich genau in der Mitte und reichen bis hinter den Sturz (BUG-018)
+	local leafW = doorW / 2
+	local leafH = doorH + 0.4
 	for _, side in { -1, 1 } do
-		local cf = o * CFrame.new(side * (doorW / 4), 0.6 + doorH / 2, -hd + 0.5)
-		local leaf = part(door, `DoorLeaf{side}`, Vector3.new(leafW, doorH - 0.2, 0.2), cf, GLASS, Enum.Material.Glass)
+		local cf = o * CFrame.new(side * (doorW / 4), 0.6 + leafH / 2, -hd + 0.5)
+		local leaf = part(door, `DoorLeaf{side}`, Vector3.new(leafW, leafH, 0.2), cf, GLASS, Enum.Material.Glass)
 		leaf.Transparency = 0.5
 		leaf.CanCollide = false
 		leaf.CastShadow = false
 		leaf:SetAttribute("ClosedCF", cf)
 		leaf:SetAttribute("Dir", side)
 		-- Rahmen der Flügel (bewegen sich mit: eigene Flügel-Teile mit gleichem Versatz)
-		for k, spec in { { Vector3.new(leafW, 0.3, 0.3), Vector3.new(0, doorH / 2 - 0.25, 0) }, { Vector3.new(leafW, 0.3, 0.3), Vector3.new(0, -doorH / 2 + 0.25, 0) }, { Vector3.new(0.3, doorH - 0.2, 0.3), Vector3.new(-side * (leafW / 2 - 0.15), 0, 0) } } do
+		for k, spec in { { Vector3.new(leafW, 0.3, 0.3), Vector3.new(0, leafH / 2 - 0.15, 0) }, { Vector3.new(leafW, 0.3, 0.3), Vector3.new(0, -leafH / 2 + 0.15, 0) }, { Vector3.new(0.3, leafH, 0.3), Vector3.new(-side * (leafW / 2 - 0.15), 0, 0) } } do
 			local fcf = cf * CFrame.new(spec[2])
 			local f = part(door, `DoorLeafFrame{side}_{k}`, spec[1], fcf, DARK, Enum.Material.Metal)
 			f.CanCollide = false
@@ -159,6 +163,10 @@ function VehicleShopBuilder.build(parent: Instance): Model
 	end
 	door:SetAttribute("Center", (o * CFrame.new(0, 3, -hd)).Position)
 	door:SetAttribute("Range", 12)
+	-- Auslösebereich (BUG-018): nur direkt vor bzw. hinter der Tür, ±(Breite/2 + 3) seitlich und
+	-- 6 Studs tief; die Kasse steht 10 Studs hinter der Tür und hält sie so nicht mehr offen
+	door:SetAttribute("Frame", o * CFrame.new(0, 3, -hd))
+	door:SetAttribute("HalfSize", Vector3.new(doorW / 2 + 3, 6, 6))
 	door:SetAttribute("Slide", leafW)
 	CollectionService:AddTag(door, "AutoDoor")
 	part(model, "DoorMat", Vector3.new(doorW - 2, 0.1, 4), o * CFrame.new(0, 0.65, -hd + 2.4), DARK, Enum.Material.Fabric)
