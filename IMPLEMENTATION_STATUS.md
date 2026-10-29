@@ -25,7 +25,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 15 | Rare Drops & Mining Luck | TESTING_REQUIRED (15a, D-045) |
 | 16 | Verkauf & Spätspiel-Geld | TESTING_REQUIRED (16a, D-046) |
 | 17 | Icons | TESTING_REQUIRED (17a Erz- und Barren-Icons, 17b Kategorie-Icons) |
-| 18 | Fahrzeuge aus Felix' Modellen, Map-Mitte | TESTING_REQUIRED (18a: 4 Fahrzeuge; 18b: Durchfahr-Verladestraße, D-052; 18c: Lastzug mit echten Anhängern, D-053; 18d–18g Nachbesserungen, Startauto, Verkaufskreis; 18h Mitte D-057; 18i LKW-Laden D-058; 18j Kreisel D-059; 18k Shops D-060; 18l Lastzüge im Kreisel D-061; 18m Shops größer D-062; 18n Läden innen D-063; 18o Parkplätze D-064/D-065/D-067; 18p Podium D-070; 18q Spitzhacken-Pack D-071; 18r Autohaus-Drehteller D-072; 18s großer Parkplatz D-073; 18t Rucksack-Pack D-074; 18u Drill-Pack D-075, Rucksack-Leuchten D-076; 18x Laptop Mine OS D-079) |
+| 18 | Fahrzeuge aus Felix' Modellen, Map-Mitte | TESTING_REQUIRED (18a: 4 Fahrzeuge; 18b: Durchfahr-Verladestraße, D-052; 18c: Lastzug mit echten Anhängern, D-053; 18d–18g Nachbesserungen, Startauto, Verkaufskreis; 18h Mitte D-057; 18i LKW-Laden D-058; 18j Kreisel D-059; 18k Shops D-060; 18l Lastzüge im Kreisel D-061; 18m Shops größer D-062; 18n Läden innen D-063; 18o Parkplätze D-064/D-065/D-067; 18p Podium D-070; 18q Spitzhacken-Pack D-071; 18r Autohaus-Drehteller D-072; 18s großer Parkplatz D-073; 18t Rucksack-Pack D-074; 18u Drill-Pack D-075, Rucksack-Leuchten D-076; 18x Laptop Mine OS D-079; 18z Starter-Blechhütte D-081) |
 
 ## Setup – Details
 
@@ -840,6 +840,16 @@ Selbsttest: alle vier Läden im Bearbeitungsmodus von oben und innen angeschaut;
 | 0.51.6: Vorfeld der Shop-Parkplätze liegt unter dem Promenadenpflaster, die runde Kante verdeckt die Stufen der Asphaltstreifen (Nachtrag zu BUG-015) | `CenterBuilder` (`shopLot`) | TESTING_REQUIRED |
 
 Selbsttest (ohne Studio, tools/topdown): Draufsicht aller Parkplätze; Überschneidungsprüfung Asphalt gegen alle Teile: nichts steht mehr auf den Parkplätzen (vorher: Asphalt unter Shop-Fronten, Fahnen, Pylon, Schau-Drill, einer Gehweg-Laterne, einem Baum; großer Parkplatz auf Hütte 2 und Zaun). Lastzug-Simulation am Kreisel erneut gerechnet.
+
+### 18z (Version 0.60.0, 2026-10-30) – Neue Starter-Blechhütte (D-081)
+
+| System | Dateien / Instanzen | Status |
+|---|---|---|
+| Hütte 27 × 22 aus Felix' Paket statt der alten Part-Hütte, ohne Türblatt, Farben aus der GLB, unsichtbare Kollisionsboxen (Boden, Stufen, Wände, Fenster, Dach) | Place-Datei: `Workspace.HallLayout.Office.StarterHut` – **Place speichern!** Sicherung `assets/HallLayout.rbxm` (Rücktest 6.355 Objekte, 0 Abweichungen; wie bisher ohne die 8 Unions von Stuhl und Bett) | TESTING_REQUIRED |
+| Schreibtisch mit Laptop, Stuhl, Bett 0,48 höher; Schrank an die Rückwand (passt an der Seitenwand nicht unters Dach) | `Office/Desk`, `Chair`, `Bed`, `Wardrobe` | TESTING_REQUIRED |
+| Deko: Tischlampe, Holzkiste am Bett, Metallregal am Bett, Deckenlampe; beide Lampen mit echtem SpotLight | `Office/DeskLamp`, `BedsideCrate`, `BedShelf`, `CeilingLamp` | TESTING_REQUIRED |
+
+Selbsttest: Play ohne Fehler; Figur läuft über die Stufen durch den Eingang auf den Boden und wieder hinaus; keine Überschneidungen der Möbel (Lampe steht auf dem Tisch); Spawn-Anker auf dem Bett mit angehoben; Innen- und Außenansicht geprüft.
 
 ### 18y (Version 0.59.2, 2026-10-29) – Drill-Shop-Verkaufstresen (D-080)
 

@@ -527,3 +527,21 @@ Ergebnis mit den echten Teilen (`tools/topdown`): keine Berührung, knappster Ab
 **Source:** Felix, 2026-10-29 („im Game-Ordner ist jetzt auch ein Drill_Shop_Verkaufstresen, ich habe ihn schon importiert … füg ihn ein und stell auch einen Arbeiter dahinter“)
 **Decision:** Vorlage `ServerStorage.Vendor.DrillCounter` aus `Drill_Shop_Counter.glb` (Farben/Materialien aus der GLB: Shop-Orange, Graphit, gebürsteter Stahl, Gummi, Warn-Amber, Tasten, Gold; Bildschirm-Texturen „BUY“ und Terminal als SurfaceAppearance; nur das Gehäuse kollidiert). Der Tresen ersetzt den bisherigen Tresen aus Parts an derselben Stelle rechts am Eingang, gedreht, sodass der BUY-Bildschirm wie bisher zum Gang zeigt; Kasse (Prompt) und Schild „$ CASHIER“ bleiben. Verkäufer (Roblox-Figur, orange) an der Fußposition aus der Paket-Anleitung hinter dem Tresen, Blick zum Kunden. Ohne Vorlage baut der Code den alten Tresen mit Verkäufer.
 **Affected systems:** MachineShopBuilder, assets/DrillCounter.rbxm, tools/ExportRbxmx.luau (Content-Werte und SurfaceAppearance-Texturen werden jetzt mitgesichert)
+
+## D-081 – Neue Starter-Blechhütte (27 × 22) mit Deko und Lampen
+
+**Source:** Felix, 2026-10-30 („wir haben jetzt eine neue Blechhütte, der Tisch, Laptop, Bett und Schrank bleiben drinnen, es kommen noch paar Deko-Sachen dazu“; Paket `Starter_Blechhuette_27x22` mit `Starterhuette_Deko_4_Modelle`; zur Tür: „lass sie erst mal weg“)
+**Decision:** In `Workspace.HallLayout.Office` ersetzt das Modell `StarterHut` (aus `Starter_Blechhuette_27x22.glb`) die alte Hülle aus Parts (Boden, Wände, Giebel, Dach, Fenster, Lampe) an derselben Stelle und mit derselben Blickrichtung; Eingang vorne rechts.
+- Farben und Materialien aus der GLB übernommen (Wand-/Dach-/Türblech-Texturen kamen beim Import mit), Fenster aus Glas.
+- Türblatt weggelassen, der Eingang bleibt offen.
+- Die sichtbaren Meshes kollidieren nicht und reagieren nicht auf Raycasts (ihre automatische Kollisionshülle hätte den Raum ausgefüllt). Begehbar machen unsichtbare Boxen nach `Collision_Guide.json` (Boden, Stufen, Wände mit Tür- und Fensteröffnungen), dazu Boxen vor beiden Fenstern und zwei schräge Dachflächen (Ordner `StarterHut/Collision`).
+- Möbel 0,48 höher (der neue Boden liegt höher).
+- Der Schrank (8,96 hoch) passt an der Seitenwand nicht mehr unter das schräge Dach und steht jetzt mittig an der Rückwand zwischen Bett und Schreibtisch, Türen zum Raum.
+- Deko aus dem Paket, Farben aus der GLB, Holz als Wood-Material in der Farbe der Holztextur:
+  - `DeskLamp` auf dem Schreibtisch, SpotLight Richtung Laptop (Reichweite 7, Helligkeit 1,1, Winkel 85).
+  - `BedsideCrate` neben dem Kopfende des Betts.
+  - `BedShelf` an der linken Wand am Fußende des Betts.
+  - `CeilingLamp` unter dem First, SpotLight nach unten (18 / 1,7 / 115).
+  - Lichtfarbe #FFE2AB, Glühbirnen Neon, Werte aus `Lichtpunkte.json`.
+  - Kiste und Regal haben je eine unsichtbare Kollisionsbox.
+**Affected systems:** Place-Datei (`Workspace.HallLayout.Office`), `assets/HallLayout.rbxm`
