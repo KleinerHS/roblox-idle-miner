@@ -9,6 +9,7 @@
 --   Model "VehicleShop"
 --   Part  "CounterPromptPart" mit ProximityPrompt "ShopPrompt" (Attribute ShopId = "vehicle")
 
+local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
@@ -115,17 +116,51 @@ function VehicleShopBuilder.build(parent: Instance): Model
 	part(model, "Forecourt", Vector3.new(W, 0.3, 10), o * CFrame.new(0, 0.15, -hd - 5), Color3.fromRGB(150, 150, 146), Enum.Material.Concrete)
 
 	-- Glasfassaden: vorne (mit Eingang), links, rechts; hinten geschlossen
-	local doorW = 12
-	glassWall(model, "Front", o, Vector3.new(-hw, 0, -hd), Vector3.new(hw, 0, -hd), H, 6, hw - doorW / 2, hw + doorW / 2)
+	-- Eingang (Felix 2026-10-29): breiter, keine Pfosten in der Öffnung, Glas über der Tür,
+	-- automatische Glas-Schiebetüren (AutoDoorController auf dem Client)
+	local doorW, doorH = 16, 12
+	glassWall(model, "Front", o, Vector3.new(-hw, 0, -hd), Vector3.new(-doorW / 2, 0, -hd), H, 6)
+	glassWall(model, "FrontR", o, Vector3.new(doorW / 2, 0, -hd), Vector3.new(hw, 0, -hd), H, 6)
 	glassWall(model, "Left", o, Vector3.new(hw, 0, -hd), Vector3.new(hw, 0, hd), H, 7)
 	glassWall(model, "Right", o, Vector3.new(-hw, 0, hd), Vector3.new(-hw, 0, -hd), H, 7)
-	-- Eingang: Rahmen, offene Schiebetüren (in die Seiten geschoben), Fußmatte
+	-- Türrahmen, Sturz und Oberlicht bis unter das Dach
 	for _, side in { -1, 1 } do
-		part(model, `DoorFrame{side}`, Vector3.new(0.6, 11, 0.8), o * CFrame.new(side * doorW / 2, 6.1, -hd), DARK, Enum.Material.Metal)
-		local leaf = part(model, `DoorLeaf{side}`, Vector3.new(doorW / 2 - 0.4, 10, 0.2), o * CFrame.new(side * (doorW / 2 + doorW / 4 - 0.2), 5.6, -hd + 0.5), GLASS, Enum.Material.Glass)
-		leaf.Transparency = 0.55
+		part(model, `DoorFrame{side}`, Vector3.new(0.6, H, 0.8), o * CFrame.new(side * doorW / 2, 0.6 + H / 2, -hd), DARK, Enum.Material.Metal)
 	end
-	part(model, "DoorHeader", Vector3.new(doorW + 1.2, 1.2, 0.8), o * CFrame.new(0, 11.6, -hd), DARK, Enum.Material.Metal)
+	part(model, "DoorHeader", Vector3.new(doorW + 1.2, 1.2, 0.8), o * CFrame.new(0, 0.6 + doorH + 0.6, -hd), DARK, Enum.Material.Metal)
+	local topH = H - doorH - 1.2
+	local transom = part(model, "DoorTransomGlass", Vector3.new(doorW - 0.6, topH, 0.25), o * CFrame.new(0, 0.6 + doorH + 1.2 + topH / 2, -hd), GLASS, Enum.Material.Glass)
+	transom.Transparency = 0.62
+	transom.CastShadow = false
+	part(model, "DoorTransomBar", Vector3.new(doorW - 0.6, 0.25, 0.4), o * CFrame.new(0, H * 0.62, -hd), FRAME, Enum.Material.SmoothPlastic)
+	part(model, "DoorHead", Vector3.new(doorW, 0.5, 0.6), o * CFrame.new(0, H + 0.35, -hd), FRAME, Enum.Material.SmoothPlastic)
+	-- Schiebetüren: geschlossen gebaut, der Client schiebt sie auf, wenn jemand davor steht.
+	-- Laufen innen vor der Glasfront (z + 0.5), nicht kollidierend.
+	local door = Instance.new("Model")
+	door.Name = "AutoDoor"
+	door.Parent = model
+	local leafW = doorW / 2 - 0.3
+	for _, side in { -1, 1 } do
+		local cf = o * CFrame.new(side * (doorW / 4), 0.6 + doorH / 2, -hd + 0.5)
+		local leaf = part(door, `DoorLeaf{side}`, Vector3.new(leafW, doorH - 0.2, 0.2), cf, GLASS, Enum.Material.Glass)
+		leaf.Transparency = 0.5
+		leaf.CanCollide = false
+		leaf.CastShadow = false
+		leaf:SetAttribute("ClosedCF", cf)
+		leaf:SetAttribute("Dir", side)
+		-- Rahmen der Flügel (bewegen sich mit: eigene Flügel-Teile mit gleichem Versatz)
+		for k, spec in { { Vector3.new(leafW, 0.3, 0.3), Vector3.new(0, doorH / 2 - 0.25, 0) }, { Vector3.new(leafW, 0.3, 0.3), Vector3.new(0, -doorH / 2 + 0.25, 0) }, { Vector3.new(0.3, doorH - 0.2, 0.3), Vector3.new(-side * (leafW / 2 - 0.15), 0, 0) } } do
+			local fcf = cf * CFrame.new(spec[2])
+			local f = part(door, `DoorLeafFrame{side}_{k}`, spec[1], fcf, DARK, Enum.Material.Metal)
+			f.CanCollide = false
+			f:SetAttribute("ClosedCF", fcf)
+			f:SetAttribute("Dir", side)
+		end
+	end
+	door:SetAttribute("Center", (o * CFrame.new(0, 3, -hd)).Position)
+	door:SetAttribute("Range", 12)
+	door:SetAttribute("Slide", leafW)
+	CollectionService:AddTag(door, "AutoDoor")
 	part(model, "DoorMat", Vector3.new(doorW - 2, 0.1, 4), o * CFrame.new(0, 0.65, -hd + 2.4), DARK, Enum.Material.Fabric)
 
 	-- Rückwand: weiß mit roter Sockelleiste und großer LED-Wand

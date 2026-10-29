@@ -841,6 +841,15 @@ Selbsttest: alle vier Läden im Bearbeitungsmodus von oben und innen angeschaut;
 
 Selbsttest (ohne Studio, tools/topdown): Draufsicht aller Parkplätze; Überschneidungsprüfung Asphalt gegen alle Teile: nichts steht mehr auf den Parkplätzen (vorher: Asphalt unter Shop-Fronten, Fahnen, Pylon, Schau-Drill, einer Gehweg-Laterne, einem Baum; großer Parkplatz auf Hütte 2 und Zaun). Lastzug-Simulation am Kreisel erneut gerechnet.
 
+### 18w (Version 0.58.5, 2026-10-29) – Autohaus-Eingang mit Schiebetüren (D-078)
+
+| System | Dateien | Status |
+|---|---|---|
+| Eingang 16 breit, keine Pfosten in der Öffnung, Oberlicht aus Glas | `VehicleShopBuilder.luau` | TESTING_REQUIRED |
+| Automatische Glas-Schiebetüren (öffnen ab 12 Studs Abstand, für alle Spieler) | `AutoDoorController.luau` (neu), `VehicleShopBuilder.luau` | TESTING_REQUIRED |
+
+Selbsttest per Studio-MCP: Play ohne Fehler; keine Pfosten/Sockel mehr in der Türöffnung; Spieler 40 Studs entfernt → Tür zu, 6 Studs vor der Tür → beide Flügel ganz offen (7,7 Studs).
+
 ### 18v (Version 0.58.3, 2026-10-29) – Felix' Änderungen an den Läden (D-077)
 
 | System | Dateien | Status |
