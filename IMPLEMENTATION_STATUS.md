@@ -846,6 +846,7 @@ Selbsttest (ohne Studio, tools/topdown): Draufsicht aller Parkplätze; Überschn
 | System | Dateien | Status |
 |---|---|---|
 | Drill-Shop aufgeräumt (Fahne, Ständer, Verkaufsplätze, Theke, Reifen, Schriftzug weg; Wartebereich neu), Pickaxe-Shop ohne Fahnen, LKW-Laden mit einem Tor in der Mitte und Lounge weiter vorne | `MachineShopBuilder.luau`, `EquipmentShopBuilder.luau`, `TruckShopBuilder.luau` | TESTING_REQUIRED |
+| 0.58.4: Drill-Shop zwei Schauflächen rechts (MK8, MK11) vor Spind und Ölfässern, orange Fahne mit „DRILLS“ senkrecht | `MachineShopBuilder.luau` | TESTING_REQUIRED |
 
 Selbsttest: Vergleich der bearbeiteten Vorschau mit einem frischen Bau (Teil für Teil bzw. Modell für Modell); nach der Übernahme entspricht die neu gebaute Vorschau Felix' Stand; Play ohne Fehler.
 

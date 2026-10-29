@@ -13,6 +13,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local LayoutConfig = require(Shared.Config.LayoutConfig)
+local DrillModels = require(ReplicatedStorage:WaitForChild("Shared").Definitions.DrillModels)
 local Drills = require(Shared.Definitions.Drills)
 
 local DrillModelBuilder = require(script.Parent.DrillModelBuilder)
@@ -182,6 +183,29 @@ function MachineShopBuilder.build(parent: Instance): Model
 		-- nur noch die orange Fahne (Felix 2026-10-29: graue Fahne entfernt)
 		if side > 0 then
 			ShopDecor.flag(model, `Flag{side}`, o * CFrame.new(side * (W / 2 + 3), 0, -D / 2 - 2), ORANGE)
+			-- „DRILLS“ senkrecht auf beiden Seiten der Fahne (Felix 2026-10-29, Größe unverändert)
+			local banner = model:FindFirstChild(`Flag{side}Banner`)
+			if banner and banner:IsA("BasePart") then
+				for _, face in { Enum.NormalId.Right, Enum.NormalId.Left } do
+					local gui = Instance.new("SurfaceGui")
+					gui.Face = face
+					gui.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
+					gui.PixelsPerStud = 40
+					gui.LightInfluence = 0.4
+					gui.Parent = banner
+					local label = Instance.new("TextLabel")
+					label.AnchorPoint = Vector2.new(0.5, 0.5)
+					label.Position = UDim2.fromScale(0.5, 0.5)
+					label.Size = UDim2.fromScale(0.7, 0.92)
+					label.BackgroundTransparency = 1
+					label.Font = Enum.Font.GothamBlack
+					label.TextScaled = true
+					label.LineHeight = 0.85
+					label.TextColor3 = WHITE
+					label.Text = "D\nR\nI\nL\nL\nS"
+					label.Parent = gui
+				end
+			end
 		end
 		ShopDecor.planter(model, `DoorPlanter{side}`, o * CFrame.new(side * (doorW / 2 + 2.5), 0.6, -D / 2 - 2), 2.6)
 	end
@@ -397,6 +421,25 @@ function MachineShopBuilder.build(parent: Instance): Model
 		drum.Shape = Enum.PartType.Cylinder
 	end
 	-- Ersatzbohrköpfe-Ständer entfernt (Felix 2026-10-29)
+	-- Zwei Schauflächen an der rechten Seite vor Spind und Ölfässern (Felix 2026-10-29):
+	-- flaches Podest mit Warnstreifen, Drill mit der Bohrspitze zur Ladenmitte, Namensschild davor
+	for k, spec in { { z = 4.8, tier = 8 }, { z = 14, tier = 11 } } do
+		local def = Drills.List[math.min(spec.tier, #Drills.List)]
+		local px = -W / 2 + 14
+		local pad = o * CFrame.new(px, 0.6, spec.z)
+		local padL, padW = 14, 8
+		part(deco, `DrillPad{k}`, Vector3.new(padL, 0.8, padW), pad * CFrame.new(0, 0.4, 0), CONCRETE_DARK, Enum.Material.Concrete)
+		part(deco, `DrillPadTop{k}`, Vector3.new(padL - 0.6, 0.15, padW - 0.6), pad * CFrame.new(0, 0.85, 0), STEEL, Enum.Material.DiamondPlate)
+		hazardStrip(deco, `DrillPadEdge{k}`, padW - 0.6, pad * CFrame.new(padL / 2 - 0.2, 0.95, 0) * CFrame.Angles(0, math.rad(90), 0))
+		-- Bohrrichtung +X (zur Ladenmitte); Drill mittig auf dem Podest
+		local tip, rear = DrillModels.tipDistance(def.Tier), DrillModels.rearDistance(def.Tier)
+		local d = DrillModelBuilder.build(def, pad * CFrame.new(-(tip - rear) / 2, 0.92, 0) * CFrame.Angles(0, math.rad(-90), 0))
+		d.Name = `PadDrill{k}`
+		d.Parent = deco
+		local plate = part(deco, `DrillPadPlate{k}`, Vector3.new(4.4, 1.1, 0.2), pad * CFrame.new(padL / 2 + 0.8, 1.4, 0) * CFrame.Angles(0, math.rad(-90), 0) * CFrame.Angles(math.rad(-20), 0, 0), STEEL_DARK, Enum.Material.SmoothPlastic)
+		surfaceText(plate, def.DisplayName:upper(), WHITE)
+		part(deco, `DrillPadPost{k}`, Vector3.new(0.3, 1, 0.3), pad * CFrame.new(padL / 2 + 0.8, 0.5, 0), STEEL_DARK, Enum.Material.Metal)
+	end
 	-- Laufkran mit Kette und Haken über der Plattform
 	part(deco, "CraneRail", Vector3.new(W - 4, 0.8, 0.8), o * CFrame.new(0, H - 1.8, 7), STEEL_DARK, Enum.Material.Metal)
 	part(deco, "CraneTrolley", Vector3.new(1.6, 1, 1.4), o * CFrame.new(10.5, H - 2.7, 7), HAZARD_YELLOW, Enum.Material.Metal)
