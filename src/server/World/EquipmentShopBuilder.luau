@@ -145,10 +145,7 @@ function EquipmentShopBuilder.build(parent: Instance): Model
 	ShopDecor.roofSign(model, "RoofSign", o * CFrame.new(0, H + 4.8, -D / 2 + 2), W * 0.7, 6, "⛏ PICKAXES", BLUE, WHITE, BLUE_DARK)
 	-- Riesen-Spitzhacke auf dem Dach entfernt (Felix 2026-10-28)
 	for _, side in { -1, 1 } do
-		-- nur noch die weiße Fahne (Flag-1); die blaue (Flag1) hat Felix entfernt (2026-10-28)
-		if side < 0 then
-			ShopDecor.flag(model, `Flag{side}`, o * CFrame.new(side * (W / 2 + 3), 0, -D / 2 - 2), WHITE)
-		end
+		-- keine Fahnen mehr (Felix 2026-10-28 blaue, 2026-10-29 weiße entfernt)
 		ShopDecor.planter(model, `DoorPlanter{side}`, o * CFrame.new(side * (doorW / 2 + 2.2), 0.6, -D / 2 - 2), 2.6)
 	end
 	local benchCF = o * CFrame.new(-W / 4, 0.6, -D / 2 - 3.5) * CFrame.Angles(0, math.rad(180), 0)

@@ -179,7 +179,10 @@ function MachineShopBuilder.build(parent: Instance): Model
 		end
 	end
 	for _, side in { -1, 1 } do
-		ShopDecor.flag(model, `Flag{side}`, o * CFrame.new(side * (W / 2 + 3), 0, -D / 2 - 2), if side > 0 then ORANGE else STEEL_DARK)
+		-- nur noch die orange Fahne (Felix 2026-10-29: graue Fahne entfernt)
+		if side > 0 then
+			ShopDecor.flag(model, `Flag{side}`, o * CFrame.new(side * (W / 2 + 3), 0, -D / 2 - 2), ORANGE)
+		end
 		ShopDecor.planter(model, `DoorPlanter{side}`, o * CFrame.new(side * (doorW / 2 + 2.5), 0.6, -D / 2 - 2), 2.6)
 	end
 	-- Schau-Drill auf dem Vorplatz (bleibt vom Parkplatz davor frei, D-065)
@@ -393,16 +396,7 @@ function MachineShopBuilder.build(parent: Instance): Model
 		local drum = part(deco, `Drum{i}`, Vector3.new(2.6, 1.6, 1.6), o * CFrame.new(-W / 2 + 3.6 + p.X, 2.3, 13.2 + p.Y) * CFrame.Angles(0, 0, math.rad(90)), if i == 3 then Color3.fromRGB(190, 50, 40) else Color3.fromRGB(40, 90, 150), Enum.Material.Metal)
 		drum.Shape = Enum.PartType.Cylinder
 	end
-	-- Ersatzbohrköpfe auf einem Ständer neben der Plattform
-	local stand = o * CFrame.new(15, 0, -9.5)
-	part(deco, "BitStandBase", Vector3.new(2.4, 0.3, 2.4), stand * CFrame.new(0, 0.75, 0), STEEL_DARK, Enum.Material.Metal)
-	for i = 1, 3 do
-		local a = math.rad(i * 120)
-		local bitCF = stand * CFrame.new(math.cos(a) * 0.6, 1.4, math.sin(a) * 0.6)
-		local core = part(deco, `SpareBit{i}`, Vector3.new(1, 0.7, 0.7), bitCF * CFrame.Angles(0, 0, math.rad(90)), Color3.fromRGB(90, 92, 98), Enum.Material.Metal)
-		core.Shape = Enum.PartType.Cylinder
-		part(deco, `SpareBitTip{i}`, Vector3.new(0.3, 0.4, 0.3), bitCF * CFrame.new(0, 0.7, 0), STEEL_LIGHT_C, Enum.Material.SmoothPlastic)
-	end
+	-- Ersatzbohrköpfe-Ständer entfernt (Felix 2026-10-29)
 	-- Laufkran mit Kette und Haken über der Plattform
 	part(deco, "CraneRail", Vector3.new(W - 4, 0.8, 0.8), o * CFrame.new(0, H - 1.8, 7), STEEL_DARK, Enum.Material.Metal)
 	part(deco, "CraneTrolley", Vector3.new(1.6, 1, 1.4), o * CFrame.new(10.5, H - 2.7, 7), HAZARD_YELLOW, Enum.Material.Metal)
@@ -448,9 +442,7 @@ function MachineShopBuilder.build(parent: Instance): Model
 
 	-- Bodenzonen: Gehweg-Linien und Servicebereich
 	ShopInterior.rug(inside, "ServiceFloor", o * CFrame.new(W / 2 - 13, 0.6, D / 2 - 12), 22, 20, Color3.fromRGB(96, 98, 102))
-	local serviceText = part(inside, "ServiceFloorText", Vector3.new(14, 0.05, 3), o * CFrame.new(W / 2 - 13, 0.68, D / 2 - 20), Color3.fromRGB(96, 98, 102), Enum.Material.SmoothPlastic)
-	serviceText.CanCollide = false
-	ShopInterior.text(serviceText, "SERVICE AREA", HAZARD_YELLOW, Enum.NormalId.Top, true)
+	-- Schriftzug „SERVICE AREA“ auf dem Boden entfernt (Felix 2026-10-29)
 
 	-- Zwei Deko-Drills auf Podesten im vorderen Showroom (D-075: Laden nur mit 3–4 Drills)
 	for k, tier in { 5, 12 } do
@@ -464,36 +456,24 @@ function MachineShopBuilder.build(parent: Instance): Model
 	end
 	ShopInterior.hangingSign(inside, "ShowroomSign", o * CFrame.new(0, signY, -2), "SHOWROOM", ORANGE, WHITE, 12, H - 1)
 
-	-- Verkaufsplätze an der rechten Wand (lokal −X): Schreibtisch, Mitarbeiter, zwei Kundenstühle
-	for k, z in { -6, 8 } do
-		local deskCF = o * CFrame.new(-W / 2 + 9, 0.6, z) * CFrame.Angles(0, math.rad(-90), 0)
-		ShopInterior.desk(inside, `SalesDesk{k}`, deskCF, WHITE, ORANGE_DARK)
-		ShopInterior.officeChair(inside, `StaffChair{k}`, deskCF * CFrame.new(0, 0, 2.8) * CFrame.Angles(0, math.rad(180), 0), STEEL_DARK)
-		for _, dx in { -1.6, 1.6 } do
-			ShopInterior.officeChair(inside, `GuestChair{k}{dx}`, deskCF * CFrame.new(dx, 0, -3), Color3.fromRGB(160, 70, 30))
-		end
-	end
+	-- Verkaufsplätze an der rechten Wand entfernt (Felix 2026-10-29), Schild bleibt
 	ShopInterior.hangingSign(inside, "SalesSign", o * CFrame.new(-W / 2 + 11, signY, 1) * CFrame.Angles(0, math.rad(90), 0), "SALES", STEEL_DARK, ORANGE, 8, H - 1)
 	ShopInterior.poster(inside, "PosterPower", o * CFrame.new(-W / 2 + t + 0.25, 10, -6) * CFrame.Angles(0, math.rad(-90), 0), 6, 7, "MORE\nPOWER!", ORANGE, WHITE)
 	ShopInterior.poster(inside, "PosterDrill", o * CFrame.new(-W / 2 + t + 0.25, 10, 8) * CFrame.Angles(0, math.rad(-90), 0), 6, 7, "DRILL\nDEEPER", STEEL_DARK, HAZARD_YELLOW)
-	ShopInterior.brochureStand(inside, "Brochures", o * CFrame.new(-W / 2 + 16, 0.6, 1) * CFrame.Angles(0, math.rad(-90), 0), { ORANGE, HAZARD_YELLOW, WHITE })
 	ShopInterior.plant(inside, "SalesPlant", o * CFrame.new(-W / 2 + 4, 0.6, 17.5), 6) -- hinter der Ölwanne
 
 	-- Wartebereich vorne rechts neben der Kasse: Sessel, Tisch, Kaffee, Fernseher
 	local wait = o * CFrame.new(-W / 2 + 12, 0.6, -D / 2 + 17)
-	for k, dx in { -4, 0, 4 } do
-		ShopInterior.armchair(inside, `WaitChair{k}`, wait * CFrame.new(dx, 0, 2.5) * CFrame.Angles(0, math.rad(180), 0), Color3.fromRGB(70, 74, 80))
+	-- Anordnung von Felix (2026-10-29): Sessel weiter nach vorne, nebeneinander, Tisch davor
+	for k, p in { Vector2.new(-4, -13.5), Vector2.new(0, -13.5), Vector2.new(-8, -13.2) } do
+		ShopInterior.armchair(inside, `WaitChair{k}`, wait * CFrame.new(p.X, 0, p.Y) * CFrame.Angles(0, math.rad(180), 0), Color3.fromRGB(70, 74, 80))
 	end
-	ShopInterior.coffeeTable(inside, "WaitTable", wait * CFrame.new(0, 0, -1.5))
+	ShopInterior.coffeeTable(inside, "WaitTable", wait * CFrame.new(-4, 0, -6.5))
 	ShopInterior.coffeeCorner(inside, "Coffee", o * CFrame.new(-W / 2 + 21, 0.6, -D / 2 + 3) * CFrame.Angles(0, math.rad(180), 0)) -- neben der Eingangspflanze
 	ShopInterior.tv(inside, "WaitTV", o * CFrame.new(-W / 2 + t + 0.3, 9, -D / 2 + 17) * CFrame.Angles(0, math.rad(-90), 0), 8, "⚙ NEW: " .. Drills.List[math.min(#Drills.List, 6)].DisplayName:upper(), ORANGE_DARK)
 
-	-- Ersatzteiltheke hinten rechts mit Regalwand
-	local partsCF = o * CFrame.new(-W / 2 + 12, 0.6, D / 2 - 12)
-	part(inside, "PartsCounter", Vector3.new(14, 3.6, 2.6), partsCF * CFrame.new(0, 1.8, 0), STEEL_DARK, Enum.Material.Metal)
-	part(inside, "PartsCounterTop", Vector3.new(14.4, 0.3, 3), partsCF * CFrame.new(0, 3.75, 0), ORANGE_DARK, Enum.Material.Metal)
-	part(inside, "PartsBell", Vector3.new(0.6, 0.4, 0.6), partsCF * CFrame.new(-5, 4.1, -0.6), HAZARD_YELLOW, Enum.Material.Metal)
-	ShopInterior.officeChair(inside, "PartsChair", partsCF * CFrame.new(2, 0, 3) * CFrame.Angles(0, math.rad(180), 0), STEEL_DARK)
+	-- Ersatzteile hinten rechts: Regalwand
+	-- Theke, Klingel und Stuhl entfernt (Felix 2026-10-29), Regal und Schild bleiben
 	ShopInterior.wallShelf(inside, "PartsShelf", o * CFrame.new(-W / 2 + 12, 0.6, D / 2 - t - 1.1), 20, 4, goods, rng2)
 	ShopInterior.hangingSign(inside, "PartsSign", o * CFrame.new(-W / 2 + 12, signY, D / 2 - 12), "PARTS", HAZARD_YELLOW, DARK, 8, H - 1)
 
@@ -507,7 +487,6 @@ function MachineShopBuilder.build(parent: Instance): Model
 	local serviced = DrillModelBuilder.build(Drills.List[1], service * CFrame.new(0, 4, 0) * CFrame.Angles(0, math.rad(90), 0))
 	serviced.Name = "ServiceDrill"
 	serviced.Parent = inside
-	ShopInterior.tireStack(inside, "SpareWheels", service * CFrame.new(-8.5, 0, -6), 3, 1.4)
 	ShopInterior.hangingSign(inside, "ServiceSign", o * CFrame.new(W / 2 - 13, signY, D / 2 - 22), "SERVICE", STEEL_DARK, HAZARD_YELLOW, 9, H - 1)
 
 	-- Eingang: Notausgang-Schild, Pflanzen, Uhr

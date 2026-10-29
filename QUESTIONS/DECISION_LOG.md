@@ -489,3 +489,9 @@ Ergebnis mit den echten Teilen (`tools/topdown`): keine Berührung, knappster Ab
 **Source:** Felix, 2026-10-28 („sie sollen ab Stufe 9 leuchten, aber bis Stufe 13 nur ganz leicht, danach immer stärker; gegen Ende können sie auch ruhig überbelichtet sein“)
 **Decision:** `BackpackModels.applyGlow(model, tier)` setzt die Stärke je Stufe: bis Stufe 13 schwach (Neon halb durchsichtig, kleines Licht), ab 14 steigend, Stufe 22 maximal (Farbe Richtung Weiß, Licht Reichweite 12, Helligkeit 3,2). Die Modelle der Stufen 1–9 haben keine Leuchtteile; sichtbar wird es daher ab Stufe 10.
 **Affected systems:** BackpackModels
+
+## D-077 – Felix' Änderungen an Drill-Shop, Pickaxe-Shop und LKW-Laden übernommen
+
+**Source:** Felix, 2026-10-29 („ich habe gerade ein paar Veränderungen an der Map gemacht, speicher sie bitte“), in der Studio-Vorschau bearbeitet; per Vergleich mit einem frischen Bau ermittelt (Umgebung, Straßen, Parkplätze unverändert)
+**Decision:** Drill-Shop: graue Fahne, Ersatzbohrköpfe-Ständer, Schriftzug „SERVICE AREA“, beide Verkaufsplätze (Schreibtische, Stühle), Prospektständer, Ersatzteiltheke mit Klingel und Stuhl sowie der Reifenstapel entfallen; Wartebereich: drei Sessel nebeneinander weiter vorne, Tisch davor. Pickaxe-Shop: auch die weiße Fahne entfällt (keine Fahnen mehr). LKW-Laden: statt zwei Toren links und rechts ein großes offenes Tor in der Mitte (32 Studs, gegenüber der Zufahrt), die Seiten sind verglast; Sofa und Tisch der Lounge 6 bzw. 5,5 Studs weiter nach vorne. Zwei doppelte Glasscheiben, die direkt in Workspace lagen, wurden entfernt.
+**Affected systems:** MachineShopBuilder, EquipmentShopBuilder, TruckShopBuilder

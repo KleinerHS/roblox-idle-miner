@@ -184,9 +184,10 @@ function TruckShopBuilder.build(parent: Instance): Model
 		part(model, `Plinth{side}`, Vector3.new(1.2, 2, D), o * CFrame.new(side * (hw - 0.5), floorTop + 1, 0), WALL_DARK, Enum.Material.Concrete)
 	end
 	part(model, "PlinthBack", Vector3.new(W, 2, 1.2), o * CFrame.new(0, floorTop + 1, hd - 0.5), WALL_DARK, Enum.Material.Concrete)
-	-- Glasfront mit zwei großen offenen Toren (durchfahrbar)
-	local gateW = 24
-	local gates = { -hw / 2, hw / 2 }
+	-- Glasfront mit einem großen offenen Tor in der Mitte (Felix 2026-10-29: statt zwei Toren
+	-- links/rechts, gegenüber der Zufahrt)
+	local gateW = 32
+	local gates = { 0 }
 	local x = -hw
 	local panel = 8
 	local i = 0
@@ -381,8 +382,9 @@ function TruckShopBuilder.build(parent: Instance): Model
 	end
 	-- Lounge vorne links (lokal +X) in der Ecke
 	local lounge = o * CFrame.new(hw - 10, floorTop, -hd + FZ - 5)
-	ShopInterior.sofa(inside, "LoungeSofa", lounge, 10, DARK)
-	ShopInterior.coffeeTable(inside, "LoungeTable", lounge * CFrame.new(0, 0, -5))
+	-- Sofa und Tisch etwas weiter nach vorne (Felix 2026-10-29)
+	ShopInterior.sofa(inside, "LoungeSofa", lounge * CFrame.new(0, 0, -6), 10, DARK)
+	ShopInterior.coffeeTable(inside, "LoungeTable", lounge * CFrame.new(0, 0, -10.46))
 	ShopInterior.tv(inside, "LoungeTV", o * CFrame.new(hw - 1.2, 10, -hd + FZ / 2) * CFrame.Angles(0, math.rad(90), 0), 9, "🚛 ROAD TRAINS", ORANGE_DARK)
 	-- Kaffee vorne rechts an der Seitenwand
 	ShopInterior.coffeeCorner(inside, "Coffee", o * CFrame.new(-hw + 2.4, floorTop, -hd + FZ / 2) * CFrame.Angles(0, math.rad(-90), 0))

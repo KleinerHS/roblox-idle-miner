@@ -841,6 +841,14 @@ Selbsttest: alle vier Läden im Bearbeitungsmodus von oben und innen angeschaut;
 
 Selbsttest (ohne Studio, tools/topdown): Draufsicht aller Parkplätze; Überschneidungsprüfung Asphalt gegen alle Teile: nichts steht mehr auf den Parkplätzen (vorher: Asphalt unter Shop-Fronten, Fahnen, Pylon, Schau-Drill, einer Gehweg-Laterne, einem Baum; großer Parkplatz auf Hütte 2 und Zaun). Lastzug-Simulation am Kreisel erneut gerechnet.
 
+### 18v (Version 0.58.3, 2026-10-29) – Felix' Änderungen an den Läden (D-077)
+
+| System | Dateien | Status |
+|---|---|---|
+| Drill-Shop aufgeräumt (Fahne, Ständer, Verkaufsplätze, Theke, Reifen, Schriftzug weg; Wartebereich neu), Pickaxe-Shop ohne Fahnen, LKW-Laden mit einem Tor in der Mitte und Lounge weiter vorne | `MachineShopBuilder.luau`, `EquipmentShopBuilder.luau`, `TruckShopBuilder.luau` | TESTING_REQUIRED |
+
+Selbsttest: Vergleich der bearbeiteten Vorschau mit einem frischen Bau (Teil für Teil bzw. Modell für Modell); nach der Übernahme entspricht die neu gebaute Vorschau Felix' Stand; Play ohne Fehler.
+
 ### 18u (Version 0.58.0, 2026-10-28) – Drill-Pack (D-075) und Rucksack-Leuchten (D-076)
 
 | System | Dateien / Instanzen | Status |
