@@ -7,6 +7,8 @@
 *.rbxmx
 !assets/**/*.rbxm
 !assets/**/*.rbxmx
+# UI-Vorlagen im Quellcode (D-079: Laptop-Oberfläche)
+!src/client/UI/*.rbxmx
 
 # Build-Ausgaben
 /build/
