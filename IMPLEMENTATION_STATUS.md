@@ -25,7 +25,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 15 | Rare Drops & Mining Luck | TESTING_REQUIRED (15a, D-045) |
 | 16 | Verkauf & Spätspiel-Geld | TESTING_REQUIRED (16a, D-046) |
 | 17 | Icons | TESTING_REQUIRED (17a Erz- und Barren-Icons, 17b Kategorie-Icons) |
-| 18 | Fahrzeuge aus Felix' Modellen, Map-Mitte | TESTING_REQUIRED (18a: 4 Fahrzeuge; 18b: Durchfahr-Verladestraße, D-052; 18c: Lastzug mit echten Anhängern, D-053; 18d–18g Nachbesserungen, Startauto, Verkaufskreis; 18h Mitte D-057; 18i LKW-Laden D-058; 18j Kreisel D-059; 18k Shops D-060; 18l Lastzüge im Kreisel D-061; 18m Shops größer D-062; 18n Läden innen D-063; 18o Parkplätze D-064/D-065/D-067; 18p Podium D-070; 18q Spitzhacken-Pack D-071; 18r Autohaus-Drehteller D-072; 18s großer Parkplatz D-073; 18t Rucksack-Pack D-074; 18u Drill-Pack D-075, Rucksack-Leuchten D-076) |
+| 18 | Fahrzeuge aus Felix' Modellen, Map-Mitte | TESTING_REQUIRED (18a: 4 Fahrzeuge; 18b: Durchfahr-Verladestraße, D-052; 18c: Lastzug mit echten Anhängern, D-053; 18d–18g Nachbesserungen, Startauto, Verkaufskreis; 18h Mitte D-057; 18i LKW-Laden D-058; 18j Kreisel D-059; 18k Shops D-060; 18l Lastzüge im Kreisel D-061; 18m Shops größer D-062; 18n Läden innen D-063; 18o Parkplätze D-064/D-065/D-067; 18p Podium D-070; 18q Spitzhacken-Pack D-071; 18r Autohaus-Drehteller D-072; 18s großer Parkplatz D-073; 18t Rucksack-Pack D-074; 18u Drill-Pack D-075, Rucksack-Leuchten D-076; 18x Laptop Mine OS D-079) |
 
 ## Setup – Details
 
@@ -840,6 +840,18 @@ Selbsttest: alle vier Läden im Bearbeitungsmodus von oben und innen angeschaut;
 | 0.51.6: Vorfeld der Shop-Parkplätze liegt unter dem Promenadenpflaster, die runde Kante verdeckt die Stufen der Asphaltstreifen (Nachtrag zu BUG-015) | `CenterBuilder` (`shopLot`) | TESTING_REQUIRED |
 
 Selbsttest (ohne Studio, tools/topdown): Draufsicht aller Parkplätze; Überschneidungsprüfung Asphalt gegen alle Teile: nichts steht mehr auf den Parkplätzen (vorher: Asphalt unter Shop-Fronten, Fahnen, Pylon, Schau-Drill, einer Gehweg-Laterne, einem Baum; großer Parkplatz auf Hütte 2 und Zaun). Lastzug-Simulation am Kreisel erneut gerechnet.
+
+### 18x (Version 0.59.0, 2026-10-29) – Laptop „Mine OS“ V4 (D-079)
+
+| System | Dateien | Status |
+|---|---|---|
+| V4-Oberfläche (Desktop, Taskleiste, 9 maximierte Apps, Prestige-Dialog) | `src/client/UI/MineOS_Laptop.rbxmx` (neu, aus Felix' Paket) | TESTING_REQUIRED |
+| Navigation: nur Taskleiste, eine App maximiert, Minimieren/Schließen → Desktop, Taskleisten-X schließt den Laptop, Escape schließt | `LaptopController.luau` (neu geschrieben) | TESTING_REQUIRED |
+| Alle Apps mit echten Werten und Aktionen (Worker, Kisten, Elevator-Upgrade, Drills, Luck, Prestige, Handelsanfragen); Beispiel-Upgrades ohne Spielsystem ersetzt oder ausgeblendet | `LaptopController.luau` | TESTING_REQUIRED |
+| Hotbar ausgeblendet, solange der Laptop offen ist | `LaptopController.luau` | TESTING_REQUIRED |
+| Kleine Bildschirme: Texte skalieren, volle Höhe unter 500 px | `LaptopController.luau` | TESTING_REQUIRED |
+
+Selbsttest per Studio-MCP (echte Mausklicks auf die Taskleiste): alle 9 Apps öffnen einzeln, maximiert, mit Markierung in der Taskleiste und echten Werten (Felix' Spielstand: Level 17, $10.15K, Lager 8.000/8.000, 1 Worker wartend, Drill MK1 Lv 2, Elevator 350); Minimieren → Desktop, App-X → Desktop, Taskleisten-X → Laptop zu, Hotbar und Kamera zurück. Größentest 640×360, 812×375, 1024×768, 1366×768, 1920×1080, 2560×1440 über alle Apps: kein Textüberlauf; kleinste Schrift 7 px (Handy), sonst ≥ 9 px. Nicht getestet: Prestige-Bestätigung (braucht Level 100) und Kaufaktionen (hätten Felix' Spielstand verändert) – die Remotes sind dieselben wie vorher. Bild nicht geprüft (Studio-Ansicht schwarz).
 
 ### 18w (Version 0.58.5, 2026-10-29) – Autohaus-Eingang mit Schiebetüren (D-078)
 

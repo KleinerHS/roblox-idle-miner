@@ -502,3 +502,21 @@ Ergebnis mit den echten Teilen (`tools/topdown`): keine Berührung, knappster Ab
 **Source:** Felix, 2026-10-29 („beim Autohaus müssen noch Glasscheiben über die Eingangstür, außerdem gehen die Stangen da einfach durch; mach den Eingang etwas größer und mach bitte Glas-Schiebetüren, die sich automatisch öffnen“)
 **Decision:** Eingang 16 Studs breit (vorher 12) und 12 hoch. Die Glasfront besteht aus zwei getrennten Abschnitten links und rechts der Tür, damit keine Pfosten mehr in der Öffnung stehen; Türrahmen bis unters Dach, Sturz, darüber ein Oberlicht aus Glas mit Querriegel. Zwei gläserne Schiebeflügel mit dunklem Rahmen öffnen sich automatisch (je 7,7 Studs zur Seite, innen vor der Glasfront), sobald irgendein Spieler höchstens 12 Studs vor der Tür steht, und schließen wieder. Rein optisch und auf jedem Client berechnet (`AutoDoorController`, Tag „AutoDoor“), Flügel nicht kollidierend.
 **Affected systems:** VehicleShopBuilder, AutoDoorController (neu), Bootstrap (Client)
+
+## D-079 – Laptop-Oberfläche „Mine OS“ V4 integriert
+
+**Source:** Felix, 2026-10-29 („Bitte integriere das Laptop-Overlay aus Version V4 … dunkles Design beibehalten, Apps ausschließlich über die Taskleiste, immer maximiert oberhalb der Taskleiste, Taskleiste bleibt beim App-Wechsel sichtbar, Schließen/Minimieren führt zum leeren Desktop, das X in der Taskleiste schließt den gesamten Laptop … mit vorhandenen Spielsystemen verbinden, tatsächliche Regeln verwenden, bestehende Systeme erhalten, alle Apps und Bildschirmgrößen testen“), Paket `Laptop_Overlay_MineOS_V4` (CLAUDE_HANDOFF.md, UI_BINDINGS.json)
+**Decision:** Die Oberfläche liegt unverändert als `src/client/UI/MineOS_Laptop.rbxmx` im Projekt (keine Scripts). `LaptopController` klont sie und verbindet sie mit den Spielsystemen; der alte Laptop (Seitenleiste) entfällt, seine Funktionen bleiben erhalten:
+- Navigation genau nach Vorgabe; Start immer auf dem leeren Desktop; Escape schließt den Laptop wie bisher; Kamera-Zoom wie bisher.
+- Overview: alle sechs Kacheln mit echten Werten, Hinweisleiste je nach Zustand (Lager fehlt/voll, Mitarbeiter unbezahlt, alles läuft).
+- Employees: statt Beispiel-Crew/„Hire employee“ die echten Slots je Mine (Reiter) mit Einstellen/Entlassen und Drill entfernen; Mitarbeiter-Upgrade und Team-Effizienz gibt es nicht.
+- Storage: Kapazität wächst bei uns über Kisten (D-037) → Karte „Storage crates“ mit Kistenkauf; statt „Transfer rate“ (kein System) die Liste der gelagerten Materialien.
+- Elevator: Status und echtes Kapazitäts-Upgrade; statt „Transport speed“ der Durchsatz (Info); Schalter „Automatic transport“ ausgeblendet (der Elevator fährt immer automatisch).
+- Production: Gesamtausstoß mit Schmelzer-Status, Maschinen-Karte blättert durch die platzierten Drills (Entfernen), Upgrade-Karte = Drill-Level (D-043), Inventar-Hinweis.
+- Luck: echte Chance, Level, Preis, Level-Voraussetzung; Fundprofil je Hit aus BalanceConfig.RareDrops (normal, Bonus ×2–×3, Bonus ×4–×10, seltenes Erz); Benachrichtigungs-Schalter ausgeblendet.
+- Company: Name mit Logo, Besitzer, Farbe und Logo als Info-Karten statt der Beispiel-Upgrades „Logistics“/„Workforce training“ (kein System).
+- Prestige: Zähler, Bonus nach dem nächsten Prestige, Level-Voraussetzung (100) mit Balken; „Review prestige“ öffnet den Bestätigungsdialog (deckt die Taskleiste nicht ab) mit Reset-/Behalten-Liste und 3 Sekunden Wartezeit.
+- Settings: echte Einstellung Handelsanfragen; Sound/Benachrichtigungen/Rare-Find-Alerts ohne Spielsystem ausgeblendet; Erscheinungsbild fest „Dark“.
+- Taskleiste: Kontostand, Firmenname, lokale Uhrzeit/Datum, Markierung der aktiven App. Die Roblox-Hotbar wird ausgeblendet, solange der Laptop offen ist (sie lag über dem Company-Knopf).
+- Kleine Bildschirme: alle Texte skalieren (Obergrenze Originalgröße, mindestens 7 px), auf Bildschirmen unter 500 px Höhe nutzt der Laptop die volle Höhe.
+**Affected systems:** LaptopController (neu geschrieben), UI/MineOS_Laptop.rbxmx (neu)

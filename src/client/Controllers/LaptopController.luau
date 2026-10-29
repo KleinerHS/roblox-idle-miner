@@ -1,17 +1,21 @@
 --!strict
--- Firmen-Laptop (docs/09 §21–28): kurzer Kamera-Zoom auf den Laptop, dann eine saubere
--- Firmen-Oberfläche mit App-Leiste. DASHBOARD (Überblick), EMPLOYEES (Worker einstellen/
--- entlassen, Drills an Mining-Slots), STORAGE und ELEVATOR (Bestand, Kapazität, Upgrades),
--- PRODUCTION (Drills mit Status, Inventar). COMPANY später.
--- Kein Windows-Klon (docs/20). Einstellen/Entlassen prüft der Server.
+-- Firmen-Laptop „Mine OS“ (D-079, Oberfläche V4 aus Felix' Paket Laptop_Overlay_MineOS_V4):
+-- dunkles Graphit-Design, Apps nur über die Taskleiste, immer maximiert über der Taskleiste,
+-- Taskleiste bleibt beim App-Wechsel sichtbar, Minimieren/Schließen führt zum leeren Desktop,
+-- das X in der Taskleiste schließt den ganzen Laptop.
+--
+-- Die Oberfläche (UI/MineOS_Laptop.rbxmx) ist reine Optik ohne Scripts. Dieser Controller
+-- verbindet sie mit den echten Spielsystemen (Werte aus dem Snapshot, Aktionen über die
+-- vorhandenen Remotes; der Server prüft alles erneut). Beispielwerte und Beispiel-Upgrades
+-- aus dem Paket, für die es kein Spielsystem gibt, werden ersetzt oder ausgeblendet.
 
 local Players = game:GetService("Players")
+local StarterGui = game:GetService("StarterGui")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
-local UITheme = require(Shared.Config.UITheme)
 local Mines = require(Shared.Definitions.Mines)
 local Materials = require(Shared.Definitions.Materials)
 local WorkerRoles = require(Shared.Definitions.WorkerRoles)
@@ -28,8 +32,6 @@ local CrateLogic = require(Shared.Util.CrateLogic)
 
 local Net = require(script.Parent.Parent.Net)
 local Create = require(script.Parent.Parent.UI.Create)
-local CategoryIcon = require(script.Parent.Parent.UI.Components.CategoryIcon)
-local OreIcon = require(script.Parent.Parent.UI.Components.OreIcon)
 local Strings = require(script.Parent.Parent.UI.Strings)
 local StateController = require(script.Parent.StateController)
 local PlotController = require(script.Parent.PlotController)
@@ -40,55 +42,80 @@ local TEXT = Strings.Laptop
 local LaptopController = {}
 
 local player = Players.LocalPlayer
-local gui: ScreenGui
-local content: Frame
-local headerName: TextLabel
-local navButtons: { [string]: TextButton } = {}
-local currentApp = "DASHBOARD"
--- Icon je Laptop-App
-local APP_ICONS: { [string]: string } = {
-	DASHBOARD = "Dashboard",
-	EMPLOYEES = "Worker",
-	STORAGE = "Storage",
-	ELEVATOR = "Elevator",
-	PRODUCTION = "Drill",
-	LUCK = "Luck",
-	COMPANY = "Company",
-	PRESTIGE = "Prestige",
+
+-- Farben aus THEME.json des Pakets
+local C = {
+	ink = Color3.fromRGB(23, 27, 34),
+	surface = Color3.fromRGB(30, 35, 44),
+	panel = Color3.fromRGB(36, 42, 52),
+	panel2 = Color3.fromRGB(44, 51, 62),
+	line = Color3.fromRGB(58, 66, 79),
+	text = Color3.fromRGB(238, 240, 244),
+	muted = Color3.fromRGB(164, 173, 186),
+	faint = Color3.fromRGB(120, 131, 145),
+	accent = Color3.fromRGB(154, 184, 231),
+	primary = Color3.fromRGB(72, 120, 201),
+	amber = Color3.fromRGB(211, 176, 120),
+	red = Color3.fromRGB(205, 140, 140),
+	green = Color3.fromRGB(140, 196, 150),
 }
+
+local APPS = { "Overview", "Employees", "Storage", "Elevator", "Production", "Luck", "Company", "Prestige", "Settings" }
+
+local gui: ScreenGui? = nil
+local root: Frame? = nil
+local currentApp: string? = nil
 local selectedMine = "mine_001"
+local selectedDrill = 1
 local statuses: { [string]: string } = {}
 local busy = false
+-- Prestige-Bestätigung: Startzeit (3 Sekunden Wartezeit, nie mit einem einzelnen Klick)
+local CONFIRM_SECONDS = 3
+local confirmStartedAt: number? = nil
+-- Aktion je Button (wird bei jedem Render neu gesetzt; nil = gesperrt)
+local handlers: { [GuiButton]: (() -> ())? } = {}
+local hooked: { [GuiButton]: boolean } = {}
+-- dynamisch erzeugte Bereiche (Mitarbeiter-Liste, Erzliste)
+local dynamic: { [string]: ScrollingFrame } = {}
 
-local function accent(snapshot: Types.StateSnapshot?): Color3
-	local color = snapshot and CompanyIdentity.ColorById[snapshot.Company.ColorId]
-	return if color then color.Color else UITheme.Colors.DefaultAccent
+-- ---------------------------------------------------------------------------------------------
+-- Hilfen
+
+local function find(path: string): any
+	local node: Instance? = root
+	for name in string.gmatch(path, "[^/]+") do
+		node = node and node:FindFirstChild(name)
+	end
+	return node
 end
 
-local function clearContent()
-	for _, child in content:GetChildren() do
-		if not child:IsA("UIListLayout") and not child:IsA("UIPadding") then
-			child:Destroy()
+local function setText(path: string, text: string, color: Color3?)
+	local l = find(path)
+	if l and (l:IsA("TextLabel") or l:IsA("TextButton")) then
+		l.Text = text
+		if color then
+			l.TextColor3 = color
 		end
 	end
 end
 
-local function label(text: string, size: number, color: Color3, order: number, bold: boolean?): TextLabel
-	return Create("TextLabel", {
-		Size = UDim2.new(1, 0, 0, size + 6),
-		BackgroundTransparency = 1,
-		Font = if bold then UITheme.FontBold else UITheme.Font,
-		TextSize = size,
-		TextColor3 = color,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextWrapped = true,
-		Text = text,
-		LayoutOrder = order,
-		Parent = content,
-	})
+local function setVisible(path: string, visible: boolean)
+	local g = find(path)
+	if g and g:IsA("GuiObject") then
+		g.Visible = visible
+	end
 end
 
--- args: Platzhalter für die Fehlermeldung (z. B. Price/Level)
+local function setFill(path: string, fraction: number, color: Color3?)
+	local f = find(path)
+	if f and f:IsA("Frame") then
+		f.Size = UDim2.fromScale(math.clamp(fraction, 0, 1), 1)
+		if color then
+			f.BackgroundColor3 = color
+		end
+	end
+end
+
 local function call(remote: string, args: { [string]: any }?, ...: any)
 	if busy then
 		return
@@ -101,296 +128,46 @@ local function call(remote: string, args: { [string]: any }?, ...: any)
 	end
 end
 
-local function slotCard(order: number, title: string, worker: Types.WorkerRecord?, roleDef: WorkerRoles.RoleDefinition, slot: number, canHire: boolean, snapshot: Types.StateSnapshot)
-	local card = Create("Frame", {
-		Size = UDim2.new(1, 0, 0, 64),
-		BackgroundColor3 = UITheme.Colors.Surface,
-		LayoutOrder = order,
-		Parent = content,
-	}, {
-		Create("UICorner", { CornerRadius = UITheme.CornerRadius }),
-		Create("UIPadding", { PaddingLeft = UDim.new(0, 14), PaddingRight = UDim.new(0, 14) }),
-	})
-	Create("TextLabel", {
-		Position = UDim2.fromOffset(0, 10),
-		Size = UDim2.new(0.6, 0, 0, 22),
-		BackgroundTransparency = 1,
-		Font = UITheme.FontBold,
-		TextSize = 18,
-		TextColor3 = UITheme.Colors.TextPrimary,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		Text = title,
-		Parent = card,
-	})
-	local sub, subColor
-	if worker then
-		local status = statuses[worker.Id] or "Working"
-		sub = `{roleDef.DisplayName} #{worker.Id:sub(2)} · {TEXT.Status[status] or status} · {string.format(TEXT.Wage, NumberFormat.cash(roleDef.WagePerMinute))}`
-		subColor = if status == "Unpaid" then UITheme.Colors.Negative elseif status == "Waiting" then UITheme.Colors.Warning else UITheme.Colors.Positive
-	else
-		sub = `{TEXT.Empty} · {roleDef.DisplayName} · {string.format(TEXT.Wage, NumberFormat.cash(roleDef.WagePerMinute))}`
-		subColor = UITheme.Colors.TextSecondary
-	end
-	Create("TextLabel", {
-		Position = UDim2.fromOffset(0, 34),
-		Size = UDim2.new(0.66, 0, 0, 18),
-		BackgroundTransparency = 1,
-		Font = UITheme.Font,
-		TextSize = 14,
-		TextColor3 = subColor,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		Text = sub,
-		Parent = card,
-	})
-	local text, color, enabled, onClick
-	if worker then
-		text, color, enabled = TEXT.Fire, UITheme.Colors.SurfaceRaised, true
-		local id = worker.Id
-		onClick = function()
-			call("FireWorker", nil, id)
-		end
-	else
-		local affordable = snapshot.Cash >= roleDef.HireCost
-		text = string.format(TEXT.Hire, NumberFormat.cash(roleDef.HireCost))
-		color = if canHire and affordable then accent(snapshot) else UITheme.Colors.SurfaceRaised
-		enabled = canHire
-		local mineId, role = selectedMine, roleDef.Id
-		onClick = function()
-			call("HireWorker", { Price = roleDef.HireCost }, mineId, role, slot)
-		end
-	end
-	local button: TextButton = Create("TextButton", {
-		AnchorPoint = Vector2.new(1, 0.5),
-		Position = UDim2.fromScale(1, 0.5),
-		Size = UDim2.fromOffset(130, 38),
-		BackgroundColor3 = color,
-		Font = UITheme.FontBold,
-		TextSize = 15,
-		TextColor3 = if color == UITheme.Colors.SurfaceRaised then UITheme.Colors.TextPrimary else Color3.fromRGB(20, 24, 28),
-		AutoButtonColor = enabled,
-		Text = text,
-		Parent = card,
-	}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
-	if enabled then
-		button.Activated:Connect(onClick)
-	end
-end
-
--- Drill-Status als Text und Farbe (docs/05 §29: Grün arbeitet, Orange wartet)
-local function drillStatus(id: string): (string, Color3)
-	local status = statuses[id]
-	if status == "Running" then
-		return TEXT.DrillStatus.Running, UITheme.Colors.Positive
-	elseif status == "OutputFull" then
-		return TEXT.DrillStatus.OutputFull, UITheme.Colors.Warning
-	end
-	return TEXT.DrillStatus.Idle, UITheme.Colors.Warning
-end
-
--- Karte für einen Mining-Slot mit Drill (Slot ist Worker ODER Drill, docs/05 §26)
-local function drillSlotCard(order: number, title: string, drill: Types.DrillRecord)
-	local def = Drills.Get(drill.Type)
-	local card = Create("Frame", {
-		Size = UDim2.new(1, 0, 0, 64),
-		BackgroundColor3 = UITheme.Colors.Surface,
-		LayoutOrder = order,
-		Parent = content,
-	}, {
-		Create("UICorner", { CornerRadius = UITheme.CornerRadius }),
-		Create("UIPadding", { PaddingLeft = UDim.new(0, 14), PaddingRight = UDim.new(0, 14) }),
-	})
-	Create("TextLabel", {
-		Position = UDim2.fromOffset(0, 10),
-		Size = UDim2.new(1, -320, 0, 22),
-		BackgroundTransparency = 1,
-		Font = UITheme.FontBold,
-		TextSize = 18,
-		TextColor3 = UITheme.Colors.TextPrimary,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		Text = title,
-		Parent = card,
-	})
-	local statusText, statusColor = drillStatus(drill.Id)
-	local level = Drills.LevelOf(drill)
-	local rate = if def then string.format(TEXT.DrillRate, NumberFormat.withSeparators(Drills.OrePerMinute(def, level))) else ""
-	Create("TextLabel", {
-		Position = UDim2.fromOffset(0, 34),
-		Size = UDim2.new(1, -320, 0, 18),
-		TextTruncate = Enum.TextTruncate.AtEnd,
-		BackgroundTransparency = 1,
-		Font = UITheme.Font,
-		TextSize = 14,
-		TextColor3 = statusColor,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		Text = `{string.format(TEXT.DrillLevel, if def then def.DisplayName else drill.Type, level)} · {statusText} · {rate}`,
-		Parent = card,
-	})
-	local button: TextButton = Create("TextButton", {
-		AnchorPoint = Vector2.new(1, 0.5),
-		Position = UDim2.fromScale(1, 0.5),
-		Size = UDim2.fromOffset(130, 38),
-		BackgroundColor3 = UITheme.Colors.SurfaceRaised,
-		Font = UITheme.FontBold,
-		TextSize = 15,
-		TextColor3 = UITheme.Colors.TextPrimary,
-		Text = TEXT.RemoveDrill,
-		Parent = card,
-	}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
-	local id = drill.Id
-	button.Activated:Connect(function()
-		call("RemoveDrill", nil, id)
-	end)
-
-	-- Drill-Level 1–10 (D-043); die MK-Stufe ändert sich nur per Kauf
-	local cost = if def then Drills.LevelUpCost(def, level) else nil
-	local canUpgrade = cost ~= nil
-	local upgradeText = if cost then string.format(TEXT.UpgradeDrill, level, level + 1, NumberFormat.cash(cost)) else TEXT.UpgradeDrillMax
-	local upgradeButton: TextButton = Create("TextButton", {
-		AnchorPoint = Vector2.new(1, 0.5),
-		Position = UDim2.new(1, -140, 0.5, 0),
-		Size = UDim2.fromOffset(170, 38),
-		BackgroundColor3 = if canUpgrade then UITheme.Colors.DefaultAccent else UITheme.Colors.SurfaceRaised,
-		Font = UITheme.FontBold,
-		TextSize = 15,
-		TextColor3 = if canUpgrade then UITheme.Colors.Background else UITheme.Colors.TextSecondary,
-		Text = upgradeText,
-		Active = canUpgrade,
-		AutoButtonColor = false,
-		Parent = card,
-	}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
-	upgradeButton.Activated:Connect(function()
-		if cost then
-			call("UpgradeDrill", { Price = NumberFormat.cash(cost) }, id)
-		end
-	end)
-end
-
-local function renderEmployees(snapshot: Types.StateSnapshot)
-	label(TEXT.Employees, 24, UITheme.Colors.TextPrimary, 1, true)
-	local storageBuilt = snapshot.Buildings.build_storage == true
-	if not storageBuilt then
-		label(TEXT.NeedStorage, 16, UITheme.Colors.Warning, 2)
-	end
-
-	-- Minen-Auswahl (nur freigeschaltete Minen)
-	local tabs = Create("Frame", {
-		Size = UDim2.new(1, 0, 0, 34),
-		BackgroundTransparency = 1,
-		LayoutOrder = 3,
-		Parent = content,
-	}, { Create("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, Padding = UDim.new(0, 8) }) })
-	local any = false
-	for _, mine in Mines.List do
-		if Mines.IsAccessible(mine, snapshot.MiningLevel, snapshot.UnlockedMines) then
-			any = true
-			local active = mine.Id == selectedMine
-			local tab: TextButton = Create("TextButton", {
-				Size = UDim2.fromOffset(96, 34),
-				BackgroundColor3 = if active then accent(snapshot) else UITheme.Colors.SurfaceRaised,
-				Font = UITheme.FontBold,
-				TextSize = 14,
-				TextColor3 = if active then Color3.fromRGB(20, 24, 28) else UITheme.Colors.TextPrimary,
-				Text = Mines.Label(mine),
-				LayoutOrder = mine.Number,
-				Parent = tabs,
-			}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
-			local id = mine.Id
-			tab.Activated:Connect(function()
-				selectedMine = id
-				LaptopController.Render()
-			end)
-		end
-	end
-	if not any then
-		label(TEXT.NoMines, 16, UITheme.Colors.TextSecondary, 4)
+-- Button binden: Aktion (oder nil = gesperrt), Text, Stil
+local function bind(button: any, text: string?, action: (() -> ())?, primary: boolean?)
+	if not (button and button:IsA("GuiButton")) then
 		return
 	end
-
-	local mine = Mines.Get(selectedMine)
-	local ore = mine and Materials.Get(mine.OreId)
-	local buffer = snapshot.MineBuffers[selectedMine] or 0
-	local elevatorLoad = 0
-	for _, amount in snapshot.ElevatorBuffer do
-		elevatorLoad += amount
+	local b = button :: GuiButton
+	handlers[b] = action
+	if not hooked[b] then
+		hooked[b] = true
+		b.Activated:Connect(function()
+			local h = handlers[b]
+			if h then
+				h()
+			end
+		end)
 	end
-	label(`{if ore then ore.DisplayName else ""} · {string.format(TEXT.Buffer, NumberFormat.withSeparators(buffer))} · {string.format(TEXT.Elevator, NumberFormat.withSeparators(elevatorLoad), NumberFormat.withSeparators(snapshot.ElevatorCapacity))}`, 14, UITheme.Colors.TextSecondary, 4)
-
-	local order = 10
-	for _, roleId in WorkerRoles.Order do
-		local roleDef = WorkerRoles.Get(roleId) :: WorkerRoles.RoleDefinition
-		for slot = 1, roleDef.Slots do
-			local worker: Types.WorkerRecord? = nil
-			for _, w in snapshot.Workers do
-				if w.MineId == selectedMine and w.Role == roleId and w.Slot == slot then
-					worker = w
-				end
-			end
-			local title = string.format(if roleId == "Mining" then TEXT.MiningSlot else TEXT.TransportSlot, slot)
-			local drill: Types.DrillRecord? = nil
-			if roleId == "Mining" then
-				for _, d in snapshot.Drills do
-					if d.MineId == selectedMine and d.Slot == slot then
-						drill = d
-					end
-				end
-			end
-			if drill then
-				drillSlotCard(order, title, drill)
-			else
-				slotCard(order, title, worker, roleDef, slot, storageBuilt, snapshot)
-			end
-			order += 1
-		end
+	if text and b:IsA("TextButton") then
+		b.Text = text
+	end
+	local enabled = action ~= nil
+	b.AutoButtonColor = enabled
+	b.Active = enabled
+	if b:IsA("TextButton") then
+		b.BackgroundColor3 = if not enabled then C.panel2 elseif primary == false then C.panel2 else C.primary
+		b.TextColor3 = if enabled then C.text else C.faint
 	end
 end
 
--- Karte im Inhaltsbereich (oder in einem Grid)
-local function card(order: number, height: number, parent: Instance?): Frame
-	return Create("Frame", {
-		Size = UDim2.new(1, 0, 0, height),
-		BackgroundColor3 = UITheme.Colors.Surface,
-		LayoutOrder = order,
-		Parent = parent or content,
-	}, {
-		Create("UICorner", { CornerRadius = UITheme.CornerRadius }),
-		Create("UIPadding", {
-			PaddingLeft = UDim.new(0, 14),
-			PaddingRight = UDim.new(0, 14),
-			PaddingTop = UDim.new(0, 10),
-			PaddingBottom = UDim.new(0, 10),
-		}),
-	})
-end
-
-local function cardText(parent: Instance, text: string, y: number, size: number, color: Color3, bold: boolean?, xAlign: Enum.TextXAlignment?): TextLabel
-	return Create("TextLabel", {
-		Position = UDim2.fromOffset(0, y),
-		Size = UDim2.new(1, 0, 0, size + 4),
-		BackgroundTransparency = 1,
-		Font = if bold then UITheme.FontBold else UITheme.Font,
-		TextSize = size,
-		TextColor3 = color,
-		TextXAlignment = xAlign or Enum.TextXAlignment.Left,
-		TextTruncate = Enum.TextTruncate.AtEnd,
-		Text = text,
-		Parent = parent,
-	})
-end
-
--- Füllbalken (0–1), z. B. Lagerauslastung
-local function bar(parent: Instance, y: number, fraction: number, snapshot: Types.StateSnapshot)
-	local f = math.clamp(fraction, 0, 1)
-	local back = Create("Frame", {
-		Position = UDim2.fromOffset(0, y),
-		Size = UDim2.new(1, 0, 0, 12),
-		BackgroundColor3 = UITheme.Colors.SurfaceRaised,
-		Parent = parent,
-	}, { Create("UICorner", { CornerRadius = UDim.new(1, 0) }) })
-	Create("Frame", {
-		Size = UDim2.fromScale(f, 1),
-		BackgroundColor3 = if f >= 1 then UITheme.Colors.Negative elseif f >= 0.85 then UITheme.Colors.Warning else accent(snapshot),
-		Parent = back,
-	}, { Create("UICorner", { CornerRadius = UDim.new(1, 0) }) })
+-- Schalter (TextButton mit „Thumb“): Zustand anzeigen und Aktion binden
+local function toggle(path: string, on: boolean, action: (() -> ())?)
+	local t = find(path)
+	if not t then
+		return
+	end
+	bind(t, nil, action)
+	t.BackgroundColor3 = if on then C.primary else C.panel2
+	local thumb = t:FindFirstChild("Thumb")
+	if thumb and thumb:IsA("Frame") then
+		thumb.Position = UDim2.new(if on then 0.522 else 0.07, 0, thumb.Position.Y.Scale, 0)
+	end
 end
 
 local function sumItems(items: { [string]: number }): number
@@ -401,7 +178,6 @@ local function sumItems(items: { [string]: number }): number
 	return total
 end
 
--- Anzahl Worker je Laufzeitstatus
 local function workerCounts(snapshot: Types.StateSnapshot): (number, number, number, number)
 	local total, working, waiting, unpaidCount = 0, 0, 0, 0
 	for _, worker in snapshot.Workers do
@@ -418,124 +194,8 @@ local function workerCounts(snapshot: Types.StateSnapshot): (number, number, num
 	return total, working, waiting, unpaidCount
 end
 
--- Upgrade-Karte für Lager oder Elevator (docs/09 §30–31). Server prüft alles erneut.
-local function upgradeCard(order: number, kind: Upgrades.UpgradeKind, capacity: number, snapshot: Types.StateSnapshot)
-	local tier = Upgrades.Next(kind, capacity)
-	local done, total = Upgrades.Progress(kind, capacity)
-	local box = card(order, 120)
-	cardText(box, string.format(TEXT.UpgradeLevel, done, total), 0, 14, UITheme.Colors.TextSecondary, true)
-	if not tier then
-		cardText(box, TEXT.MaxLevel, 26, 22, UITheme.Colors.Positive, true)
-		cardText(box, TEXT.MaxLevelSub, 56, 15, UITheme.Colors.TextSecondary)
-		return
-	end
-	cardText(box, `{TEXT.Current}: {NumberFormat.withSeparators(capacity)}   →   {TEXT.Next}: {NumberFormat.withSeparators(tier.Capacity)}`, 26, 18, UITheme.Colors.TextPrimary, true)
-	local levelOk = snapshot.MiningLevel >= tier.RequiredLevel
-	local affordable = snapshot.Cash >= tier.Cost
-	cardText(box, `{TEXT.Cost}: {NumberFormat.cash(tier.Cost)}`, 54, 15, if affordable then UITheme.Colors.TextPrimary else UITheme.Colors.Negative)
-	cardText(box, string.format(TEXT.RequiresLevel, tier.RequiredLevel), 76, 15, if levelOk then UITheme.Colors.TextSecondary else UITheme.Colors.Warning)
-	local ready = levelOk and affordable
-	local button: TextButton = Create("TextButton", {
-		AnchorPoint = Vector2.new(1, 1),
-		Position = UDim2.fromScale(1, 1),
-		Size = UDim2.fromOffset(170, 40),
-		BackgroundColor3 = if ready then accent(snapshot) else UITheme.Colors.SurfaceRaised,
-		Font = UITheme.FontBold,
-		TextSize = 15,
-		TextColor3 = if ready then Color3.fromRGB(20, 24, 28) else UITheme.Colors.TextPrimary,
-		Text = string.format(TEXT.UpgradeButton, NumberFormat.cash(tier.Cost)),
-		Parent = box,
-	}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
-	button.Activated:Connect(function()
-		call("BuyUpgrade", { Level = tier.RequiredLevel, Price = tier.Cost }, kind)
-	end)
-end
-
--- Kisten-Karte (D-037): belegte/gekaufte Kisten, nächste Kiste kaufen. Server prüft alles erneut.
-local function crateCard(order: number, snapshot: Types.StateSnapshot)
-	local cfg = BalanceConfig.Storage
-	local crates = snapshot.StorageCrates
-	local usedCrates = CrateLogic.used(snapshot.StorageItems)
-	local box = card(order, 120)
-	cardText(box, TEXT.CratesTitle, 0, 14, UITheme.Colors.TextSecondary, true)
-	cardText(box, string.format(TEXT.CratesLine, usedCrates, crates, cfg.MaxCrates), 26, 18, UITheme.Colors.TextPrimary, true)
-	cardText(box, string.format(TEXT.CrateSizeLine, NumberFormat.withSeparators(cfg.CrateSize)), 54, 14, UITheme.Colors.TextSecondary)
-	if crates >= cfg.MaxCrates then
-		cardText(box, TEXT.CratesMax, 80, 16, UITheme.Colors.Positive, true)
-		return
-	end
-	local price = CrateLogic.price(crates + 1)
-	local affordable = snapshot.Cash >= price
-	cardText(box, `{TEXT.Cost}: {NumberFormat.cash(price)}`, 80, 15, if affordable then UITheme.Colors.TextPrimary else UITheme.Colors.Negative)
-	local button: TextButton = Create("TextButton", {
-		AnchorPoint = Vector2.new(1, 1),
-		Position = UDim2.fromScale(1, 1),
-		Size = UDim2.fromOffset(190, 40),
-		BackgroundColor3 = if affordable then accent(snapshot) else UITheme.Colors.SurfaceRaised,
-		Font = UITheme.FontBold,
-		TextSize = 15,
-		TextColor3 = if affordable then Color3.fromRGB(20, 24, 28) else UITheme.Colors.TextPrimary,
-		Text = string.format(TEXT.BuyCrate, NumberFormat.cash(price)),
-		Parent = box,
-	}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
-	button.Activated:Connect(function()
-		call("BuyStorageCrate", { Price = price })
-	end)
-end
-
--- DASHBOARD: schneller Firmenüberblick, keine Tabelle (docs/09 §24)
-local function renderDashboard(snapshot: Types.StateSnapshot)
-	label(TEXT.Dashboard, 24, UITheme.Colors.TextPrimary, 1, true)
-	local grid = Create("Frame", {
-		Size = UDim2.new(1, 0, 0, 0),
-		AutomaticSize = Enum.AutomaticSize.Y,
-		BackgroundTransparency = 1,
-		LayoutOrder = 2,
-		Parent = content,
-	}, {
-		Create("UIGridLayout", {
-			CellSize = UDim2.new(0.5, -5, 0, 96),
-			CellPadding = UDim2.fromOffset(10, 10),
-			SortOrder = Enum.SortOrder.LayoutOrder,
-		}),
-	})
-	local function tile(order: number, title: string, value: string, sub: string?, subColor: Color3?): Frame
-		local box = card(order, 96, grid)
-		cardText(box, title, 0, 14, UITheme.Colors.TextSecondary, true)
-		cardText(box, value, 22, 24, UITheme.Colors.TextPrimary, true)
-		if sub then
-			cardText(box, sub, 54, 14, subColor or UITheme.Colors.TextSecondary)
-		end
-		return box
-	end
-
-	tile(1, TEXT.MiningLevel, tostring(snapshot.MiningLevel), string.format(Strings.Hud.XP, NumberFormat.withSeparators(snapshot.MiningXP), NumberFormat.withSeparators(snapshot.MiningXPRequired)))
-	tile(2, TEXT.Cash, NumberFormat.cash(snapshot.Cash))
-
-	if snapshot.Buildings.build_storage then
-		local used = sumItems(snapshot.StorageItems)
-		local box = tile(3, TEXT.StorageCard, `{NumberFormat.withSeparators(used)} / {NumberFormat.withSeparators(snapshot.StorageCapacity)}`)
-		bar(box, 58, used / math.max(1, snapshot.StorageCapacity), snapshot)
-	else
-		tile(3, TEXT.StorageCard, "–", TEXT.NotBuilt)
-	end
-
-	local total, working, waiting, unpaidCount = workerCounts(snapshot)
-	if total == 0 then
-		tile(4, TEXT.EmployeesCard, "0", TEXT.NoEmployees)
-	else
-		local parts = { string.format(TEXT.ActiveCount, working) }
-		if waiting > 0 then
-			table.insert(parts, string.format(TEXT.WaitingCount, waiting))
-		end
-		if unpaidCount > 0 then
-			table.insert(parts, string.format(TEXT.UnpaidCount, unpaidCount))
-		end
-		tile(4, TEXT.EmployeesCard, tostring(total), table.concat(parts, " · "), if unpaidCount > 0 then UITheme.Colors.Negative elseif waiting > 0 then UITheme.Colors.Warning else UITheme.Colors.Positive)
-	end
-
-	-- Produktion: rechnerischer Abbau der bezahlten Mining-Worker und laufenden Drills,
-	-- dazu der Elevator-Füllstand
+-- rechnerischer Abbau pro Minute (bezahlte Mining-Worker + laufende Drills)
+local function productionRate(snapshot: Types.StateSnapshot): number
 	local rate = 0
 	for _, worker in snapshot.Workers do
 		if worker.Role == "Mining" and statuses[worker.Id] ~= "Unpaid" then
@@ -548,101 +208,469 @@ local function renderDashboard(snapshot: Types.StateSnapshot)
 			rate += Drills.OrePerMinute(def, Drills.LevelOf(drill))
 		end
 	end
-	local load = sumItems(snapshot.ElevatorBuffer)
-	tile(5, TEXT.ProductionCard, string.format(TEXT.PerMinute, NumberFormat.withSeparators(rate)), string.format(TEXT.ElevatorLoad, NumberFormat.withSeparators(load), NumberFormat.withSeparators(snapshot.ElevatorCapacity)))
+	return rate
 end
 
--- STORAGE: Bestand, Kapazität, Upgrade (docs/09 §29–30)
-local function renderStorage(snapshot: Types.StateSnapshot)
-	label(TEXT.StorageTitle, 24, UITheme.Colors.TextPrimary, 1, true)
-	if not snapshot.Buildings.build_storage then
-		label(TEXT.StorageNotBuilt, 16, UITheme.Colors.Warning, 2)
-		return
-	end
-	local used = sumItems(snapshot.StorageItems)
-	local head = card(2, 64)
-	cardText(head, `{NumberFormat.withSeparators(used)} / {NumberFormat.withSeparators(snapshot.StorageCapacity)}`, 0, 22, UITheme.Colors.TextPrimary, true)
-	bar(head, 32, used / math.max(1, snapshot.StorageCapacity), snapshot)
+local function storageFull(snapshot: Types.StateSnapshot): boolean
+	return snapshot.Buildings.build_storage == true and CrateLogic.isFull(snapshot.StorageItems, snapshot.StorageCrates)
+end
 
-	local ids = {}
-	for id, amount in snapshot.StorageItems do
-		if amount > 0 then
-			table.insert(ids, id)
+local function pct(x: number): string
+	local v = x * 100
+	if v >= 10 then
+		return string.format("%.0f%%", v)
+	elseif v >= 1 then
+		return string.format("%.1f%%", v)
+	end
+	return string.format("%.2f%%", v)
+end
+
+-- Skalierung für dynamische Inhalte (Gestaltung 1280 breit)
+local function px(n: number): number
+	local r = root
+	-- nicht unter 60 %: auf kleinen Bildschirmen sonst unleserlich (Test 2026-10-29)
+	local s = if r then math.clamp(r.AbsoluteSize.X / 1280, 0.6, 1) else 1
+	return math.floor(n * s + 0.5)
+end
+
+-- Scrollbereich an Stelle der Beispiel-Inhalte (graphitfarbene Karten untereinander)
+local function dynamicArea(app: string, position: UDim2, size: UDim2): ScrollingFrame
+	local area = dynamic[app]
+	if area and area.Parent then
+		for _, child in area:GetChildren() do
+			if not child:IsA("UIListLayout") then
+				child:Destroy()
+			end
+		end
+		return area
+	end
+	local new: ScrollingFrame = Create("ScrollingFrame", {
+		Name = "Dynamic",
+		Position = position,
+		Size = size,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		ScrollBarThickness = 5,
+		ScrollBarImageColor3 = C.line,
+		AutomaticCanvasSize = Enum.AutomaticSize.Y,
+		CanvasSize = UDim2.new(),
+		Parent = find(`Windows/{app}/Content`),
+	}, {
+		Create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 8) }),
+	})
+	dynamic[app] = new
+	return new
+end
+
+local function dynLabel(parent: Instance, text: string, size: number, color: Color3, order: number, bold: boolean?): TextLabel
+	return Create("TextLabel", {
+		Size = UDim2.new(1, -8, 0, px(size + 8)),
+		BackgroundTransparency = 1,
+		Font = if bold then Enum.Font.GothamBold else Enum.Font.Gotham,
+		TextSize = px(size),
+		TextColor3 = color,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextWrapped = true,
+		Text = text,
+		LayoutOrder = order,
+		Parent = parent,
+	})
+end
+
+local function dynButton(parent: Instance, text: string, action: (() -> ())?, primary: boolean?, anchorRight: number?): TextButton
+	local b: TextButton = Create("TextButton", {
+		AnchorPoint = Vector2.new(1, 0.5),
+		Position = UDim2.new(1, -px(anchorRight or 14), 0.5, 0),
+		Size = UDim2.fromOffset(px(150), px(34)),
+		Font = Enum.Font.Gotham,
+		TextScaled = true,
+		Parent = parent,
+	}, {
+		Create("UICorner", { CornerRadius = UDim.new(0, 5) }),
+		Create("UITextSizeConstraint", { MaxTextSize = px(14), MinTextSize = 7 }),
+		Create("UIPadding", { PaddingLeft = UDim.new(0, 4), PaddingRight = UDim.new(0, 4) }),
+	})
+	bind(b, text, action, primary)
+	return b
+end
+
+local function dynCard(parent: Instance, order: number, height: number): Frame
+	return Create("Frame", {
+		Size = UDim2.new(1, -8, 0, px(height)),
+		BackgroundColor3 = C.panel,
+		LayoutOrder = order,
+		Parent = parent,
+	}, {
+		Create("UICorner", { CornerRadius = UDim.new(0, 8) }),
+		Create("UIStroke", { Color = C.line, Thickness = 1 }),
+	})
+end
+
+local function cardLine(parent: Instance, text: string, y: number, size: number, color: Color3, bold: boolean?, width: number?): TextLabel
+	return Create("TextLabel", {
+		Position = UDim2.fromOffset(px(16), px(y)),
+		Size = UDim2.new(width or 0.55, 0, 0, px(size + 6)),
+		BackgroundTransparency = 1,
+		Font = if bold then Enum.Font.GothamBold else Enum.Font.Gotham,
+		TextSize = px(size),
+		TextColor3 = color,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextTruncate = Enum.TextTruncate.AtEnd,
+		Text = text,
+		Parent = parent,
+	})
+end
+
+-- ---------------------------------------------------------------------------------------------
+-- Apps
+
+local function renderOverview(snapshot: Types.StateSnapshot)
+	local base = "Windows/Overview/Content"
+	setText(`{base}/MiningLevel/Value`, tostring(snapshot.MiningLevel))
+	setText(`{base}/MiningLevel/Hint`, string.format("%s / %s XP", NumberFormat.withSeparators(snapshot.MiningXP), NumberFormat.withSeparators(snapshot.MiningXPRequired)))
+	setText(`{base}/Cash/Value`, NumberFormat.cash(snapshot.Cash))
+	local nextCrate = CrateLogic.price(snapshot.StorageCrates + 1)
+	setText(`{base}/Cash/Hint`, if snapshot.Cash >= nextCrate then "Ready for your next upgrade" else "Keep mining and selling")
+
+	local full = storageFull(snapshot)
+	if snapshot.Buildings.build_storage then
+		local used = sumItems(snapshot.StorageItems)
+		setText(`{base}/Storage/Value`, `{NumberFormat.withSeparators(used)} / {NumberFormat.withSeparators(snapshot.StorageCapacity)}`, if full then C.amber else C.text)
+		setText(`{base}/Storage/Hint`, if full then "Storage full" else string.format("%s crates in use", tostring(CrateLogic.used(snapshot.StorageItems))))
+	else
+		setText(`{base}/Storage/Value`, "–", C.text)
+		setText(`{base}/Storage/Hint`, "Not built yet")
+	end
+
+	local total, working, waiting, unpaidCount = workerCounts(snapshot)
+	setText(`{base}/Employees/Value`, tostring(total))
+	local parts = { `{working} active`, `{waiting} waiting` }
+	if unpaidCount > 0 then
+		table.insert(parts, `{unpaidCount} unpaid`)
+	end
+	setText(`{base}/Employees/Hint`, if total == 0 then "No employees yet" else table.concat(parts, "  /  "), if unpaidCount > 0 then C.red else nil)
+
+	local rate = productionRate(snapshot)
+	setText(`{base}/Production/Value`, string.format("%s ore / min", NumberFormat.withSeparators(rate)))
+	setText(`{base}/Production/Hint`, if full then "Waiting for free storage" elseif rate > 0 then "Running" else "No active miners or drills")
+
+	local load = sumItems(snapshot.ElevatorBuffer)
+	if snapshot.Buildings.build_elevator then
+		setText(`{base}/Elevator/Value`, `{NumberFormat.withSeparators(load)} / {NumberFormat.withSeparators(snapshot.ElevatorCapacity)}`)
+		setText(`{base}/Elevator/Hint`, if load > 0 and full then "Waiting for storage" elseif load > 0 then "Transporting" else "Idle")
+	else
+		setText(`{base}/Elevator/Value`, "–")
+		setText(`{base}/Elevator/Hint`, "Not built yet")
+	end
+
+	-- Hinweisbalken: wichtigster Zustand
+	local title, desc, color
+	if not snapshot.Buildings.build_storage then
+		title, desc, color = "Build your storage", "Build the storage in your hall to start collecting ore.", C.amber
+	elseif full then
+		title, desc, color = "Storage is full", "Buy more crates to keep your operation moving.", C.amber
+	elseif unpaidCount > 0 then
+		title, desc, color = "Employees are unpaid", "Keep enough cash so your crew keeps working.", C.red
+	else
+		title, desc, color = "Everything is running", "Your operation is working normally.", C.green
+	end
+	setText(`{base}/CapacityNotice/Title`, title)
+	setText(`{base}/CapacityNotice/Description`, desc)
+	local accent = find(`{base}/CapacityNotice/Accent`)
+	if accent then
+		accent.BackgroundColor3 = color
+	end
+end
+
+local function renderEmployees(snapshot: Types.StateSnapshot)
+	setVisible("Windows/Employees/Content/Roster", false)
+	setVisible("Windows/Employees/Content/HirePanel", false)
+	setText("Windows/Employees/Content/Description", "Hire workers for your mining and transport slots.")
+	local area = dynamicArea("Employees", UDim2.fromScale(0, 0.25), UDim2.fromScale(1, 0.75))
+	local storageBuilt = snapshot.Buildings.build_storage == true
+	local order = 1
+	if not storageBuilt then
+		dynLabel(area, TEXT.NeedStorage, 15, C.amber, order)
+		order += 1
+	end
+	-- Minen-Auswahl
+	local tabs = Create("Frame", {
+		Size = UDim2.new(1, -8, 0, px(34)),
+		BackgroundTransparency = 1,
+		LayoutOrder = order,
+		Parent = area,
+	}, { Create("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, Padding = UDim.new(0, px(8)), SortOrder = Enum.SortOrder.LayoutOrder }) })
+	order += 1
+	local any = false
+	for _, mine in Mines.List do
+		if Mines.IsAccessible(mine, snapshot.MiningLevel, snapshot.UnlockedMines) then
+			any = true
+			local active = mine.Id == selectedMine
+			local tab: TextButton = Create("TextButton", {
+				Size = UDim2.fromOffset(px(96), px(32)),
+				Font = Enum.Font.Gotham,
+				TextSize = px(14),
+				LayoutOrder = mine.Number,
+				Parent = tabs,
+			}, { Create("UICorner", { CornerRadius = UDim.new(0, 5) }) })
+			local id = mine.Id
+			bind(tab, Mines.Label(mine), function()
+				selectedMine = id
+				LaptopController.Render()
+			end, active)
 		end
 	end
-	table.sort(ids, function(a, b)
-		local oa, ob = Materials.Get(a), Materials.Get(b)
-		return (if oa then oa.Tier else 999) < (if ob then ob.Tier else 999)
-	end)
-	if #ids == 0 then
-		label(TEXT.StorageEmpty, 15, UITheme.Colors.TextSecondary, 3)
-	end
-	for i, id in ids do
-		local ore = Materials.Get(id)
-		local row = card(2 + i, 40)
-		local icon = OreIcon.create(id, 30)
-		icon.AnchorPoint = Vector2.new(0, 0.5)
-		icon.Position = UDim2.new(0, -6, 0.5, 0)
-		icon.Parent = row
-		local nameLabel = cardText(row, if ore then ore.DisplayName else id, 0, 16, UITheme.Colors.TextPrimary)
-		nameLabel.Position = UDim2.fromOffset(30, 0)
-		cardText(row, NumberFormat.withSeparators(snapshot.StorageItems[id]), 0, 16, UITheme.Colors.TextPrimary, true, Enum.TextXAlignment.Right)
-	end
-	crateCard(100, snapshot)
-end
-
--- ELEVATOR: Kapazität, Takt, Status, Upgrade (docs/09 §31)
-local function renderElevator(snapshot: Types.StateSnapshot)
-	label(TEXT.ElevatorTitle, 24, UITheme.Colors.TextPrimary, 1, true)
-	if not snapshot.Buildings.build_elevator then
-		label(TEXT.ElevatorNotBuilt, 16, UITheme.Colors.Warning, 2)
+	if not any then
+		dynLabel(area, TEXT.NoMines, 15, C.muted, order)
 		return
 	end
-	local load = sumItems(snapshot.ElevatorBuffer)
-	local storageFull = snapshot.Buildings.build_storage == true and CrateLogic.isFull(snapshot.StorageItems, snapshot.StorageCrates)
-	local status = if load > 0 and storageFull then "StorageFull" elseif load > 0 then "Transporting" else "Idle"
-	local statusColor = if status == "StorageFull" then UITheme.Colors.Negative elseif status == "Transporting" then UITheme.Colors.Positive else UITheme.Colors.TextSecondary
+	local mine = Mines.Get(selectedMine)
+	local ore = mine and Materials.Get(mine.OreId)
+	local buffer = snapshot.MineBuffers[selectedMine] or 0
+	local total, working, waiting, unpaidCount = workerCounts(snapshot)
+	dynLabel(area, `{if ore then ore.DisplayName else ""} · {string.format(TEXT.Buffer, NumberFormat.withSeparators(buffer))} · Crew {total} ({working} active, {waiting} waiting{if unpaidCount > 0 then `, {unpaidCount} unpaid` else ""})`, 14, C.muted, order)
+	order += 1
 
-	local cycle = BalanceConfig.Elevator.CycleSeconds
-	local head = card(2, 118)
-	cardText(head, TEXT.Capacity, 0, 14, UITheme.Colors.TextSecondary, true)
-	cardText(head, TEXT.ElevatorStatus[status], 0, 14, statusColor, true, Enum.TextXAlignment.Right)
-	cardText(head, string.format(TEXT.PerTrip, NumberFormat.withSeparators(snapshot.ElevatorCapacity)), 22, 22, UITheme.Colors.TextPrimary, true)
-	cardText(head, string.format(TEXT.TripEvery, cycle, NumberFormat.withSeparators(math.floor(snapshot.ElevatorCapacity * 60 / cycle))), 54, 15, UITheme.Colors.TextSecondary)
-	cardText(head, string.format(TEXT.CurrentLoad, NumberFormat.withSeparators(load)), 76, 15, UITheme.Colors.TextSecondary)
-	upgradeCard(3, "elevator", snapshot.ElevatorCapacity, snapshot)
+	for _, roleId in WorkerRoles.Order do
+		local roleDef = WorkerRoles.Get(roleId) :: WorkerRoles.RoleDefinition
+		for slot = 1, roleDef.Slots do
+			local worker: Types.WorkerRecord? = nil
+			for _, w in snapshot.Workers do
+				if w.MineId == selectedMine and w.Role == roleId and w.Slot == slot then
+					worker = w
+				end
+			end
+			local drill: Types.DrillRecord? = nil
+			if roleId == "Mining" then
+				for _, d in snapshot.Drills do
+					if d.MineId == selectedMine and d.Slot == slot then
+						drill = d
+					end
+				end
+			end
+			local title = string.format(if roleId == "Mining" then TEXT.MiningSlot else TEXT.TransportSlot, slot)
+			local box = dynCard(area, order, 62)
+			order += 1
+			cardLine(box, title, 9, 16, C.text, true)
+			local d = drill
+			if d then
+				-- Slot mit Drill: entfernen (Upgrade in der Production-App)
+				local def = Drills.Get(d.Type)
+				local level = Drills.LevelOf(d)
+				local st = statuses[d.Id]
+				local stText = if st == "Running" then TEXT.DrillStatus.Running elseif st == "OutputFull" then TEXT.DrillStatus.OutputFull else TEXT.DrillStatus.Idle
+				cardLine(box, `{if def then def.DisplayName else d.Type} · Lv {level} · {stText}`, 34, 13, if st == "Running" then C.green else C.amber, false, 0.6)
+				local id = d.Id
+				dynButton(box, "Remove drill", function()
+					call("RemoveDrill", nil, id)
+				end, false)
+			elseif worker then
+				local status = statuses[worker.Id] or "Working"
+				cardLine(box, `{roleDef.DisplayName} #{worker.Id:sub(2)} · {TEXT.Status[status] or status} · {string.format(TEXT.Wage, NumberFormat.cash(roleDef.WagePerMinute))}`, 34, 13, if status == "Unpaid" then C.red elseif status == "Waiting" then C.amber else C.green, false, 0.6)
+				local id = worker.Id
+				dynButton(box, "Fire", function()
+					call("FireWorker", nil, id)
+				end, false)
+			else
+				cardLine(box, `{TEXT.Empty} · {roleDef.DisplayName} · {string.format(TEXT.Wage, NumberFormat.cash(roleDef.WagePerMinute))}`, 34, 13, C.muted, false, 0.6)
+				local mineId, role = selectedMine, roleDef.Id
+				local canHire = storageBuilt and snapshot.Cash >= roleDef.HireCost
+				dynButton(box, `Hire  ·  {NumberFormat.cash(roleDef.HireCost)}`, if canHire
+					then function()
+						call("HireWorker", { Price = roleDef.HireCost }, mineId, role, slot)
+					end
+					else nil, true)
+			end
+		end
+	end
 end
 
--- PRODUCTION: platzierte Drills mit Status, verfügbare Drills im Inventar (docs/09 §32–33)
-local function renderProduction(snapshot: Types.StateSnapshot)
-	label(TEXT.ProductionTitle, 24, UITheme.Colors.TextPrimary, 1, true)
-	-- Schmelzer (docs/09 §32, D-011): Status, Füllstände, Priorität
-	local hasSmelter = snapshot.Buildings.build_smelter == true
-	if hasSmelter then
-		local state = snapshot.Smelter
-		local status = SmelterLogic.Status(state)
-		local box = card(2, 78)
-		cardText(box, TEXT.SmelterCard, 0, 17, UITheme.Colors.TextPrimary, true)
-		cardText(box, Strings.Smelter.Status[status] or status, 0, 14, if status == "Running" then UITheme.Colors.Positive elseif status == "OutputFull" then UITheme.Colors.Negative else UITheme.Colors.Warning, true, Enum.TextXAlignment.Right)
-		local cfg = BalanceConfig.Smelter
-		cardText(box, `{string.format(Strings.Smelter.Input, NumberFormat.withSeparators(SmelterLogic.Sum(state.Input)), CrateLogic.used(state.Input), cfg.InputCrates)} · {string.format(Strings.Smelter.Output, NumberFormat.withSeparators(SmelterLogic.Sum(state.Output)), CrateLogic.used(state.Output), cfg.OutputCrates)}`, 24, 14, UITheme.Colors.TextSecondary)
-		local preferred = if state.Priority ~= "" then Materials.Get(state.Priority) else nil
-		cardText(box, `{Strings.Smelter.Priority}: {if preferred then preferred.DisplayName else Strings.Smelter.Auto}`, 44, 14, UITheme.Colors.TextSecondary)
+local function renderStorage(snapshot: Types.StateSnapshot)
+	local base = "Windows/Storage/Content"
+	local built = snapshot.Buildings.build_storage == true
+	local used = sumItems(snapshot.StorageItems)
+	local full = storageFull(snapshot)
+	setText(`{base}/Description`, "Monitor stored ore and add crates to grow your capacity.")
+	if built then
+		setText(`{base}/CapacitySummary/Value`, `{NumberFormat.withSeparators(used)} / {NumberFormat.withSeparators(snapshot.StorageCapacity)}`)
+		setText(`{base}/CapacitySummary/State`, if full then "FULL" else "OK", if full then C.amber else C.green)
+		setFill(`{base}/CapacitySummary/StorageCapacity/Fill`, used / math.max(1, snapshot.StorageCapacity), if full then C.amber else C.primary)
+	else
+		setText(`{base}/CapacitySummary/Value`, "Not built yet")
+		setText(`{base}/CapacitySummary/State`, "", C.muted)
+		setFill(`{base}/CapacitySummary/StorageCapacity/Fill`, 0)
 	end
+
+	-- Kapazität wächst über Paletten-Kisten (D-037): nächste Kiste kaufen
+	local cfg = BalanceConfig.Storage
+	local crates = snapshot.StorageCrates
+	setText(`{base}/CapacityUpgrade/Title`, "Storage crates")
+	setVisible(`{base}/CapacityUpgrade/Arrow`, true)
+	setVisible(`{base}/CapacityUpgrade/Next`, true)
+	local upgrade = find(`{base}/CapacityUpgrade/Upgrade`)
+	if crates >= cfg.MaxCrates then
+		setText(`{base}/CapacityUpgrade/Subtitle`, TEXT.CratesMax)
+		setText(`{base}/CapacityUpgrade/Current`, NumberFormat.withSeparators(crates * cfg.CrateSize))
+		setVisible(`{base}/CapacityUpgrade/Arrow`, false)
+		setVisible(`{base}/CapacityUpgrade/Next`, false)
+		bind(upgrade, "Maximum reached", nil)
+	else
+		local price = CrateLogic.price(crates + 1)
+		setText(`{base}/CapacityUpgrade/Subtitle`, string.format("%d / %d crates · each holds %s of one material", crates, cfg.MaxCrates, NumberFormat.withSeparators(cfg.CrateSize)))
+		setText(`{base}/CapacityUpgrade/Current`, NumberFormat.withSeparators(crates * cfg.CrateSize))
+		setText(`{base}/CapacityUpgrade/Next`, NumberFormat.withSeparators((crates + 1) * cfg.CrateSize))
+		bind(upgrade, `Buy crate  ·  {NumberFormat.cash(price)}`, if built and snapshot.Cash >= price
+			then function()
+				call("BuyStorageCrate", { Price = price })
+			end
+			else nil)
+	end
+
+	-- statt „Transfer rate“ (kein Spielsystem): Liste der gelagerten Materialien
+	local card = find(`{base}/TransferUpgrade`)
+	if card then
+		setText(`{base}/TransferUpgrade/Title`, "Stored materials")
+		setText(`{base}/TransferUpgrade/Subtitle`, string.format("%d crates in use", CrateLogic.used(snapshot.StorageItems)))
+		for _, n in { "Current", "Arrow", "Next", "Upgrade" } do
+			setVisible(`{base}/TransferUpgrade/{n}`, false)
+		end
+		local list = card:FindFirstChild("Materials") :: ScrollingFrame?
+		if not list then
+			list = Create("ScrollingFrame", {
+				Name = "Materials",
+				Position = UDim2.fromScale(0.041, 0.4),
+				Size = UDim2.fromScale(0.918, 0.55),
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				ScrollBarThickness = 4,
+				ScrollBarImageColor3 = C.line,
+				AutomaticCanvasSize = Enum.AutomaticSize.Y,
+				CanvasSize = UDim2.new(),
+				Parent = card,
+			}, { Create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 2) }) })
+		end
+		local l = list :: ScrollingFrame
+		for _, child in l:GetChildren() do
+			if not child:IsA("UIListLayout") then
+				child:Destroy()
+			end
+		end
+		local ids = {}
+		for id, amount in snapshot.StorageItems do
+			if amount > 0 then
+				table.insert(ids, id)
+			end
+		end
+		table.sort(ids, function(a, b)
+			return snapshot.StorageItems[a] > snapshot.StorageItems[b]
+		end)
+		if #ids == 0 then
+			dynLabel(l, if built then TEXT.StorageEmpty else TEXT.StorageNotBuilt, 14, C.muted, 1)
+		end
+		for i, id in ids do
+			local mat = Materials.Get(id)
+			local row = Create("Frame", { Size = UDim2.new(1, -6, 0, px(22)), BackgroundTransparency = 1, LayoutOrder = i, Parent = l })
+			Create("TextLabel", {
+				Size = UDim2.fromScale(0.65, 1),
+				BackgroundTransparency = 1,
+				Font = Enum.Font.Gotham,
+				TextSize = px(14),
+				TextColor3 = C.text,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				TextTruncate = Enum.TextTruncate.AtEnd,
+				Text = if mat then mat.DisplayName else id,
+				Parent = row,
+			})
+			Create("TextLabel", {
+				AnchorPoint = Vector2.new(1, 0),
+				Position = UDim2.fromScale(1, 0),
+				Size = UDim2.fromScale(0.35, 1),
+				BackgroundTransparency = 1,
+				Font = Enum.Font.GothamBold,
+				TextSize = px(14),
+				TextColor3 = C.accent,
+				TextXAlignment = Enum.TextXAlignment.Right,
+				Text = NumberFormat.withSeparators(snapshot.StorageItems[id]),
+				Parent = row,
+			})
+		end
+	end
+end
+
+local function renderElevator(snapshot: Types.StateSnapshot)
+	local base = "Windows/Elevator/Content"
+	local built = snapshot.Buildings.build_elevator == true
+	local load = sumItems(snapshot.ElevatorBuffer)
+	local full = storageFull(snapshot)
+	setText(`{base}/Description`, "Manage elevator capacity and see how much ore reaches the surface.")
+	setText(`{base}/Status/LocationLabel`, "STATUS")
+	if built then
+		local status = if load > 0 and full then "StorageFull" elseif load > 0 then "Transporting" else "Idle"
+		setText(`{base}/Status/Position`, TEXT.ElevatorStatus[status], if status == "StorageFull" then C.amber elseif status == "Transporting" then C.green else C.text)
+		setText(`{base}/Status/Load`, `{NumberFormat.withSeparators(load)} / {NumberFormat.withSeparators(snapshot.ElevatorCapacity)} ore`)
+	else
+		setText(`{base}/Status/Position`, "Not built yet", C.muted)
+		setText(`{base}/Status/Load`, "")
+	end
+
+	-- Kapazität: echte Upgrade-Stufen (Upgrades „elevator“)
+	local tier = Upgrades.Next("elevator", snapshot.ElevatorCapacity)
+	setText(`{base}/CapacityUpgrade/Current`, NumberFormat.withSeparators(snapshot.ElevatorCapacity))
+	local upgrade = find(`{base}/CapacityUpgrade/Upgrade`)
+	if not tier then
+		setText(`{base}/CapacityUpgrade/Subtitle`, TEXT.MaxLevelSub)
+		setVisible(`{base}/CapacityUpgrade/Arrow`, false)
+		setVisible(`{base}/CapacityUpgrade/Next`, false)
+		bind(upgrade, "Maximum reached", nil)
+	else
+		local t = tier
+		local levelOk = snapshot.MiningLevel >= t.RequiredLevel
+		setText(`{base}/CapacityUpgrade/Subtitle`, if levelOk then "Carry more ore on every trip." else string.format("Requires mining level %d", t.RequiredLevel), if levelOk then nil else C.amber)
+		setVisible(`{base}/CapacityUpgrade/Arrow`, true)
+		setVisible(`{base}/CapacityUpgrade/Next`, true)
+		setText(`{base}/CapacityUpgrade/Next`, NumberFormat.withSeparators(t.Capacity))
+		bind(upgrade, `Upgrade  ·  {NumberFormat.cash(t.Cost)}`, if built and levelOk and snapshot.Cash >= t.Cost
+			then function()
+				call("BuyUpgrade", { Level = t.RequiredLevel, Price = t.Cost }, "elevator")
+			end
+			else nil)
+	end
+
+	-- statt „Transport speed“ (kein Spielsystem): Durchsatz
+	local cycle = BalanceConfig.Elevator.CycleSeconds
+	setText(`{base}/SpeedUpgrade/Title`, "Throughput")
+	setText(`{base}/SpeedUpgrade/Subtitle`, string.format("One trip every %d s.", cycle))
+	setText(`{base}/SpeedUpgrade/Current`, string.format("%s ore / min", NumberFormat.withSeparators(math.floor(snapshot.ElevatorCapacity * 60 / cycle))))
+	setVisible(`{base}/SpeedUpgrade/Arrow`, false)
+	setVisible(`{base}/SpeedUpgrade/Next`, false)
+	setVisible(`{base}/SpeedUpgrade/Upgrade`, false)
+	-- „Automatic transport“ gibt es nicht (der Elevator fährt immer automatisch)
+	setVisible(`{base}/AutomaticLabel`, false)
+	setVisible(`{base}/AutomaticTransport`, false)
+end
+
+local function renderProduction(snapshot: Types.StateSnapshot)
+	local base = "Windows/Production/Content"
+	local full = storageFull(snapshot)
+	local rate = productionRate(snapshot)
+	setText(`{base}/Output/OutputValue`, string.format("%s ore / min", NumberFormat.withSeparators(rate)))
+	setText(`{base}/Output/Status`, if full then "STORAGE FULL" elseif rate > 0 then "RUNNING" else "IDLE", if full then C.amber elseif rate > 0 then C.green else C.muted)
+	-- Schmelzer (D-011) in der Kopfzeile
+	if snapshot.Buildings.build_smelter then
+		local status = SmelterLogic.Status(snapshot.Smelter)
+		setText(`{base}/Output/OutputLabel`, `TOTAL OUTPUT  ·  SMELTER {string.upper(Strings.Smelter.Status[status] or status)}`)
+	else
+		setText(`{base}/Output/OutputLabel`, "TOTAL OUTPUT")
+	end
+
 	local placed: { Types.DrillRecord } = {}
-	local available: { [string]: number } = {}
+	local inventory = 0
 	for _, drill in snapshot.Drills do
 		if drill.MineId then
 			table.insert(placed, drill)
 		else
-			available[drill.Type] = (available[drill.Type] or 0) + 1
+			inventory += 1
 		end
-	end
-	if #placed == 0 and next(available) == nil then
-		if not hasSmelter then
-			label(TEXT.NoMachines, 16, UITheme.Colors.TextSecondary, 2)
-		end
-		return
 	end
 	table.sort(placed, function(a, b)
 		local ma, mb = Mines.Get(a.MineId or ""), Mines.Get(b.MineId or "")
@@ -652,256 +680,278 @@ local function renderProduction(snapshot: Types.StateSnapshot)
 		end
 		return (a.Slot or 0) < (b.Slot or 0)
 	end)
-	for i, drill in placed do
-		local def = Drills.Get(drill.Type)
-		local mine = Mines.Get(drill.MineId or "")
-		local box = card(10 + i, 64)
-		cardText(box, `{if def then def.DisplayName else drill.Type} – {if mine then Mines.Label(mine) else ""} · {string.format(TEXT.MiningSlot, drill.Slot or 0)}`, 0, 17, UITheme.Colors.TextPrimary, true)
-		local statusText, statusColor = drillStatus(drill.Id)
-		local rate = if def then string.format(TEXT.DrillRate, NumberFormat.withSeparators(Drills.OrePerMinute(def, Drills.LevelOf(drill)))) else ""
-		cardText(box, `Lv {Drills.LevelOf(drill)} · {statusText} · {rate}`, 24, 14, statusColor)
-		local button: TextButton = Create("TextButton", {
-			AnchorPoint = Vector2.new(1, 0.5),
-			Position = UDim2.fromScale(1, 0.5),
-			Size = UDim2.fromOffset(120, 36),
-			BackgroundColor3 = UITheme.Colors.SurfaceRaised,
-			Font = UITheme.FontBold,
-			TextSize = 14,
-			TextColor3 = UITheme.Colors.TextPrimary,
-			Text = TEXT.RemoveDrill,
-			Parent = box,
-		}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
-		local id = drill.Id
-		button.Activated:Connect(function()
-			call("RemoveDrill", nil, id)
-		end)
+	local machine = find(`{base}/SelectedMachine`)
+	local remove = machine and machine:FindFirstChild("RemoveMachine")
+	if machine and not remove then
+		remove = Create("TextButton", {
+			Name = "RemoveMachine",
+			Position = UDim2.fromScale(0.037, 0.789),
+			Size = UDim2.fromScale(0.3, 0.116),
+			Font = Enum.Font.Gotham,
+			TextScaled = true,
+			Parent = machine,
+		}, {
+			Create("UICorner", { CornerRadius = UDim.new(0, 5) }),
+			Create("UITextSizeConstraint", { MaxTextSize = 14 }),
+		})
 	end
-	if next(available) ~= nil then
-		label(TEXT.InventoryTitle, 16, UITheme.Colors.TextSecondary, 100, true)
-		local order = 101
-		for _, def in Drills.List do
-			local count = available[def.Id]
-			if count then
-				local box = card(order, 52)
-				cardText(box, string.format(TEXT.InventoryLine, def.DisplayName, count), 0, 16, UITheme.Colors.TextPrimary, true)
-				cardText(box, TEXT.InventoryHint, 22, 13, UITheme.Colors.TextSecondary)
-				order += 1
+	if #placed == 0 then
+		selectedDrill = 1
+		setText(`{base}/SelectedMachine/Machine`, "No machine placed")
+		setText(`{base}/SelectedMachine/Level`, if inventory > 0 then string.format("%d IN INVENTORY", inventory) else "")
+		setText(`{base}/SelectedMachine/State`, if inventory > 0 then "Ready to place" else "No drills yet", C.muted)
+		setText(`{base}/SelectedMachine/Reason`, if inventory > 0 then TEXT.InventoryHint else TEXT.NoMachines)
+		bind(find(`{base}/SelectedMachine/ManageMachine`), "Next machine", nil, false)
+		bind(remove, "Remove", nil, false)
+		setText(`{base}/OutputUpgrade/Current`, "–")
+		bind(find(`{base}/OutputUpgrade/UpgradeProduction`), "Upgrade", nil)
+		return
+	end
+	selectedDrill = math.clamp(selectedDrill, 1, #placed)
+	local drill = placed[selectedDrill]
+	local def = Drills.Get(drill.Type)
+	local mine = Mines.Get(drill.MineId or "")
+	local level = Drills.LevelOf(drill)
+	local st = statuses[drill.Id]
+	setText(`{base}/SelectedMachine/Machine`, `{if def then def.DisplayName else drill.Type}  ·  {if mine then Mines.Label(mine) else ""} slot {drill.Slot or 0}`)
+	setText(`{base}/SelectedMachine/Level`, string.format("LEVEL %02d / %02d%s", level, Drills.MaxLevel, if inventory > 0 then `  ·  {inventory} IN INVENTORY` else ""))
+	setText(`{base}/SelectedMachine/State`, if st == "Running" then "Running" elseif st == "OutputFull" then "Paused" else "Idle", if st == "Running" then C.green else C.amber)
+	setText(`{base}/SelectedMachine/Reason`, if st == "Running" then (if def then string.format(TEXT.DrillRate, NumberFormat.withSeparators(Drills.OrePerMinute(def, level))) else "") elseif st == "OutputFull" then "Output full – needs transport" else "Waiting to start")
+	bind(find(`{base}/SelectedMachine/ManageMachine`), `Next machine  ({selectedDrill}/{#placed})`, if #placed > 1
+		then function()
+			selectedDrill = selectedDrill % #placed + 1
+			LaptopController.Render()
+		end
+		else nil, false)
+	local id = drill.Id
+	bind(remove, "Remove", function()
+		call("RemoveDrill", nil, id)
+	end, false)
+	-- Drill-Level 1–10 (D-043)
+	local upgradeButton = find(`{base}/OutputUpgrade/UpgradeProduction`)
+	setText(`{base}/OutputUpgrade/Title`, "Drill level")
+	local cost = if def then Drills.LevelUpCost(def, level) else nil
+	if def and cost then
+		local c = cost
+		setText(`{base}/OutputUpgrade/Current`, `{NumberFormat.withSeparators(Drills.OrePerMinute(def, level))} > {NumberFormat.withSeparators(Drills.OrePerMinute(def, level + 1))}`)
+		bind(upgradeButton, `Upgrade  ·  {NumberFormat.cash(c)}`, if snapshot.Cash >= c
+			then function()
+				call("UpgradeDrill", { Price = NumberFormat.cash(c) }, id)
+			end
+			else nil)
+	else
+		setText(`{base}/OutputUpgrade/Current`, if def then NumberFormat.withSeparators(Drills.OrePerMinute(def, level)) else "–")
+		bind(upgradeButton, "Maximum level", nil)
+	end
+end
+
+local function renderLuck(snapshot: Types.StateSnapshot)
+	local base = "Windows/Luck/Content"
+	local level = snapshot.LuckLevel or 0
+	local max = BalanceConfig.Luck.MaxLevel
+	local chance = RareDropLogic.Chance(level)
+	setText(`{base}/Description`, TEXT.LuckHint)
+	setText(`{base}/LuckMultiplier/Multiplier`, pct(chance))
+	setText(`{base}/LuckMultiplier/MultiplierLabel`, string.format("RARE FIND CHANCE  ·  LEVEL %d / %d", level, max))
+	local price, requiredLevel = RareDropLogic.NextLuck(level)
+	local button = find(`{base}/LuckMultiplier/UpgradeLuck`)
+	if not price or not requiredLevel then
+		setText(`{base}/LuckMultiplier/Next`, TEXT.LuckMax)
+		bind(button, "Maximum reached", nil)
+	else
+		local p, r = price, requiredLevel
+		local levelOk = snapshot.MiningLevel >= r
+		setText(`{base}/LuckMultiplier/Next`, if levelOk then `Next level  ·  {pct(RareDropLogic.Chance(level + 1))}` else string.format("Requires mining level %d", r), if levelOk then nil else C.amber)
+		bind(button, `Upgrade  ·  {NumberFormat.cash(p)}`, if levelOk and snapshot.Cash >= p
+			then function()
+				call("BuyLuck", { Level = r, Price = NumberFormat.cash(p) })
+			end
+			else nil)
+	end
+	-- Fundprofil je Hit nach den echten Regeln (BalanceConfig.RareDrops): normaler Hit, Bonus ×2–×3,
+	-- Bonus ×4–×10, seltenes Erz
+	local rd = BalanceConfig.RareDrops
+	local weights = rd.MultiplierWeights
+	local totalW, lowW = 0, 0
+	for i, w in weights do
+		totalW += w
+		if i <= 2 then
+			lowW += w
+		end
+	end
+	local multShare = chance * (1 - rd.OreShare)
+	local rows = {
+		{ "Common", "Normal hit", 1 - chance },
+		{ "Uncommon", "Bonus ×2–×3", multShare * lowW / totalW },
+		{ "Rare", "Bonus ×4–×10", multShare * (totalW - lowW) / totalW },
+		{ "Epic", "Rare ore", chance * rd.OreShare },
+	}
+	setText(`{base}/RarityOverview/Title`, "Find profile per hit")
+	for _, row in rows do
+		setText(`{base}/RarityOverview/{row[1]}Label`, row[2])
+		setText(`{base}/RarityOverview/{row[1]}Value`, pct(row[3]))
+		setFill(`{base}/RarityOverview/{row[1]}Chance/Fill`, math.max(row[3], if row[3] > 0 then 0.01 else 0))
+	end
+	-- Benachrichtigungs-Schalter: kein Spielsystem
+	setVisible(`{base}/RarityOverview/NotificationsLabel`, false)
+	setVisible(`{base}/RarityOverview/RareFindNotifications`, false)
+end
+
+local function renderCompany(snapshot: Types.StateSnapshot)
+	local base = "Windows/Company/Content"
+	local logo = CompanyIdentity.LogoById[snapshot.Company.LogoId]
+	local color = CompanyIdentity.ColorById[snapshot.Company.ColorId]
+	setText(`{base}/CompanyProfile/CompanyName`, `{if logo then logo.Glyph .. "  " else ""}{snapshot.Company.Name}`)
+	setText(`{base}/CompanyProfile/Owner`, `Owner  /  {player.DisplayName}`)
+	setText(`{base}/Description`, "Your company identity.")
+	-- statt Beispiel-Upgrades (kein Spielsystem): Farbe und Logo
+	setText(`{base}/LogisticsUpgrade/Title`, TEXT.CompanyColor)
+	setText(`{base}/LogisticsUpgrade/Subtitle`, "Your company's accent color.")
+	setText(`{base}/LogisticsUpgrade/Current`, if color then color.DisplayName else "–", if color then color.Color else nil)
+	setText(`{base}/WorkforceUpgrade/Title`, "Company logo")
+	setText(`{base}/WorkforceUpgrade/Subtitle`, "Your company's logo.")
+	setText(`{base}/WorkforceUpgrade/Current`, if logo then `{logo.Glyph}  {logo.DisplayName}` else "–")
+	for _, cardName in { "LogisticsUpgrade", "WorkforceUpgrade" } do
+		setVisible(`{base}/{cardName}/Arrow`, false)
+		setVisible(`{base}/{cardName}/Next`, false)
+		setVisible(`{base}/{cardName}/Upgrade`, false)
+	end
+	setText(`{base}/CompanyHint`, TEXT.CompanyChangeHint)
+end
+
+local function bonusText(count: number): string
+	local money = math.floor((PrestigeLogic.MoneyMultiplier(count) - 1) * 100 + 0.5)
+	local speed = math.floor((PrestigeLogic.SpeedMultiplier(count) - 1) * 100 + 0.5)
+	return string.format("+%d%% money · +%d%% speed", money, speed)
+end
+
+local function renderPrestige(snapshot: Types.StateSnapshot)
+	local base = "Windows/Prestige/Content"
+	local count = snapshot.PrestigeCount
+	local required = BalanceConfig.Prestige.RequiredLevel
+	local available = PrestigeLogic.IsAvailable(snapshot.MiningLevel)
+	setText(`{base}/PrestigeSummary/CurrentLevel`, tostring(count))
+	setText(`{base}/PrestigeSummary/RewardLabel`, "BONUS AFTER NEXT PRESTIGE")
+	setText(`{base}/PrestigeSummary/Reward`, bonusText(count + 1))
+	setFill(`{base}/PrestigeSummary/PrestigeRequirement/Fill`, snapshot.MiningLevel / required, if available then C.green else C.primary)
+	setText(`{base}/PrestigeSummary/Requirement`, string.format("Mining level %d / %d required", snapshot.MiningLevel, required), if available then C.green else nil)
+	setText(`{base}/PrestigeReview/Description`, if count > 0 then `Current bonus: {bonusText(count)}` else "Review what resets and what you keep.")
+	bind(find(`{base}/PrestigeReview/ReviewPrestige`), if available then "Review prestige" else string.format("Level %d required", required), if available
+		then function()
+			confirmStartedAt = os.clock()
+			LaptopController.Render()
+		end
+		else nil)
+
+	-- Bestätigungsdialog (deckt die Taskleiste nicht ab)
+	local dialog = find("PrestigeConfirmation")
+	if dialog then
+		dialog.Visible = confirmStartedAt ~= nil and currentApp == "Prestige"
+		if dialog.Visible then
+			setText("PrestigeConfirmation/Description", `Resets: cash, level, buildings, workers, drills, all ore. You keep: prestige bonuses, company, pickaxes, backpacks, vehicles, Robux purchases. You gain: {bonusText(count + 1)}. This cannot be undone.`)
+			bind(find("PrestigeConfirmation/Cancel"), "Cancel", function()
+				confirmStartedAt = nil
+				LaptopController.Render()
+			end, false)
+			local remaining = math.ceil(CONFIRM_SECONDS - (os.clock() - (confirmStartedAt :: number)))
+			if remaining > 0 then
+				bind(find("PrestigeConfirmation/Confirm"), `Confirm prestige ({remaining})`, nil)
+				task.delay(1, LaptopController.Render)
+			else
+				bind(find("PrestigeConfirmation/Confirm"), "Confirm prestige", function()
+					confirmStartedAt = nil
+					call("Prestige", { Level = required })
+					LaptopController.Render()
+				end)
+				local confirm = find("PrestigeConfirmation/Confirm")
+				if confirm then
+					confirm.BackgroundColor3 = Color3.fromRGB(176, 84, 84)
+				end
 			end
 		end
 	end
 end
 
--- COMPANY: Firmenname, Logo, Farbe (docs/09 §25) und Einstellungen (Handelsanfragen, docs/13 §12)
-local function renderCompany(snapshot: Types.StateSnapshot)
-	label(TEXT.CompanyTitle, 24, UITheme.Colors.TextPrimary, 1, true)
-	local logo = CompanyIdentity.LogoById[snapshot.Company.LogoId]
-	local color = CompanyIdentity.ColorById[snapshot.Company.ColorId]
-	local box = card(2, 92)
-	cardText(box, `{if logo then logo.Glyph .. "  " else ""}{snapshot.Company.Name}`, 0, 22, UITheme.Colors.TextPrimary, true)
-	cardText(box, `{TEXT.CompanyColor}: {if color then color.DisplayName else "-"}`, 32, 15, UITheme.Colors.TextSecondary)
-	Create("Frame", {
-		AnchorPoint = Vector2.new(1, 0.5),
-		Position = UDim2.fromScale(1, 0.5),
-		Size = UDim2.fromOffset(48, 48),
-		BackgroundColor3 = accent(snapshot),
-		Parent = box,
-	}, { Create("UICorner", { CornerRadius = UDim.new(1, 0) }) })
-	cardText(box, TEXT.CompanyChangeHint, 54, 13, UITheme.Colors.TextSecondary)
-
-	label(TEXT.Settings, 16, UITheme.Colors.TextSecondary, 3, true)
-	local settingsBox = card(4, 60)
+local function renderSettings(snapshot: Types.StateSnapshot)
+	local base = "Windows/Settings/Content/Preferences"
+	-- echte Einstellung: Handelsanfragen (docs/13 §12); weitere Schalter haben kein Spielsystem
+	setText(`{base}/Title0`, TEXT.TradeRequests)
+	setText(`{base}/Description0`, "Allow other players to send you trade offers")
 	local enabled = snapshot.Settings.TradeRequests
-	cardText(settingsBox, TEXT.TradeRequests, 8, 17, UITheme.Colors.TextPrimary, true)
-	local toggle: TextButton = Create("TextButton", {
-		AnchorPoint = Vector2.new(1, 0.5),
-		Position = UDim2.fromScale(1, 0.5),
-		Size = UDim2.fromOffset(110, 36),
-		BackgroundColor3 = if enabled then UITheme.Colors.Positive else UITheme.Colors.SurfaceRaised,
-		Font = UITheme.FontBold,
-		TextSize = 15,
-		TextColor3 = if enabled then Color3.fromRGB(20, 24, 28) else UITheme.Colors.TextPrimary,
-		Text = if enabled then TEXT.On else TEXT.Off,
-		Parent = settingsBox,
-	}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
-	toggle.Activated:Connect(function()
+	toggle(`{base}/Toggle_soundEnabled`, enabled, function()
 		call("SetTradeRequests", nil, not enabled)
 	end)
-end
-
--- LUCK (D-045): Mining Luck Stufe für Stufe, erhöht nur die Rare-Drop-Chance beim eigenen Mining
-local function renderLuck(snapshot: Types.StateSnapshot)
-	label(TEXT.LuckTitle, 24, UITheme.Colors.TextPrimary, 1, true)
-	label(TEXT.LuckHint, 15, UITheme.Colors.TextSecondary, 2)
-	local level = snapshot.LuckLevel or 0
-	local max = BalanceConfig.Luck.MaxLevel
-	local box = card(3, 120)
-	cardText(box, string.format(TEXT.LuckLine, level, max), 0, 14, UITheme.Colors.TextSecondary, true)
-	cardText(box, string.format(TEXT.LuckChanceLine, string.format("%.2f%%", RareDropLogic.Chance(level) * 100)), 24, 20, UITheme.Colors.TextPrimary, true)
-	local price, requiredLevel = RareDropLogic.NextLuck(level)
-	if not price or not requiredLevel then
-		cardText(box, TEXT.LuckMax, 56, 16, UITheme.Colors.Positive, true)
-		return
+	for _, n in { "Title1", "Description1", "Toggle_notificationsEnabled", "Divider1", "Title2", "Description2", "Toggle_rareFindNotifications", "Divider2" } do
+		setVisible(`{base}/{n}`, false)
 	end
-	cardText(box, string.format(TEXT.LuckNext, string.format("%.2f%%", RareDropLogic.Chance(level + 1) * 100)), 54, 15, UITheme.Colors.TextSecondary)
-	local levelOk = snapshot.MiningLevel >= requiredLevel
-	local affordable = snapshot.Cash >= price
-	cardText(box, string.format(TEXT.RequiresLevel, requiredLevel), 76, 15, if levelOk then UITheme.Colors.TextSecondary else UITheme.Colors.Warning)
-	local ready = levelOk and affordable
-	local button: TextButton = Create("TextButton", {
-		AnchorPoint = Vector2.new(1, 1),
-		Position = UDim2.fromScale(1, 1),
-		Size = UDim2.fromOffset(170, 40),
-		BackgroundColor3 = if ready then accent(snapshot) else UITheme.Colors.SurfaceRaised,
-		Font = UITheme.FontBold,
-		TextSize = 15,
-		TextColor3 = if ready then Color3.fromRGB(20, 24, 28) else UITheme.Colors.TextPrimary,
-		Text = string.format(TEXT.LuckButton, NumberFormat.cash(price)),
-		Parent = box,
-	}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
-	button.Activated:Connect(function()
-		call("BuyLuck", { Level = requiredLevel, Price = NumberFormat.cash(price) })
-	end)
+	-- nur das dunkle Design (Felix: dunkles Design beibehalten)
+	bind(find(`{base}/Theme`), "Dark", nil, false)
 end
 
--- PRESTIGE (docs/12 §50–52, docs/09 §74): Voraussetzung, Bonus, Reset-/Behalten-Liste und
--- Bestätigung in zwei Schritten mit Wartezeit – nie mit einem einzelnen Klick.
-local CONFIRM_SECONDS = 3
-local confirmStartedAt: number? = nil
+local RENDER: { [string]: (Types.StateSnapshot) -> () } = {
+	Overview = renderOverview,
+	Employees = renderEmployees,
+	Storage = renderStorage,
+	Elevator = renderElevator,
+	Production = renderProduction,
+	Luck = renderLuck,
+	Company = renderCompany,
+	Prestige = renderPrestige,
+	Settings = renderSettings,
+}
 
-local function bonusText(count: number): string
-	local money = math.floor((PrestigeLogic.MoneyMultiplier(count) - 1) * 100 + 0.5)
-	local speed = math.floor((PrestigeLogic.SpeedMultiplier(count) - 1) * 100 + 0.5)
-	return string.format(TEXT.PrestigeBonusLine, money, speed)
-end
-
-local function listCard(order: number, title: string, lines: { string }, color: Color3)
-	local box = card(order, 28 + #lines * 20)
-	cardText(box, title, 0, 15, color, true)
-	for i, line in lines do
-		cardText(box, line, 4 + i * 20, 14, UITheme.Colors.TextPrimary)
-	end
-end
-
-local function renderPrestige(snapshot: Types.StateSnapshot)
-	local count = snapshot.PrestigeCount
-	local required = BalanceConfig.Prestige.RequiredLevel
-	local available = PrestigeLogic.IsAvailable(snapshot.MiningLevel)
-	label(TEXT.PrestigeTitle, 24, UITheme.Colors.TextPrimary, 1, true)
-
-	if confirmStartedAt then
-		-- Schritt 2: Bestätigung
-		local box = card(2, 64)
-		cardText(box, TEXT.PrestigeConfirmTitle, 0, 22, UITheme.Colors.Warning, true)
-		cardText(box, TEXT.PrestigeConfirmText, 30, 15, UITheme.Colors.TextPrimary)
-		listCard(3, TEXT.PrestigeResets, TEXT.PrestigeResetList, UITheme.Colors.Negative)
-		listCard(4, TEXT.PrestigeKeeps, TEXT.PrestigeKeepList, UITheme.Colors.Positive)
-		listCard(5, TEXT.PrestigeGain, { bonusText(count + 1) }, UITheme.Colors.Positive)
-		local row = Create("Frame", { Size = UDim2.new(1, 0, 0, 44), BackgroundTransparency = 1, LayoutOrder = 6, Parent = content })
-		local cancel: TextButton = Create("TextButton", {
-			Size = UDim2.new(0.5, -4, 1, 0),
-			BackgroundColor3 = UITheme.Colors.SurfaceRaised,
-			Font = UITheme.FontBold,
-			TextSize = 16,
-			TextColor3 = UITheme.Colors.TextPrimary,
-			Text = TEXT.PrestigeCancel,
-			Parent = row,
-		}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
-		cancel.Activated:Connect(function()
-			confirmStartedAt = nil
-			LaptopController.Render()
-		end)
-		local remaining = math.ceil(CONFIRM_SECONDS - (os.clock() - (confirmStartedAt :: number)))
-		local ready = remaining <= 0
-		local confirm: TextButton = Create("TextButton", {
-			AnchorPoint = Vector2.new(1, 0),
-			Position = UDim2.fromScale(1, 0),
-			Size = UDim2.new(0.5, -4, 1, 0),
-			BackgroundColor3 = if ready then UITheme.Colors.Negative else UITheme.Colors.Surface,
-			Font = UITheme.FontBold,
-			TextSize = 16,
-			TextColor3 = UITheme.Colors.TextPrimary,
-			AutoButtonColor = ready,
-			Text = if ready then TEXT.PrestigeConfirm else string.format(TEXT.PrestigeConfirmIn, remaining),
-			Parent = row,
-		}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
-		if ready then
-			confirm.Activated:Connect(function()
-				confirmStartedAt = nil
-				call("Prestige", { Level = required })
-				LaptopController.Render()
-			end)
-		else
-			task.delay(1, LaptopController.Render)
+-- Taskleiste: Kontostand, Firma, Uhr, aktive App
+local function renderTaskbar(snapshot: Types.StateSnapshot)
+	setText("Taskbar/WalletValue", NumberFormat.cash(snapshot.Cash))
+	setText("Taskbar/CompanyName", snapshot.Company.Name)
+	setText("Taskbar/Clock", os.date("%H:%M") :: string)
+	setText("Taskbar/Date", string.upper(os.date("%d %b") :: string))
+	for _, app in APPS do
+		local indicator = find(`Taskbar/Pinned_{app}/ActiveIndicator`)
+		if indicator then
+			indicator.Visible = app == currentApp
 		end
-		return
-	end
-
-	-- Schritt 1: Übersicht
-	local box = card(2, 70)
-	cardText(box, string.format(TEXT.PrestigeCount, count), 0, 20, UITheme.Colors.TextPrimary, true)
-	cardText(box, if count > 0 then bonusText(count) else TEXT.PrestigeNoBonus, 30, 15, UITheme.Colors.TextSecondary)
-	local req = card(3, 62)
-	cardText(req, string.format(TEXT.PrestigeRequirement, required, snapshot.MiningLevel), 0, 16, if available then UITheme.Colors.Positive else UITheme.Colors.TextPrimary, true)
-	bar(req, 28, snapshot.MiningLevel / required, snapshot)
-	listCard(4, TEXT.PrestigeGain, { bonusText(count + 1) }, UITheme.Colors.Positive)
-	listCard(5, TEXT.PrestigeResets, TEXT.PrestigeResetList, UITheme.Colors.Negative)
-	listCard(6, TEXT.PrestigeKeeps, TEXT.PrestigeKeepList, UITheme.Colors.Positive)
-	local start: TextButton = Create("TextButton", {
-		Size = UDim2.new(1, 0, 0, 46),
-		BackgroundColor3 = if available then accent(snapshot) else UITheme.Colors.Surface,
-		Font = UITheme.FontBold,
-		TextSize = 17,
-		TextColor3 = if available then Color3.fromRGB(20, 24, 28) else UITheme.Colors.TextSecondary,
-		AutoButtonColor = available,
-		Text = if available then TEXT.PrestigeStart else string.format(TEXT.PrestigeLocked, required),
-		LayoutOrder = 7,
-		Parent = content,
-	}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
-	if available then
-		start.Activated:Connect(function()
-			confirmStartedAt = os.clock()
-			LaptopController.Render()
-		end)
 	end
 end
 
 function LaptopController.Render()
-	if not gui or not gui.Enabled then
+	local g = gui
+	if not g or not g.Enabled then
 		return
 	end
-	clearContent()
 	local snapshot = StateController.Get()
 	if not snapshot then
 		return
 	end
-	local logo = CompanyIdentity.LogoById[snapshot.Company.LogoId]
-	headerName.Text = `{if logo then logo.Glyph .. "  " else ""}{snapshot.Company.Name}`
-	for app, button in navButtons do
-		local active = app == currentApp
-		button.BackgroundColor3 = if active then accent(snapshot) else UITheme.Colors.Surface
-		button.TextColor3 = if active then Color3.fromRGB(20, 24, 28) else UITheme.Colors.TextPrimary
+	renderTaskbar(snapshot)
+	-- genau eine App sichtbar (maximiert über der Taskleiste), sonst der leere Desktop
+	for _, app in APPS do
+		setVisible(`Windows/{app}`, app == currentApp)
 	end
-	if currentApp == "EMPLOYEES" then
-		renderEmployees(snapshot)
-	elseif currentApp == "DASHBOARD" then
-		renderDashboard(snapshot)
-	elseif currentApp == "STORAGE" then
-		renderStorage(snapshot)
-	elseif currentApp == "ELEVATOR" then
-		renderElevator(snapshot)
-	elseif currentApp == "PRODUCTION" then
-		renderProduction(snapshot)
-	elseif currentApp == "LUCK" then
-		renderLuck(snapshot)
-	elseif currentApp == "COMPANY" then
-		renderCompany(snapshot)
-	elseif currentApp == "PRESTIGE" then
-		renderPrestige(snapshot)
-	else
-		label(currentApp, 24, UITheme.Colors.TextPrimary, 1, true)
-		label(TEXT.ComingSoon, 16, UITheme.Colors.TextSecondary, 2)
+	setVisible("Header", currentApp == nil)
+	local dialog = find("PrestigeConfirmation")
+	if dialog and currentApp ~= "Prestige" then
+		dialog.Visible = false
+	end
+	local app = currentApp
+	if app then
+		local render = RENDER[app]
+		if render then
+			render(snapshot)
+		end
 	end
 end
+
+local function openApp(app: string?)
+	if currentApp ~= app then
+		confirmStartedAt = nil
+	end
+	currentApp = app
+	LaptopController.Render()
+end
+
+-- ---------------------------------------------------------------------------------------------
+-- Öffnen / Schließen
 
 -- Kurzer Kamera-Zoom auf den Laptop (docs/04 §7, docs/09 §21)
 local function zoomTo(open: boolean)
@@ -920,128 +970,132 @@ local function zoomTo(open: boolean)
 	end
 end
 
+-- Die Roblox-Werkzeugleiste (Hotbar) liegt über allen Spiel-Oberflächen und verdeckte die
+-- Taskleiste mittig (Company-Knopf nicht klickbar): solange der Laptop offen ist, ausblenden
+local function setHotbar(visible: boolean)
+	pcall(function()
+		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, visible)
+	end)
+end
+
 local function close()
+	local g = gui
+	if not g then
+		return
+	end
 	confirmStartedAt = nil
-	gui.Enabled = false
+	currentApp = nil
+	g.Enabled = false
+	setHotbar(true)
 	zoomTo(false)
 end
 
 local function open()
+	local g = gui
+	if not g then
+		return
+	end
 	zoomTo(true)
 	task.wait(0.35)
-	gui.Enabled = true
+	-- Start immer auf dem leeren Desktop mit Taskleiste
+	currentApp = nil
+	setHotbar(false)
+	g.Enabled = true
 	LaptopController.Render()
 end
 
 local function build()
-	gui = Create("ScreenGui", {
-		Name = "Laptop",
-		ResetOnSpawn = false,
-		Enabled = false,
-		DisplayOrder = 35,
-		IgnoreGuiInset = true,
-		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
-		Parent = player:WaitForChild("PlayerGui"),
-	})
-	local panel = Create("Frame", {
-		AnchorPoint = Vector2.new(0.5, 0.5),
-		Position = UDim2.fromScale(0.5, 0.5),
-		Size = UDim2.fromScale(0.9, 0.8),
-		BackgroundColor3 = UITheme.Colors.Background,
-		Parent = gui,
-	}, {
-		Create("UICorner", { CornerRadius = UDim.new(0, 16) }),
-		Create("UIStroke", { Color = UITheme.Colors.SurfaceRaised, Thickness = 2 }),
-		Create("UISizeConstraint", { MaxSize = Vector2.new(860, 560) }),
-	})
-	-- Kopfzeile mit Firmenname
-	local header = Create("Frame", {
-		Size = UDim2.new(1, 0, 0, 52),
-		BackgroundColor3 = UITheme.Colors.Surface,
-		Parent = panel,
-	}, {
-		Create("UICorner", { CornerRadius = UDim.new(0, 16) }),
-		Create("UIPadding", { PaddingLeft = UDim.new(0, 20), PaddingRight = UDim.new(0, 12) }),
-	})
-	headerName = Create("TextLabel", {
-		Size = UDim2.new(1, -50, 1, 0),
-		BackgroundTransparency = 1,
-		Font = UITheme.FontBold,
-		TextSize = 20,
-		TextColor3 = UITheme.Colors.TextPrimary,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		Parent = header,
-	})
-	local closeButton: TextButton = Create("TextButton", {
-		AnchorPoint = Vector2.new(1, 0.5),
-		Position = UDim2.fromScale(1, 0.5),
-		Size = UDim2.fromOffset(34, 34),
-		BackgroundColor3 = UITheme.Colors.SurfaceRaised,
-		Font = UITheme.FontBold,
-		TextSize = 18,
-		TextColor3 = UITheme.Colors.TextPrimary,
-		Text = TEXT.Close,
-		Parent = header,
-	}, { Create("UICorner", { CornerRadius = UDim.new(1, 0) }) })
-	closeButton.Activated:Connect(close)
+	local template = script.Parent.Parent:WaitForChild("UI"):WaitForChild("MineOS_Laptop") :: ScreenGui
+	local g = template:Clone()
+	g.Name = "Laptop"
+	g.Enabled = false
+	g.ResetOnSpawn = false
+	g.DisplayOrder = 35
+	g.Parent = player:WaitForChild("PlayerGui")
+	gui = g
+	root = g:WaitForChild("MineOS") :: Frame
 
-	-- App-Leiste links
-	local nav = Create("Frame", {
-		Position = UDim2.fromOffset(14, 66),
-		Size = UDim2.new(0, 170, 1, -80),
-		BackgroundTransparency = 1,
-		Parent = panel,
-	}, { Create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 6) }) })
-	for i, app in TEXT.Apps do
-		local button: TextButton = Create("TextButton", {
-			Size = UDim2.new(1, 0, 0, 40),
-			BackgroundColor3 = UITheme.Colors.Surface,
-			Font = UITheme.FontBold,
-			TextSize = 14,
-			TextColor3 = UITheme.Colors.TextPrimary,
-			Text = "      " .. app,
-			LayoutOrder = i,
-			Parent = nav,
-		}, { Create("UICorner", { CornerRadius = UITheme.CornerRadius }) })
-		-- Kategorie-Icon links (docs/09 §61)
-		local icon = CategoryIcon.create(APP_ICONS[app] or "", 30)
-		icon.AnchorPoint = Vector2.new(0, 0.5)
-		icon.Position = UDim2.new(0, 6, 0.5, 0)
-		icon.Parent = button
-		button.Activated:Connect(function()
-			confirmStartedAt = nil
-			currentApp = app
-			LaptopController.Render()
-		end)
-		navButtons[app] = button
+	-- Kleine Bildschirme (Größentest 2026-10-29): Texte mit fester Schriftgröße liefen über. Alle
+	-- Texte skalieren mit (Obergrenze = Originalgröße, mindestens 7 px).
+	for _, d in g:GetDescendants() do
+		if d:IsA("TextLabel") or d:IsA("TextButton") then
+			local c = d:FindFirstChildOfClass("UITextSizeConstraint")
+			if not c then
+				local nc = Instance.new("UITextSizeConstraint")
+				nc.MaxTextSize = math.max(1, math.floor(d.TextSize))
+				nc.Parent = d
+				c = nc
+			elseif not d.TextScaled then
+				c.MaxTextSize = math.max(c.MinTextSize, math.floor(d.TextSize))
+			end
+			c.MinTextSize = math.min(7, c.MaxTextSize)
+			d.TextScaled = true
+		end
+	end
+	-- Auf niedrigen Bildschirmen (Handy quer) die ganze Höhe nutzen; Seitenverhältnis bleibt 1,6
+	local canvas = root :: Frame
+	local defaultSize = canvas.Size
+	local function fitCanvas()
+		local vp = workspace.CurrentCamera.ViewportSize
+		canvas.Size = if vp.Y < 500 then UDim2.fromScale(1, 1) else defaultSize
+	end
+	fitCanvas()
+	workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(fitCanvas)
+
+	-- alle App-Fenster und der Dialog starten verborgen
+	for _, app in APPS do
+		setVisible(`Windows/{app}`, false)
+	end
+	setVisible("PrestigeConfirmation", false)
+
+	-- Taskleiste: Apps öffnen, Einstellungen, Laptop schließen
+	for _, app in APPS do
+		local launcher = if app == "Settings" then find("Taskbar/Settings") else find(`Taskbar/Pinned_{app}`)
+		if launcher and launcher:IsA("GuiButton") then
+			launcher.Activated:Connect(function()
+				openApp(app)
+			end)
+		end
+		-- Minimieren und Schließen führen zum leeren Desktop
+		for _, n in { "Minimize", "Close" } do
+			local b = find(`Windows/{app}/Titlebar/{n}`)
+			if b and b:IsA("GuiButton") then
+				b.Activated:Connect(function()
+					openApp(nil)
+				end)
+			end
+		end
+	end
+	local closeLaptop = find("Taskbar/CloseLaptop")
+	if closeLaptop and closeLaptop:IsA("GuiButton") then
+		closeLaptop.Activated:Connect(close)
 	end
 
-	content = Create("ScrollingFrame", {
-		Position = UDim2.fromOffset(198, 66),
-		Size = UDim2.new(1, -212, 1, -80),
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
-		ScrollBarThickness = 6,
-		ScrollBarImageColor3 = UITheme.Colors.SurfaceRaised,
-		AutomaticCanvasSize = Enum.AutomaticSize.Y,
-		CanvasSize = UDim2.new(),
-		Parent = panel,
-	}, {
-		Create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 8) }),
-		Create("UIPadding", { PaddingRight = UDim.new(0, 8) }),
-	})
-
 	UserInputService.InputBegan:Connect(function(input, processed)
-		if not processed and input.KeyCode == Enum.KeyCode.Escape and gui.Enabled then
+		if not processed and input.KeyCode == Enum.KeyCode.Escape and g.Enabled then
 			close()
 		end
 	end)
 	StateController.Changed:Connect(function()
 		LaptopController.Render()
 	end)
+	-- dynamische Inhalte bei Größenänderung neu aufbauen
+	local r = root :: Frame
+	r:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+		LaptopController.Render()
+	end)
 	player.CharacterAdded:Connect(function()
-		if gui.Enabled then
+		if g.Enabled then
 			close()
+		end
+	end)
+	-- Uhr in der Taskleiste
+	task.spawn(function()
+		while true do
+			task.wait(15)
+			if g.Enabled then
+				setText("Taskbar/Clock", os.date("%H:%M") :: string)
+			end
 		end
 	end)
 end
