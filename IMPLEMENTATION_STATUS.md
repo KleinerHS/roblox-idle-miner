@@ -850,6 +850,7 @@ Selbsttest (ohne Studio, tools/topdown): Draufsicht aller Parkplätze; Überschn
 | Umbau Hütte → Premium-Büro (und zurück nach Prestige) | `BuildingService.luau`, `BuildTemplates.luau` (`buildOfficeUpgrade`) | TESTING_REQUIRED |
 | Vorlage Premium-Büro: Farben, Texturen, 13 Lichter, Kollision, Monitor als Firmen-Computer, Spawn vor dem Sofa | Place-Datei: `ServerStorage.Vendor.PremiumOffice` – **Place speichern!** Sicherung `assets/PremiumOffice.rbxm` (Rücktest 512 Objekte, 0 Abweichungen) | TESTING_REQUIRED |
 | Glastüren öffnen automatisch nach außen | `AutoDoorController.luau` (Drehtüren) | TESTING_REQUIRED |
+| 0.61.1: Firmenname auf Logowand und Fußmatte statt „YOUR COMPANY“ (D-083); Rücktest Vorlage 517 Objekte, 0 Abweichungen | `BuildingService.luau`, Vorlage `PremiumOffice` | TESTING_REQUIRED |
 
 Selbsttest (Play): Knopf erscheint mit „$35,000“. Büro per DevTools gesetzt: Premium-Büro steht in der Hallenecke, Hütte und Knopf weg. Türen öffnen sich beim Herangehen und schließen wieder. Die Figur läuft hinein und um Schreibtisch und Sofa; der Computer-Prompt ist in Reichweite, der Spawn-Punkt liegt vor dem Sofa. Danach zurückgesetzt: Hütte und Knopf wieder da. Keine Skriptfehler. Echter Kauf nicht getestet (Felix' Spielstand hat $10K). Innen- und Außenansicht geprüft.
 

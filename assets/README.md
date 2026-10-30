@@ -11,7 +11,7 @@ Sie werden **nicht** von Rojo synchronisiert.
 | `Pickaxes.rbxm` | `ServerStorage.Vendor.Pickaxes` – 25 Spitzhacken-Vorlagen aus Felix' Pickaxe-Pack (D-071), MeshParts mit Farben/Materialien, Pivot Unterkante Mitte. Rücktest 195 Objekte, 0 Abweichungen | 2026-10-27 |
 | `Backpacks.rbxm` | `ServerStorage.Vendor.Backpacks` – 22 Rucksack-Vorlagen aus Felix' Rucksack-Pack (D-074), MeshParts mit Farben/Materialien, leuchtende Teile Neon + Licht, Pivot = Befestigungspunkt am Rücken. Rücktest 115 Objekte, 0 Abweichungen | 2026-10-28 |
 | `Drills.rbxm` | `ServerStorage.Vendor.Drills` – 30 Drill-Vorlagen L01–L30 aus Felix' Paket Industrial_Drills (D-075), Gruppen Rotor/Roller_01–03 mit Drehpunkten aus Drill_Config. Rücktest 408 Objekte, 0 Abweichungen | 2026-10-28 |
-| `PremiumOffice.rbxm` | `ServerStorage.Vendor.PremiumOffice` – Premium-Firmenbüro 42 × 48 (Büro-Stufe 2, D-082) aus Felix' Paket, inkl. Farben, Textur-Verweisen, Lichtern, Kollision, Türen, Computer-Prompt und Spawn-Anker. Rücktest 512 Objekte, 0 Abweichungen | 2026-10-30 |
+| `PremiumOffice.rbxm` | `ServerStorage.Vendor.PremiumOffice` – Premium-Firmenbüro 42 × 48 (Büro-Stufe 2, D-082) aus Felix' Paket, inkl. Farben, Textur-Verweisen, Lichtern, Kollision, Türen, Computer-Prompt, Spawn-Anker und Firmenname-Schildern (D-083). Rücktest 517 Objekte, 0 Abweichungen | 2026-10-30 |
 | `DrillCounter.rbxm` | `ServerStorage.Vendor.DrillCounter` – Verkaufstresen des Drill-Shops aus Felix' Paket Drill_Shop_Verkaufstresen (D-080), inkl. Bildschirm-Texturen. Rücktest 28 Objekte, 0 Abweichungen | 2026-10-29 |
 
 ## Wiederherstellen

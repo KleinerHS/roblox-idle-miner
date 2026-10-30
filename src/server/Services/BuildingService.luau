@@ -235,7 +235,21 @@ local function updateUpgradeButton(player: Player, state: PlotState, data: Types
 	end
 end
 
+-- Firmenname auf Gebäuden (D-083): TextLabels mit Attribut CompanyName (z. B. Logowand und
+-- Fußmatte im Premium-Büro). Ohne eingerichtete Firma bleibt der Platzhalter.
+local function updateCompanyNames(state: PlotState, data: Types.PlayerData)
+	local text = if data.Company.Created and data.Company.Name ~= "" then string.upper(data.Company.Name) else "YOUR COMPANY"
+	for _, model in state.models do
+		for _, d in model:GetDescendants() do
+			if d:IsA("TextLabel") and d:GetAttribute("CompanyName") == true then
+				d.Text = text
+			end
+		end
+	end
+end
+
 local function updateSign(state: PlotState, player: Player, data: Types.PlayerData)
+	updateCompanyNames(state, data)
 	local plotId = state.plot:GetAttribute("PlotId")
 	if data.Company.Created then
 		local logo = CompanyIdentity.LogoById[data.Company.LogoId]

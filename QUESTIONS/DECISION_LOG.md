@@ -563,3 +563,12 @@ Ergebnis mit den echten Teilen (`tools/topdown`): keine Berührung, knappster Ab
 - **Spawn:** vor dem Ledersofa.
 - **Firmenname:** Logowand und Fußmatte zeigen vorerst den Platzhalter „YOUR COMPANY“ aus dem Paket.
 **Affected systems:** OfficeUpgrades (neu), LayoutConfig (BuildButtons.office_premium, OfficeUpgrades), BuildTemplates (buildOfficeUpgrade), BuildingService, AutoDoorController, Place-Datei `ServerStorage.Vendor.PremiumOffice`, `assets/PremiumOffice.rbxm`
+
+## D-083 – Firmenname im Premium-Büro
+
+**Source:** Felix, 2026-10-30 (Antwort auf die Frage, ob auf Logowand und Fußmatte statt „YOUR COMPANY“ der Firmenname stehen soll: „ja, mach das“)
+**Decision:** Logowand und Fußmatte zeigen den Firmennamen in Großbuchstaben, ohne eingerichtete Firma den Platzhalter „YOUR COMPANY“.
+- **Logowand:** Statt der Schriftzug-Textur zeigt ein SurfaceGui den Namen, cremefarben mit dunkelbraunem Rand wie im Paket.
+- **Fußmatte:** Die Textur ist eine Kopie ohne Schrift (Logo und Rahmen bleiben). Der Name steht als SurfaceGui an der alten Stelle, lesbar beim Hereinkommen.
+- **Technik:** Gesetzt wird der Name vom Server (`BuildingService`, alle TextLabels mit Attribut `CompanyName` in den Gebäuden des Plots). Das gilt auch für spätere Gebäude mit diesem Attribut.
+**Affected systems:** BuildingService, Place-Datei `ServerStorage.Vendor.PremiumOffice`, `assets/PremiumOffice.rbxm`
