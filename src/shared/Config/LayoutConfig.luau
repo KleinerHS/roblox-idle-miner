@@ -71,6 +71,14 @@ local LayoutConfig = {
 		build_storage = Vector2.new(30, -2),
 		build_garage = Vector2.new(95, -30),
 		build_smelter = Vector2.new(-75, -60),
+		-- Büro-Upgrade (D-082): vor der Hütte rechts neben dem Eingang
+		office_premium = Vector2.new(129, 75),
+	} :: { [string]: Vector2 },
+
+	-- Büro-Ausbaustufen (D-082): Mitte der Grundfläche (X/Z, lokal zur Plotmitte), Eingang nach −Z
+	-- (zum Elevator). Premium-Büro 42 × 48 hinten rechts in der Hallenecke, frei von Säulen.
+	OfficeUpgrades = {
+		office_premium = Vector2.new(126.5, 91.5),
 	} :: { [string]: Vector2 },
 
 	-- Feste Förderband-Strecken (docs/06 §23, D-024), lokal zur Plotmitte: X, Höhe über dem

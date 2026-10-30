@@ -5,6 +5,9 @@
 -- schickt dafür nichts; Besitz, Reihenfolge, Level und Geld prüft nur der Server.
 --
 -- Hängt die Firmeneinrichtung ab (CompanyService ruft danach Refresh auf).
+--
+-- Büro-Ausbaustufen (D-082): eigener Kaufknopf neben dem Büro, sobald das Büro steht und die Firma
+-- eingerichtet ist. Nach dem Kauf wird das Büro-Modell durch die neue Stufe ersetzt.
 
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
@@ -13,6 +16,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local LayoutConfig = require(Shared.Config.LayoutConfig)
 local BuildSteps = require(Shared.Definitions.BuildSteps)
+local OfficeUpgrades = require(Shared.Definitions.OfficeUpgrades)
 local CompanyIdentity = require(Shared.Definitions.CompanyIdentity)
 local Types = require(Shared.Types)
 local Result = require(Shared.Util.Result)
@@ -43,7 +47,14 @@ type PlotState = {
 	models: { [string]: Model },
 	button: BasePart?,
 	buttonStepId: string?,
+	-- gebaute Büro-Stufe (nil = Hütte) und Kaufknopf der nächsten Stufe
+	officeUpgrade: string?,
+	upgradeButton: BasePart?,
+	upgradeButtonId: string?,
 }
+
+-- Was ein Kaufknopf anzeigt (BuildStep oder Büro-Stufe)
+type Offer = { DisplayName: string, Price: number, RequiredLevel: number }
 
 local states: { [Player]: PlotState } = {}
 local lastTouch: { [Player]: number } = {}
@@ -86,7 +97,7 @@ local function checkPurchase(data: Types.PlayerData, step: BuildSteps.BuildStepD
 	return nil
 end
 
-local function makeButtonLabel(button: BasePart, step: BuildSteps.BuildStepDefinition, data: Types.PlayerData)
+local function makeButtonLabel(button: BasePart, step: Offer, data: Types.PlayerData, verb: string)
 	local gui = button:FindFirstChild("ButtonGui") :: BillboardGui?
 	if not gui then
 		local billboard = Instance.new("BillboardGui")
@@ -131,7 +142,7 @@ local function makeButtonLabel(button: BasePart, step: BuildSteps.BuildStepDefin
 	local title = card:FindFirstChild("Title") :: TextLabel
 	local sub = card:FindFirstChild("Sub") :: TextLabel
 
-	title.Text = `BUILD {string.upper(step.DisplayName)}`
+	title.Text = `{verb} {string.upper(step.DisplayName)}`
 	if data.MiningLevel < step.RequiredLevel then
 		sub.Text = `Requires Mining Level {step.RequiredLevel}`
 		sub.TextColor3 = COLOR_BUTTON_BLOCKED
@@ -144,10 +155,12 @@ local function makeButtonLabel(button: BasePart, step: BuildSteps.BuildStepDefin
 end
 
 local tryPurchase: (player: Player, stepId: string) -> ()
+local tryUpgrade: (player: Player, upgradeId: string) -> ()
 
-local function createButton(state: PlotState, player: Player, step: BuildSteps.BuildStepDefinition): BasePart
-	local position = LayoutConfig.BuildButtons[step.Id]
-	assert(position, `Keine Button-Position für {step.Id} in LayoutConfig.BuildButtons`)
+-- Bodenknopf an LayoutConfig.BuildButtons[id]; Betreten durch den Besitzer ruft onBuy(id) auf
+local function createButton(state: PlotState, player: Player, id: string, onBuy: (Player, string) -> ()): BasePart
+	local position = LayoutConfig.BuildButtons[id]
+	assert(position, `Keine Button-Position für {id} in LayoutConfig.BuildButtons`)
 	local size = LayoutConfig.ButtonSize
 	local button = Instance.new("Part")
 	button.Name = "BuyButton"
@@ -158,7 +171,7 @@ local function createButton(state: PlotState, player: Player, step: BuildSteps.B
 	button.Material = Enum.Material.Neon
 	button.Color = COLOR_BUTTON_READY
 	button.Transparency = 0.15
-	button:SetAttribute("BuildStepId", step.Id)
+	button:SetAttribute("BuildStepId", id)
 	CollectionService:AddTag(button, BUTTON_TAG)
 
 	button.Touched:Connect(function(hit: BasePart)
@@ -176,10 +189,7 @@ local function createButton(state: PlotState, player: Player, step: BuildSteps.B
 			notify(toucher, "Warning", Result.Codes.NOT_OWNER)
 			return
 		end
-		local stepId = button:GetAttribute("BuildStepId")
-		if typeof(stepId) == "string" then
-			tryPurchase(toucher, stepId)
-		end
+		onBuy(toucher, id)
 	end)
 
 	button.Parent = getFolder(state.plot)
@@ -199,10 +209,29 @@ local function updateButton(player: Player, state: PlotState, data: Types.Player
 	end
 	if visible and nextStep then
 		if not state.button then
-			state.button = createButton(state, player, nextStep)
+			state.button = createButton(state, player, nextStep.Id, tryPurchase)
 			state.buttonStepId = nextStep.Id
 		end
-		makeButtonLabel(state.button :: BasePart, nextStep, data)
+		makeButtonLabel(state.button :: BasePart, nextStep, data, "BUILD")
+	end
+end
+
+-- Knopf für die nächste Büro-Stufe (D-082)
+local function updateUpgradeButton(player: Player, state: PlotState, data: Types.PlayerData)
+	local nextUpgrade = OfficeUpgrades.GetNext(data.Buildings)
+	local visible = nextUpgrade ~= nil and data.Buildings.build_office == true and data.Company.Created
+	local wantedId = if visible and nextUpgrade then nextUpgrade.Id else nil
+	if state.upgradeButton and state.upgradeButtonId ~= wantedId then
+		state.upgradeButton:Destroy()
+		state.upgradeButton = nil
+		state.upgradeButtonId = nil
+	end
+	if wantedId and nextUpgrade then
+		if not state.upgradeButton then
+			state.upgradeButton = createButton(state, player, wantedId, tryUpgrade)
+			state.upgradeButtonId = wantedId
+		end
+		makeButtonLabel(state.upgradeButton :: BasePart, nextUpgrade, data, "UPGRADE")
 	end
 end
 
@@ -251,9 +280,29 @@ local function render(player: Player)
 	end
 	local s = state :: PlotState
 
+	-- Büro der falschen Stufe (nach dem Upgrade oder nach Prestige) abreißen
+	local upgrade = OfficeUpgrades.GetCurrent(data.Buildings)
+	local officeVariant = if upgrade then upgrade.Id else nil
+	local oldOffice = s.models.build_office
+	if oldOffice and s.officeUpgrade ~= officeVariant then
+		oldOffice:Destroy()
+		s.models.build_office = nil
+	end
+
 	for _, step in BuildSteps.List do
 		if data.Buildings[step.Id] and not s.models[step.Id] then
-			local model = BuildTemplates.build(step.Id, plotCFrame(plot))
+			local model: Model? = nil
+			if step.Id == "build_office" and officeVariant then
+				model = BuildTemplates.buildOfficeUpgrade(officeVariant, plotCFrame(plot))
+			end
+			if model then
+				s.officeUpgrade = officeVariant
+			else
+				model = BuildTemplates.build(step.Id, plotCFrame(plot))
+				if step.Id == "build_office" then
+					s.officeUpgrade = nil
+				end
+			end
 			if model then
 				model.Parent = getFolder(plot)
 				s.models[step.Id] = model
@@ -263,6 +312,7 @@ local function render(player: Player)
 	end
 
 	updateButton(player, s, data)
+	updateUpgradeButton(player, s, data)
 	updateSign(s, player, data)
 	updateSpawn(s)
 end
@@ -279,6 +329,9 @@ local function clear(player: Player)
 	end
 	if state.button then
 		state.button:Destroy()
+	end
+	if state.upgradeButton then
+		state.upgradeButton:Destroy()
 	end
 end
 
@@ -311,6 +364,45 @@ tryPurchase = function(player: Player, stepId: string)
 	notify(player, "Success", "BUILD_PURCHASED", { Name = step.DisplayName })
 end
 
+tryUpgrade = function(player: Player, upgradeId: string)
+	local data = DataService.Get(player)
+	local def = OfficeUpgrades.ById[upgradeId]
+	if not data or not def then
+		return
+	end
+	local nextUpgrade = OfficeUpgrades.GetNext(data.Buildings)
+	local code: string? = nil
+	if data.Buildings[def.Id] then
+		code = Result.Codes.ALREADY_DONE
+	elseif not nextUpgrade or nextUpgrade.Id ~= def.Id or not data.Buildings.build_office or not data.Company.Created then
+		code = Result.Codes.NOT_AVAILABLE
+	elseif data.MiningLevel < def.RequiredLevel then
+		code = Result.Codes.LEVEL_TOO_LOW
+	elseif data.Cash < def.Price then
+		code = Result.Codes.NOT_ENOUGH_MONEY
+	end
+	if code then
+		if code ~= Result.Codes.ALREADY_DONE then
+			notify(player, "Warning", code, { Level = def.RequiredLevel, Price = def.Price })
+		end
+		return
+	end
+
+	-- Prüfung oben und Änderung hier ohne Yield dazwischen → atomar.
+	local applied = DataService.Mutate(player, function(d)
+		d.Cash -= def.Price
+		d.Buildings[def.Id] = true
+	end)
+	if not applied then
+		return
+	end
+
+	Log.debug(TAG, `{player.Name} kauft {def.Id} für {def.Price}`)
+	render(player)
+	DataService.RequestSave(player)
+	notify(player, "Success", "BUILD_PURCHASED", { Name = def.DisplayName })
+end
+
 function BuildingService.Init() end
 
 function BuildingService.Start()
@@ -329,6 +421,7 @@ function BuildingService.Start()
 		local data = DataService.Get(player)
 		if state and data then
 			updateButton(player, state, data)
+			updateUpgradeButton(player, state, data)
 		end
 	end)
 	for _, player in Players:GetPlayers() do

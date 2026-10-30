@@ -545,3 +545,21 @@ Ergebnis mit den echten Teilen (`tools/topdown`): keine Berührung, knappster Ab
   - Lichtfarbe #FFE2AB, Glühbirnen Neon, Werte aus `Lichtpunkte.json`.
   - Kiste und Regal haben je eine unsichtbare Kollisionsbox.
 **Affected systems:** Place-Datei (`Workspace.HallLayout.Office`), `assets/HallLayout.rbxm`
+
+## D-082 – Büro-Upgrade Stufe 2: Premium-Firmenbüro 42 × 48
+
+**Source:** Felix, 2026-10-30 („ich plane, dass man die Hütte upgraden können soll, das ist die Lvl-2-Variante, es soll ganz einfach über einen Kauf-Button neben der Hütte machbar sein“; Paket `Premium_Firmenbuero_42x48`). Antworten: Level 15 und $35.000; Monitor öffnet das Mine OS; Spawn vor dem Sofa; Eingangstüren öffnen automatisch.
+**Decision:**
+- **Kauf:** Neue Definition `OfficeUpgrades` (Stufe 2 `office_premium`, $35.000, ab Mining Level 15). Neben der Hütte (vor dem Eingang rechts) steht ein Bodenknopf „UPGRADE PREMIUM OFFICE“ wie die Bau-Knöpfe. Er erscheint, sobald das Büro steht und die Firma eingerichtet ist. Geprüft wird nur auf dem Server (Besitz, Level, Geld).
+- **Speichern:** Der Besitz liegt wie ein Gebäude in `Buildings.office_premium`, ohne neue Datenversion. Prestige setzt ihn wie alle Gebäude zurück, dann steht wieder die Hütte.
+- **Umbau:** Nach dem Kauf reißt `BuildingService` die Hütte ab und baut das Premium-Büro aus der Vorlage `ServerStorage.Vendor.PremiumOffice`.
+- **Platz:** Das Büro steht hinten rechts in der Hallenecke (Mitte 126,5 / 91,5 lokal zum Plot), Eingang zum Elevator. Die Fläche ist frei von Säulen und anderen Objekten.
+- **Vorlage:**
+  - Komplettfassung aus Felix' Import. Farben und Materialien stammen aus der GLB. Die acht Texturen (Walnuss, Leder, Firmenschriftzug, Monitor, Ziele-Tafel, Wandbild, Teppich, Fußmatte) sind hochgeladen und als SurfaceAppearance gesetzt.
+  - 13 Lichter aus `PremiumOffice_LichtRig.rbxmx`.
+  - Unsichtbare Kollision für Boden, Wände (Eingang offen), Dach und die großen Möbel. Die sichtbaren Meshes kollidieren nicht.
+- **Türen:** Die beiden Glasflügel öffnen automatisch nach außen (90°), sobald jemand vor oder hinter der Tür steht. Dafür kann `AutoDoorController` jetzt auch Drehtüren (Attribut `Swing`, Scharnier-Attachment `Hinge`, Bereich `DoorSensor`).
+- **Computer:** Der Monitor auf dem Chef-Schreibtisch ist der Firmen-Computer: Model „Laptop“ mit Prompt „Use Computer“. Er öffnet das Mine OS wie bisher der Laptop; Kamera-Zoom auf den Bildschirm.
+- **Spawn:** vor dem Ledersofa.
+- **Firmenname:** Logowand und Fußmatte zeigen vorerst den Platzhalter „YOUR COMPANY“ aus dem Paket.
+**Affected systems:** OfficeUpgrades (neu), LayoutConfig (BuildButtons.office_premium, OfficeUpgrades), BuildTemplates (buildOfficeUpgrade), BuildingService, AutoDoorController, Place-Datei `ServerStorage.Vendor.PremiumOffice`, `assets/PremiumOffice.rbxm`

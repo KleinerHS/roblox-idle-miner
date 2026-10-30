@@ -4,14 +4,17 @@
 -- unter assets/ existieren, wird hier nur der Bau ersetzt; Namen, Tags und Anker bleiben gleich.
 --
 -- Vereinbarte Namen/Tags, auf die andere Systeme zugreifen:
---   Office:   Part "SpawnAnchor" (Spawn auf dem Bett), Model "Laptop" (Tag "Laptop")
+--   Office:   Part "SpawnAnchor" (Spawn), Model "Laptop" (Tag "Laptop") mit Parts "Base" und "Screen"
+--             (gilt auch für die Büro-Stufen aus ServerStorage.Vendor, D-082)
 --   Elevator: Model mit Tag "Elevator", Folder "Cage" (siehe ElevatorCageBuilder)
 
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerStorage = game:GetService("ServerStorage")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local LayoutConfig = require(Shared.Config.LayoutConfig)
+local OfficeUpgrades = require(Shared.Definitions.OfficeUpgrades)
 
 local ElevatorCageBuilder = require(script.Parent.ElevatorCageBuilder)
 local HallLayout = require(script.Parent.HallLayout)
@@ -215,6 +218,26 @@ function BuildTemplates.build(stepId: string, plotCFrame: CFrame): Model?
 	-- von Hand angepasstes Layout (Workspace.HallLayout) hat Vorrang vor dem Code-Bau
 	local model = HallLayout.cloneStep(stepId, plotCFrame) or builder(plotCFrame)
 	model:SetAttribute("BuildStepId", stepId)
+	return model
+end
+
+-- Büro einer Ausbaustufe (D-082) aus der Vorlage ServerStorage.Vendor.<Template>. Die Vorlage hat
+-- ihren Pivot in der Mitte der Grundfläche auf der Bodenunterseite, Eingang nach −Z; sie enthält
+-- wie die Hütte "SpawnAnchor" und das Model "Laptop" (Tag "Laptop"). nil ohne Vorlage.
+function BuildTemplates.buildOfficeUpgrade(upgradeId: string, plotCFrame: CFrame): Model?
+	local def = OfficeUpgrades.ById[upgradeId]
+	local center = LayoutConfig.OfficeUpgrades[upgradeId]
+	local vendor = ServerStorage:FindFirstChild("Vendor")
+	local template = def and vendor and vendor:FindFirstChild(def.Template)
+	if not (def and center and template and template:IsA("Model")) then
+		warn(`[BuildTemplates] Keine Vorlage für Büro-Stufe {upgradeId}`)
+		return nil
+	end
+	local model = template:Clone()
+	model.Name = "Office"
+	model:PivotTo(plotCFrame * CFrame.new(center.X, LayoutConfig.HallFloorTop, center.Y))
+	model:SetAttribute("BuildStepId", "build_office")
+	model:SetAttribute("OfficeUpgrade", upgradeId)
 	return model
 end
 

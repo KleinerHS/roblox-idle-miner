@@ -4,6 +4,6 @@
 
 return {
 	Game = "Roblox Idle Miner",
-	Version = "0.60.0",
-	Phase = "Phase 18z – Starter-Blechhütte",
+	Version = "0.61.0",
+	Phase = "Phase 19a – Büro-Upgrade Premium-Büro",
 }

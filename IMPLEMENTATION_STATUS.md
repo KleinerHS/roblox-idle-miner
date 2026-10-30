@@ -26,6 +26,7 @@ Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` 
 | 16 | Verkauf & Spätspiel-Geld | TESTING_REQUIRED (16a, D-046) |
 | 17 | Icons | TESTING_REQUIRED (17a Erz- und Barren-Icons, 17b Kategorie-Icons) |
 | 18 | Fahrzeuge aus Felix' Modellen, Map-Mitte | TESTING_REQUIRED (18a: 4 Fahrzeuge; 18b: Durchfahr-Verladestraße, D-052; 18c: Lastzug mit echten Anhängern, D-053; 18d–18g Nachbesserungen, Startauto, Verkaufskreis; 18h Mitte D-057; 18i LKW-Laden D-058; 18j Kreisel D-059; 18k Shops D-060; 18l Lastzüge im Kreisel D-061; 18m Shops größer D-062; 18n Läden innen D-063; 18o Parkplätze D-064/D-065/D-067; 18p Podium D-070; 18q Spitzhacken-Pack D-071; 18r Autohaus-Drehteller D-072; 18s großer Parkplatz D-073; 18t Rucksack-Pack D-074; 18u Drill-Pack D-075, Rucksack-Leuchten D-076; 18x Laptop Mine OS D-079; 18z Starter-Blechhütte D-081) |
+| 19 | Büro-Ausbaustufen | TESTING_REQUIRED (19a: Premium-Büro als Stufe 2, D-082) |
 
 ## Setup – Details
 
@@ -840,6 +841,17 @@ Selbsttest: alle vier Läden im Bearbeitungsmodus von oben und innen angeschaut;
 | 0.51.6: Vorfeld der Shop-Parkplätze liegt unter dem Promenadenpflaster, die runde Kante verdeckt die Stufen der Asphaltstreifen (Nachtrag zu BUG-015) | `CenterBuilder` (`shopLot`) | TESTING_REQUIRED |
 
 Selbsttest (ohne Studio, tools/topdown): Draufsicht aller Parkplätze; Überschneidungsprüfung Asphalt gegen alle Teile: nichts steht mehr auf den Parkplätzen (vorher: Asphalt unter Shop-Fronten, Fahnen, Pylon, Schau-Drill, einer Gehweg-Laterne, einem Baum; großer Parkplatz auf Hütte 2 und Zaun). Lastzug-Simulation am Kreisel erneut gerechnet.
+
+### 19a (Version 0.61.0, 2026-10-30) – Büro-Upgrade: Premium-Firmenbüro (D-082)
+
+| System | Dateien / Instanzen | Status |
+|---|---|---|
+| Kaufknopf „UPGRADE PREMIUM OFFICE“ neben der Hütte, $35.000 ab Level 15, serverseitige Prüfung, Besitz gespeichert | `OfficeUpgrades.luau` (neu), `BuildingService.luau`, `LayoutConfig.luau` | TESTING_REQUIRED |
+| Umbau Hütte → Premium-Büro (und zurück nach Prestige) | `BuildingService.luau`, `BuildTemplates.luau` (`buildOfficeUpgrade`) | TESTING_REQUIRED |
+| Vorlage Premium-Büro: Farben, Texturen, 13 Lichter, Kollision, Monitor als Firmen-Computer, Spawn vor dem Sofa | Place-Datei: `ServerStorage.Vendor.PremiumOffice` – **Place speichern!** Sicherung `assets/PremiumOffice.rbxm` (Rücktest 512 Objekte, 0 Abweichungen) | TESTING_REQUIRED |
+| Glastüren öffnen automatisch nach außen | `AutoDoorController.luau` (Drehtüren) | TESTING_REQUIRED |
+
+Selbsttest (Play): Knopf erscheint mit „$35,000“. Büro per DevTools gesetzt: Premium-Büro steht in der Hallenecke, Hütte und Knopf weg. Türen öffnen sich beim Herangehen und schließen wieder. Die Figur läuft hinein und um Schreibtisch und Sofa; der Computer-Prompt ist in Reichweite, der Spawn-Punkt liegt vor dem Sofa. Danach zurückgesetzt: Hütte und Knopf wieder da. Keine Skriptfehler. Echter Kauf nicht getestet (Felix' Spielstand hat $10K). Innen- und Außenansicht geprüft.
 
 ### 18z (Version 0.60.0, 2026-10-30) – Neue Starter-Blechhütte (D-081)
 
