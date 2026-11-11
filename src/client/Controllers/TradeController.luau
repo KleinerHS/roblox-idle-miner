@@ -184,7 +184,8 @@ local function stockRows()
 	end
 	local ids = {}
 	for id, n in snapshot.StorageItems do
-		if n > 0 then
+		-- Sonderfunde sind vorerst nicht handelbar (D-088)
+		if n > 0 and Materials.IsTradable(id) then
 			table.insert(ids, id)
 		end
 	end

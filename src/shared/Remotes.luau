@@ -92,6 +92,8 @@ local Remotes: { [string]: RemoteDefinition } = {
 	RemoveDrill = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
 	-- Nächstes Mining-Luck-Level kaufen (Equipment-Shop, D-007): () -> Result<newLevel>
 	BuyLuck = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 5, Window = 10 } },
+	-- Offline-Upgrade kaufen (D-088): ("efficiency" | "duration") -> Result<neue Stufe>
+	BuyOfflineUpgrade = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 5, Window = 10 } },
 	-- Platzierten Drill ein Level aufwerten (Laptop, D-043: Level 1–10, MK bleibt): (drillId: string) -> Result<newLevel>
 	UpgradeDrill = { Kind = "Function", Direction = "ClientToServer", RateLimit = { Count = 6, Window = 10 } },
 	-- Garage (Phase 6): Server öffnet die Fahrzeugauswahl nach Betreten des Leuchtrings

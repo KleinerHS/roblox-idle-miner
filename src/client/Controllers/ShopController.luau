@@ -66,7 +66,7 @@ local SHOP_TITLES: { [string]: string } = {
 local openedAt: Vector3? = nil
 local busy = false
 
-type Card = { Id: string, Name: string, Level: number, Price: number, Available: boolean, Stats: { { label: string, value: string, compare: string? } }, Multi: boolean? }
+type Card = { Id: string, Name: string, Level: number, Price: number, Available: boolean, Stats: { { label: string, value: string, compare: string? } }, Multi: boolean?, Requires: string? }
 
 -- Inventar je Drill-Typ: gekauft, platziert (docs/10 §38)
 local function drillCounts(snapshot: Types.StateSnapshot, typeId: string): (number, number)
@@ -97,13 +97,16 @@ local function cardsFor(tab: string, snapshot: Types.StateSnapshot): { Card }
 	local cards: { Card } = {}
 	if tab == "pickaxe" then
 		local current = Pickaxes.Get(snapshot.EquippedPickaxe)
-		for _, def in Pickaxes.List do
+		for i, def in Pickaxes.List do
+			-- Vorgänger einmal kaufen (D-088)
+			local previous = Pickaxes.List[i - 1]
 			table.insert(cards, {
 				Id = def.Id,
 				Name = def.DisplayName,
 				Level = def.RequiredLevel,
 				Price = def.Price,
 				Available = def.Available ~= false,
+				Requires = if previous and not snapshot.OwnedPickaxes[previous.Id] then previous.DisplayName else nil,
 				Stats = {
 					{ label = TEXT.Power, value = tostring(def.MiningPower), compare = if current and current.Id ~= def.Id then tostring(current.MiningPower) else nil },
 					{ label = TEXT.Speed, value = string.format("%.2f/s", def.MiningSpeed), compare = if current and current.Id ~= def.Id then string.format("%.2f/s", current.MiningSpeed) else nil },
@@ -153,8 +156,10 @@ local function cardsFor(tab: string, snapshot: Types.StateSnapshot): { Card }
 			})
 		end
 	elseif tab == "drill" then
-		for _, def in Drills.List do
+		for i, def in Drills.List do
 			local owned, placed = drillCounts(snapshot, def.Id)
+			-- Typ-Vorgänger einmal gekauft haben (D-088)
+			local previous = Drills.List[i - 1]
 			table.insert(cards, {
 				Id = def.Id,
 				Name = def.DisplayName,
@@ -162,6 +167,7 @@ local function cardsFor(tab: string, snapshot: Types.StateSnapshot): { Card }
 				Price = def.Price,
 				Available = true,
 				Multi = true,
+				Requires = if previous and not (snapshot.BoughtDrillTypes or {})[previous.Id] then previous.DisplayName else nil,
 				Stats = {
 					{ label = TEXT.Production, value = string.format(TEXT.PerMinute, NumberFormat.withSeparators(Drills.OrePerMinute(def))) },
 					{ label = TEXT.Output, value = NumberFormat.withSeparators(def.OutputCapacity) },
@@ -171,13 +177,16 @@ local function cardsFor(tab: string, snapshot: Types.StateSnapshot): { Card }
 		end
 	else
 		local current = Backpacks.Get(snapshot.EquippedBackpack)
-		for _, def in Backpacks.List do
+		for i, def in Backpacks.List do
+			-- Vorgänger einmal kaufen (D-088)
+			local previous = Backpacks.List[i - 1]
 			table.insert(cards, {
 				Id = def.Id,
 				Name = def.DisplayName,
 				Level = def.RequiredLevel,
 				Price = def.Price,
 				Available = def.Available ~= false,
+				Requires = if previous and not snapshot.OwnedBackpacks[previous.Id] then previous.DisplayName else nil,
 				Stats = {
 					{ label = TEXT.Capacity, value = NumberFormat.withSeparators(def.Capacity), compare = if current and current.Id ~= def.Id then NumberFormat.withSeparators(current.Capacity) else nil },
 				},
@@ -200,13 +209,21 @@ local function act(remote: string, itemId: string)
 	end
 end
 
+-- Grund der Sperre: Level oder fehlender Vorgänger (D-088)
+local function lockText(card: Card, snapshot: Types.StateSnapshot): string
+	if snapshot.MiningLevel < card.Level or not card.Requires then
+		return string.format(TEXT.RequiresLevel, card.Level)
+	end
+	return string.format(TEXT.RequiresPrevious, card.Requires)
+end
+
 -- Status und Aktion einer Karte (Text, Farbe, aktiv, Remote) – Liste und Podium-Ansicht
 local function actionFor(card: Card, snapshot: Types.StateSnapshot, isOwned: boolean, isEquipped: boolean, locked: boolean): (string, Color3, boolean, string?)
 	local actionText, actionColor, enabled, remote
 	if card.Multi then
 		-- Mehrfach kaufbar (Drills): nur Level und Geld entscheiden
 		if locked then
-			actionText, actionColor, enabled = `{TEXT.Locked}\n{string.format(TEXT.RequiresLevel, card.Level)}`, UITheme.Colors.SurfaceRaised, false
+			actionText, actionColor, enabled = `{TEXT.Locked}\n{lockText(card, snapshot)}`, UITheme.Colors.SurfaceRaised, false
 		else
 			local affordable = snapshot.Cash >= card.Price
 			actionText = string.format(TEXT.Buy, NumberFormat.cash(card.Price))
@@ -220,7 +237,7 @@ local function actionFor(card: Card, snapshot: Types.StateSnapshot, isOwned: boo
 		elseif not card.Available then
 			actionText, actionColor, enabled = TEXT.ComingSoon, UITheme.Colors.SurfaceRaised, false
 		elseif locked then
-			actionText, actionColor, enabled = `{TEXT.Locked}\n{string.format(TEXT.RequiresLevel, card.Level)}`, UITheme.Colors.SurfaceRaised, false
+			actionText, actionColor, enabled = `{TEXT.Locked}\n{lockText(card, snapshot)}`, UITheme.Colors.SurfaceRaised, false
 		else
 			local affordable = snapshot.Cash >= card.Price
 			actionText = string.format(TEXT.Buy, NumberFormat.cash(card.Price))
@@ -234,7 +251,7 @@ local function actionFor(card: Card, snapshot: Types.StateSnapshot, isOwned: boo
 	elseif not card.Available then
 		actionText, actionColor, enabled = TEXT.ComingSoon, UITheme.Colors.SurfaceRaised, false
 	elseif locked then
-		actionText, actionColor, enabled = `{TEXT.Locked}\n{string.format(TEXT.RequiresLevel, card.Level)}`, UITheme.Colors.SurfaceRaised, false
+		actionText, actionColor, enabled = `{TEXT.Locked}\n{lockText(card, snapshot)}`, UITheme.Colors.SurfaceRaised, false
 	else
 		local affordable = snapshot.Cash >= card.Price
 		actionText = string.format(TEXT.Buy, NumberFormat.cash(card.Price))
@@ -283,7 +300,7 @@ local function render()
 	for index, card in cardsFor(currentTab, snapshot) do
 		local isOwned = owned[card.Id] == true
 		local isEquipped = equipped == card.Id
-		local locked = not isOwned and snapshot.MiningLevel < card.Level
+		local locked = not isOwned and (snapshot.MiningLevel < card.Level or card.Requires ~= nil)
 
 		local frame = Create("Frame", {
 			Name = card.Id,
@@ -470,7 +487,7 @@ local function renderShowcase()
 	local owned, equipped = ownership(snapshot)
 	local isOwned = owned[card.Id] == true
 	local isEquipped = equipped == card.Id
-	local locked = not isOwned and snapshot.MiningLevel < card.Level
+	local locked = not isOwned and (snapshot.MiningLevel < card.Level or card.Requires ~= nil)
 	local text, color, enabled, remote = actionFor(card, snapshot, isOwned, isEquipped, locked)
 	scName.Text = card.Name
 	local statLines = {}
@@ -478,7 +495,7 @@ local function renderShowcase()
 		table.insert(statLines, if stat.compare then `{stat.label}: {stat.compare} → {stat.value}` else `{stat.label}: {stat.value}`)
 	end
 	scStats.Text = table.concat(statLines, "   ·   ")
-	scInfo.Text = if locked then string.format(TEXT.RequiresLevel, card.Level) else ""
+	scInfo.Text = if locked then lockText(card, snapshot) else ""
 	scCounter.Text = `{scIndex} / {#cards}`
 	scAction.Text = string.split(text, "\n")[1]
 	scAction.BackgroundColor3 = color

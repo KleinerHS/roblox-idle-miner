@@ -1,7 +1,7 @@
 --!strict
 -- Fenster „WHILE YOU WERE AWAY“ nach dem Login (docs/14 §15, Phase 10). Zeigt nur die
--- Werte, die der Server per OfflineSummary bestätigt hat; das Material liegt bereits im
--- Lager bzw. in den Puffern. Reine Anzeige, keine Logik.
+-- Werte, die der Server per OfflineSummary bestätigt hat; seit D-088 Offline-Geld statt Material
+-- (das Geld ist bereits gutgeschrieben). Reine Anzeige, keine Logik.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -9,8 +9,6 @@ local UserInputService = game:GetService("UserInputService")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local UITheme = require(Shared.Config.UITheme)
-local GameConfig = require(Shared.Config.GameConfig)
-local Materials = require(Shared.Definitions.Materials)
 local NumberFormat = require(Shared.Util.NumberFormat)
 
 local Net = require(script.Parent.Parent.Net)
@@ -27,8 +25,6 @@ local gui: ScreenGui
 local titleLabel: TextLabel
 local list: Frame
 local notes: TextLabel
-local storageLabel: TextLabel
-local storageFill: Frame
 
 local function close()
 	gui.Enabled = false
@@ -81,64 +77,30 @@ local function row(order: number, color: Color3, text: string, value: string)
 	})
 end
 
--- Material-Zeilen in fester Reihenfolge (Stufe, dann ID)
-local function materialRows(start: number, counts: { [string]: number }, label: string): number
-	local entries = {}
-	for id, n in counts do
-		local mat = Materials.Get(id)
-		if mat and n > 0 then
-			table.insert(entries, { mat = mat, n = n })
-		end
+local function duration(seconds: number): string
+	local minutes = math.max(1, math.floor(seconds / 60 + 0.5))
+	if minutes < 60 then
+		return `{minutes} MIN`
 	end
-	table.sort(entries, function(a, b)
-		if a.mat.Tier ~= b.mat.Tier then
-			return a.mat.Tier < b.mat.Tier
-		end
-		return a.mat.Id < b.mat.Id
-	end)
-	local order = start
-	for _, entry in entries do
-		row(order, entry.mat.Color, string.format(label, entry.mat.DisplayName), NumberFormat.withSeparators(entry.n))
-		order += 1
-	end
-	return order
+	return string.format("%d H %02d MIN", minutes // 60, minutes % 60)
 end
 
 local function show(summary: any)
-	if typeof(summary) ~= "table" or typeof(summary.Seconds) ~= "number" then
+	if typeof(summary) ~= "table" or typeof(summary.Seconds) ~= "number" or typeof(summary.Cash) ~= "number" then
 		return
 	end
-	local minutes = math.max(1, math.floor(summary.Seconds / 60 + 0.5))
-	titleLabel.Text = string.format(TEXT.Title, minutes)
+	titleLabel.Text = string.format(TEXT.Title, duration(summary.Seconds))
 	clearList()
-	local order = materialRows(1, summary.Mined or {}, TEXT.Mined)
-	order = materialRows(order, summary.Smelted or {}, TEXT.Smelted)
-	if (summary.WagesPaid or 0) > 0 then
-		row(order, UITheme.Colors.Warning, TEXT.Wages, "−" .. NumberFormat.cash(summary.WagesPaid))
-		order += 1
-	end
-	if order == 1 then
-		row(order, UITheme.Colors.TextSecondary, TEXT.NothingProduced, "")
-	end
+	row(1, UITheme.Colors.Positive, TEXT.Earned, "+" .. NumberFormat.cash(summary.Cash))
 
-	local lines = {}
-	if summary.StorageFullAfter and summary.StorageFullAfter < summary.Seconds then
-		table.insert(lines, string.format(TEXT.StorageFullAfter, math.max(1, math.floor(summary.StorageFullAfter / 60 + 0.5))))
-	end
-	if (summary.UnpaidMinutes or 0) > 0 then
-		table.insert(lines, TEXT.Unpaid)
-	end
-	if summary.Seconds >= GameConfig.Offline.MaxSeconds then
-		table.insert(lines, TEXT.Capped)
+	local lines = {
+		string.format(TEXT.Rate, math.floor((summary.Efficiency or 0) * 100 + 0.5), NumberFormat.cash(math.floor(summary.GrossPerMinute or 0))),
+	}
+	if summary.Capped then
+		table.insert(lines, string.format(TEXT.Capped, math.floor((summary.MaxSeconds or 0) / 3600 + 0.5)))
 	end
 	notes.Text = table.concat(lines, "\n")
-	notes.Visible = #lines > 0
-
-	local capacity = math.max(1, summary.StorageCapacity or 1)
-	local fraction = math.clamp((summary.StorageUsed or 0) / capacity, 0, 1)
-	storageLabel.Text = string.format(TEXT.Storage, math.floor(fraction * 100 + 0.5), NumberFormat.withSeparators(summary.StorageUsed or 0), NumberFormat.withSeparators(capacity))
-	storageFill.Size = UDim2.fromScale(fraction, 1)
-	storageFill.BackgroundColor3 = if fraction >= 1 then UITheme.Colors.Warning else UITheme.Colors.Positive
+	notes.Visible = true
 	gui.Enabled = true
 end
 
@@ -193,34 +155,13 @@ local function build()
 		LayoutOrder = 3,
 		Parent = panel,
 	}, { Create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 6) }) })
-	storageLabel = Create("TextLabel", {
-		Size = UDim2.new(1, 0, 0, 20),
-		BackgroundTransparency = 1,
-		Font = UITheme.FontBold,
-		TextSize = 16,
-		TextColor3 = UITheme.Colors.TextPrimary,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		LayoutOrder = 4,
-		Parent = panel,
-	})
-	local bar = Create("Frame", {
-		Size = UDim2.new(1, 0, 0, 10),
-		BackgroundColor3 = UITheme.Colors.Surface,
-		LayoutOrder = 5,
-		Parent = panel,
-	}, { Create("UICorner", { CornerRadius = UDim.new(1, 0) }) })
-	storageFill = Create("Frame", {
-		Size = UDim2.fromScale(0, 1),
-		BackgroundColor3 = UITheme.Colors.Positive,
-		Parent = bar,
-	}, { Create("UICorner", { CornerRadius = UDim.new(1, 0) }) })
 	notes = Create("TextLabel", {
 		Size = UDim2.new(1, 0, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
 		Font = UITheme.Font,
 		TextSize = 15,
-		TextColor3 = UITheme.Colors.Warning,
+		TextColor3 = UITheme.Colors.TextSecondary,
 		TextXAlignment = Enum.TextXAlignment.Left,
 		TextWrapped = true,
 		Visible = false,

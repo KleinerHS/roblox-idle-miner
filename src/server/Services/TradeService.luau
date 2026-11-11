@@ -116,6 +116,10 @@ local function validateOffer(owner: Player, offer: Offer): string?
 		return Result.Codes.DATA_NOT_LOADED
 	end
 	for id, n in offer.Materials do
+		-- Sonderfunde sind vorerst nicht handelbar (D-088)
+		if Materials.Get(id) and not Materials.IsTradable(id) then
+			return Result.Codes.NOT_AVAILABLE
+		end
 		if not Materials.Get(id) or n < 1 or n % 1 ~= 0 or (data.Storage.Items[id] or 0) < n then
 			return Result.Codes.NOT_OWNED
 		end

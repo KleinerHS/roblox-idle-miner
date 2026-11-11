@@ -18,6 +18,16 @@ Beim Übernehmen (D-087) aufgefallen, trotzdem so eingebaut:
 6. Erzwerte mit Nachkommastellen: der Erlös eines Verkaufs wird abgerundet (bei kleinen Mengen ein paar Cent weniger).
 7. In der Excel-Vorschau steht beim Prestige-Tempobonus 5 %, eingetragen ist 0 (Excel-Formel wertet die 0 als „leer“). Übernommen: 0.
 
+Regeln (D-088), ebenfalls trotzdem eingebaut:
+8. Offline 8 h × 30 % bringt mehr als untätiges Online-Stehen mit vollem Lager (siehe Q-037). Eingebaut wie in der Datei.
+9. Ein Sonderfund belegt eine ganze Lagerkiste (1.000er-Kiste je Sorte), auch bei 1 Stück.
+10. Sonderfund-Werte sehr hoch: z. B. Ancient Diamond $9,68 Mrd. gegenüber Mine 100 für $1,9 Mrd. Ein Glückstreffer kann Stunden Fortschritt überspringen.
+11. Mengenbonus: eingebaut als 1 % eigene Chance plus 0,15 % nächstes Erz (so in der Datei). Falls 1 % als Gesamtchance gemeint war, sinkt der Bonus leicht.
+12. Vorgänger-Regel auch für Rucksäcke (Zielbild), die Datei nennt nur Spitzhacken und Drills.
+13. Offline-Upgrades liegen in der Laptop-App „Company“ und ersetzen dort die zwei Platzhalter-Karten.
+14. Offline-Geld enthält den Prestige-Geldbonus, der Schmelzer zählt offline nicht.
+15. Echter Spielstand: Beim ersten Play ohne `UseMockData` wird Felix' Profil auf v15 umgestellt (nicht rückgängig zu machen, vorher nicht gesichert).
+
 ## Q-037 – Offline-Cash gegenüber untätigem Onlinebetrieb
 
 **Status:** OPEN

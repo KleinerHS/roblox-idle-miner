@@ -1,5 +1,19 @@
 # Implementation Status
 
+## Phase 20b (Version 0.63.0, 2026-11-11) – Neubalancing: Regeln im Spiel (D-088)
+
+| System | Dateien | Status |
+|---|---|---|
+| Offline nur Geld (30 %, 8 h, Elevator-Deckel, Prestige-Geldbonus) | `OfflineSimulation`, `OfflineService`, `OfflineLogic`, `OfflineController` | TESTING_REQUIRED |
+| Offline-Upgrades Effizienz/Dauer im Laptop (App Company) | `OfflineService`, `LaptopController`, `Remotes` | TESTING_REQUIRED |
+| Prestige setzt Fahrzeuge, Luck, Offline-Upgrades zurück | `PrestigeReset`, `Strings` | TESTING_REQUIRED |
+| Vorgänger-Regel Spitzhacken/Rucksäcke/Drills | `ShopService`, `ShopController`, `Result` | TESTING_REQUIRED |
+| Funde je Hit (Sonderfund/nächstes Erz/Mengenbonus), 150 Sonderfund-Materialien, nicht handelbar | `RareDropLogic`, `Materials`, `MiningService`, `TradeService`, `MiningController`, `OreIcon` | TESTING_REQUIRED |
+| Verladen: Erz nur für den Ofen zurückhalten, wenn es dorthin kann | `LoadingService` | TESTING_REQUIRED |
+| Spielstand v15 (BoughtTypes, Offline-Stufen) | `DataSchema`, `Types`, `DataService` | TESTING_REQUIRED |
+
+Selbsttest (Luau-CLI, Module gebündelt): Wurfhäufigkeiten über 2 Mio. Würfe passen zu den Chancen; Offline-Lauf Testprofil 8 h = $26.000 (Elevator-gedeckelt); Prestige-Reset entfernt Fahrzeuge, Luck, Offline-Stufen, behält Spitzhacken; Umstellung v14→v15 markiert bei besessenem Drill MK4 (`drill_mk7`) alle Stufen MK1–MK4 und das Förderband; fehlende Offline-Stufen ergänzt Reconcile; Sonderfunde existieren und sind nicht handelbar. Typprüfung ohne neue echte Fehler. Kein Play-Test in Studio.
+
 ## Phase 20a (Version 0.62.0, 2026-11-11) – Neubalancing: Werte im Spiel (D-087)
 
 | System | Dateien | Status |

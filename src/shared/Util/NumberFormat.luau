@@ -20,6 +20,11 @@ end
 function NumberFormat.compact(value: number): string
 	local absValue = math.abs(value)
 	if absValue < 1000 then
+		-- Erzwerte mit Nachkommastellen (D-088, z. B. $2.4) nicht auf ganze Dollar kürzen
+		if value % 1 ~= 0 then
+			local text = string.format("%.2f", math.floor(value * 100) / 100):gsub("%.?0+$", "")
+			return text
+		end
 		return tostring(math.floor(value))
 	end
 	local index = 1

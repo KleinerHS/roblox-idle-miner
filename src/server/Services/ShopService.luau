@@ -128,6 +128,16 @@ local function validate(player: Player, categoryName: unknown, itemId: unknown):
 	return category, item, data, nil
 end
 
+-- ID des Vorgängers in einer Stufenliste (nil = erste Stufe)
+local function previousOf(list: { { Id: string } }, id: string): string?
+	for i, def in list do
+		if def.Id == id then
+			return if i > 1 then list[i - 1].Id else nil
+		end
+	end
+	return nil
+end
+
 local function buy(player: Player, categoryName: unknown, itemId: unknown)
 	local category, item, data, code = validate(player, categoryName, itemId)
 	if code or not category or not item or not data then
@@ -141,6 +151,11 @@ local function buy(player: Player, categoryName: unknown, itemId: unknown)
 	end
 	if data.MiningLevel < item.RequiredLevel then
 		return Result.err(Result.Codes.LEVEL_TOO_LOW)
+	end
+	-- Spitzhacken und Rucksäcke: Vorgänger muss besessen werden (D-088)
+	local previous = previousOf(if categoryName == "pickaxe" then Pickaxes.List else Backpacks.List, item.Id)
+	if previous and not category.owned(data)[previous] then
+		return Result.err(Result.Codes.PREDECESSOR_REQUIRED)
 	end
 	if data.Cash < item.Price then
 		return Result.err(Result.Codes.NOT_ENOUGH_MONEY)
@@ -199,6 +214,13 @@ local function buyMachine(player: Player, typeId: unknown)
 	if data.MiningLevel < def.RequiredLevel then
 		return Result.err(Result.Codes.LEVEL_TOO_LOW)
 	end
+	-- Drills: Typ-Vorgänger muss einmal gekauft worden sein (D-088)
+	if drill then
+		local previous = previousOf(Drills.List, drill.Id)
+		if previous and not data.Machines.BoughtTypes[previous] then
+			return Result.err(Result.Codes.PREDECESSOR_REQUIRED)
+		end
+	end
 	if data.Cash < def.Price then
 		return Result.err(Result.Codes.NOT_ENOUGH_MONEY)
 	end
@@ -207,6 +229,7 @@ local function buyMachine(player: Player, typeId: unknown)
 	local newId = ""
 	DataService.Mutate(player, function(d)
 		d.Cash -= def.Price
+		d.Machines.BoughtTypes[def.Id] = true
 		d.Machines.Seq += 1
 		if conveyor then
 			newId = `c{d.Machines.Seq}`

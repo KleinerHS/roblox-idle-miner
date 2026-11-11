@@ -1,5 +1,19 @@
 # Decision Log
 
+## D-088 – Neubalancing: Regeln aus Felix' Balancing-Datei im Spiel
+
+**Source:** Felix, 2026-11-11 (Balancing_Neuentwurf.xlsx: „ich habe ein paar regeln geändert … falls dir probleme auffallen füg sie trotzdem ein und frag mich danach“). Werte selbst: D-087.
+**Decision:**
+- **Offline = Geld:** Während der Abwesenheit gibt es nur Geld, kein Material, keine XP, kein Lohn. Bruttowert/s = Förderung der Minenarbeiter und platzierten Drills (mit Drill-Level), gedeckelt durch die Elevator-Kapazität, bewertet mit dem Erz-Verkaufswert, × Effizienz × Prestige-Geldbonus. Grundwerte 30 % und 8 h (`GameConfig.Offline.MaxSeconds = 28800`). Schmelzer zählt offline nicht.
+- **Offline-Upgrades** im Laptop (App „Company“, ersetzen die bisherigen Platzhalter-Karten): Effizienz 35/40/45/50 % (Level 15/35/55/75), Dauer 10/12 h (Level 30/65), Preise aus der Datei. Remote `BuyOfflineUpgrade`, nur am Laptop, serverseitig geprüft.
+- **Prestige:** Fahrzeuge, Mining Luck und Offline-Upgrades werden zurückgesetzt. Spitzhacken, Rucksäcke und Robux-Käufe bleiben.
+- **Vorgänger-Regel:** Spitzhacken, Rucksäcke und Drills nur kaufbar, wenn die vorherige Stufe gekauft wurde (Drills: `Machines.BoughtTypes`, einmal gekauft zählt auch nach Verkauf/Platzierung). Fehler `PREDECESSOR_REQUIRED`, Shop zeigt „Buy … first“.
+- **Funde je Hit:** ein exklusiver Wurf: Sonderfund Ancient/Radiant/Pristine (Chancen aus der Datei), sonst nächstes Erz 0,15 %, sonst Mengenbonus ×2–×10 mit 1 %, alles × Luck-Faktor. Sonderfunde sind eigene Materialien `<erz>_<rarität>` (Wert und XP aus der Datei, 150 Stück), nicht handelbar.
+- **Verladen:** Schmelzbares Erz bleibt nur im Lager, solange es in den Ofen kann (Ofen gebaut, Förderband Lager → Ofen, Platz im Eingangslager). Sonst wird es verladen.
+- **Spielstand v15:** `Machines.BoughtTypes` (Umstellung: alle Drill-Typen bis zur höchsten besessenen Stufe plus besessene Förderbänder) und `Offline = { EfficiencyLevel, DurationLevel }`.
+- **Anzeige:** Geldbeträge unter 1.000 mit bis zu 2 Nachkommastellen („$2.4“).
+**Affected systems:** BalanceConfig (RareDrops, SpecialFinds, Offline), GameConfig, RareDropLogic, OfflineLogic (neu), OfflineSimulation, OfflineService, DataSchema v15, DataService, PrestigeReset, ShopService, MiningService, LoadingService, TradeService, Materials, Remotes, Result, Strings, ShopController, LaptopController, OfflineController, MiningController, TradeController, OreIcon, NumberFormat
+
 ## D-087 – Neubalancing: Werte aus Felix' Balancing-Datei im Spiel
 
 **Source:** Felix, 2026-11-11 („hier sind die neuen Werte, ich habe ein paar Regeln geändert, die wir besprochen haben; falls dir Probleme auffallen, füg sie trotzdem ein und frag mich danach“). Datei `Balancing_Neuentwurf.xlsx` (identisch mit `outputs/balancing-20261111/`, Kopie unter `BALANCING/Balancing_Neuentwurf_2026-11-11.xlsx`), Einzelwerte aus `tools/balancing_20261109/definitions.json` und `model.json`.

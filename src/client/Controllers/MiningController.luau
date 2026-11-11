@@ -13,6 +13,7 @@ local Shared = ReplicatedStorage:WaitForChild("Shared")
 local GameConfig = require(Shared.Config.GameConfig)
 local Mines = require(Shared.Definitions.Mines)
 local Ores = require(Shared.Definitions.Ores)
+local Materials = require(Shared.Definitions.Materials)
 local Pickaxes = require(Shared.Definitions.Pickaxes)
 local PrestigeLogic = require(Shared.Util.PrestigeLogic)
 
@@ -154,14 +155,26 @@ end
 -- Rare Drop (docs/03 §8, docs/09 §17): großer Schriftzug, Glanz, Funken, Sound – nur nach
 -- Bestätigung durch den Server
 local RARE_GOLD = Color3.fromRGB(255, 205, 70)
+local RARITY_COLOR: { [string]: Color3 } = {
+	pristine = Color3.fromRGB(170, 225, 255),
+	radiant = Color3.fromRGB(255, 210, 80),
+	ancient = Color3.fromRGB(195, 125, 255),
+}
 local function rareEffect(at: Vector3, rare: any)
-	local ore = Ores.Get(rare.OreId)
-	local color = if ore then ore.Color else RARE_GOLD
-	local name = if ore then string.upper(ore.DisplayName) else ""
-	local isOre = rare.Kind == "Ore"
-	local title = if isOre then Strings.Hud.RareDrop else Strings.Hud.LuckyDrop
-	local line = if isOre then `+{rare.Amount} {name}` else `x{rare.Multiplier} {name}`
-	HudController.ShowRareDrop(title, line, if isOre then color:Lerp(Color3.new(1, 1, 1), 0.25) else RARE_GOLD)
+	local info = Materials.Get(rare.OreId)
+	local color = if info then info.Color else RARE_GOLD
+	local name = if info then string.upper(info.DisplayName) else ""
+	local kind = rare.Kind
+	local isOre = kind == "Ore" or kind == "Special"
+	if kind == "Special" then
+		-- Sonderfund (D-088): Farbe der Seltenheit, eigener Schriftzug
+		color = RARITY_COLOR[if info then info.Rarity or "" else ""] or RARE_GOLD
+		HudController.ShowRareDrop(Strings.Hud.SpecialFind, `+{rare.Amount} {name}`, color)
+	else
+		local title = if isOre then Strings.Hud.RareDrop else Strings.Hud.LuckyDrop
+		local line = if isOre then `+{rare.Amount} {name}` else `x{rare.Multiplier} {name}`
+		HudController.ShowRareDrop(title, line, if isOre then color:Lerp(Color3.new(1, 1, 1), 0.25) else RARE_GOLD)
+	end
 	SoundController.Play(if isOre then "RareDrop" else "LuckyDrop", at)
 
 	-- Leuchtender Glanz und Funken an der Erzwand
@@ -191,7 +204,7 @@ local function rareEffect(at: Vector3, rare: any)
 	sparks.Drag = 2
 	sparks.Rate = 0
 	sparks.Parent = anchor
-	sparks:Emit(if isOre then 40 else 25)
+	sparks:Emit(if kind == "Special" then 70 elseif isOre then 40 else 25)
 	Debris:AddItem(anchor, 1.6)
 end
 

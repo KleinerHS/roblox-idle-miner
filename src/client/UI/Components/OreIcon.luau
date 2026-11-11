@@ -44,10 +44,33 @@ end
 -- Richtung zur Kamera (siehe create): Erzklumpen sitzen auf der sichtbaren Seite
 local VIEW = ModelIcon.View
 
-local function build(id: string): Model?
+-- Sonderfunde (D-088): Leuchtfarbe je Seltenheit
+local RARITY_GLOW: { [string]: Color3 } = {
+	pristine = Color3.fromRGB(170, 225, 255),
+	radiant = Color3.fromRGB(255, 210, 80),
+	ancient = Color3.fromRGB(195, 125, 255),
+}
+
+local build: (id: string) -> Model?
+build = function(id: string): Model?
 	local info = Materials.Get(id)
 	if not info then
 		return nil
+	end
+	if info.Kind == "Special" and info.SourceId then
+		-- Sonderfund: Modell des Quell-Erzes mit leuchtenden Splittern in der Seltenheitsfarbe
+		local model = build(info.SourceId)
+		if not model then
+			return nil
+		end
+		local glow = RARITY_GLOW[info.Rarity or ""] or Color3.new(1, 1, 1)
+		local rng = Random.new(info.Tier * 131)
+		for i = 1, 3 do
+			local s = 0.35 + i * 0.08
+			local pos = VIEW * 1.1 + Vector3.new(rng:NextNumber(-0.8, 0.8), rng:NextNumber(-0.2, 0.9), rng:NextNumber(-0.6, 0.6))
+			part(model, Vector3.new(s, s, s), CFrame.new(pos) * CFrame.Angles(0.6, 0.8, 0.3), glow, Enum.Material.Neon)
+		end
+		return model
 	end
 	local model = Instance.new("Model")
 	local rng = Random.new(info.Tier * 97 + (if info.Kind == "Bar" then 7 else 0))

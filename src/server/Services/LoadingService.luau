@@ -22,6 +22,7 @@ local Vehicles = require(Shared.Definitions.Vehicles)
 local Types = require(Shared.Types)
 local NumberFormat = require(Shared.Util.NumberFormat)
 local SmelterLogic = require(Shared.Util.SmelterLogic)
+local CrateLogic = require(Shared.Util.CrateLogic)
 
 local GarageTemplate = require(script.Parent.Parent.World.GarageTemplate)
 local DataService = require(script.Parent.DataService)
@@ -52,13 +53,30 @@ local function sum(items: Types.ItemCounts): number
 	return total
 end
 
--- Verkaufbare Materialien im Lager, wertvollstes zuerst (D-025); mit Schmelzer ohne
--- schmelzbares Erz (D-030)
-local function loadOrder(storage: Types.ItemCounts, keepSmeltable: boolean): { string }
+-- Schmelzbares Erz bleibt für den Ofen im Lager (D-030), aber nur solange es dorthin kann
+-- (D-088, Felix' Balancing-Entwurf: Verarbeitung hat Vorrang, Rest bei Rückstau verladen):
+-- Ofen gebaut, Förderband Lager → Ofen eingesetzt und im Ofen-Eingangslager Platz für diese Sorte.
+local function reservedForSmelter(data: Types.PlayerData, id: string): boolean
+	if not data.Buildings.build_smelter or not SmelterLogic.IsSmeltable(id) then
+		return false
+	end
+	local hasConveyor = false
+	for _, record in data.Machines.Conveyors do
+		if record.Slot == "StorageToSmelter" then
+			hasConveyor = true
+			break
+		end
+	end
+	return hasConveyor and CrateLogic.freeFor(data.Smelter.Input, BalanceConfig.Smelter.InputCrates, id) > 0
+end
+
+-- Verkaufbare Materialien im Lager, wertvollstes zuerst (D-025), ohne für den Ofen reserviertes Erz
+local function loadOrder(data: Types.PlayerData): { string }
+	local storage = data.Storage.Items
 	local ids = {}
 	for id, amount in storage do
 		local material = Materials.Get(id)
-		if amount > 0 and material and material.SellValue and not (keepSmeltable and SmelterLogic.IsSmeltable(id)) then
+		if amount > 0 and material and material.SellValue and not reservedForSmelter(data, id) then
 			table.insert(ids, id)
 		end
 	end
@@ -163,7 +181,7 @@ local function tickBay(player: Player, data: Types.PlayerData, garage: Model, ba
 	local budget = math.min(free, math.floor(rate * TICK_SECONDS))
 	local plan: { [string]: number } = {}
 	local total = 0
-	for _, id in loadOrder(data.Storage.Items, data.Buildings.build_smelter == true) do
+	for _, id in loadOrder(data) do
 		local take = math.min(data.Storage.Items[id], budget - total)
 		if take > 0 then
 			plan[id] = take

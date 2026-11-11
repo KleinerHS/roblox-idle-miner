@@ -30,6 +30,7 @@ local Types = require(Shared.Types)
 local NumberFormat = require(Shared.Util.NumberFormat)
 local PrestigeLogic = require(Shared.Util.PrestigeLogic)
 local CrateLogic = require(Shared.Util.CrateLogic)
+local OfflineLogic = require(Shared.Util.OfflineLogic)
 
 local Net = require(script.Parent.Parent.Net)
 local Create = require(script.Parent.Parent.UI.Create)
@@ -769,23 +770,19 @@ local function renderLuck(snapshot: Types.StateSnapshot)
 			end
 			else nil)
 	end
-	-- Fundprofil je Hit nach den echten Regeln (BalanceConfig.RareDrops): normaler Hit, Bonus ×2–×3,
-	-- Bonus ×4–×10, seltenes Erz
+	-- Fundprofil je Hit nach den echten Regeln (D-088): normaler Hit, Mengen-Bonus ×2–×10,
+	-- seltenes Erz, Sonderfund (Pristine/Radiant/Ancient)
 	local rd = BalanceConfig.RareDrops
-	local weights = rd.MultiplierWeights
-	local totalW, lowW = 0, 0
-	for i, w in weights do
-		totalW += w
-		if i <= 2 then
-			lowW += w
-		end
+	local factor = RareDropLogic.LuckFactor(level)
+	local specialChance = 0
+	for _, rarity in BalanceConfig.SpecialFinds.Rarities do
+		specialChance += rarity.Chance * factor
 	end
-	local multShare = chance * (1 - rd.OreShare)
 	local rows = {
 		{ "Common", "Normal hit", 1 - chance },
-		{ "Uncommon", "Bonus ×2–×3", multShare * lowW / totalW },
-		{ "Rare", "Bonus ×4–×10", multShare * (totalW - lowW) / totalW },
-		{ "Epic", "Rare ore", chance * rd.OreShare },
+		{ "Uncommon", "Bonus ×2–×10", rd.AmountChance * factor },
+		{ "Rare", "Rare ore", rd.NextOreChance * factor },
+		{ "Epic", "Special find", specialChance },
 	}
 	setText(`{base}/RarityOverview/Title`, "Find profile per hit")
 	for _, row in rows do
@@ -798,32 +795,58 @@ local function renderLuck(snapshot: Types.StateSnapshot)
 	setVisible(`{base}/RarityOverview/RareFindNotifications`, false)
 end
 
+-- Offline-Upgrade-Karte (D-088): aktuelle Stufe, nächste Stufe, Kaufknopf
+local function renderOfflineCard(snapshot: Types.StateSnapshot, cardName: string, kind: OfflineLogic.Kind, title: string, subtitle: string, format: (level: number) -> string)
+	local base = `Windows/Company/Content/{cardName}`
+	local level = if kind == "efficiency" then snapshot.OfflineEfficiencyLevel or 0 else snapshot.OfflineDurationLevel or 0
+	setText(`{base}/Title`, title)
+	setText(`{base}/Current`, format(level))
+	local button = find(`{base}/Upgrade`)
+	setVisible(`{base}/Upgrade`, true)
+	local price, requiredLevel = OfflineLogic.Next(kind, level)
+	if not price or not requiredLevel then
+		setText(`{base}/Subtitle`, TEXT.MaxLevelSub)
+		setVisible(`{base}/Arrow`, false)
+		setVisible(`{base}/Next`, false)
+		bind(button, "Maximum reached", nil)
+		return
+	end
+	local p, r = price, requiredLevel
+	local levelOk = snapshot.MiningLevel >= r
+	setText(`{base}/Subtitle`, if levelOk then subtitle else string.format("Requires mining level %d", r), if levelOk then nil else C.amber)
+	setVisible(`{base}/Arrow`, true)
+	setVisible(`{base}/Next`, true)
+	setText(`{base}/Next`, format(level + 1))
+	bind(button, `Upgrade  ·  {NumberFormat.cash(p)}`, if levelOk and snapshot.Cash >= p
+		then function()
+			call("BuyOfflineUpgrade", { Level = r, Price = NumberFormat.cash(p) }, kind)
+		end
+		else nil)
+end
+
 local function renderCompany(snapshot: Types.StateSnapshot)
 	local base = "Windows/Company/Content"
 	local logo = CompanyIdentity.LogoById[snapshot.Company.LogoId]
 	local color = CompanyIdentity.ColorById[snapshot.Company.ColorId]
-	setText(`{base}/CompanyProfile/CompanyName`, `{if logo then logo.Glyph .. "  " else ""}{snapshot.Company.Name}`)
+	-- Logo und Farbe stehen im Kopf (Name in Firmenfarbe), die beiden Karten sind seit D-088 die
+	-- Offline-Upgrades (Geld während der Abwesenheit)
+	setText(`{base}/CompanyProfile/CompanyName`, `{if logo then logo.Glyph .. "  " else ""}{snapshot.Company.Name}`, if color then color.Color else nil)
 	setText(`{base}/CompanyProfile/Owner`, `Owner  /  {player.DisplayName}`)
-	setText(`{base}/Description`, "Your company identity.")
-	-- statt Beispiel-Upgrades (kein Spielsystem): Farbe und Logo
-	setText(`{base}/LogisticsUpgrade/Title`, TEXT.CompanyColor)
-	setText(`{base}/LogisticsUpgrade/Subtitle`, "Your company's accent color.")
-	setText(`{base}/LogisticsUpgrade/Current`, if color then color.DisplayName else "–", if color then color.Color else nil)
-	setText(`{base}/WorkforceUpgrade/Title`, "Company logo")
-	setText(`{base}/WorkforceUpgrade/Subtitle`, "Your company's logo.")
-	setText(`{base}/WorkforceUpgrade/Current`, if logo then `{logo.Glyph}  {logo.DisplayName}` else "–")
-	for _, cardName in { "LogisticsUpgrade", "WorkforceUpgrade" } do
-		setVisible(`{base}/{cardName}/Arrow`, false)
-		setVisible(`{base}/{cardName}/Next`, false)
-		setVisible(`{base}/{cardName}/Upgrade`, false)
-	end
+	setText(`{base}/Description`, TEXT.CompanyOfflineHint)
+	renderOfflineCard(snapshot, "LogisticsUpgrade", "efficiency", TEXT.OfflineEfficiency, TEXT.OfflineEfficiencySub, function(level)
+		return string.format("%d %%", math.floor(OfflineLogic.Efficiency(level) * 100 + 0.5))
+	end)
+	renderOfflineCard(snapshot, "WorkforceUpgrade", "duration", TEXT.OfflineDuration, TEXT.OfflineDurationSub, function(level)
+		return string.format("%d h", math.floor(OfflineLogic.MaxSeconds(level) / 3600 + 0.5))
+	end)
 	setText(`{base}/CompanyHint`, TEXT.CompanyChangeHint)
 end
 
 local function bonusText(count: number): string
 	local money = math.floor((PrestigeLogic.MoneyMultiplier(count) - 1) * 100 + 0.5)
 	local speed = math.floor((PrestigeLogic.SpeedMultiplier(count) - 1) * 100 + 0.5)
-	return string.format("+%d%% money · +%d%% speed", money, speed)
+	-- ohne Speed-Bonus (D-088) nur den Geldbonus zeigen
+	return if speed > 0 then string.format("+%d%% money · +%d%% speed", money, speed) else string.format("+%d%% money", money)
 end
 
 local function renderPrestige(snapshot: Types.StateSnapshot)
@@ -849,7 +872,7 @@ local function renderPrestige(snapshot: Types.StateSnapshot)
 	if dialog then
 		dialog.Visible = confirmStartedAt ~= nil and currentApp == "Prestige"
 		if dialog.Visible then
-			setText("PrestigeConfirmation/Description", `Resets: cash, level, buildings, workers, drills, all ore. You keep: prestige bonuses, company, pickaxes, backpacks, vehicles, Robux purchases. You gain: {bonusText(count + 1)}. This cannot be undone.`)
+			setText("PrestigeConfirmation/Description", `Resets: cash, level, buildings, workers, drills, all ore, vehicles, Mining Luck, offline upgrades. You keep: prestige bonuses, company, pickaxes, backpacks, Robux purchases. You gain: {bonusText(count + 1)}. This cannot be undone.`)
 			bind(find("PrestigeConfirmation/Cancel"), "Cancel", function()
 				confirmStartedAt = nil
 				LaptopController.Render()

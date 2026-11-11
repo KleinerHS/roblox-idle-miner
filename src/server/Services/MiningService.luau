@@ -20,6 +20,7 @@ local Log = require(Shared.Util.Log)
 local PrestigeLogic = require(Shared.Util.PrestigeLogic)
 local RareDropLogic = require(Shared.Util.RareDropLogic)
 local Ores = require(Shared.Definitions.Ores)
+local Materials = require(Shared.Definitions.Materials)
 local BalanceConfig = require(Shared.Config.BalanceConfig)
 
 local ToolBuilder = require(script.Parent.Parent.World.ToolBuilder)
@@ -69,9 +70,15 @@ local function rollRareDrop(data: Types.PlayerData, mine: Mines.MineDefinition, 
 		return nil
 	end
 	local maxOffset = #Ores.List - ore.Tier
-	local roll = RareDropLogic.Roll(rng, data.Equipment.LuckLevel or 0, maxOffset)
+	local hasSpecial = Materials.SpecialId(ore.Id, "pristine") ~= nil
+	local roll = RareDropLogic.Roll(rng, data.Equipment.LuckLevel or 0, maxOffset, hasSpecial)
 	if not roll then
 		return nil
+	end
+	if roll.Kind == "Special" then
+		-- Sonderfund (D-088): ein Stück mit festem Wert, nur beim Abbauen von Hand
+		local id = Materials.SpecialId(ore.Id, (roll :: any).Rarity)
+		return if id then { Kind = "Special", OreId = id, Amount = 1 } else nil
 	end
 	if roll.Kind == "Ore" then
 		local rare = Ores.GetByTier(ore.Tier + (roll :: any).TierOffset)

@@ -24,6 +24,7 @@ local Types = require(Shared.Types)
 local Result = require(Shared.Util.Result)
 local Signal = require(Shared.Util.Signal)
 local Leveling = require(Shared.Util.Leveling)
+local OfflineLogic = require(Shared.Util.OfflineLogic)
 local Log = require(Shared.Util.Log)
 
 local ProfileStore = require(script.Parent.Parent.Packages.ProfileStore)
@@ -87,6 +88,9 @@ local function buildSnapshot(data: Types.PlayerData): Types.StateSnapshot
 		Settings = table.clone(data.Settings),
 		Smelter = { Input = table.clone(data.Smelter.Input), Output = table.clone(data.Smelter.Output), Priority = data.Smelter.Priority },
 		PrestigeCount = data.Prestige.Count,
+		BoughtDrillTypes = table.clone(data.Machines.BoughtTypes),
+		OfflineEfficiencyLevel = data.Offline.EfficiencyLevel,
+		OfflineDurationLevel = data.Offline.DurationLevel,
 	}
 end
 
@@ -125,7 +129,8 @@ local function onProfileReady(player: Player, profile: Profile)
 	-- Offline-Zeit nur aus der Serverzeit (docs/14 §7, §16), vor dem Überschreiben auswerten.
 	-- LastValidTime = 0 (neues Profil) ergibt keine Offline-Zeit.
 	local previous = data.LastValidTime
-	offlineSeconds[player] = if previous > 0 then math.clamp(now - previous, 0, GameConfig.Offline.MaxSeconds) else 0
+	-- Rohzeit auf das größte Stufen-Limit kappen, OfflineService kappt auf das Limit des Spielers (D-088)
+	offlineSeconds[player] = if previous > 0 then math.clamp(now - previous, 0, OfflineLogic.AbsoluteMaxSeconds()) else 0
 	data.LastValidTime = now
 
 	profile.OnSave:Connect(function()

@@ -114,6 +114,14 @@ export type PlayerData = {
 		-- ab DataVersion 7
 		Conveyors: { [string]: ConveyorRecord },
 		Seq: number,
+		-- ab DataVersion 14: je Maschinentyp einmal gekauft (Vorgänger-Regel, D-088)
+		BoughtTypes: { [string]: boolean },
+	},
+
+	-- Offline-Upgrades (D-088), 0 = nichts gekauft, bei Prestige zurückgesetzt
+	Offline: {
+		EfficiencyLevel: number,
+		DurationLevel: number,
 	},
 
 	-- Fahrzeuge (ab DataVersion 5): Fuhrpark mit Ladung je Fahrzeug
@@ -173,6 +181,10 @@ export type StateSnapshot = {
 	Smelter: SmelterState,
 	Settings: { TradeRequests: boolean },
 	PrestigeCount: number,
+	-- D-088: Vorgänger-Regel im Machine-Shop, Offline-Upgrades im Laptop
+	BoughtDrillTypes: { [string]: boolean },
+	OfflineEfficiencyLevel: number,
+	OfflineDurationLevel: number,
 }
 
 return {}

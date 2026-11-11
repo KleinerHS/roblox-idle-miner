@@ -1,12 +1,12 @@
 --!strict
 -- Prestige (docs/12 §50–64, D-012, D-033). Ab Mining Level 100, nur am eigenen Laptop, nie
 -- automatisch. Setzt die Firmenprogression auf den Startzustand und behält Identität,
--- permanente Ausrüstung, Fahrzeuge, Robux-Käufe und den Prestige-Zähler.
+-- Spitzhacken, Rucksäcke, Robux-Käufe und den Prestige-Zähler.
 --
 -- Zurückgesetzt: Geld, Level/XP, Gebäude (inkl. Hütte/Büro), Minen, Lager inkl. Inhalt und
 -- Upgrade, Elevator-Upgrade, Worker, Drills, Förderbänder, Schmelzer, Produktionspuffer,
--- Rucksack-Inhalt, Fahrzeugladungen (Fahrzeuge bleiben, werden eingelagert).
--- Erhalten: Prestige-Zähler, Firma (Name/Logo/Farbe), Spitzhacken, Rucksäcke, Fahrzeuge,
+-- Rucksack-Inhalt, Fahrzeuge, Mining Luck, Offline-Upgrades (D-088).
+-- Erhalten: Prestige-Zähler, Firma (Name/Logo/Farbe), Spitzhacken, Rucksäcke,
 -- Robux-Käufe (Entitlements), Einstellungen, Statistik.
 --
 -- Duplikationsschutz (docs/12 §63): kein Prestige während eines Handels oder im Fahrzeug;

@@ -234,12 +234,12 @@ local BalanceConfig = {
 		FireRefund = 0, -- Felix (D-021)
 	},
 
-	-- Rare Drops beim manuellen Mining (docs/03 §7–8, docs/11 §18–21, D-006). Nur Spieler, nie
-	-- Worker/Drills/Offline. Ein Rare Event ist ENTWEDER Mengen-Multiplikator ODER ein Rare Ore.
-	-- D-087: Mengenbonus 1 % je Hit, nächstes Erz 0,15 % je Hit (= 1 % × 15 %), wie bisher.
+	-- Rare Drops beim manuellen Mining (docs/03 §7–8, docs/11 §18–21). Nur Spieler, nie Worker/Drills/
+	-- Offline. Seit D-088 ein exklusiver Ergebniswurf je gültigem Hit: Sonderfund (ancient, radiant,
+	-- pristine) ODER nächstes Erz ODER Mengen-Bonus ODER nichts. Alle Chancen × Luck-Faktor.
 	RareDrops = {
-		BaseChance = 0.01, -- bestätigt D-087
-		OreShare = 0.15, -- bestätigt D-087 (ergibt 0,15 % je Hit für ein besseres Erz)
+		AmountChance = 0.01, -- D-087/D-088: Mengen-Bonus ×2 … ×10 auf diesen Hit
+		NextOreChance = 0.0015, -- D-087/D-088: 1 seltenes Erz 1–4 Erzstufen über der Mine
 		-- Gewichte für den Multiplikator ×2 … ×10 (höher = häufiger)
 		MultiplierWeights = { 30, 22, 15, 10, 8, 6, 4, 3, 2 }, -- TODO_BALANCE (×2 … ×10)
 		-- Gewichte für 1 … 4 Erzstufen weiter (je weiter, desto seltener, docs/11 §19)
@@ -247,7 +247,171 @@ local BalanceConfig = {
 		RareOreAmount = 1, -- docs/03 §7: genau ein seltenes Erz
 	},
 
-	-- Mining Luck (docs/10 §17, D-007): erhöht nur die Rare-Drop-Chance: Chance × (1 + Level × Bonus).
+	-- Sonderfunde (D-088, Blatt „Sonderfunde“ aus Felix' Entwurf): je Erz drei Seltenheiten mit festem
+	-- Verkaufswert und XP je Fund. Nur beim Abbauen von Hand, vorerst nicht handelbar.
+	-- ID = <Erz-ID>_<Seltenheit>. Chance je Hit × Luck-Faktor.
+	SpecialFinds = {
+		Rarities = { -- Reihenfolge = Wurfreihenfolge (seltenste zuerst)
+			{ Id = "ancient", DisplayName = "Ancient", Chance = 2e-06 }, -- TODO_BALANCE (D-088) (1 : 600.000)
+			{ Id = "radiant", DisplayName = "Radiant", Chance = 1.7e-05 }, -- TODO_BALANCE (D-088) (1 : 60.000)
+			{ Id = "pristine", DisplayName = "Pristine", Chance = 0.000167 }, -- TODO_BALANCE (D-088) (1 : 6.000)
+		},
+		Values = { -- TODO_BALANCE (D-088)
+			ore_coal_pristine = { Value = 600, XP = 1 },
+			ore_coal_radiant = { Value = 3600, XP = 1 },
+			ore_coal_ancient = { Value = 21600, XP = 1 },
+			ore_copper_pristine = { Value = 1488, XP = 1.71 },
+			ore_copper_radiant = { Value = 8925, XP = 1.71 },
+			ore_copper_ancient = { Value = 53550, XP = 1.71 },
+			ore_tin_pristine = { Value = 3266, XP = 2.45 },
+			ore_tin_radiant = { Value = 19594, XP = 2.45 },
+			ore_tin_ancient = { Value = 117563, XP = 2.45 },
+			ore_iron_pristine = { Value = 5067, XP = 3.21 },
+			ore_iron_radiant = { Value = 30403, XP = 3.21 },
+			ore_iron_ancient = { Value = 182419, XP = 3.21 },
+			ore_lead_pristine = { Value = 5978, XP = 3.99 },
+			ore_lead_radiant = { Value = 35868, XP = 3.99 },
+			ore_lead_ancient = { Value = 215208, XP = 3.99 },
+			ore_zinc_pristine = { Value = 6869, XP = 4.8 },
+			ore_zinc_radiant = { Value = 41213, XP = 4.8 },
+			ore_zinc_ancient = { Value = 247280, XP = 4.8 },
+			ore_silver_pristine = { Value = 11463, XP = 5.63 },
+			ore_silver_radiant = { Value = 68779, XP = 5.63 },
+			ore_silver_ancient = { Value = 412673, XP = 5.63 },
+			ore_nickel_pristine = { Value = 16693, XP = 6.49 },
+			ore_nickel_radiant = { Value = 100160, XP = 6.49 },
+			ore_nickel_ancient = { Value = 600959, XP = 6.49 },
+			ore_cobalt_pristine = { Value = 21482, XP = 7.37 },
+			ore_cobalt_radiant = { Value = 128890, XP = 7.37 },
+			ore_cobalt_ancient = { Value = 773338, XP = 7.37 },
+			ore_chromium_pristine = { Value = 30149, XP = 8.27 },
+			ore_chromium_radiant = { Value = 180896, XP = 8.27 },
+			ore_chromium_ancient = { Value = 1085373, XP = 8.27 },
+			ore_manganese_pristine = { Value = 36063, XP = 9.2 },
+			ore_manganese_radiant = { Value = 216380, XP = 9.2 },
+			ore_manganese_ancient = { Value = 1298279, XP = 9.2 },
+			ore_aluminum_pristine = { Value = 48904, XP = 10.15 },
+			ore_aluminum_radiant = { Value = 293426, XP = 10.15 },
+			ore_aluminum_ancient = { Value = 1760553, XP = 10.15 },
+			ore_titanium_pristine = { Value = 44421, XP = 11.13 },
+			ore_titanium_radiant = { Value = 266528, XP = 11.13 },
+			ore_titanium_ancient = { Value = 1599170, XP = 11.13 },
+			ore_tungsten_pristine = { Value = 53218, XP = 12.13 },
+			ore_tungsten_radiant = { Value = 319311, XP = 12.13 },
+			ore_tungsten_ancient = { Value = 1915864, XP = 12.13 },
+			ore_platinum_pristine = { Value = 71383, XP = 13.15 },
+			ore_platinum_radiant = { Value = 428298, XP = 13.15 },
+			ore_platinum_ancient = { Value = 2569786, XP = 13.15 },
+			ore_palladium_pristine = { Value = 91138, XP = 14.2 },
+			ore_palladium_radiant = { Value = 546827, XP = 14.2 },
+			ore_palladium_ancient = { Value = 3280964, XP = 14.2 },
+			ore_osmium_pristine = { Value = 113714, XP = 15.27 },
+			ore_osmium_radiant = { Value = 682281, XP = 15.27 },
+			ore_osmium_ancient = { Value = 4093686, XP = 15.27 },
+			ore_iridium_pristine = { Value = 136344, XP = 16.37 },
+			ore_iridium_radiant = { Value = 818066, XP = 16.37 },
+			ore_iridium_ancient = { Value = 4908398, XP = 16.37 },
+			ore_rhodium_pristine = { Value = 175179, XP = 17.49 },
+			ore_rhodium_radiant = { Value = 1051077, XP = 17.49 },
+			ore_rhodium_ancient = { Value = 6306460, XP = 17.49 },
+			ore_uranium_pristine = { Value = 174290, XP = 18.63 },
+			ore_uranium_radiant = { Value = 1045743, XP = 18.63 },
+			ore_uranium_ancient = { Value = 6274456, XP = 18.63 },
+			ore_mythril_pristine = { Value = 271616, XP = 19.8 },
+			ore_mythril_radiant = { Value = 1629695, XP = 19.8 },
+			ore_mythril_ancient = { Value = 9778172, XP = 19.8 },
+			ore_obsidian_pristine = { Value = 290359, XP = 20.99 },
+			ore_obsidian_radiant = { Value = 1742155, XP = 20.99 },
+			ore_obsidian_ancient = { Value = 10452928, XP = 20.99 },
+			ore_ruby_pristine = { Value = 363197, XP = 22.21 },
+			ore_ruby_radiant = { Value = 2179181, XP = 22.21 },
+			ore_ruby_ancient = { Value = 13075087, XP = 22.21 },
+			ore_sapphire_pristine = { Value = 467527, XP = 23.45 },
+			ore_sapphire_radiant = { Value = 2805164, XP = 23.45 },
+			ore_sapphire_ancient = { Value = 16830981, XP = 23.45 },
+			ore_emerald_pristine = { Value = 599097, XP = 24.71 },
+			ore_emerald_radiant = { Value = 3594584, XP = 24.71 },
+			ore_emerald_ancient = { Value = 21567505, XP = 24.71 },
+			ore_amethyst_pristine = { Value = 630639, XP = 26 },
+			ore_amethyst_radiant = { Value = 3783836, XP = 26 },
+			ore_amethyst_ancient = { Value = 22703015, XP = 26 },
+			ore_topaz_pristine = { Value = 825359, XP = 27.31 },
+			ore_topaz_radiant = { Value = 4952152, XP = 27.31 },
+			ore_topaz_ancient = { Value = 29712915, XP = 27.31 },
+			ore_aquamarine_pristine = { Value = 1188143, XP = 28.65 },
+			ore_aquamarine_radiant = { Value = 7128860, XP = 28.65 },
+			ore_aquamarine_ancient = { Value = 42773159, XP = 28.65 },
+			ore_opal_pristine = { Value = 1592977, XP = 30.01 },
+			ore_opal_radiant = { Value = 9557861, XP = 30.01 },
+			ore_opal_ancient = { Value = 57347168, XP = 30.01 },
+			ore_black_opal_pristine = { Value = 1947000, XP = 31.39 },
+			ore_black_opal_radiant = { Value = 11681998, XP = 31.39 },
+			ore_black_opal_ancient = { Value = 70091986, XP = 31.39 },
+			ore_jade_pristine = { Value = 2336270, XP = 32.8 },
+			ore_jade_radiant = { Value = 14017620, XP = 32.8 },
+			ore_jade_ancient = { Value = 84105720, XP = 32.8 },
+			ore_amber_pristine = { Value = 3076880, XP = 34.23 },
+			ore_amber_radiant = { Value = 18461280, XP = 34.23 },
+			ore_amber_ancient = { Value = 110767680, XP = 34.23 },
+			ore_meteorite_pristine = { Value = 4124726, XP = 35.69 },
+			ore_meteorite_radiant = { Value = 24748355, XP = 35.69 },
+			ore_meteorite_ancient = { Value = 148490129, XP = 35.69 },
+			ore_star_metal_pristine = { Value = 6544392, XP = 37.17 },
+			ore_star_metal_radiant = { Value = 39266352, XP = 37.17 },
+			ore_star_metal_ancient = { Value = 235598112, XP = 37.17 },
+			ore_luminous_crystal_pristine = { Value = 6530106, XP = 38.67 },
+			ore_luminous_crystal_radiant = { Value = 39180635, XP = 38.67 },
+			ore_luminous_crystal_ancient = { Value = 235083809, XP = 38.67 },
+			ore_dragonstone_pristine = { Value = 8729740, XP = 40.2 },
+			ore_dragonstone_radiant = { Value = 52378441, XP = 40.2 },
+			ore_dragonstone_ancient = { Value = 314270647, XP = 40.2 },
+			ore_netherium_pristine = { Value = 10615489, XP = 41.75 },
+			ore_netherium_radiant = { Value = 63692933, XP = 41.75 },
+			ore_netherium_ancient = { Value = 382157597, XP = 41.75 },
+			ore_celestial_metal_pristine = { Value = 18760465, XP = 43.33 },
+			ore_celestial_metal_radiant = { Value = 112562791, XP = 43.33 },
+			ore_celestial_metal_ancient = { Value = 675376745, XP = 43.33 },
+			ore_astralium_pristine = { Value = 25292214, XP = 44.93 },
+			ore_astralium_radiant = { Value = 151753285, XP = 44.93 },
+			ore_astralium_ancient = { Value = 910519708, XP = 44.93 },
+			ore_aetherium_pristine = { Value = 25465072, XP = 46.55 },
+			ore_aetherium_radiant = { Value = 152790429, XP = 46.55 },
+			ore_aetherium_ancient = { Value = 916742576, XP = 46.55 },
+			ore_void_pristine = { Value = 30557944, XP = 48.2 },
+			ore_void_radiant = { Value = 183347666, XP = 48.2 },
+			ore_void_ancient = { Value = 1100085993, XP = 48.2 },
+			ore_darksteel_pristine = { Value = 37049307, XP = 49.87 },
+			ore_darksteel_radiant = { Value = 222295844, XP = 49.87 },
+			ore_darksteel_ancient = { Value = 1333775065, XP = 49.87 },
+			ore_sun_crystal_pristine = { Value = 44459069, XP = 51.57 },
+			ore_sun_crystal_radiant = { Value = 266754413, XP = 51.57 },
+			ore_sun_crystal_ancient = { Value = 1600526477, XP = 51.57 },
+			ore_moon_crystal_pristine = { Value = 53350804, XP = 53.29 },
+			ore_moon_crystal_radiant = { Value = 320104822, XP = 53.29 },
+			ore_moon_crystal_ancient = { Value = 1920628930, XP = 53.29 },
+			ore_galaxium_pristine = { Value = 71644199, XP = 55.03 },
+			ore_galaxium_radiant = { Value = 429865193, XP = 55.03 },
+			ore_galaxium_ancient = { Value = 2579191159, XP = 55.03 },
+			ore_cosmium_pristine = { Value = 154819338, XP = 56.8 },
+			ore_cosmium_radiant = { Value = 928916026, XP = 56.8 },
+			ore_cosmium_ancient = { Value = 5573496159, XP = 56.8 },
+			ore_quantium_pristine = { Value = 186807032, XP = 58.59 },
+			ore_quantium_radiant = { Value = 1120842190, XP = 58.59 },
+			ore_quantium_ancient = { Value = 6725053141, XP = 58.59 },
+			ore_singularium_pristine = { Value = 224168210, XP = 60.41 },
+			ore_singularium_radiant = { Value = 1345009262, XP = 60.41 },
+			ore_singularium_ancient = { Value = 8070055573, XP = 60.41 },
+			ore_primal_crystal_pristine = { Value = 269001923, XP = 62.25 },
+			ore_primal_crystal_radiant = { Value = 1614011536, XP = 62.25 },
+			ore_primal_crystal_ancient = { Value = 9684069217, XP = 62.25 },
+			ore_diamond_pristine = { Value = 269001923, XP = 64.11 },
+			ore_diamond_radiant = { Value = 1614011536, XP = 64.11 },
+			ore_diamond_ancient = { Value = 9684069217, XP = 64.11 },
+		} :: { [string]: { Value: number, XP: number } },
+	},
+
+	-- Mining Luck (docs/10 §17, D-007): erhöht alle Rare-Drop- und Sonderfund-Chancen: × (1 + Level × Bonus).
+	-- Seit D-088 bei Prestige zurückgesetzt.
 	-- D-087: Preis und Mindest-Level je Stufe einzeln.
 	Luck = {
 		MaxLevel = 10, -- D-087
@@ -282,6 +446,24 @@ local BalanceConfig = {
 		{ Capacity = 1200, Cost = 6000000, RequiredLevel = 65 },
 		{ Capacity = 1600, Cost = 25000000, RequiredLevel = 75 },
 		{ Capacity = 2200, Cost = 130000000, RequiredLevel = 85 },
+		},
+	},
+
+	-- Offline-Geld (D-088): Während der Abwesenheit gibt es Geld statt Material: Efficiency × Bruttowert
+	-- der installierten Firma (Worker + platzierte Drills, gedeckelt durch den Elevator) je Sekunde.
+	-- Keine XP, kein Material, kein Lohn. Dauer-Limit ohne Upgrade: GameConfig.Offline.MaxSeconds (8 h).
+	-- Upgrades in der Laptop-App COMPANY, der Reihe nach, bei Prestige zurückgesetzt.
+	Offline = {
+		Efficiency = 0.3, -- TODO_BALANCE (D-088)
+		EfficiencyLevels = { -- TODO_BALANCE (D-088)
+			{ RequiredLevel = 15, Price = 83466, Efficiency = 0.35 },
+			{ RequiredLevel = 35, Price = 1227100, Efficiency = 0.4 },
+			{ RequiredLevel = 55, Price = 21386579, Efficiency = 0.45 },
+			{ RequiredLevel = 75, Price = 675376745, Efficiency = 0.5 },
+		},
+		DurationLevels = { -- TODO_BALANCE (D-088)
+			{ RequiredLevel = 30, Price = 912505, Hours = 10 },
+			{ RequiredLevel = 65, Price = 148490129, Hours = 12 },
 		},
 	},
 

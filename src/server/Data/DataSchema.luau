@@ -1,5 +1,5 @@
 --!strict
--- Datenschema v14: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
+-- Datenschema v15: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
 -- Regeln:
 --  * Defaults gibt es nur hier.
 --  * Jede Strukturänderung erhöht CURRENT_VERSION und bekommt eine Migration
@@ -13,10 +13,11 @@ local BalanceConfig = require(Shared.Config.BalanceConfig)
 local Pickaxes = require(Shared.Definitions.Pickaxes)
 local Backpacks = require(Shared.Definitions.Backpacks)
 local Mines = require(Shared.Definitions.Mines)
+local Drills = require(Shared.Definitions.Drills)
 local Types = require(Shared.Types)
 local Leveling = require(Shared.Util.Leveling)
 
-local CURRENT_VERSION = 14
+local CURRENT_VERSION = 15
 
 local DataSchema = {
 	CurrentVersion = CURRENT_VERSION,
@@ -101,6 +102,14 @@ local TEMPLATE: Types.PlayerData = {
 		-- Förderbänder (v7) mit Instanz-ID, eingesetzt an einem festen Platz oder im Inventar
 		Conveyors = {},
 		Seq = 0,
+		-- je Maschinentyp einmal gekauft (v15, Vorgänger-Regel D-088)
+		BoughtTypes = {},
+	},
+
+	-- Offline-Upgrades (D-088): gekaufte Stufen Effizienz und Dauer
+	Offline = {
+		EfficiencyLevel = 0,
+		DurationLevel = 0,
 	},
 
 	-- Fahrzeuge (v5): Fuhrpark, Ladung je Fahrzeug, Garagen-Stellplatz (D-009, D-016)
@@ -280,6 +289,33 @@ local MIGRATIONS: { [number]: (data: { [string]: any }) -> () } = {
 		if typeof(eq.EquippedBackpack) == "string" then
 			eq.EquippedBackpack = Backpacks.LegacyIds[eq.EquippedBackpack] or eq.EquippedBackpack
 		end
+	end,
+	-- v14 → v15: Vorgänger-Regel für Drills (D-088). Alle Typen bis zum höchsten besessenen gelten als
+	-- gekauft, damit bestehende Spieler nicht nachkaufen müssen.
+	[14] = function(data)
+		local machines = data.Machines
+		if typeof(machines) ~= "table" then
+			return
+		end
+		local bought = {}
+		local highest = 0
+		for _, record in machines.Drills or {} do
+			local def = typeof(record) == "table" and Drills.Get(record.Type)
+			if def then
+				highest = math.max(highest, def.Tier)
+			end
+		end
+		for _, def in Drills.List do
+			if def.Tier <= highest then
+				bought[def.Id] = true
+			end
+		end
+		for _, record in machines.Conveyors or {} do
+			if typeof(record) == "table" and typeof(record.Type) == "string" then
+				bought[record.Type] = true
+			end
+		end
+		machines.BoughtTypes = bought
 	end,
 }
 

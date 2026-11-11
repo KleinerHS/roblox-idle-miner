@@ -27,7 +27,7 @@ local GameConfig = {
 
 	Offline = {
 		-- Maximale Offline-Produktion in Sekunden (docs/14 §7, verbindlich).
-		MaxSeconds = 3600,
+		MaxSeconds = 28800, -- 8 h (Felix Balancing-Entwurf 2026-11-11, D-088), TODO_BALANCE
 		-- Erst ab dieser Abwesenheit erscheint das Fenster „WHILE YOU WERE AWAY“ (kurze
 		-- Reconnects werden still nachgerechnet)
 		MinSummarySeconds = 60,

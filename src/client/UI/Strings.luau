@@ -15,6 +15,7 @@ local MESSAGES: { [string]: string } = {
 	ALREADY_DONE = "Already done.",
 	NOT_ENOUGH_MONEY = "Not enough money. You need {Price}.",
 	LEVEL_TOO_LOW = "Requires Mining Level {Level}.",
+	PREDECESSOR_REQUIRED = "Buy the previous tier first.",
 
 	-- Firma
 	NAME_INVALID = "Company name must be 3–24 characters.",
@@ -66,6 +67,7 @@ local MESSAGES: { [string]: string } = {
 	DRILL_REMOVED = "{Name} moved back to your inventory.",
 	DRILL_UPGRADED = "{Name} upgraded to level {Level}!",
 	LUCK_PURCHASED = "Mining Luck level {Level} purchased!",
+	OFFLINE_UPGRADE_PURCHASED = "Offline upgrade purchased!",
 	NOT_OWNED = "You don't own this item yet.",
 
 	-- Worker
@@ -154,6 +156,8 @@ Strings.Shop = table.freeze({
 	ComingSoon = "COMING SOON",
 	Locked = "LOCKED",
 	RequiresLevel = "Requires Mining Level %d",
+	-- Vorgänger einmal kaufen (D-088)
+	RequiresPrevious = "Buy %s first",
 	Close = "X",
 })
 
@@ -244,6 +248,12 @@ Strings.Laptop = table.freeze({
 	SmelterCard = "Smelter",
 	CompanyTitle = "COMPANY",
 	CompanyColor = "Company color",
+	-- Offline-Upgrades in der Company-App (D-088)
+	CompanyOfflineHint = "Your company earns money while you are offline. Upgrade how much and how long.",
+	OfflineEfficiency = "Offline earnings",
+	OfflineEfficiencySub = "Share of your company's output paid while offline.",
+	OfflineDuration = "Offline time",
+	OfflineDurationSub = "How long your company keeps earning while you are away.",
 	CompanyChangeHint = "Changing name, logo or color will be possible later (Robux).",
 	Settings = "SETTINGS",
 	TradeRequests = "Trade requests",
@@ -269,12 +279,12 @@ Strings.Laptop = table.freeze({
 		"Mine unlocks, storage and elevator upgrades",
 		"Workers, drills and conveyors",
 		"All ore and bars (storage, backpack, machines, vehicle cargo)",
+		"Vehicles, Mining Luck and offline upgrades",
 	},
 	PrestigeKeepList = {
 		"Prestige count and all prestige bonuses",
 		"Company name, logo and color",
 		"Pickaxes and backpacks",
-		"Vehicles (stored until you rebuild your garage)",
 		"Robux purchases",
 	},
 	PrestigeStart = "PRESTIGE…",
@@ -385,22 +395,18 @@ Strings.Hud = table.freeze({
 	LevelUp = "LEVEL UP!",
 	RareDrop = "RARE DROP!",
 	LuckyDrop = "LUCKY DROP!",
+	SpecialFind = "SPECIAL FIND!",
 	LevelUpSub = "Mining Level %d",
 	MineUnlocked = "NEW MINE UNLOCKED",
 	MineAvailable = "NEW MINE FOR SALE",
 })
 
 Strings.Offline = table.freeze({
-	Title = "WHILE YOU WERE AWAY – %d MIN",
-	Subtitle = "Your company kept working while you were offline.",
-	Mined = "%s mined",
-	Smelted = "%s smelted",
-	Wages = "Wages paid",
-	NothingProduced = "Nothing was produced.",
-	StorageFullAfter = "Storage was full after %d min – more ore is waiting in the mines.",
-	Unpaid = "Not enough money for all wages – some workers paused.",
-	Capped = "Offline production is limited to 1 hour.",
-	Storage = "Storage: %d%% full (%s / %s)",
+	Title = "WHILE YOU WERE AWAY – %s",
+	Subtitle = "Your company kept earning money while you were offline.",
+	Earned = "Offline earnings",
+	Rate = "%d%% of your company's output (%s / min)",
+	Capped = "Offline earnings are limited to %d hours. Upgrade in the laptop app OFFLINE.",
 	Continue = "CONTINUE",
 })
 
