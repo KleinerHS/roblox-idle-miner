@@ -1,0 +1,4362 @@
+{
+  "ores": [
+    {
+      "id": "ore_coal",
+      "name": "Coal",
+      "tier": 1,
+      "price": 2.0,
+      "xp": 1.0,
+      "source_row": 2
+    },
+    {
+      "id": "ore_copper",
+      "name": "Copper",
+      "tier": 2,
+      "price": 2.4,
+      "xp": 1.71,
+      "source_row": 3
+    },
+    {
+      "id": "ore_tin",
+      "name": "Tin",
+      "tier": 3,
+      "price": 2.88,
+      "xp": 2.45,
+      "source_row": 4
+    },
+    {
+      "id": "ore_iron",
+      "name": "Iron",
+      "tier": 4,
+      "price": 3.46,
+      "xp": 3.21,
+      "source_row": 5
+    },
+    {
+      "id": "ore_lead",
+      "name": "Lead",
+      "tier": 5,
+      "price": 4.15,
+      "xp": 3.99,
+      "source_row": 6
+    },
+    {
+      "id": "ore_zinc",
+      "name": "Zinc",
+      "tier": 6,
+      "price": 4.98,
+      "xp": 4.8,
+      "source_row": 7
+    },
+    {
+      "id": "ore_silver",
+      "name": "Silver",
+      "tier": 7,
+      "price": 5.97,
+      "xp": 5.63,
+      "source_row": 8
+    },
+    {
+      "id": "ore_nickel",
+      "name": "Nickel",
+      "tier": 8,
+      "price": 7.17,
+      "xp": 6.49,
+      "source_row": 9
+    },
+    {
+      "id": "ore_cobalt",
+      "name": "Cobalt",
+      "tier": 9,
+      "price": 8.6,
+      "xp": 7.37,
+      "source_row": 10
+    },
+    {
+      "id": "ore_chromium",
+      "name": "Chromium",
+      "tier": 10,
+      "price": 10.32,
+      "xp": 8.27,
+      "source_row": 11
+    },
+    {
+      "id": "ore_manganese",
+      "name": "Manganese",
+      "tier": 11,
+      "price": 12.38,
+      "xp": 9.2,
+      "source_row": 12
+    },
+    {
+      "id": "ore_aluminum",
+      "name": "Aluminum",
+      "tier": 12,
+      "price": 14.86,
+      "xp": 10.15,
+      "source_row": 13
+    },
+    {
+      "id": "ore_titanium",
+      "name": "Titanium",
+      "tier": 13,
+      "price": 17.83,
+      "xp": 11.13,
+      "source_row": 14
+    },
+    {
+      "id": "ore_tungsten",
+      "name": "Tungsten",
+      "tier": 14,
+      "price": 21.4,
+      "xp": 12.13,
+      "source_row": 15
+    },
+    {
+      "id": "ore_platinum",
+      "name": "Platinum",
+      "tier": 15,
+      "price": 25.68,
+      "xp": 13.15,
+      "source_row": 16
+    },
+    {
+      "id": "ore_palladium",
+      "name": "Palladium",
+      "tier": 16,
+      "price": 30.81,
+      "xp": 14.2,
+      "source_row": 17
+    },
+    {
+      "id": "ore_osmium",
+      "name": "Osmium",
+      "tier": 17,
+      "price": 36.98,
+      "xp": 15.27,
+      "source_row": 18
+    },
+    {
+      "id": "ore_iridium",
+      "name": "Iridium",
+      "tier": 18,
+      "price": 44.37,
+      "xp": 16.37,
+      "source_row": 19
+    },
+    {
+      "id": "ore_rhodium",
+      "name": "Rhodium",
+      "tier": 19,
+      "price": 53.25,
+      "xp": 17.49,
+      "source_row": 20
+    },
+    {
+      "id": "ore_uranium",
+      "name": "Uranium",
+      "tier": 20,
+      "price": 63.9,
+      "xp": 18.63,
+      "source_row": 21
+    },
+    {
+      "id": "ore_mythril",
+      "name": "Mythril",
+      "tier": 21,
+      "price": 76.68,
+      "xp": 19.8,
+      "source_row": 22
+    },
+    {
+      "id": "ore_obsidian",
+      "name": "Obsidian",
+      "tier": 22,
+      "price": 92.01,
+      "xp": 20.99,
+      "source_row": 23
+    },
+    {
+      "id": "ore_ruby",
+      "name": "Ruby",
+      "tier": 23,
+      "price": 110.41,
+      "xp": 22.21,
+      "source_row": 24
+    },
+    {
+      "id": "ore_sapphire",
+      "name": "Sapphire",
+      "tier": 24,
+      "price": 132.49,
+      "xp": 23.45,
+      "source_row": 25
+    },
+    {
+      "id": "ore_emerald",
+      "name": "Emerald",
+      "tier": 25,
+      "price": 158.99,
+      "xp": 24.71,
+      "source_row": 26
+    },
+    {
+      "id": "ore_amethyst",
+      "name": "Amethyst",
+      "tier": 26,
+      "price": 190.79,
+      "xp": 26.0,
+      "source_row": 27
+    },
+    {
+      "id": "ore_topaz",
+      "name": "Topaz",
+      "tier": 27,
+      "price": 228.95,
+      "xp": 27.31,
+      "source_row": 28
+    },
+    {
+      "id": "ore_aquamarine",
+      "name": "Aquamarine",
+      "tier": 28,
+      "price": 274.74,
+      "xp": 28.65,
+      "source_row": 29
+    },
+    {
+      "id": "ore_opal",
+      "name": "Opal",
+      "tier": 29,
+      "price": 329.69,
+      "xp": 30.01,
+      "source_row": 30
+    },
+    {
+      "id": "ore_black_opal",
+      "name": "Black Opal",
+      "tier": 30,
+      "price": 395.63,
+      "xp": 31.39,
+      "source_row": 31
+    },
+    {
+      "id": "ore_jade",
+      "name": "Jade",
+      "tier": 31,
+      "price": 474.75,
+      "xp": 32.8,
+      "source_row": 32
+    },
+    {
+      "id": "ore_amber",
+      "name": "Amber",
+      "tier": 32,
+      "price": 569.7,
+      "xp": 34.23,
+      "source_row": 33
+    },
+    {
+      "id": "ore_meteorite",
+      "name": "Meteorite Ore",
+      "tier": 33,
+      "price": 683.64,
+      "xp": 35.69,
+      "source_row": 34
+    },
+    {
+      "id": "ore_star_metal",
+      "name": "Star Metal",
+      "tier": 34,
+      "price": 820.37,
+      "xp": 37.17,
+      "source_row": 35
+    },
+    {
+      "id": "ore_luminous_crystal",
+      "name": "Luminous Crystal",
+      "tier": 35,
+      "price": 984.45,
+      "xp": 38.67,
+      "source_row": 36
+    },
+    {
+      "id": "ore_dragonstone",
+      "name": "Dragonstone",
+      "tier": 36,
+      "price": 1181.34,
+      "xp": 40.2,
+      "source_row": 37
+    },
+    {
+      "id": "ore_netherium",
+      "name": "Netherium",
+      "tier": 37,
+      "price": 1417.6,
+      "xp": 41.75,
+      "source_row": 38
+    },
+    {
+      "id": "ore_celestial_metal",
+      "name": "Celestial Metal",
+      "tier": 38,
+      "price": 1701.12,
+      "xp": 43.33,
+      "source_row": 39
+    },
+    {
+      "id": "ore_astralium",
+      "name": "Astralium",
+      "tier": 39,
+      "price": 2041.35,
+      "xp": 44.93,
+      "source_row": 40
+    },
+    {
+      "id": "ore_aetherium",
+      "name": "Aetherium",
+      "tier": 40,
+      "price": 2449.62,
+      "xp": 46.55,
+      "source_row": 41
+    },
+    {
+      "id": "ore_void",
+      "name": "Void Ore",
+      "tier": 41,
+      "price": 2939.54,
+      "xp": 48.2,
+      "source_row": 42
+    },
+    {
+      "id": "ore_darksteel",
+      "name": "Darksteel",
+      "tier": 42,
+      "price": 3527.45,
+      "xp": 49.87,
+      "source_row": 43
+    },
+    {
+      "id": "ore_sun_crystal",
+      "name": "Sun Crystal",
+      "tier": 43,
+      "price": 4232.94,
+      "xp": 51.57,
+      "source_row": 44
+    },
+    {
+      "id": "ore_moon_crystal",
+      "name": "Moon Crystal",
+      "tier": 44,
+      "price": 5079.53,
+      "xp": 53.29,
+      "source_row": 45
+    },
+    {
+      "id": "ore_galaxium",
+      "name": "Galaxium",
+      "tier": 45,
+      "price": 6095.44,
+      "xp": 55.03,
+      "source_row": 46
+    },
+    {
+      "id": "ore_cosmium",
+      "name": "Cosmium",
+      "tier": 46,
+      "price": 7314.52,
+      "xp": 56.8,
+      "source_row": 47
+    },
+    {
+      "id": "ore_quantium",
+      "name": "Quantium",
+      "tier": 47,
+      "price": 8777.43,
+      "xp": 58.59,
+      "source_row": 48
+    },
+    {
+      "id": "ore_singularium",
+      "name": "Singularium",
+      "tier": 48,
+      "price": 10532.91,
+      "xp": 60.41,
+      "source_row": 49
+    },
+    {
+      "id": "ore_primal_crystal",
+      "name": "Primal Crystal",
+      "tier": 49,
+      "price": 12639.5,
+      "xp": 62.25,
+      "source_row": 50
+    },
+    {
+      "id": "ore_diamond",
+      "name": "Diamond",
+      "tier": 50,
+      "price": 15167.4,
+      "xp": 64.11,
+      "source_row": 51
+    }
+  ],
+  "picks": [
+    {
+      "id": "pickaxe_standard",
+      "name": "Standard Pickaxe",
+      "level": 1,
+      "price": 0,
+      "power": 1,
+      "speed": 1.0,
+      "rate_min": 60.0,
+      "tier": 1,
+      "prerequisite_id": null,
+      "source_row": 2
+    },
+    {
+      "id": "pickaxe_copper",
+      "name": "Copper Pickaxe",
+      "level": 2,
+      "price": 90,
+      "power": 2,
+      "speed": 1.033,
+      "rate_min": 123.96,
+      "tier": 2,
+      "prerequisite_id": "pickaxe_standard",
+      "source_row": 3
+    },
+    {
+      "id": "pickaxe_iron",
+      "name": "Iron Pickaxe",
+      "level": 3,
+      "price": 750,
+      "power": 3,
+      "speed": 1.067,
+      "rate_min": 192.06,
+      "tier": 3,
+      "prerequisite_id": "pickaxe_copper",
+      "source_row": 4
+    },
+    {
+      "id": "pickaxe_gold",
+      "name": "Gold Pickaxe",
+      "level": 7,
+      "price": 1600,
+      "power": 4,
+      "speed": 1.1,
+      "rate_min": 264.0,
+      "tier": 4,
+      "prerequisite_id": "pickaxe_iron",
+      "source_row": 5
+    },
+    {
+      "id": "pickaxe_obsidian",
+      "name": "Obsidian Pickaxe",
+      "level": 11,
+      "price": 3300,
+      "power": 5,
+      "speed": 1.133,
+      "rate_min": 339.9,
+      "tier": 5,
+      "prerequisite_id": "pickaxe_gold",
+      "source_row": 6
+    },
+    {
+      "id": "pickaxe_raw_diamond",
+      "name": "Raw Diamond Pickaxe",
+      "level": 16,
+      "price": 6300,
+      "power": 6,
+      "speed": 1.167,
+      "rate_min": 420.12,
+      "tier": 6,
+      "prerequisite_id": "pickaxe_obsidian",
+      "source_row": 7
+    },
+    {
+      "id": "pickaxe_nature",
+      "name": "Nature Pickaxe",
+      "level": 20,
+      "price": 12000,
+      "power": 7,
+      "speed": 1.2,
+      "rate_min": 504.0,
+      "tier": 7,
+      "prerequisite_id": "pickaxe_raw_diamond",
+      "source_row": 8,
+      "reference_gross_min": 5135.58,
+      "reference_interval_min": 24.0,
+      "purchase_budget_share": 0.06
+    },
+    {
+      "id": "pickaxe_fire",
+      "name": "Fire Pickaxe",
+      "level": 24,
+      "price": 19000,
+      "power": 8,
+      "speed": 1.233,
+      "rate_min": 591.84,
+      "tier": 8,
+      "prerequisite_id": "pickaxe_nature",
+      "source_row": 9,
+      "reference_gross_min": 9177.2,
+      "reference_interval_min": 24.0,
+      "purchase_budget_share": 0.06
+    },
+    {
+      "id": "pickaxe_ice",
+      "name": "Ice Pickaxe",
+      "level": 28,
+      "price": 29000,
+      "power": 9,
+      "speed": 1.267,
+      "rate_min": 684.18,
+      "tier": 9,
+      "prerequisite_id": "pickaxe_fire",
+      "source_row": 10,
+      "reference_gross_min": 10643.69,
+      "reference_interval_min": 34.8,
+      "purchase_budget_share": 0.06
+    },
+    {
+      "id": "pickaxe_electric",
+      "name": "Electric Pickaxe",
+      "level": 32,
+      "price": 50000,
+      "power": 10,
+      "speed": 1.3,
+      "rate_min": 780.0,
+      "tier": 10,
+      "prerequisite_id": "pickaxe_ice",
+      "source_row": 11,
+      "reference_gross_min": 18227.28,
+      "reference_interval_min": 38.4,
+      "purchase_budget_share": 0.06
+    },
+    {
+      "id": "pickaxe_light",
+      "name": "Light Pickaxe",
+      "level": 36,
+      "price": 90000,
+      "power": 11,
+      "speed": 1.333,
+      "rate_min": 879.78,
+      "tier": 11,
+      "prerequisite_id": "pickaxe_electric",
+      "source_row": 12,
+      "reference_gross_min": 30488.48,
+      "reference_interval_min": 38.4,
+      "purchase_budget_share": 0.06
+    },
+    {
+      "id": "pickaxe_poison",
+      "name": "Poison Pickaxe",
+      "level": 41,
+      "price": 160000,
+      "power": 12,
+      "speed": 1.367,
+      "rate_min": 984.24,
+      "tier": 12,
+      "prerequisite_id": "pickaxe_light",
+      "source_row": 13,
+      "reference_gross_min": 40655.09,
+      "reference_interval_min": 48.0,
+      "purchase_budget_share": 0.06
+    },
+    {
+      "id": "pickaxe_shadow",
+      "name": "Shadow Pickaxe",
+      "level": 45,
+      "price": 200000,
+      "power": 13,
+      "speed": 1.4,
+      "rate_min": 1092.0,
+      "tier": 13,
+      "prerequisite_id": "pickaxe_poison",
+      "source_row": 14,
+      "reference_gross_min": 65668.17,
+      "reference_interval_min": 38.4,
+      "purchase_budget_share": 0.06
+    },
+    {
+      "id": "pickaxe_blood",
+      "name": "Blood Pickaxe",
+      "level": 49,
+      "price": 350000,
+      "power": 14,
+      "speed": 1.433,
+      "rate_min": 1203.72,
+      "tier": 14,
+      "prerequisite_id": "pickaxe_shadow",
+      "source_row": 15,
+      "reference_gross_min": 113537.94,
+      "reference_interval_min": 38.4,
+      "purchase_budget_share": 0.06
+    },
+    {
+      "id": "pickaxe_ghost",
+      "name": "Ghost Pickaxe",
+      "level": 53,
+      "price": 710000,
+      "power": 15,
+      "speed": 1.467,
+      "rate_min": 1320.3,
+      "tier": 15,
+      "prerequisite_id": "pickaxe_blood",
+      "source_row": 16,
+      "reference_gross_min": 160653.22,
+      "reference_interval_min": 54.6,
+      "purchase_budget_share": 0.06
+    },
+    {
+      "id": "pickaxe_inferno",
+      "name": "Inferno Pickaxe",
+      "level": 57,
+      "price": 1400000,
+      "power": 16,
+      "speed": 1.5,
+      "rate_min": 1440.0,
+      "tier": 16,
+      "prerequisite_id": "pickaxe_ghost",
+      "source_row": 17,
+      "reference_gross_min": 282391.23,
+      "reference_interval_min": 60.0,
+      "purchase_budget_share": 0.06
+    },
+    {
+      "id": "pickaxe_rune",
+      "name": "Rune Pickaxe",
+      "level": 62,
+      "price": 4300000,
+      "power": 17,
+      "speed": 1.533,
+      "rate_min": 1563.66,
+      "tier": 17,
+      "prerequisite_id": "pickaxe_inferno",
+      "source_row": 18,
+      "reference_gross_min": 601019.56,
+      "reference_interval_min": 86.333,
+      "purchase_budget_share": 0.06
+    },
+    {
+      "id": "pickaxe_cosmic",
+      "name": "Cosmic Pickaxe",
+      "level": 66,
+      "price": 7600000,
+      "power": 18,
+      "speed": 1.567,
+      "rate_min": 1692.36,
+      "tier": 18,
+      "prerequisite_id": "pickaxe_rune",
+      "source_row": 19,
+      "reference_gross_min": 1064164.47,
+      "reference_interval_min": 82.667,
+      "purchase_budget_share": 0.06
+    },
+    {
+      "id": "pickaxe_sapphire",
+      "name": "Sapphire Pickaxe",
+      "level": 70,
+      "price": 12000000,
+      "power": 19,
+      "speed": 1.6,
+      "rate_min": 1824.0,
+      "tier": 19,
+      "prerequisite_id": "pickaxe_cosmic",
+      "source_row": 20,
+      "reference_gross_min": 1717230.85,
+      "reference_interval_min": 82.667,
+      "purchase_budget_share": 0.06
+    },
+    {
+      "id": "pickaxe_amethyst",
+      "name": "Amethyst Pickaxe",
+      "level": 74,
+      "price": 20000000,
+      "power": 20,
+      "speed": 1.633,
+      "rate_min": 1959.6,
+      "tier": 20,
+      "prerequisite_id": "pickaxe_sapphire",
+      "source_row": 21,
+      "reference_gross_min": 2776327.84,
+      "reference_interval_min": 82.667,
+      "purchase_budget_share": 0.06
+    },
+    {
+      "id": "pickaxe_ice_titan",
+      "name": "Ice Titan Pickaxe",
+      "level": 78,
+      "price": 58000000,
+      "power": 21,
+      "speed": 1.667,
+      "rate_min": 2100.42,
+      "tier": 21,
+      "prerequisite_id": "pickaxe_amethyst",
+      "source_row": 22,
+      "reference_gross_min": 6044757.82,
+      "reference_interval_min": 96.667,
+      "purchase_budget_share": 0.06
+    },
+    {
+      "id": "pickaxe_royal",
+      "name": "Royal Pickaxe",
+      "level": 82,
+      "price": 75000000,
+      "power": 22,
+      "speed": 1.7,
+      "rate_min": 2244.0,
+      "tier": 22,
+      "prerequisite_id": "pickaxe_ice_titan",
+      "source_row": 23,
+      "reference_gross_min": 7250249.07,
+      "reference_interval_min": 101.333,
+      "purchase_budget_share": 0.06
+    },
+    {
+      "id": "pickaxe_crystal_king",
+      "name": "Crystal King Pickaxe",
+      "level": 87,
+      "price": 150000000,
+      "power": 23,
+      "speed": 1.733,
+      "rate_min": 2391.54,
+      "tier": 23,
+      "prerequisite_id": "pickaxe_royal",
+      "source_row": 24,
+      "reference_gross_min": 11683522.35,
+      "reference_interval_min": 126.667,
+      "purchase_budget_share": 0.06
+    },
+    {
+      "id": "pickaxe_shadow_king",
+      "name": "Shadow King Pickaxe",
+      "level": 91,
+      "price": 240000000,
+      "power": 24,
+      "speed": 1.767,
+      "rate_min": 2544.48,
+      "tier": 24,
+      "prerequisite_id": "pickaxe_crystal_king",
+      "source_row": 25,
+      "reference_gross_min": 20829992.25,
+      "reference_interval_min": 115.0,
+      "purchase_budget_share": 0.06
+    },
+    {
+      "id": "pickaxe_primal_king",
+      "name": "Primal King Pickaxe",
+      "level": 95,
+      "price": 470000000,
+      "power": 25,
+      "speed": 1.8,
+      "rate_min": 2700.0,
+      "tier": 25,
+      "prerequisite_id": "pickaxe_shadow_king",
+      "source_row": 26,
+      "reference_gross_min": 30196495.56,
+      "reference_interval_min": 156.0,
+      "purchase_budget_share": 0.06
+    }
+  ],
+  "packs": [
+    {
+      "id": "backpack_field_pouch",
+      "name": "Field Pouch",
+      "tier": 1,
+      "level": 1,
+      "price": 0,
+      "capacity": 2400,
+      "prerequisite_id": null,
+      "source_row": 2
+    },
+    {
+      "id": "backpack_leather_satchel",
+      "name": "Leather Satchel",
+      "tier": 2,
+      "level": 2,
+      "price": 120,
+      "capacity": 3600,
+      "prerequisite_id": "backpack_field_pouch",
+      "source_row": 3
+    },
+    {
+      "id": "backpack_copper_prospector",
+      "name": "Copper Prospector",
+      "tier": 3,
+      "level": 3,
+      "price": 700,
+      "capacity": 5000,
+      "prerequisite_id": "backpack_leather_satchel",
+      "source_row": 4
+    },
+    {
+      "id": "backpack_bronze_drill",
+      "name": "Bronze Drill Pack",
+      "tier": 4,
+      "level": 8,
+      "price": 1400,
+      "capacity": 6400,
+      "prerequisite_id": "backpack_copper_prospector",
+      "source_row": 5
+    },
+    {
+      "id": "backpack_iron_hauler",
+      "name": "Iron Hauler",
+      "tier": 5,
+      "level": 13,
+      "price": 3300,
+      "capacity": 7900,
+      "prerequisite_id": "backpack_bronze_drill",
+      "source_row": 6
+    },
+    {
+      "id": "backpack_steel_surveyor",
+      "name": "Steel Surveyor",
+      "tier": 6,
+      "level": 18,
+      "price": 6100,
+      "capacity": 9500,
+      "prerequisite_id": "backpack_iron_hauler",
+      "source_row": 7
+    },
+    {
+      "id": "backpack_gold_vault",
+      "name": "Gold Vault",
+      "tier": 7,
+      "level": 22,
+      "price": 11000,
+      "capacity": 11100,
+      "prerequisite_id": "backpack_steel_surveyor",
+      "source_row": 8,
+      "reference_gross_min": 7213.05,
+      "reference_interval_min": 24.0,
+      "purchase_budget_share": 0.04
+    },
+    {
+      "id": "backpack_blackstone_safe",
+      "name": "Blackstone Safe",
+      "tier": 8,
+      "level": 27,
+      "price": 18000,
+      "capacity": 12900,
+      "prerequisite_id": "backpack_gold_vault",
+      "source_row": 9,
+      "reference_gross_min": 8884.77,
+      "reference_interval_min": 37.2,
+      "purchase_budget_share": 0.04
+    },
+    {
+      "id": "backpack_obsidian_case",
+      "name": "Obsidian Case",
+      "tier": 9,
+      "level": 32,
+      "price": 41000,
+      "capacity": 16500,
+      "prerequisite_id": "backpack_blackstone_safe",
+      "source_row": 10,
+      "reference_gross_min": 18227.28,
+      "reference_interval_min": 48.0,
+      "purchase_budget_share": 0.04
+    },
+    {
+      "id": "backpack_verdant_reliquary",
+      "name": "Verdant Reliquary",
+      "tier": 10,
+      "level": 37,
+      "price": 78000,
+      "capacity": 19000,
+      "prerequisite_id": "backpack_obsidian_case",
+      "source_row": 11,
+      "reference_gross_min": 31595.29,
+      "reference_interval_min": 48.0,
+      "purchase_budget_share": 0.04
+    },
+    {
+      "id": "backpack_toxic_extractor",
+      "name": "Toxic Extractor",
+      "tier": 11,
+      "level": 42,
+      "price": 160000,
+      "capacity": 21900,
+      "prerequisite_id": "backpack_verdant_reliquary",
+      "source_row": 12,
+      "reference_gross_min": 63488.9,
+      "reference_interval_min": 48.0,
+      "purchase_budget_share": 0.04
+    },
+    {
+      "id": "backpack_ember_furnace",
+      "name": "Ember Furnace",
+      "tier": 12,
+      "level": 47,
+      "price": 230000,
+      "capacity": 25200,
+      "prerequisite_id": "backpack_toxic_extractor",
+      "source_row": 13,
+      "reference_gross_min": 87478.47,
+      "reference_interval_min": 48.0,
+      "purchase_budget_share": 0.04
+    },
+    {
+      "id": "backpack_lava_crucible",
+      "name": "Lava Crucible",
+      "tier": 13,
+      "level": 51,
+      "price": 320000,
+      "capacity": 29000,
+      "prerequisite_id": "backpack_ember_furnace",
+      "source_row": 14,
+      "reference_gross_min": 133892.95,
+      "reference_interval_min": 43.8,
+      "purchase_budget_share": 0.04
+    },
+    {
+      "id": "backpack_frost_archive",
+      "name": "Frost Archive",
+      "tier": 14,
+      "level": 56,
+      "price": 1100000,
+      "capacity": 33400,
+      "prerequisite_id": "backpack_lava_crucible",
+      "source_row": 15,
+      "reference_gross_min": 282391.23,
+      "reference_interval_min": 75.0,
+      "purchase_budget_share": 0.04
+    },
+    {
+      "id": "backpack_tidal_prism",
+      "name": "Tidal Prism",
+      "tier": 15,
+      "level": 61,
+      "price": 2200000,
+      "capacity": 38500,
+      "prerequisite_id": "backpack_frost_archive",
+      "source_row": 16,
+      "reference_gross_min": 500872.63,
+      "reference_interval_min": 80.667,
+      "purchase_budget_share": 0.04
+    },
+    {
+      "id": "backpack_storm_reactor",
+      "name": "Storm Reactor",
+      "tier": 16,
+      "level": 66,
+      "price": 6300000,
+      "capacity": 44300,
+      "prerequisite_id": "backpack_tidal_prism",
+      "source_row": 17,
+      "reference_gross_min": 1064164.47,
+      "reference_interval_min": 103.333,
+      "purchase_budget_share": 0.04
+    },
+    {
+      "id": "backpack_thunder_coil",
+      "name": "Thunder Coil",
+      "tier": 17,
+      "level": 71,
+      "price": 10000000,
+      "capacity": 51000,
+      "prerequisite_id": "backpack_storm_reactor",
+      "source_row": 18,
+      "reference_gross_min": 1736669.8,
+      "reference_interval_min": 103.333,
+      "purchase_budget_share": 0.04
+    },
+    {
+      "id": "backpack_amethyst_sanctum",
+      "name": "Amethyst Sanctum",
+      "tier": 18,
+      "level": 76,
+      "price": 33000000,
+      "capacity": 58700,
+      "prerequisite_id": "backpack_thunder_coil",
+      "source_row": 19,
+      "reference_gross_min": 5037300.04,
+      "reference_interval_min": 108.0,
+      "purchase_budget_share": 0.04
+    },
+    {
+      "id": "backpack_lunar_oracle",
+      "name": "Lunar Oracle",
+      "tier": 19,
+      "level": 80,
+      "price": 42000000,
+      "capacity": 67600,
+      "prerequisite_id": "backpack_amethyst_sanctum",
+      "source_row": 20,
+      "reference_gross_min": 6041899.11,
+      "reference_interval_min": 101.333,
+      "purchase_budget_share": 0.04
+    },
+    {
+      "id": "backpack_solar_sovereign",
+      "name": "Solar Sovereign",
+      "tier": 20,
+      "level": 85,
+      "price": 84000000,
+      "capacity": 77800,
+      "prerequisite_id": "backpack_lunar_oracle",
+      "source_row": 21,
+      "reference_gross_min": 9736285.29,
+      "reference_interval_min": 126.667,
+      "purchase_budget_share": 0.04
+    },
+    {
+      "id": "backpack_royal_crystal",
+      "name": "Royal Crystal",
+      "tier": 21,
+      "level": 90,
+      "price": 160000000,
+      "capacity": 89500,
+      "prerequisite_id": "backpack_solar_sovereign",
+      "source_row": 22,
+      "reference_gross_min": 18776072.79,
+      "reference_interval_min": 126.667,
+      "purchase_budget_share": 0.04
+    },
+    {
+      "id": "backpack_void_emperor",
+      "name": "Void Emperor",
+      "tier": 22,
+      "level": 95,
+      "price": 390000000,
+      "capacity": 103000,
+      "prerequisite_id": "backpack_royal_crystal",
+      "source_row": 23,
+      "reference_gross_min": 30196495.56,
+      "reference_interval_min": 195.0,
+      "purchase_budget_share": 0.04
+    }
+  ],
+  "drills": [
+    {
+      "id": "drill_mk1",
+      "name": "Drill MK1",
+      "tier": 1,
+      "level": 10,
+      "price": 900,
+      "units_cycle": 4,
+      "cycle_seconds": 5,
+      "rate_min": 48,
+      "buffer": 240,
+      "prerequisite_id": null,
+      "source_row": 2
+    },
+    {
+      "id": "drill_mk2",
+      "name": "Drill MK2",
+      "tier": 2,
+      "level": 12,
+      "price": 1400,
+      "units_cycle": 5,
+      "cycle_seconds": 5,
+      "rate_min": 60,
+      "buffer": 300,
+      "prerequisite_id": "drill_mk1",
+      "source_row": 3
+    },
+    {
+      "id": "drill_mk3",
+      "name": "Drill MK3",
+      "tier": 3,
+      "level": 16,
+      "price": 2000,
+      "units_cycle": 6,
+      "cycle_seconds": 5,
+      "rate_min": 72,
+      "buffer": 360,
+      "prerequisite_id": "drill_mk2",
+      "source_row": 4
+    },
+    {
+      "id": "drill_mk7",
+      "name": "Drill MK4",
+      "tier": 4,
+      "level": 18,
+      "price": 2900,
+      "units_cycle": 7,
+      "cycle_seconds": 5,
+      "rate_min": 84,
+      "buffer": 420,
+      "prerequisite_id": "drill_mk3",
+      "source_row": 5
+    },
+    {
+      "id": "drill_mk4",
+      "name": "Drill MK5",
+      "tier": 5,
+      "level": 20,
+      "price": 5600,
+      "units_cycle": 8,
+      "cycle_seconds": 5,
+      "rate_min": 96,
+      "buffer": 480,
+      "prerequisite_id": "drill_mk7",
+      "source_row": 6,
+      "reference_gross_min": 5135.58,
+      "reference_interval_min": 12.0,
+      "purchase_budget_share": 0.25
+    },
+    {
+      "id": "drill_mk8",
+      "name": "Drill MK6",
+      "tier": 6,
+      "level": 23,
+      "price": 18000,
+      "units_cycle": 9,
+      "cycle_seconds": 5,
+      "rate_min": 108,
+      "buffer": 540,
+      "prerequisite_id": "drill_mk4",
+      "source_row": 7,
+      "reference_gross_min": 7213.05,
+      "reference_interval_min": 18.0,
+      "purchase_budget_share": 0.25
+    },
+    {
+      "id": "drill_mk5",
+      "name": "Drill MK7",
+      "tier": 7,
+      "level": 25,
+      "price": 23000,
+      "units_cycle": 10,
+      "cycle_seconds": 5,
+      "rate_min": 120,
+      "buffer": 600,
+      "prerequisite_id": "drill_mk8",
+      "source_row": 8,
+      "reference_gross_min": 9960.38,
+      "reference_interval_min": 12.0,
+      "purchase_budget_share": 0.25
+    },
+    {
+      "id": "drill_mk9",
+      "name": "Drill MK8",
+      "tier": 8,
+      "level": 28,
+      "price": 73000,
+      "units_cycle": 11,
+      "cycle_seconds": 5,
+      "rate_min": 132,
+      "buffer": 660,
+      "prerequisite_id": "drill_mk5",
+      "source_row": 9,
+      "reference_gross_min": 10643.69,
+      "reference_interval_min": 28.8,
+      "purchase_budget_share": 0.25
+    },
+    {
+      "id": "drill_mk6",
+      "name": "Drill MK9",
+      "tier": 9,
+      "level": 30,
+      "price": 80000,
+      "units_cycle": 12,
+      "cycle_seconds": 5,
+      "rate_min": 144,
+      "buffer": 720,
+      "prerequisite_id": "drill_mk9",
+      "source_row": 10,
+      "reference_gross_min": 14277.13,
+      "reference_interval_min": 19.2,
+      "purchase_budget_share": 0.25
+    },
+    {
+      "id": "drill_mk10",
+      "name": "Drill MK10",
+      "tier": 10,
+      "level": 33,
+      "price": 160000,
+      "units_cycle": 13,
+      "cycle_seconds": 5,
+      "rate_min": 156,
+      "buffer": 780,
+      "prerequisite_id": "drill_mk6",
+      "source_row": 11,
+      "reference_gross_min": 18965.33,
+      "reference_interval_min": 28.8,
+      "purchase_budget_share": 0.25
+    },
+    {
+      "id": "drill_mk11",
+      "name": "Drill MK11",
+      "tier": 11,
+      "level": 35,
+      "price": 140000,
+      "units_cycle": 14,
+      "cycle_seconds": 5,
+      "rate_min": 168,
+      "buffer": 840,
+      "prerequisite_id": "drill_mk10",
+      "source_row": 12,
+      "reference_gross_min": 24085.23,
+      "reference_interval_min": 19.2,
+      "purchase_budget_share": 0.25
+    },
+    {
+      "id": "drill_mk12",
+      "name": "Drill MK12",
+      "tier": 12,
+      "level": 38,
+      "price": 120000,
+      "units_cycle": 15,
+      "cycle_seconds": 5,
+      "rate_min": 180,
+      "buffer": 900,
+      "prerequisite_id": "drill_mk11",
+      "source_row": 13,
+      "reference_gross_min": 37898.61,
+      "reference_interval_min": 28.8,
+      "purchase_budget_share": 0.25
+    },
+    {
+      "id": "drill_mk13",
+      "name": "Drill MK13",
+      "tier": 13,
+      "level": 40,
+      "price": 240000,
+      "units_cycle": 17,
+      "cycle_seconds": 5,
+      "rate_min": 204,
+      "buffer": 1020,
+      "prerequisite_id": "drill_mk12",
+      "source_row": 14,
+      "reference_gross_min": 38170.66,
+      "reference_interval_min": 19.2,
+      "purchase_budget_share": 0.25
+    },
+    {
+      "id": "drill_mk14",
+      "name": "Drill MK14",
+      "tier": 14,
+      "level": 43,
+      "price": 620000,
+      "units_cycle": 19,
+      "cycle_seconds": 5,
+      "rate_min": 228,
+      "buffer": 1140,
+      "prerequisite_id": "drill_mk13",
+      "source_row": 15,
+      "reference_gross_min": 63488.9,
+      "reference_interval_min": 28.8,
+      "purchase_budget_share": 0.25
+    },
+    {
+      "id": "drill_mk15",
+      "name": "Drill MK15",
+      "tier": 15,
+      "level": 45,
+      "price": 430000,
+      "units_cycle": 21,
+      "cycle_seconds": 5,
+      "rate_min": 252,
+      "buffer": 1260,
+      "prerequisite_id": "drill_mk14",
+      "source_row": 16,
+      "reference_gross_min": 65668.17,
+      "reference_interval_min": 19.2,
+      "purchase_budget_share": 0.25
+    },
+    {
+      "id": "drill_mk16",
+      "name": "Drill MK16",
+      "tier": 16,
+      "level": 48,
+      "price": 1000000,
+      "units_cycle": 24,
+      "cycle_seconds": 5,
+      "rate_min": 288,
+      "buffer": 1440,
+      "prerequisite_id": "drill_mk15",
+      "source_row": 17,
+      "reference_gross_min": 104952.59,
+      "reference_interval_min": 28.8,
+      "purchase_budget_share": 0.25
+    },
+    {
+      "id": "drill_mk17",
+      "name": "Drill MK17",
+      "tier": 17,
+      "level": 50,
+      "price": 910000,
+      "units_cycle": 27,
+      "cycle_seconds": 5,
+      "rate_min": 324,
+      "buffer": 1620,
+      "prerequisite_id": "drill_mk16",
+      "source_row": 18,
+      "reference_gross_min": 140667.83,
+      "reference_interval_min": 19.2,
+      "purchase_budget_share": 0.25
+    },
+    {
+      "id": "drill_mk18",
+      "name": "Drill MK18",
+      "tier": 18,
+      "level": 53,
+      "price": 1400000,
+      "units_cycle": 30,
+      "cycle_seconds": 5,
+      "rate_min": 360,
+      "buffer": 1800,
+      "prerequisite_id": "drill_mk17",
+      "source_row": 19,
+      "reference_gross_min": 160653.22,
+      "reference_interval_min": 45.0,
+      "purchase_budget_share": 0.25
+    },
+    {
+      "id": "drill_mk19",
+      "name": "Drill MK19",
+      "tier": 19,
+      "level": 55,
+      "price": 2200000,
+      "units_cycle": 34,
+      "cycle_seconds": 5,
+      "rate_min": 408,
+      "buffer": 2040,
+      "prerequisite_id": "drill_mk18",
+      "source_row": 20,
+      "reference_gross_min": 214572.35,
+      "reference_interval_min": 30.0,
+      "purchase_budget_share": 0.25
+    },
+    {
+      "id": "drill_mk20",
+      "name": "Drill MK20",
+      "tier": 20,
+      "level": 58,
+      "price": 5200000,
+      "units_cycle": 38,
+      "cycle_seconds": 5,
+      "rate_min": 456,
+      "buffer": 2280,
+      "prerequisite_id": "drill_mk19",
+      "source_row": 21,
+      "reference_gross_min": 344771.11,
+      "reference_interval_min": 45.0,
+      "purchase_budget_share": 0.25
+    },
+    {
+      "id": "drill_mk21",
+      "name": "Drill MK21",
+      "tier": 21,
+      "level": 60,
+      "price": 4600000,
+      "units_cycle": 43,
+      "cycle_seconds": 5,
+      "rate_min": 516,
+      "buffer": 2580,
+      "prerequisite_id": "drill_mk20",
+      "source_row": 22,
+      "reference_gross_min": 454726.35,
+      "reference_interval_min": 30.0,
+      "purchase_budget_share": 0.25
+    },
+    {
+      "id": "drill_mk22",
+      "name": "Drill MK22",
+      "tier": 22,
+      "level": 63,
+      "price": 14000000,
+      "units_cycle": 48,
+      "cycle_seconds": 5,
+      "rate_min": 576,
+      "buffer": 2880,
+      "prerequisite_id": "drill_mk21",
+      "source_row": 23,
+      "reference_gross_min": 609825.7,
+      "reference_interval_min": 62.0,
+      "purchase_budget_share": 0.25
+    },
+    {
+      "id": "drill_mk23",
+      "name": "Drill MK23",
+      "tier": 23,
+      "level": 65,
+      "price": 12000000,
+      "units_cycle": 54,
+      "cycle_seconds": 5,
+      "rate_min": 648,
+      "buffer": 3240,
+      "prerequisite_id": "drill_mk22",
+      "source_row": 24,
+      "reference_gross_min": 805603.96,
+      "reference_interval_min": 41.333,
+      "purchase_budget_share": 0.25
+    },
+    {
+      "id": "drill_mk24",
+      "name": "Drill MK24",
+      "tier": 24,
+      "level": 68,
+      "price": 37000000,
+      "units_cycle": 61,
+      "cycle_seconds": 5,
+      "rate_min": 732,
+      "buffer": 3660,
+      "prerequisite_id": "drill_mk23",
+      "source_row": 25,
+      "reference_gross_min": 1726603.12,
+      "reference_interval_min": 62.0,
+      "purchase_budget_share": 0.25
+    },
+    {
+      "id": "drill_mk25",
+      "name": "Drill MK25",
+      "tier": 25,
+      "level": 71,
+      "price": 37000000,
+      "units_cycle": 69,
+      "cycle_seconds": 5,
+      "rate_min": 828,
+      "buffer": 4140,
+      "prerequisite_id": "drill_mk24",
+      "source_row": 26,
+      "reference_gross_min": 1736669.8,
+      "reference_interval_min": 62.0,
+      "purchase_budget_share": 0.25
+    },
+    {
+      "id": "drill_mk26",
+      "name": "Drill MK26",
+      "tier": 26,
+      "level": 75,
+      "price": 76000000,
+      "units_cycle": 78,
+      "cycle_seconds": 5,
+      "rate_min": 936,
+      "buffer": 4680,
+      "prerequisite_id": "drill_mk25",
+      "source_row": 27,
+      "reference_gross_min": 2805161.82,
+      "reference_interval_min": 82.667,
+      "purchase_budget_share": 0.25
+    },
+    {
+      "id": "drill_mk27",
+      "name": "Drill MK27",
+      "tier": 27,
+      "level": 79,
+      "price": 230000000,
+      "units_cycle": 88,
+      "cycle_seconds": 5,
+      "rate_min": 1056,
+      "buffer": 5280,
+      "prerequisite_id": "drill_mk26",
+      "source_row": 28,
+      "reference_gross_min": 6087877.25,
+      "reference_interval_min": 101.333,
+      "purchase_budget_share": 0.25
+    },
+    {
+      "id": "drill_mk28",
+      "name": "Drill MK28",
+      "tier": 28,
+      "level": 83,
+      "price": 270000000,
+      "units_cycle": 99,
+      "cycle_seconds": 5,
+      "rate_min": 1188,
+      "buffer": 5940,
+      "prerequisite_id": "drill_mk27",
+      "source_row": 29,
+      "reference_gross_min": 7313557.94,
+      "reference_interval_min": 101.333,
+      "purchase_budget_share": 0.25
+    },
+    {
+      "id": "drill_mk29",
+      "name": "Drill MK29",
+      "tier": 29,
+      "level": 87,
+      "price": 410000000,
+      "units_cycle": 111,
+      "cycle_seconds": 5,
+      "rate_min": 1332,
+      "buffer": 6660,
+      "prerequisite_id": "drill_mk28",
+      "source_row": 30,
+      "reference_gross_min": 11683522.35,
+      "reference_interval_min": 101.333,
+      "purchase_budget_share": 0.25
+    },
+    {
+      "id": "drill_mk30",
+      "name": "Drill MK30",
+      "tier": 30,
+      "level": 90,
+      "price": 500000000,
+      "units_cycle": 125,
+      "cycle_seconds": 5,
+      "rate_min": 1500,
+      "buffer": 7500,
+      "prerequisite_id": "drill_mk29",
+      "source_row": 31,
+      "reference_gross_min": 18776072.79,
+      "reference_interval_min": 76.0,
+      "purchase_budget_share": 0.25
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "vehicle_pickup",
+      "name": "Pickup",
+      "level": 6,
+      "price": 520,
+      "capacity": 6000,
+      "speed": 55,
+      "acceleration": 1,
+      "available": true,
+      "model_scenario_included": true,
+      "source_row": 2
+    },
+    {
+      "id": "vehicle_van",
+      "name": "Cargo Van",
+      "level": 15,
+      "price": 3900,
+      "capacity": 12000,
+      "speed": 52,
+      "acceleration": 0.85,
+      "available": true,
+      "model_scenario_included": true,
+      "source_row": 3
+    },
+    {
+      "id": "vehicle_boxtruck",
+      "name": "High-Roof Van",
+      "level": 30,
+      "price": 110000,
+      "capacity": 24000,
+      "speed": 46,
+      "acceleration": 0.65,
+      "available": true,
+      "model_scenario_included": true,
+      "source_row": 4,
+      "reference_gross_min": 14277.13,
+      "reference_interval_min": 108.0,
+      "purchase_budget_share": 0.06
+    },
+    {
+      "id": "vehicle_truck",
+      "name": "Box Truck",
+      "level": 45,
+      "price": 770000,
+      "capacity": 110000,
+      "speed": 44,
+      "acceleration": 0.55,
+      "available": true,
+      "model_scenario_included": true,
+      "source_row": 5,
+      "reference_gross_min": 65668.17,
+      "reference_interval_min": 144.0,
+      "purchase_budget_share": 0.06
+    },
+    {
+      "id": "vehicle_hauler",
+      "name": "Tipper Road Train",
+      "level": 65,
+      "price": 20000000,
+      "capacity": 145000,
+      "speed": 33,
+      "acceleration": 0.45,
+      "available": false,
+      "model_scenario_included": true,
+      "source_row": 6,
+      "reference_gross_min": 805603.96,
+      "reference_interval_min": 301.333,
+      "purchase_budget_share": 0.06
+    },
+    {
+      "id": "vehicle_roadtrain",
+      "name": "Grain Road Train",
+      "level": 80,
+      "price": 190000000,
+      "capacity": 180000,
+      "speed": 33,
+      "acceleration": 0.4,
+      "available": false,
+      "model_scenario_included": true,
+      "source_row": 7,
+      "reference_gross_min": 6041899.11,
+      "reference_interval_min": 333.333,
+      "purchase_budget_share": 0.06
+    }
+  ],
+  "mines": [
+    {
+      "id": "mine_001",
+      "number": 1,
+      "ore_id": "ore_coal",
+      "level": 1,
+      "price": 0,
+      "source_row": 2
+    },
+    {
+      "id": "mine_002",
+      "number": 2,
+      "ore_id": "ore_coal",
+      "level": 2,
+      "price": 0,
+      "source_row": 3
+    },
+    {
+      "id": "mine_003",
+      "number": 3,
+      "ore_id": "ore_copper",
+      "level": 3,
+      "price": 58,
+      "source_row": 4
+    },
+    {
+      "id": "mine_004",
+      "number": 4,
+      "ore_id": "ore_copper",
+      "level": 4,
+      "price": 61,
+      "source_row": 5
+    },
+    {
+      "id": "mine_005",
+      "number": 5,
+      "ore_id": "ore_tin",
+      "level": 5,
+      "price": 78,
+      "source_row": 6
+    },
+    {
+      "id": "mine_006",
+      "number": 6,
+      "ore_id": "ore_tin",
+      "level": 6,
+      "price": 82,
+      "source_row": 7
+    },
+    {
+      "id": "mine_007",
+      "number": 7,
+      "ore_id": "ore_iron",
+      "level": 7,
+      "price": 100,
+      "source_row": 8
+    },
+    {
+      "id": "mine_008",
+      "number": 8,
+      "ore_id": "ore_iron",
+      "level": 8,
+      "price": 110,
+      "source_row": 9
+    },
+    {
+      "id": "mine_009",
+      "number": 9,
+      "ore_id": "ore_lead",
+      "level": 9,
+      "price": 140,
+      "source_row": 10
+    },
+    {
+      "id": "mine_010",
+      "number": 10,
+      "ore_id": "ore_lead",
+      "level": 10,
+      "price": 140,
+      "source_row": 11
+    },
+    {
+      "id": "mine_011",
+      "number": 11,
+      "ore_id": "ore_zinc",
+      "level": 11,
+      "price": 180,
+      "source_row": 12
+    },
+    {
+      "id": "mine_012",
+      "number": 12,
+      "ore_id": "ore_zinc",
+      "level": 12,
+      "price": 180,
+      "source_row": 13
+    },
+    {
+      "id": "mine_013",
+      "number": 13,
+      "ore_id": "ore_silver",
+      "level": 13,
+      "price": 230,
+      "source_row": 14
+    },
+    {
+      "id": "mine_014",
+      "number": 14,
+      "ore_id": "ore_silver",
+      "level": 14,
+      "price": 240,
+      "source_row": 15
+    },
+    {
+      "id": "mine_015",
+      "number": 15,
+      "ore_id": "ore_nickel",
+      "level": 15,
+      "price": 290,
+      "source_row": 16
+    },
+    {
+      "id": "mine_016",
+      "number": 16,
+      "ore_id": "ore_nickel",
+      "level": 16,
+      "price": 300,
+      "source_row": 17
+    },
+    {
+      "id": "mine_017",
+      "number": 17,
+      "ore_id": "ore_cobalt",
+      "level": 17,
+      "price": 380,
+      "source_row": 18
+    },
+    {
+      "id": "mine_018",
+      "number": 18,
+      "ore_id": "ore_cobalt",
+      "level": 18,
+      "price": 390,
+      "source_row": 19
+    },
+    {
+      "id": "mine_019",
+      "number": 19,
+      "ore_id": "ore_chromium",
+      "level": 19,
+      "price": 480,
+      "source_row": 20
+    },
+    {
+      "id": "mine_020",
+      "number": 20,
+      "ore_id": "ore_chromium",
+      "level": 20,
+      "price": 2500,
+      "source_row": 21,
+      "reference_gross_min": 5135.58,
+      "reference_interval_min": 6.0,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_021",
+      "number": 21,
+      "ore_id": "ore_manganese",
+      "level": 21,
+      "price": 4100,
+      "source_row": 22,
+      "reference_gross_min": 6029.46,
+      "reference_interval_min": 6.0,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_022",
+      "number": 22,
+      "ore_id": "ore_manganese",
+      "level": 22,
+      "price": 6300,
+      "source_row": 23,
+      "reference_gross_min": 7213.05,
+      "reference_interval_min": 6.0,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_023",
+      "number": 23,
+      "ore_id": "ore_aluminum",
+      "level": 23,
+      "price": 8000,
+      "source_row": 24,
+      "reference_gross_min": 7213.05,
+      "reference_interval_min": 6.0,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_024",
+      "number": 24,
+      "ore_id": "ore_aluminum",
+      "level": 24,
+      "price": 12000,
+      "source_row": 25,
+      "reference_gross_min": 9177.2,
+      "reference_interval_min": 6.0,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_025",
+      "number": 25,
+      "ore_id": "ore_titanium",
+      "level": 25,
+      "price": 24000,
+      "source_row": 26,
+      "reference_gross_min": 9960.38,
+      "reference_interval_min": 9.6,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_026",
+      "number": 26,
+      "ore_id": "ore_titanium",
+      "level": 26,
+      "price": 24000,
+      "source_row": 27,
+      "reference_gross_min": 8884.77,
+      "reference_interval_min": 9.6,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_027",
+      "number": 27,
+      "ore_id": "ore_tungsten",
+      "level": 27,
+      "price": 28000,
+      "source_row": 28,
+      "reference_gross_min": 8884.77,
+      "reference_interval_min": 9.6,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_028",
+      "number": 28,
+      "ore_id": "ore_tungsten",
+      "level": 28,
+      "price": 38000,
+      "source_row": 29,
+      "reference_gross_min": 10643.69,
+      "reference_interval_min": 9.6,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_029",
+      "number": 29,
+      "ore_id": "ore_platinum",
+      "level": 29,
+      "price": 48000,
+      "source_row": 30,
+      "reference_gross_min": 11914.28,
+      "reference_interval_min": 9.6,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_030",
+      "number": 30,
+      "ore_id": "ore_platinum",
+      "level": 30,
+      "price": 64000,
+      "source_row": 31,
+      "reference_gross_min": 14277.13,
+      "reference_interval_min": 9.6,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_031",
+      "number": 31,
+      "ore_id": "ore_palladium",
+      "level": 31,
+      "price": 69000,
+      "source_row": 32,
+      "reference_gross_min": 15209.01,
+      "reference_interval_min": 9.6,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_032",
+      "number": 32,
+      "ore_id": "ore_palladium",
+      "level": 32,
+      "price": 83000,
+      "source_row": 33,
+      "reference_gross_min": 18227.28,
+      "reference_interval_min": 9.6,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_033",
+      "number": 33,
+      "ore_id": "ore_osmium",
+      "level": 33,
+      "price": 87000,
+      "source_row": 34,
+      "reference_gross_min": 18965.33,
+      "reference_interval_min": 9.6,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_034",
+      "number": 34,
+      "ore_id": "ore_osmium",
+      "level": 34,
+      "price": 110000,
+      "source_row": 35,
+      "reference_gross_min": 24085.23,
+      "reference_interval_min": 9.6,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_035",
+      "number": 35,
+      "ore_id": "ore_iridium",
+      "level": 35,
+      "price": 110000,
+      "source_row": 36,
+      "reference_gross_min": 24085.23,
+      "reference_interval_min": 9.6,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_036",
+      "number": 36,
+      "ore_id": "ore_iridium",
+      "level": 36,
+      "price": 150000,
+      "source_row": 37,
+      "reference_gross_min": 30488.48,
+      "reference_interval_min": 9.6,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_037",
+      "number": 37,
+      "ore_id": "ore_rhodium",
+      "level": 37,
+      "price": 160000,
+      "source_row": 38,
+      "reference_gross_min": 31595.29,
+      "reference_interval_min": 9.6,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_038",
+      "number": 38,
+      "ore_id": "ore_rhodium",
+      "level": 38,
+      "price": 190000,
+      "source_row": 39,
+      "reference_gross_min": 37898.61,
+      "reference_interval_min": 9.6,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_039",
+      "number": 39,
+      "ore_id": "ore_uranium",
+      "level": 39,
+      "price": 200000,
+      "source_row": 40,
+      "reference_gross_min": 39830.94,
+      "reference_interval_min": 9.6,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_040",
+      "number": 40,
+      "ore_id": "ore_uranium",
+      "level": 40,
+      "price": 190000,
+      "source_row": 41,
+      "reference_gross_min": 38170.66,
+      "reference_interval_min": 9.6,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_041",
+      "number": 41,
+      "ore_id": "ore_mythril",
+      "level": 41,
+      "price": 210000,
+      "source_row": 42,
+      "reference_gross_min": 40655.09,
+      "reference_interval_min": 9.6,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_042",
+      "number": 42,
+      "ore_id": "ore_mythril",
+      "level": 42,
+      "price": 330000,
+      "source_row": 43,
+      "reference_gross_min": 63488.9,
+      "reference_interval_min": 9.6,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_043",
+      "number": 43,
+      "ore_id": "ore_obsidian",
+      "level": 43,
+      "price": 330000,
+      "source_row": 44,
+      "reference_gross_min": 63488.9,
+      "reference_interval_min": 9.6,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_044",
+      "number": 44,
+      "ore_id": "ore_obsidian",
+      "level": 44,
+      "price": 340000,
+      "source_row": 45,
+      "reference_gross_min": 65668.17,
+      "reference_interval_min": 9.6,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_045",
+      "number": 45,
+      "ore_id": "ore_ruby",
+      "level": 45,
+      "price": 340000,
+      "source_row": 46,
+      "reference_gross_min": 65668.17,
+      "reference_interval_min": 9.6,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_046",
+      "number": 46,
+      "ore_id": "ore_ruby",
+      "level": 46,
+      "price": 450000,
+      "source_row": 47,
+      "reference_gross_min": 87478.47,
+      "reference_interval_min": 9.6,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_047",
+      "number": 47,
+      "ore_id": "ore_sapphire",
+      "level": 47,
+      "price": 450000,
+      "source_row": 48,
+      "reference_gross_min": 87478.47,
+      "reference_interval_min": 9.6,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_048",
+      "number": 48,
+      "ore_id": "ore_sapphire",
+      "level": 48,
+      "price": 540000,
+      "source_row": 49,
+      "reference_gross_min": 104952.59,
+      "reference_interval_min": 9.6,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_049",
+      "number": 49,
+      "ore_id": "ore_emerald",
+      "level": 49,
+      "price": 590000,
+      "source_row": 50,
+      "reference_gross_min": 113537.94,
+      "reference_interval_min": 9.6,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_050",
+      "number": 50,
+      "ore_id": "ore_emerald",
+      "level": 50,
+      "price": 1100000,
+      "source_row": 51,
+      "reference_gross_min": 140667.83,
+      "reference_interval_min": 15.0,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_051",
+      "number": 51,
+      "ore_id": "ore_amethyst",
+      "level": 51,
+      "price": 1100000,
+      "source_row": 52,
+      "reference_gross_min": 133892.95,
+      "reference_interval_min": 15.0,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_052",
+      "number": 52,
+      "ore_id": "ore_amethyst",
+      "level": 52,
+      "price": 1300000,
+      "source_row": 53,
+      "reference_gross_min": 160653.22,
+      "reference_interval_min": 15.0,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_053",
+      "number": 53,
+      "ore_id": "ore_topaz",
+      "level": 53,
+      "price": 1300000,
+      "source_row": 54,
+      "reference_gross_min": 160653.22,
+      "reference_interval_min": 15.0,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_054",
+      "number": 54,
+      "ore_id": "ore_topaz",
+      "level": 54,
+      "price": 1700000,
+      "source_row": 55,
+      "reference_gross_min": 214572.35,
+      "reference_interval_min": 15.0,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_055",
+      "number": 55,
+      "ore_id": "ore_aquamarine",
+      "level": 55,
+      "price": 1700000,
+      "source_row": 56,
+      "reference_gross_min": 214572.35,
+      "reference_interval_min": 15.0,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_056",
+      "number": 56,
+      "ore_id": "ore_aquamarine",
+      "level": 56,
+      "price": 2300000,
+      "source_row": 57,
+      "reference_gross_min": 282391.23,
+      "reference_interval_min": 15.0,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_057",
+      "number": 57,
+      "ore_id": "ore_opal",
+      "level": 57,
+      "price": 2300000,
+      "source_row": 58,
+      "reference_gross_min": 282391.23,
+      "reference_interval_min": 15.0,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_058",
+      "number": 58,
+      "ore_id": "ore_opal",
+      "level": 58,
+      "price": 2800000,
+      "source_row": 59,
+      "reference_gross_min": 344771.11,
+      "reference_interval_min": 15.0,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_059",
+      "number": 59,
+      "ore_id": "ore_black_opal",
+      "level": 59,
+      "price": 3100000,
+      "source_row": 60,
+      "reference_gross_min": 378953.37,
+      "reference_interval_min": 15.0,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_060",
+      "number": 60,
+      "ore_id": "ore_black_opal",
+      "level": 60,
+      "price": 5400000,
+      "source_row": 61,
+      "reference_gross_min": 454726.35,
+      "reference_interval_min": 20.667,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_061",
+      "number": 61,
+      "ore_id": "ore_jade",
+      "level": 61,
+      "price": 5900000,
+      "source_row": 62,
+      "reference_gross_min": 500872.63,
+      "reference_interval_min": 20.667,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_062",
+      "number": 62,
+      "ore_id": "ore_jade",
+      "level": 62,
+      "price": 7000000,
+      "source_row": 63,
+      "reference_gross_min": 601019.56,
+      "reference_interval_min": 20.667,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_063",
+      "number": 63,
+      "ore_id": "ore_amber",
+      "level": 63,
+      "price": 7000000,
+      "source_row": 64,
+      "reference_gross_min": 609825.7,
+      "reference_interval_min": 20.667,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_064",
+      "number": 64,
+      "ore_id": "ore_amber",
+      "level": 64,
+      "price": 9200000,
+      "source_row": 65,
+      "reference_gross_min": 805603.96,
+      "reference_interval_min": 20.667,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_065",
+      "number": 65,
+      "ore_id": "ore_meteorite",
+      "level": 65,
+      "price": 9100000,
+      "source_row": 66,
+      "reference_gross_min": 805603.96,
+      "reference_interval_min": 20.667,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_066",
+      "number": 66,
+      "ore_id": "ore_meteorite",
+      "level": 66,
+      "price": 12000000,
+      "source_row": 67,
+      "reference_gross_min": 1064164.47,
+      "reference_interval_min": 20.667,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_067",
+      "number": 67,
+      "ore_id": "ore_star_metal",
+      "level": 67,
+      "price": 12000000,
+      "source_row": 68,
+      "reference_gross_min": 1077362.14,
+      "reference_interval_min": 20.667,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_068",
+      "number": 68,
+      "ore_id": "ore_star_metal",
+      "level": 68,
+      "price": 19000000,
+      "source_row": 69,
+      "reference_gross_min": 1726603.12,
+      "reference_interval_min": 20.667,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_069",
+      "number": 69,
+      "ore_id": "ore_luminous_crystal",
+      "level": 69,
+      "price": 21000000,
+      "source_row": 70,
+      "reference_gross_min": 1920105.43,
+      "reference_interval_min": 20.667,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_070",
+      "number": 70,
+      "ore_id": "ore_luminous_crystal",
+      "level": 70,
+      "price": 18000000,
+      "source_row": 71,
+      "reference_gross_min": 1717230.85,
+      "reference_interval_min": 20.667,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_071",
+      "number": 71,
+      "ore_id": "ore_dragonstone",
+      "level": 71,
+      "price": 19000000,
+      "source_row": 72,
+      "reference_gross_min": 1736669.8,
+      "reference_interval_min": 20.667,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_072",
+      "number": 72,
+      "ore_id": "ore_dragonstone",
+      "level": 72,
+      "price": 24000000,
+      "source_row": 73,
+      "reference_gross_min": 2313636.26,
+      "reference_interval_min": 20.667,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_073",
+      "number": 73,
+      "ore_id": "ore_netherium",
+      "level": 73,
+      "price": 23000000,
+      "source_row": 74,
+      "reference_gross_min": 2313636.26,
+      "reference_interval_min": 20.667,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_074",
+      "number": 74,
+      "ore_id": "ore_netherium",
+      "level": 74,
+      "price": 28000000,
+      "source_row": 75,
+      "reference_gross_min": 2776327.84,
+      "reference_interval_min": 20.667,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_075",
+      "number": 75,
+      "ore_id": "ore_celestial_metal",
+      "level": 75,
+      "price": 41000000,
+      "source_row": 76,
+      "reference_gross_min": 2805161.82,
+      "reference_interval_min": 25.333,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_076",
+      "number": 76,
+      "ore_id": "ore_celestial_metal",
+      "level": 76,
+      "price": 73000000,
+      "source_row": 77,
+      "reference_gross_min": 5037300.04,
+      "reference_interval_min": 25.333,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_077",
+      "number": 77,
+      "ore_id": "ore_astralium",
+      "level": 77,
+      "price": 72000000,
+      "source_row": 78,
+      "reference_gross_min": 5037300.04,
+      "reference_interval_min": 25.333,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_078",
+      "number": 78,
+      "ore_id": "ore_astralium",
+      "level": 78,
+      "price": 82000000,
+      "source_row": 79,
+      "reference_gross_min": 6044757.82,
+      "reference_interval_min": 25.333,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_079",
+      "number": 79,
+      "ore_id": "ore_aetherium",
+      "level": 79,
+      "price": 89000000,
+      "source_row": 80,
+      "reference_gross_min": 6087877.25,
+      "reference_interval_min": 25.333,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_080",
+      "number": 80,
+      "ore_id": "ore_aetherium",
+      "level": 80,
+      "price": 80000000,
+      "source_row": 81,
+      "reference_gross_min": 6041899.11,
+      "reference_interval_min": 25.333,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_081",
+      "number": 81,
+      "ore_id": "ore_void",
+      "level": 81,
+      "price": 79000000,
+      "source_row": 82,
+      "reference_gross_min": 6041899.11,
+      "reference_interval_min": 25.333,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_082",
+      "number": 82,
+      "ore_id": "ore_void",
+      "level": 82,
+      "price": 100000000,
+      "source_row": 83,
+      "reference_gross_min": 7250249.07,
+      "reference_interval_min": 25.333,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_083",
+      "number": 83,
+      "ore_id": "ore_darksteel",
+      "level": 83,
+      "price": 100000000,
+      "source_row": 84,
+      "reference_gross_min": 7313557.94,
+      "reference_interval_min": 25.333,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_084",
+      "number": 84,
+      "ore_id": "ore_darksteel",
+      "level": 84,
+      "price": 130000000,
+      "source_row": 85,
+      "reference_gross_min": 9736285.29,
+      "reference_interval_min": 25.333,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_085",
+      "number": 85,
+      "ore_id": "ore_sun_crystal",
+      "level": 85,
+      "price": 130000000,
+      "source_row": 86,
+      "reference_gross_min": 9736285.29,
+      "reference_interval_min": 25.333,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_086",
+      "number": 86,
+      "ore_id": "ore_sun_crystal",
+      "level": 86,
+      "price": 150000000,
+      "source_row": 87,
+      "reference_gross_min": 11683522.35,
+      "reference_interval_min": 25.333,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_087",
+      "number": 87,
+      "ore_id": "ore_moon_crystal",
+      "level": 87,
+      "price": 150000000,
+      "source_row": 88,
+      "reference_gross_min": 11683522.35,
+      "reference_interval_min": 25.333,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_088",
+      "number": 88,
+      "ore_id": "ore_moon_crystal",
+      "level": 88,
+      "price": 190000000,
+      "source_row": 89,
+      "reference_gross_min": 15646733.72,
+      "reference_interval_min": 25.333,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_089",
+      "number": 89,
+      "ore_id": "ore_galaxium",
+      "level": 89,
+      "price": 190000000,
+      "source_row": 90,
+      "reference_gross_min": 15646733.72,
+      "reference_interval_min": 25.333,
+      "purchase_budget_share": 0.4
+    },
+    {
+      "id": "mine_090",
+      "number": 90,
+      "ore_id": "ore_galaxium",
+      "level": 90,
+      "price": 600000000,
+      "source_row": 91,
+      "reference_gross_min": 18776072.79,
+      "reference_interval_min": 39.0,
+      "purchase_budget_share": 0.7
+    },
+    {
+      "id": "mine_091",
+      "number": 91,
+      "ore_id": "ore_cosmium",
+      "level": 91,
+      "price": 660000000,
+      "source_row": 92,
+      "reference_gross_min": 20829992.25,
+      "reference_interval_min": 39.0,
+      "purchase_budget_share": 0.7
+    },
+    {
+      "id": "mine_092",
+      "number": 92,
+      "ore_id": "ore_cosmium",
+      "level": 92,
+      "price": 770000000,
+      "source_row": 93,
+      "reference_gross_min": 25163745.77,
+      "reference_interval_min": 39.0,
+      "purchase_budget_share": 0.7
+    },
+    {
+      "id": "mine_093",
+      "number": 93,
+      "ore_id": "ore_quantium",
+      "level": 93,
+      "price": 770000000,
+      "source_row": 94,
+      "reference_gross_min": 25163745.77,
+      "reference_interval_min": 39.0,
+      "purchase_budget_share": 0.7
+    },
+    {
+      "id": "mine_094",
+      "number": 94,
+      "ore_id": "ore_quantium",
+      "level": 94,
+      "price": 980000000,
+      "source_row": 95,
+      "reference_gross_min": 30196495.56,
+      "reference_interval_min": 39.0,
+      "purchase_budget_share": 0.7
+    },
+    {
+      "id": "mine_095",
+      "number": 95,
+      "ore_id": "ore_singularium",
+      "level": 95,
+      "price": 980000000,
+      "source_row": 96,
+      "reference_gross_min": 30196495.56,
+      "reference_interval_min": 39.0,
+      "purchase_budget_share": 0.7
+    },
+    {
+      "id": "mine_096",
+      "number": 96,
+      "ore_id": "ore_singularium",
+      "level": 96,
+      "price": 1200000000,
+      "source_row": 97,
+      "reference_gross_min": 36481465.76,
+      "reference_interval_min": 39.0,
+      "purchase_budget_share": 0.7
+    },
+    {
+      "id": "mine_097",
+      "number": 97,
+      "ore_id": "ore_primal_crystal",
+      "level": 97,
+      "price": 1200000000,
+      "source_row": 98,
+      "reference_gross_min": 36481465.76,
+      "reference_interval_min": 39.0,
+      "purchase_budget_share": 0.7
+    },
+    {
+      "id": "mine_098",
+      "number": 98,
+      "ore_id": "ore_primal_crystal",
+      "level": 98,
+      "price": 1400000000,
+      "source_row": 99,
+      "reference_gross_min": 43777766.62,
+      "reference_interval_min": 39.0,
+      "purchase_budget_share": 0.7
+    },
+    {
+      "id": "mine_099",
+      "number": 99,
+      "ore_id": "ore_diamond",
+      "level": 99,
+      "price": 1400000000,
+      "source_row": 100,
+      "reference_gross_min": 43777766.62,
+      "reference_interval_min": 39.0,
+      "purchase_budget_share": 0.7
+    },
+    {
+      "id": "mine_100",
+      "number": 100,
+      "ore_id": "ore_diamond",
+      "level": 100,
+      "price": 1900000000,
+      "source_row": 101,
+      "reference_gross_min": 52533299.94,
+      "reference_interval_min": 55.0,
+      "purchase_budget_share": 0.7
+    }
+  ],
+  "buildings": [
+    {
+      "id": "build_office",
+      "name": "Office",
+      "level": 1,
+      "price": 0,
+      "source_row": 2
+    },
+    {
+      "id": "build_elevator",
+      "name": "Elevator",
+      "level": 1,
+      "price": 80,
+      "source_row": 3
+    },
+    {
+      "id": "build_walls",
+      "name": "Walls",
+      "level": 2,
+      "price": 100,
+      "source_row": 4
+    },
+    {
+      "id": "build_roof",
+      "name": "Roof",
+      "level": 3,
+      "price": 180,
+      "source_row": 5
+    },
+    {
+      "id": "build_storage",
+      "name": "Storage",
+      "level": 3,
+      "price": 250,
+      "source_row": 6
+    },
+    {
+      "id": "build_garage",
+      "name": "Garage",
+      "level": 6,
+      "price": 900,
+      "source_row": 7
+    },
+    {
+      "id": "build_smelter",
+      "name": "Smelter",
+      "level": 10,
+      "price": 2800,
+      "source_row": 8
+    },
+    {
+      "id": "office_premium",
+      "name": "Premium Office",
+      "level": 25,
+      "price": 21000,
+      "source_row": 9,
+      "optional": true
+    }
+  ],
+  "conveyors": [
+    {
+      "id": "conveyor_mk1",
+      "name": "Conveyor MK1",
+      "level": 12,
+      "price": 1200,
+      "throughput_min": 6000,
+      "source_row": 10
+    }
+  ],
+  "elevator": [
+    {
+      "tier": 1,
+      "level": 5,
+      "capacity": 100,
+      "price": 200,
+      "source_row": 2
+    },
+    {
+      "tier": 2,
+      "level": 10,
+      "capacity": 160,
+      "price": 540,
+      "source_row": 3
+    },
+    {
+      "tier": 3,
+      "level": 18,
+      "capacity": 240,
+      "price": 1600,
+      "source_row": 4
+    },
+    {
+      "tier": 4,
+      "level": 26,
+      "capacity": 350,
+      "price": 12000,
+      "source_row": 5,
+      "reference_gross_min": 8884.77,
+      "reference_interval_min": 51.6,
+      "purchase_budget_share": 0.03
+    },
+    {
+      "tier": 5,
+      "level": 35,
+      "capacity": 500,
+      "price": 77000,
+      "source_row": 6,
+      "reference_gross_min": 24085.23,
+      "reference_interval_min": 86.4,
+      "purchase_budget_share": 0.03
+    },
+    {
+      "tier": 6,
+      "level": 45,
+      "capacity": 700,
+      "price": 260000,
+      "source_row": 7,
+      "reference_gross_min": 65668.17,
+      "reference_interval_min": 96.0,
+      "purchase_budget_share": 0.03
+    },
+    {
+      "tier": 7,
+      "level": 55,
+      "capacity": 900,
+      "price": 1100000,
+      "source_row": 8,
+      "reference_gross_min": 214572.35,
+      "reference_interval_min": 123.0,
+      "purchase_budget_share": 0.03
+    },
+    {
+      "tier": 8,
+      "level": 65,
+      "capacity": 1200,
+      "price": 6000000,
+      "source_row": 9,
+      "reference_gross_min": 805603.96,
+      "reference_interval_min": 178.333,
+      "purchase_budget_share": 0.03
+    },
+    {
+      "tier": 9,
+      "level": 75,
+      "capacity": 1600,
+      "price": 25000000,
+      "source_row": 10,
+      "reference_gross_min": 2805161.82,
+      "reference_interval_min": 206.667,
+      "purchase_budget_share": 0.03
+    },
+    {
+      "tier": 10,
+      "level": 85,
+      "capacity": 2200,
+      "price": 130000000,
+      "source_row": 11,
+      "reference_gross_min": 9736285.29,
+      "reference_interval_min": 253.333,
+      "purchase_budget_share": 0.03
+    }
+  ],
+  "bars": [
+    {
+      "id": "bar_copper",
+      "name": "Copper Bar",
+      "tier": 2,
+      "price": 6.72,
+      "xp": 3.76,
+      "source_row": 54
+    },
+    {
+      "id": "bar_tin",
+      "name": "Tin Bar",
+      "tier": 3,
+      "price": 8.06,
+      "xp": 5.39,
+      "source_row": 55
+    },
+    {
+      "id": "bar_iron",
+      "name": "Iron Bar",
+      "tier": 4,
+      "price": 9.69,
+      "xp": 7.06,
+      "source_row": 56
+    },
+    {
+      "id": "bar_lead",
+      "name": "Lead Bar",
+      "tier": 5,
+      "price": 11.62,
+      "xp": 8.78,
+      "source_row": 57
+    },
+    {
+      "id": "bar_zinc",
+      "name": "Zinc Bar",
+      "tier": 6,
+      "price": 13.94,
+      "xp": 10.56,
+      "source_row": 58
+    },
+    {
+      "id": "bar_silver",
+      "name": "Silver Bar",
+      "tier": 7,
+      "price": 16.72,
+      "xp": 12.39,
+      "source_row": 59
+    },
+    {
+      "id": "bar_nickel",
+      "name": "Nickel Bar",
+      "tier": 8,
+      "price": 20.08,
+      "xp": 14.28,
+      "source_row": 60
+    },
+    {
+      "id": "bar_cobalt",
+      "name": "Cobalt Bar",
+      "tier": 9,
+      "price": 24.08,
+      "xp": 16.21,
+      "source_row": 61
+    },
+    {
+      "id": "bar_chromium",
+      "name": "Chromium Bar",
+      "tier": 10,
+      "price": 28.9,
+      "xp": 18.19,
+      "source_row": 62
+    },
+    {
+      "id": "bar_manganese",
+      "name": "Manganese Bar",
+      "tier": 11,
+      "price": 34.66,
+      "xp": 20.24,
+      "source_row": 63
+    },
+    {
+      "id": "bar_aluminum",
+      "name": "Aluminum Bar",
+      "tier": 12,
+      "price": 41.61,
+      "xp": 22.33,
+      "source_row": 64
+    },
+    {
+      "id": "bar_titanium",
+      "name": "Titanium Bar",
+      "tier": 13,
+      "price": 49.92,
+      "xp": 24.49,
+      "source_row": 65
+    },
+    {
+      "id": "bar_tungsten",
+      "name": "Tungsten Bar",
+      "tier": 14,
+      "price": 59.92,
+      "xp": 26.69,
+      "source_row": 66
+    },
+    {
+      "id": "bar_platinum",
+      "name": "Platinum Bar",
+      "tier": 15,
+      "price": 71.9,
+      "xp": 28.93,
+      "source_row": 67
+    },
+    {
+      "id": "bar_palladium",
+      "name": "Palladium Bar",
+      "tier": 16,
+      "price": 86.27,
+      "xp": 31.24,
+      "source_row": 68
+    },
+    {
+      "id": "bar_osmium",
+      "name": "Osmium Bar",
+      "tier": 17,
+      "price": 103.54,
+      "xp": 33.59,
+      "source_row": 69
+    },
+    {
+      "id": "bar_iridium",
+      "name": "Iridium Bar",
+      "tier": 18,
+      "price": 124.24,
+      "xp": 36.01,
+      "source_row": 70
+    },
+    {
+      "id": "bar_rhodium",
+      "name": "Rhodium Bar",
+      "tier": 19,
+      "price": 149.1,
+      "xp": 38.48,
+      "source_row": 71
+    },
+    {
+      "id": "bar_mythril",
+      "name": "Mythril Bar",
+      "tier": 21,
+      "price": 214.7,
+      "xp": 43.56,
+      "source_row": 72
+    },
+    {
+      "id": "bar_star_metal",
+      "name": "Star Metal Bar",
+      "tier": 34,
+      "price": 2297.04,
+      "xp": 81.77,
+      "source_row": 73
+    },
+    {
+      "id": "bar_celestial_metal",
+      "name": "Celestial Metal Bar",
+      "tier": 38,
+      "price": 4763.14,
+      "xp": 95.33,
+      "source_row": 74
+    },
+    {
+      "id": "bar_astralium",
+      "name": "Astralium Bar",
+      "tier": 39,
+      "price": 5715.78,
+      "xp": 98.85,
+      "source_row": 75
+    }
+  ],
+  "recipes": [
+    {
+      "id": "recipe_bar_copper",
+      "input_id": "ore_copper",
+      "input_qty": 2,
+      "output_id": "bar_copper",
+      "output_qty": 1,
+      "seconds": 0.04,
+      "capacity_bars_min": 1500
+    },
+    {
+      "id": "recipe_bar_tin",
+      "input_id": "ore_tin",
+      "input_qty": 2,
+      "output_id": "bar_tin",
+      "output_qty": 1,
+      "seconds": 0.04,
+      "capacity_bars_min": 1500
+    },
+    {
+      "id": "recipe_bar_iron",
+      "input_id": "ore_iron",
+      "input_qty": 2,
+      "output_id": "bar_iron",
+      "output_qty": 1,
+      "seconds": 0.04,
+      "capacity_bars_min": 1500
+    },
+    {
+      "id": "recipe_bar_lead",
+      "input_id": "ore_lead",
+      "input_qty": 2,
+      "output_id": "bar_lead",
+      "output_qty": 1,
+      "seconds": 0.04,
+      "capacity_bars_min": 1500
+    },
+    {
+      "id": "recipe_bar_zinc",
+      "input_id": "ore_zinc",
+      "input_qty": 2,
+      "output_id": "bar_zinc",
+      "output_qty": 1,
+      "seconds": 0.04,
+      "capacity_bars_min": 1500
+    },
+    {
+      "id": "recipe_bar_silver",
+      "input_id": "ore_silver",
+      "input_qty": 2,
+      "output_id": "bar_silver",
+      "output_qty": 1,
+      "seconds": 0.04,
+      "capacity_bars_min": 1500
+    },
+    {
+      "id": "recipe_bar_nickel",
+      "input_id": "ore_nickel",
+      "input_qty": 2,
+      "output_id": "bar_nickel",
+      "output_qty": 1,
+      "seconds": 0.04,
+      "capacity_bars_min": 1500
+    },
+    {
+      "id": "recipe_bar_cobalt",
+      "input_id": "ore_cobalt",
+      "input_qty": 2,
+      "output_id": "bar_cobalt",
+      "output_qty": 1,
+      "seconds": 0.04,
+      "capacity_bars_min": 1500
+    },
+    {
+      "id": "recipe_bar_chromium",
+      "input_id": "ore_chromium",
+      "input_qty": 2,
+      "output_id": "bar_chromium",
+      "output_qty": 1,
+      "seconds": 0.04,
+      "capacity_bars_min": 1500
+    },
+    {
+      "id": "recipe_bar_manganese",
+      "input_id": "ore_manganese",
+      "input_qty": 2,
+      "output_id": "bar_manganese",
+      "output_qty": 1,
+      "seconds": 0.04,
+      "capacity_bars_min": 1500
+    },
+    {
+      "id": "recipe_bar_aluminum",
+      "input_id": "ore_aluminum",
+      "input_qty": 2,
+      "output_id": "bar_aluminum",
+      "output_qty": 1,
+      "seconds": 0.04,
+      "capacity_bars_min": 1500
+    },
+    {
+      "id": "recipe_bar_titanium",
+      "input_id": "ore_titanium",
+      "input_qty": 2,
+      "output_id": "bar_titanium",
+      "output_qty": 1,
+      "seconds": 0.04,
+      "capacity_bars_min": 1500
+    },
+    {
+      "id": "recipe_bar_tungsten",
+      "input_id": "ore_tungsten",
+      "input_qty": 2,
+      "output_id": "bar_tungsten",
+      "output_qty": 1,
+      "seconds": 0.04,
+      "capacity_bars_min": 1500
+    },
+    {
+      "id": "recipe_bar_platinum",
+      "input_id": "ore_platinum",
+      "input_qty": 2,
+      "output_id": "bar_platinum",
+      "output_qty": 1,
+      "seconds": 0.04,
+      "capacity_bars_min": 1500
+    },
+    {
+      "id": "recipe_bar_palladium",
+      "input_id": "ore_palladium",
+      "input_qty": 2,
+      "output_id": "bar_palladium",
+      "output_qty": 1,
+      "seconds": 0.04,
+      "capacity_bars_min": 1500
+    },
+    {
+      "id": "recipe_bar_osmium",
+      "input_id": "ore_osmium",
+      "input_qty": 2,
+      "output_id": "bar_osmium",
+      "output_qty": 1,
+      "seconds": 0.04,
+      "capacity_bars_min": 1500
+    },
+    {
+      "id": "recipe_bar_iridium",
+      "input_id": "ore_iridium",
+      "input_qty": 2,
+      "output_id": "bar_iridium",
+      "output_qty": 1,
+      "seconds": 0.04,
+      "capacity_bars_min": 1500
+    },
+    {
+      "id": "recipe_bar_rhodium",
+      "input_id": "ore_rhodium",
+      "input_qty": 2,
+      "output_id": "bar_rhodium",
+      "output_qty": 1,
+      "seconds": 0.04,
+      "capacity_bars_min": 1500
+    },
+    {
+      "id": "recipe_bar_mythril",
+      "input_id": "ore_mythril",
+      "input_qty": 2,
+      "output_id": "bar_mythril",
+      "output_qty": 1,
+      "seconds": 0.04,
+      "capacity_bars_min": 1500
+    },
+    {
+      "id": "recipe_bar_star_metal",
+      "input_id": "ore_star_metal",
+      "input_qty": 2,
+      "output_id": "bar_star_metal",
+      "output_qty": 1,
+      "seconds": 0.04,
+      "capacity_bars_min": 1500
+    },
+    {
+      "id": "recipe_bar_celestial_metal",
+      "input_id": "ore_celestial_metal",
+      "input_qty": 2,
+      "output_id": "bar_celestial_metal",
+      "output_qty": 1,
+      "seconds": 0.04,
+      "capacity_bars_min": 1500
+    },
+    {
+      "id": "recipe_bar_astralium",
+      "input_id": "ore_astralium",
+      "input_qty": 2,
+      "output_id": "bar_astralium",
+      "output_qty": 1,
+      "seconds": 0.04,
+      "capacity_bars_min": 1500
+    }
+  ],
+  "storage": [
+    {
+      "number": 1,
+      "capacity": 1000,
+      "price": 60,
+      "source_row": null
+    },
+    {
+      "number": 2,
+      "capacity": 1000,
+      "price": 190,
+      "source_row": null
+    },
+    {
+      "number": 3,
+      "capacity": 1000,
+      "price": 390,
+      "source_row": null
+    },
+    {
+      "number": 4,
+      "capacity": 1000,
+      "price": 630,
+      "source_row": null
+    },
+    {
+      "number": 5,
+      "capacity": 1000,
+      "price": 930,
+      "source_row": null
+    },
+    {
+      "number": 6,
+      "capacity": 1000,
+      "price": 1300,
+      "source_row": null
+    },
+    {
+      "number": 7,
+      "capacity": 1000,
+      "price": 1600,
+      "source_row": null
+    },
+    {
+      "number": 8,
+      "capacity": 1000,
+      "price": 2100,
+      "source_row": null
+    },
+    {
+      "number": 9,
+      "capacity": 1000,
+      "price": 2500,
+      "source_row": null
+    },
+    {
+      "number": 10,
+      "capacity": 1000,
+      "price": 3000,
+      "source_row": null
+    },
+    {
+      "number": 11,
+      "capacity": 1000,
+      "price": 3500,
+      "source_row": null
+    },
+    {
+      "number": 12,
+      "capacity": 1000,
+      "price": 4100,
+      "source_row": null
+    },
+    {
+      "number": 13,
+      "capacity": 1000,
+      "price": 4700,
+      "source_row": null
+    },
+    {
+      "number": 14,
+      "capacity": 1000,
+      "price": 5300,
+      "source_row": null
+    },
+    {
+      "number": 15,
+      "capacity": 1000,
+      "price": 6000,
+      "source_row": null
+    },
+    {
+      "number": 16,
+      "capacity": 1000,
+      "price": 6700,
+      "source_row": null
+    },
+    {
+      "number": 17,
+      "capacity": 1000,
+      "price": 7400,
+      "source_row": null
+    },
+    {
+      "number": 18,
+      "capacity": 1000,
+      "price": 8200,
+      "source_row": null
+    },
+    {
+      "number": 19,
+      "capacity": 1000,
+      "price": 9000,
+      "source_row": null
+    },
+    {
+      "number": 20,
+      "capacity": 1000,
+      "price": 9800,
+      "source_row": null
+    },
+    {
+      "number": 21,
+      "capacity": 1000,
+      "price": 11000,
+      "source_row": null
+    },
+    {
+      "number": 22,
+      "capacity": 1000,
+      "price": 11000,
+      "source_row": null
+    },
+    {
+      "number": 23,
+      "capacity": 1000,
+      "price": 12000,
+      "source_row": null
+    },
+    {
+      "number": 24,
+      "capacity": 1000,
+      "price": 13000,
+      "source_row": null
+    },
+    {
+      "number": 25,
+      "capacity": 1000,
+      "price": 14000,
+      "source_row": null
+    },
+    {
+      "number": 26,
+      "capacity": 1000,
+      "price": 15000,
+      "source_row": null
+    },
+    {
+      "number": 27,
+      "capacity": 1000,
+      "price": 16000,
+      "source_row": null
+    },
+    {
+      "number": 28,
+      "capacity": 1000,
+      "price": 17000,
+      "source_row": null
+    },
+    {
+      "number": 29,
+      "capacity": 1000,
+      "price": 18000,
+      "source_row": null
+    },
+    {
+      "number": 30,
+      "capacity": 1000,
+      "price": 19000,
+      "source_row": null
+    },
+    {
+      "number": 31,
+      "capacity": 1000,
+      "price": 21000,
+      "source_row": null
+    },
+    {
+      "number": 32,
+      "capacity": 1000,
+      "price": 22000,
+      "source_row": null
+    },
+    {
+      "number": 33,
+      "capacity": 1000,
+      "price": 23000,
+      "source_row": null
+    },
+    {
+      "number": 34,
+      "capacity": 1000,
+      "price": 24000,
+      "source_row": null
+    },
+    {
+      "number": 35,
+      "capacity": 1000,
+      "price": 25000,
+      "source_row": null
+    },
+    {
+      "number": 36,
+      "capacity": 1000,
+      "price": 27000,
+      "source_row": null
+    },
+    {
+      "number": 37,
+      "capacity": 1000,
+      "price": 28000,
+      "source_row": null
+    },
+    {
+      "number": 38,
+      "capacity": 1000,
+      "price": 29000,
+      "source_row": null
+    },
+    {
+      "number": 39,
+      "capacity": 1000,
+      "price": 30000,
+      "source_row": null
+    },
+    {
+      "number": 40,
+      "capacity": 1000,
+      "price": 32000,
+      "source_row": null
+    },
+    {
+      "number": 41,
+      "capacity": 1000,
+      "price": 33000,
+      "source_row": null
+    },
+    {
+      "number": 42,
+      "capacity": 1000,
+      "price": 34000,
+      "source_row": null
+    },
+    {
+      "number": 43,
+      "capacity": 1000,
+      "price": 36000,
+      "source_row": null
+    },
+    {
+      "number": 44,
+      "capacity": 1000,
+      "price": 37000,
+      "source_row": null
+    },
+    {
+      "number": 45,
+      "capacity": 1000,
+      "price": 39000,
+      "source_row": null
+    },
+    {
+      "number": 46,
+      "capacity": 1000,
+      "price": 40000,
+      "source_row": null
+    },
+    {
+      "number": 47,
+      "capacity": 1000,
+      "price": 42000,
+      "source_row": null
+    },
+    {
+      "number": 48,
+      "capacity": 1000,
+      "price": 43000,
+      "source_row": null
+    },
+    {
+      "number": 49,
+      "capacity": 1000,
+      "price": 45000,
+      "source_row": null
+    },
+    {
+      "number": 50,
+      "capacity": 1000,
+      "price": 46000,
+      "source_row": null
+    },
+    {
+      "number": 51,
+      "capacity": 1000,
+      "price": 48000,
+      "source_row": null
+    },
+    {
+      "number": 52,
+      "capacity": 1000,
+      "price": 50000,
+      "source_row": null
+    },
+    {
+      "number": 53,
+      "capacity": 1000,
+      "price": 51000,
+      "source_row": null
+    },
+    {
+      "number": 54,
+      "capacity": 1000,
+      "price": 53000,
+      "source_row": null
+    },
+    {
+      "number": 55,
+      "capacity": 1000,
+      "price": 55000,
+      "source_row": null
+    },
+    {
+      "number": 56,
+      "capacity": 1000,
+      "price": 56000,
+      "source_row": null
+    },
+    {
+      "number": 57,
+      "capacity": 1000,
+      "price": 58000,
+      "source_row": null
+    },
+    {
+      "number": 58,
+      "capacity": 1000,
+      "price": 60000,
+      "source_row": null
+    },
+    {
+      "number": 59,
+      "capacity": 1000,
+      "price": 61000,
+      "source_row": null
+    },
+    {
+      "number": 60,
+      "capacity": 1000,
+      "price": 63000,
+      "source_row": null
+    },
+    {
+      "number": 61,
+      "capacity": 1000,
+      "price": 65000,
+      "source_row": null
+    },
+    {
+      "number": 62,
+      "capacity": 1000,
+      "price": 67000,
+      "source_row": null
+    },
+    {
+      "number": 63,
+      "capacity": 1000,
+      "price": 69000,
+      "source_row": null
+    },
+    {
+      "number": 64,
+      "capacity": 1000,
+      "price": 71000,
+      "source_row": null
+    },
+    {
+      "number": 65,
+      "capacity": 1000,
+      "price": 72000,
+      "source_row": null
+    },
+    {
+      "number": 66,
+      "capacity": 1000,
+      "price": 74000,
+      "source_row": null
+    },
+    {
+      "number": 67,
+      "capacity": 1000,
+      "price": 76000,
+      "source_row": null
+    },
+    {
+      "number": 68,
+      "capacity": 1000,
+      "price": 78000,
+      "source_row": null
+    },
+    {
+      "number": 69,
+      "capacity": 1000,
+      "price": 80000,
+      "source_row": null
+    },
+    {
+      "number": 70,
+      "capacity": 1000,
+      "price": 82000,
+      "source_row": null
+    },
+    {
+      "number": 71,
+      "capacity": 1000,
+      "price": 84000,
+      "source_row": null
+    },
+    {
+      "number": 72,
+      "capacity": 1000,
+      "price": 86000,
+      "source_row": null
+    },
+    {
+      "number": 73,
+      "capacity": 1000,
+      "price": 88000,
+      "source_row": null
+    },
+    {
+      "number": 74,
+      "capacity": 1000,
+      "price": 90000,
+      "source_row": null
+    },
+    {
+      "number": 75,
+      "capacity": 1000,
+      "price": 92000,
+      "source_row": null
+    },
+    {
+      "number": 76,
+      "capacity": 1000,
+      "price": 95000,
+      "source_row": null
+    },
+    {
+      "number": 77,
+      "capacity": 1000,
+      "price": 97000,
+      "source_row": null
+    },
+    {
+      "number": 78,
+      "capacity": 1000,
+      "price": 99000,
+      "source_row": null
+    },
+    {
+      "number": 79,
+      "capacity": 1000,
+      "price": 100000,
+      "source_row": null
+    },
+    {
+      "number": 80,
+      "capacity": 1000,
+      "price": 100000,
+      "source_row": null
+    },
+    {
+      "number": 81,
+      "capacity": 1000,
+      "price": 110000,
+      "source_row": null
+    },
+    {
+      "number": 82,
+      "capacity": 1000,
+      "price": 110000,
+      "source_row": null
+    },
+    {
+      "number": 83,
+      "capacity": 1000,
+      "price": 110000,
+      "source_row": null
+    },
+    {
+      "number": 84,
+      "capacity": 1000,
+      "price": 110000,
+      "source_row": null
+    },
+    {
+      "number": 85,
+      "capacity": 1000,
+      "price": 110000,
+      "source_row": null
+    },
+    {
+      "number": 86,
+      "capacity": 1000,
+      "price": 120000,
+      "source_row": null
+    },
+    {
+      "number": 87,
+      "capacity": 1000,
+      "price": 120000,
+      "source_row": null
+    },
+    {
+      "number": 88,
+      "capacity": 1000,
+      "price": 120000,
+      "source_row": null
+    },
+    {
+      "number": 89,
+      "capacity": 1000,
+      "price": 120000,
+      "source_row": null
+    },
+    {
+      "number": 90,
+      "capacity": 1000,
+      "price": 130000,
+      "source_row": null
+    },
+    {
+      "number": 91,
+      "capacity": 1000,
+      "price": 130000,
+      "source_row": null
+    },
+    {
+      "number": 92,
+      "capacity": 1000,
+      "price": 130000,
+      "source_row": null
+    },
+    {
+      "number": 93,
+      "capacity": 1000,
+      "price": 130000,
+      "source_row": null
+    },
+    {
+      "number": 94,
+      "capacity": 1000,
+      "price": 140000,
+      "source_row": null
+    },
+    {
+      "number": 95,
+      "capacity": 1000,
+      "price": 140000,
+      "source_row": null
+    },
+    {
+      "number": 96,
+      "capacity": 1000,
+      "price": 140000,
+      "source_row": null
+    },
+    {
+      "number": 97,
+      "capacity": 1000,
+      "price": 140000,
+      "source_row": null
+    },
+    {
+      "number": 98,
+      "capacity": 1000,
+      "price": 150000,
+      "source_row": null
+    },
+    {
+      "number": 99,
+      "capacity": 1000,
+      "price": 150000,
+      "source_row": null
+    },
+    {
+      "number": 100,
+      "capacity": 1000,
+      "price": 150000,
+      "source_row": null
+    },
+    {
+      "number": 101,
+      "capacity": 1000,
+      "price": 150000,
+      "source_row": null
+    },
+    {
+      "number": 102,
+      "capacity": 1000,
+      "price": 160000,
+      "source_row": null
+    },
+    {
+      "number": 103,
+      "capacity": 1000,
+      "price": 160000,
+      "source_row": null
+    },
+    {
+      "number": 104,
+      "capacity": 1000,
+      "price": 160000,
+      "source_row": null
+    },
+    {
+      "number": 105,
+      "capacity": 1000,
+      "price": 160000,
+      "source_row": null
+    },
+    {
+      "number": 106,
+      "capacity": 1000,
+      "price": 170000,
+      "source_row": null
+    },
+    {
+      "number": 107,
+      "capacity": 1000,
+      "price": 170000,
+      "source_row": null
+    },
+    {
+      "number": 108,
+      "capacity": 1000,
+      "price": 170000,
+      "source_row": null
+    },
+    {
+      "number": 109,
+      "capacity": 1000,
+      "price": 170000,
+      "source_row": null
+    },
+    {
+      "number": 110,
+      "capacity": 1000,
+      "price": 180000,
+      "source_row": null
+    },
+    {
+      "number": 111,
+      "capacity": 1000,
+      "price": 180000,
+      "source_row": null
+    },
+    {
+      "number": 112,
+      "capacity": 1000,
+      "price": 180000,
+      "source_row": null
+    },
+    {
+      "number": 113,
+      "capacity": 1000,
+      "price": 190000,
+      "source_row": null
+    },
+    {
+      "number": 114,
+      "capacity": 1000,
+      "price": 190000,
+      "source_row": null
+    },
+    {
+      "number": 115,
+      "capacity": 1000,
+      "price": 190000,
+      "source_row": null
+    },
+    {
+      "number": 116,
+      "capacity": 1000,
+      "price": 190000,
+      "source_row": null
+    },
+    {
+      "number": 117,
+      "capacity": 1000,
+      "price": 200000,
+      "source_row": null
+    },
+    {
+      "number": 118,
+      "capacity": 1000,
+      "price": 200000,
+      "source_row": null
+    },
+    {
+      "number": 119,
+      "capacity": 1000,
+      "price": 200000,
+      "source_row": null
+    },
+    {
+      "number": 120,
+      "capacity": 1000,
+      "price": 210000,
+      "source_row": null
+    },
+    {
+      "number": 121,
+      "capacity": 1000,
+      "price": 210000,
+      "source_row": null
+    },
+    {
+      "number": 122,
+      "capacity": 1000,
+      "price": 210000,
+      "source_row": null
+    },
+    {
+      "number": 123,
+      "capacity": 1000,
+      "price": 210000,
+      "source_row": null
+    },
+    {
+      "number": 124,
+      "capacity": 1000,
+      "price": 220000,
+      "source_row": null
+    },
+    {
+      "number": 125,
+      "capacity": 1000,
+      "price": 220000,
+      "source_row": null
+    },
+    {
+      "number": 126,
+      "capacity": 1000,
+      "price": 220000,
+      "source_row": null
+    },
+    {
+      "number": 127,
+      "capacity": 1000,
+      "price": 230000,
+      "source_row": null
+    },
+    {
+      "number": 128,
+      "capacity": 1000,
+      "price": 230000,
+      "source_row": null
+    },
+    {
+      "number": 129,
+      "capacity": 1000,
+      "price": 230000,
+      "source_row": null
+    },
+    {
+      "number": 130,
+      "capacity": 1000,
+      "price": 240000,
+      "source_row": null
+    },
+    {
+      "number": 131,
+      "capacity": 1000,
+      "price": 240000,
+      "source_row": null
+    },
+    {
+      "number": 132,
+      "capacity": 1000,
+      "price": 240000,
+      "source_row": null
+    },
+    {
+      "number": 133,
+      "capacity": 1000,
+      "price": 240000,
+      "source_row": null
+    },
+    {
+      "number": 134,
+      "capacity": 1000,
+      "price": 250000,
+      "source_row": null
+    },
+    {
+      "number": 135,
+      "capacity": 1000,
+      "price": 250000,
+      "source_row": null
+    },
+    {
+      "number": 136,
+      "capacity": 1000,
+      "price": 250000,
+      "source_row": null
+    },
+    {
+      "number": 137,
+      "capacity": 1000,
+      "price": 260000,
+      "source_row": null
+    },
+    {
+      "number": 138,
+      "capacity": 1000,
+      "price": 260000,
+      "source_row": null
+    },
+    {
+      "number": 139,
+      "capacity": 1000,
+      "price": 260000,
+      "source_row": null
+    },
+    {
+      "number": 140,
+      "capacity": 1000,
+      "price": 270000,
+      "source_row": null
+    },
+    {
+      "number": 141,
+      "capacity": 1000,
+      "price": 270000,
+      "source_row": null
+    },
+    {
+      "number": 142,
+      "capacity": 1000,
+      "price": 270000,
+      "source_row": null
+    },
+    {
+      "number": 143,
+      "capacity": 1000,
+      "price": 280000,
+      "source_row": null
+    },
+    {
+      "number": 144,
+      "capacity": 1000,
+      "price": 280000,
+      "source_row": null
+    },
+    {
+      "number": 145,
+      "capacity": 1000,
+      "price": 280000,
+      "source_row": null
+    },
+    {
+      "number": 146,
+      "capacity": 1000,
+      "price": 290000,
+      "source_row": null
+    },
+    {
+      "number": 147,
+      "capacity": 1000,
+      "price": 290000,
+      "source_row": null
+    },
+    {
+      "number": 148,
+      "capacity": 1000,
+      "price": 290000,
+      "source_row": null
+    },
+    {
+      "number": 149,
+      "capacity": 1000,
+      "price": 300000,
+      "source_row": null
+    },
+    {
+      "number": 150,
+      "capacity": 1000,
+      "price": 300000,
+      "source_row": null
+    },
+    {
+      "number": 151,
+      "capacity": 1000,
+      "price": 300000,
+      "source_row": null
+    },
+    {
+      "number": 152,
+      "capacity": 1000,
+      "price": 310000,
+      "source_row": null
+    },
+    {
+      "number": 153,
+      "capacity": 1000,
+      "price": 310000,
+      "source_row": null
+    },
+    {
+      "number": 154,
+      "capacity": 1000,
+      "price": 310000,
+      "source_row": null
+    },
+    {
+      "number": 155,
+      "capacity": 1000,
+      "price": 320000,
+      "source_row": null
+    },
+    {
+      "number": 156,
+      "capacity": 1000,
+      "price": 320000,
+      "source_row": null
+    },
+    {
+      "number": 157,
+      "capacity": 1000,
+      "price": 320000,
+      "source_row": null
+    },
+    {
+      "number": 158,
+      "capacity": 1000,
+      "price": 330000,
+      "source_row": null
+    },
+    {
+      "number": 159,
+      "capacity": 1000,
+      "price": 330000,
+      "source_row": null
+    },
+    {
+      "number": 160,
+      "capacity": 1000,
+      "price": 340000,
+      "source_row": null
+    },
+    {
+      "number": 161,
+      "capacity": 1000,
+      "price": 340000,
+      "source_row": null
+    },
+    {
+      "number": 162,
+      "capacity": 1000,
+      "price": 340000,
+      "source_row": null
+    },
+    {
+      "number": 163,
+      "capacity": 1000,
+      "price": 350000,
+      "source_row": null
+    },
+    {
+      "number": 164,
+      "capacity": 1000,
+      "price": 350000,
+      "source_row": null
+    },
+    {
+      "number": 165,
+      "capacity": 1000,
+      "price": 350000,
+      "source_row": null
+    },
+    {
+      "number": 166,
+      "capacity": 1000,
+      "price": 360000,
+      "source_row": null
+    },
+    {
+      "number": 167,
+      "capacity": 1000,
+      "price": 360000,
+      "source_row": null
+    },
+    {
+      "number": 168,
+      "capacity": 1000,
+      "price": 360000,
+      "source_row": null
+    },
+    {
+      "number": 169,
+      "capacity": 1000,
+      "price": 370000,
+      "source_row": null
+    },
+    {
+      "number": 170,
+      "capacity": 1000,
+      "price": 370000,
+      "source_row": null
+    },
+    {
+      "number": 171,
+      "capacity": 1000,
+      "price": 380000,
+      "source_row": null
+    },
+    {
+      "number": 172,
+      "capacity": 1000,
+      "price": 380000,
+      "source_row": null
+    },
+    {
+      "number": 173,
+      "capacity": 1000,
+      "price": 380000,
+      "source_row": null
+    },
+    {
+      "number": 174,
+      "capacity": 1000,
+      "price": 390000,
+      "source_row": null
+    },
+    {
+      "number": 175,
+      "capacity": 1000,
+      "price": 390000,
+      "source_row": null
+    },
+    {
+      "number": 176,
+      "capacity": 1000,
+      "price": 390000,
+      "source_row": null
+    },
+    {
+      "number": 177,
+      "capacity": 1000,
+      "price": 400000,
+      "source_row": null
+    },
+    {
+      "number": 178,
+      "capacity": 1000,
+      "price": 400000,
+      "source_row": null
+    },
+    {
+      "number": 179,
+      "capacity": 1000,
+      "price": 410000,
+      "source_row": null
+    },
+    {
+      "number": 180,
+      "capacity": 1000,
+      "price": 410000,
+      "source_row": null
+    },
+    {
+      "number": 181,
+      "capacity": 1000,
+      "price": 410000,
+      "source_row": null
+    },
+    {
+      "number": 182,
+      "capacity": 1000,
+      "price": 420000,
+      "source_row": null
+    },
+    {
+      "number": 183,
+      "capacity": 1000,
+      "price": 420000,
+      "source_row": null
+    },
+    {
+      "number": 184,
+      "capacity": 1000,
+      "price": 420000,
+      "source_row": null
+    },
+    {
+      "number": 185,
+      "capacity": 1000,
+      "price": 430000,
+      "source_row": null
+    },
+    {
+      "number": 186,
+      "capacity": 1000,
+      "price": 430000,
+      "source_row": null
+    },
+    {
+      "number": 187,
+      "capacity": 1000,
+      "price": 440000,
+      "source_row": null
+    },
+    {
+      "number": 188,
+      "capacity": 1000,
+      "price": 440000,
+      "source_row": null
+    },
+    {
+      "number": 189,
+      "capacity": 1000,
+      "price": 440000,
+      "source_row": null
+    },
+    {
+      "number": 190,
+      "capacity": 1000,
+      "price": 450000,
+      "source_row": null
+    },
+    {
+      "number": 191,
+      "capacity": 1000,
+      "price": 450000,
+      "source_row": null
+    },
+    {
+      "number": 192,
+      "capacity": 1000,
+      "price": 460000,
+      "source_row": null
+    }
+  ],
+  "general": {
+    "start_cash": 80,
+    "worker_hire": 180,
+    "worker_wage_min": 1,
+    "worker_rate_min": 25,
+    "worker_slot_buffer": 150,
+    "elevator_start_capacity": 60,
+    "elevator_cycle_seconds": 10,
+    "crate_size": 1000,
+    "max_crates": 192,
+    "start_crates": 0,
+    "smelter_ore_per_bar": 2,
+    "smelter_seconds_per_bar": 0.04,
+    "smelter_input_crates": 16,
+    "smelter_output_crates": 16,
+    "loading_min_units_second": 100,
+    "loading_full_seconds": 4,
+    "drill_max_level": 10,
+    "drill_level_bonus": 0.04,
+    "drill_upgrade_share": 0.03,
+    "drill_upgrade_growth": 1.18,
+    "offline_rate": 0.3,
+    "offline_max_hours": 8,
+    "prestige_money_bonus": 0.05,
+    "prestige_speed_bonus": 0.0,
+    "prestige_speed_max": 0.0,
+    "prestige_level": 100,
+    "late_price_growth": 1,
+    "late_price_start": 40,
+    "manual_trip_seconds": 45,
+    "vehicle_trip_seconds": 70,
+    "mine_buffer_reserve_minutes": 5,
+    "capacity_reserve": 1.25
+  }
+}

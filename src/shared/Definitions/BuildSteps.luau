@@ -19,15 +19,15 @@ local list: { BuildStepDefinition } = {
 	{
 		Id = "build_office",
 		DisplayName = "Office",
-		Price = 0, -- fest (docs/04 §6)
-		RequiredLevel = 1,
+		Price = 0, -- Balancing 2026-11-11 (D-087)
+		RequiredLevel = 1, -- Balancing 2026-11-11 (D-087)
 		Requires = nil,
 	},
 	{
 		Id = "build_elevator",
 		DisplayName = "Elevator",
-		Price = 200, -- fest (D-003)
-		RequiredLevel = 1,
+		Price = 80, -- Balancing 2026-11-11 (D-087)
+		RequiredLevel = 1, -- Balancing 2026-11-11 (D-087)
 		Requires = "build_office",
 		RequiresCompanySetup = true,
 	},
@@ -36,24 +36,24 @@ local list: { BuildStepDefinition } = {
 	{
 		Id = "build_walls",
 		DisplayName = "Walls",
-		Price = 1500, -- Felix (D-020)
-		RequiredLevel = 3, -- Felix (D-020)
+		Price = 100, -- Balancing 2026-11-11 (D-087)
+		RequiredLevel = 2, -- Balancing 2026-11-11 (D-087)
 		Requires = "build_elevator",
 		RequiresCompanySetup = true,
 	},
 	{
 		Id = "build_roof",
 		DisplayName = "Roof",
-		Price = 2500, -- Felix (D-020)
-		RequiredLevel = 4, -- Felix (D-020)
+		Price = 180, -- Balancing 2026-11-11 (D-087)
+		RequiredLevel = 3, -- Balancing 2026-11-11 (D-087)
 		Requires = "build_walls",
 		RequiresCompanySetup = true,
 	},
 	{
 		Id = "build_storage",
 		DisplayName = "Storage",
-		Price = 5000, -- Felix (D-020)
-		RequiredLevel = 5, -- Felix (D-020)
+		Price = 250, -- Balancing 2026-11-11 (D-087)
+		RequiredLevel = 3, -- Balancing 2026-11-11 (D-087)
 		Requires = "build_roof",
 		RequiresCompanySetup = true,
 	},
@@ -61,8 +61,8 @@ local list: { BuildStepDefinition } = {
 	{
 		Id = "build_garage",
 		DisplayName = "Garage",
-		Price = 10000,
-		RequiredLevel = 7,
+		Price = 900, -- Balancing 2026-11-11 (D-087)
+		RequiredLevel = 6, -- Balancing 2026-11-11 (D-087)
 		Requires = "build_storage",
 		RequiresCompanySetup = true,
 	},
@@ -70,8 +70,8 @@ local list: { BuildStepDefinition } = {
 	{
 		Id = "build_smelter",
 		DisplayName = "Smelter",
-		Price = 25000, -- Felix (D-028)
-		RequiredLevel = 10, -- Felix (D-028)
+		Price = 2800, -- Balancing 2026-11-11 (D-087)
+		RequiredLevel = 10, -- Balancing 2026-11-11 (D-087)
 		Requires = "build_garage",
 		RequiresCompanySetup = true,
 	},

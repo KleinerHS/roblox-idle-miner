@@ -1,5 +1,7 @@
 # 12 – PROGRESSION AND PRESTIGE
 
+> Aktualisierung 2026-11-08, D-084: Neue Zeit-Richtwerte und 30 Drills bis ca. L90 siehe `BALANCING_ZIELBILD_2026-11-08.md`. Bei künftigem Prestige bleiben von normaler Spielausrüstung nur Spitzhacken und Rucksäcke erhalten und sofort nutzbar; Fahrzeuge und Luck-Upgrades resetten künftig ebenfalls. Firmenidentität, Einstellungen, Statistiken, Prestige-Zähler/-Boni und bezahlte Entitlements bleiben getrennt behandelt. Ca. 15 % kürzerer zweiter Gesamtdurchlauf ist ein weicher Wunsch; stärker beschleunigter Anfang ausdrücklich erlaubt. Diese Richtungsänderung ersetzt widersprechende alte Abschnitte, ist aber noch nicht im Spielcode umgesetzt.
+
 ## 1. Zweck dieses Dokuments
 
 Dieses Dokument definiert den langfristigen Fortschritt des Spielers.

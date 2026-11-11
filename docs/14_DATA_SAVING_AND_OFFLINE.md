@@ -1,5 +1,7 @@
 # 14 – DATA SAVING AND OFFLINE PRODUCTION
 
+> Aktualisierung 2026-11-08, D-084: Felix wünscht künftig Offline-Cash aus geschätzter automatischer Firmenleistung statt zusätzlich erzeugter Materialien, zunächst ca. 30 % für maximal acht Stunden, später ausbaubar. Ersetzt im Zielmodell die folgenden alten Angaben „maximal 1 Stunde“/„nur Material“. Präzise Berechnungsbasis, Empfehlungen zu Offline-XP und Kapazitäten sowie Tests stehen in `BALANCING_ZIELBILD_2026-11-08.md`. Bestehender Spielcode rechnet noch das alte Materialmodell. Anspruch und Material derselben Produktion dürfen nicht doppelt gutgeschrieben werden.
+
 ## 1. Ziel
 Alle wichtigen Spieler- und Firmenzustände müssen sicher persistent gespeichert werden. Offline-Produktion ist auf maximal 1 Stunde begrenzt.
 

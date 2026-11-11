@@ -1,5 +1,11 @@
 # 00 – READ ME FIRST
 
+## Aktueller Balancing-Auftrag – 2026-11-08
+
+Felix hat das vollständige Neubalancing aller Zahlen beauftragt; D-084 und `BALANCING_ZIELBILD_2026-11-08.md` dokumentieren seine neuen Richtwerte. Diese ausdrücklich neueren Angaben ersetzen die betreffenden alten Balance-/Offline-/Prestige-Angaben unten: L10 ca. 30 Minuten, L50 ca. sechs Stunden, L100 ca. 30 aktive Stunden; Drills ab ungefähr L10 bis L90; früh ca. 15 Minuten ohne Verkaufszwang. Gewünschtes Offline-Zielmodell künftig ca. 30 % Cash aus automatischer Firmenleistung für bis zu acht Stunden, nicht mehr das alte einstündige Materialmodell. Normale Prestige-Ausrüstung: nur Spitzhacken und Rucksäcke bleiben, sofort nutzbar; Fahrzeuge und Luck resetten künftig ebenfalls. Metadaten und bezahlte Entitlements bleiben separat behandelt.
+
+Dies dokumentiert den Auftrag und bestätigte Richtungsantworten, keine bereits umgesetzte Spieländerung. Neue konkrete Werte, zusätzliche Rare-Erze und Detailregeln bleiben bis Berechnung und Tests TODO_BALANCE/VORSCHLAG. Checkpoint-Regel aus AGENTS.md gilt weiterhin.
+
 > **MANDATORY ENTRY POINT FOR CLAUDE CODE**
 >
 > Read this file completely before inspecting or modifying the Roblox project. Do not begin implementation until the documentation audit below is complete.

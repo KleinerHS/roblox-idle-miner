@@ -1,5 +1,67 @@
 # Implementation Status
 
+## Phase 20a (Version 0.62.0, 2026-11-11) – Neubalancing: Werte im Spiel (D-087)
+
+| System | Dateien | Status |
+|---|---|---|
+| Alle Werte aus Felix' Balancing-Datei (Erze, Barren, Minen, Ausrüstung, Drills, Fahrzeuge, Gebäude, Worker, Elevator, Kisten, Luck, Drill-Level, Prestige) | `BalanceConfig.luau`, `Pickaxes`, `Backpacks`, `Drills`, `Vehicles`, `BuildSteps`, `OfficeUpgrades`, `Conveyors`, `Mines` | TESTING_REQUIRED |
+| XP-Bedarf je Level als Tabelle 1–120 | `Leveling.luau` | TESTING_REQUIRED |
+| Schmelzer 1.500 Barren/min, gebündelt (online und offline) | `SmelterLogic.luau`, `SmelterService.luau`, `OfflineSimulation.luau` | TESTING_REQUIRED |
+| Spielstand-Umstellung v14 (Fortschritt im Level anteilig, Elevator-Stufe) | `DataSchema.luau` | TESTING_REQUIRED |
+| Studio-Testmodus `UseMockData` (frisches Profil nur im Speicher) | `DataService.luau` | TESTING_REQUIRED |
+
+Selbsttest: In Studio mit frischen Modul-Kopien geprüft: XP-Tabelle (L1 45, L120 7.647.031), Minen (Mine 09 Level 9 / $140), Luck-Stufen, Kistenpreise 1/192, Fahrzeug- und Drillwerte, Schmelzer (1 s = 25 Barren, 60 s = 1.500, volles Ausgangslager begrenzt). Umstellung an Testprofilen: Level 17 mit 3.967 XP → 1.433 von 13.122 (gleicher Anteil), Elevator 350 bleibt, 10.000 → 2.200, 1.500 → 1.200. Play mit Testmodus: frisches Profil v14 mit $80, Verkauf von 100 Coal = $200 und 100 XP (Level 2), Schmelzer schmilzt im Spiel gut 1.500 Barren pro Minute, keine Skriptfehler. Felix' echter Spielstand wurde NICHT geladen und nicht gesichert (Lesezugriff blockiert); er wird beim ersten normalen Play auf v14 umgestellt.
+
+## Balancing-Checkpoint – 2026-11-11: Fracht und Fortschritt
+
+- Status `TESTING_REQUIRED`. Felix wünscht größere Fahrzeugladungen und ein zügiges Spielgefühl. Die Zeiten sind Richtwerte. Claude übernimmt die Änderungen am Spielcode.
+- Aktuelle Arbeitskopie `outputs/balancing-20261111/Balancing_Neuentwurf.xlsx`. Box Truck 110.000, Tipper 145.000 und Grain 180.000 Fracht. Der Schmelzer ist für 1.500 Barren pro Minute vorgesehen.
+- Referenz mit vier kaufbaren Fahrzeugen erreicht Level 100 nach 26,17 aktiven Stunden. Die kürzeste Frachtreserve beträgt mit zwei Drills 28,19 und mit vier Drills 15,82 Minuten. Späte XP-Schwellen und Preise wurden abgestimmt, um lange Pausen zwischen Käufen zu verkürzen.
+- Zwölf Modellläufe samt Bilanzprüfung. MK22 und MK23 werden im Referenzlauf gemeinsam gekauft. Beide produzieren.
+- Studio-Testanleitung und Codeübergabe in `docs/BALANCING_UEBERGABE_CLAUDE.md`. Modellprüfung und Kapazitätsergebnisse in `TESTING/BALANCING_2026-11-11.md`. Ein bestehender Spielstand von Felix wird bei der Übernahme separat geprüft.
+- Checkpoint nach Revision und Übergabe. Der nächste Hauptschritt erfordert Felix' ausdrückliche Freigabe.
+
+## Balancing-Checkpoint – 2026-11-11: Prüfung vor der Spielübernahme
+
+- Status `TESTING_REQUIRED`. Excel und Referenzlauf stimmen überein. Die Veröffentlichung setzt einen angepassten und getesteten Studio-Stand voraus.
+- Wesentliche Abweichungen sind der Schmelzer mit maximal 60 statt modellierten 3.000 Barren/min, die für den Kauf gesperrten Lastzüge, der getrennte Rucksackverkauf und fehlende Anpassungen für Einzelwerte, Altprofile, Offline-Cash, Prestige und seltene Funde.
+- Gegenprobe mit kaufbaren Fahrzeugen und dem heutigen Schmelzerlimit ergibt 34,81 Stunden bis Level 100 sowie 10,25 Minuten minimale Frachtreserve. Das Modell verwendet weiterhin seinen vereinfachten Verkaufsablauf.
+- Befunde, Belege und Roblox-Studio-Testanleitung stehen in `TESTING/BALANCING_RELEASE_REVIEW_2026-11-11.md`. Diese Prüfung hat keine neue Spielumsetzung freigegeben.
+- Checkpoint nach der Prüfung. Der nächste Hauptschritt erfordert Felix' ausdrückliche Freigabe gemäß AGENTS.md.
+
+## Balancing-Checkpoint – 2026-11-09: Excel-Rechenentwurf
+
+- Status: TESTING_REQUIRED. Zielbild durch Felix am 2026-11-09 mit „weiter“ für die Excel-Arbeitskopie freigegeben; konkrete Zahlen noch nicht USER_APPROVED.
+- Arbeitskopie: `outputs/balancing-20261109/Balancing_Neuentwurf.xlsx`. Originaldatei auf dem Desktop und Spielcode bleiben unverändert.
+- Erhalten: zwölf ursprüngliche Blätter, numerische Ist-Spalten, fünf Filter mit lokalen Namen, eingefrorene Identitätsspalten sowie ursprüngliche Ansichts-/Berechnungsmetadaten. Neue Werte in Neu-Spalten; neue XP-/Kistenkurven ersetzen die entsprechenden Vorschauformeln.
+- Ergänzt: Ergebnisdiagramm, zehn berechnete Läufe, Kauf-/Verkaufsereignisse, Levelstände, Rezepte, Sonderfunde/Luck-/Offline-Upgrades, Kapazitätsvorschau, Eingabeabgleich und 200-Slot-Belastungstest. Berechnung mit Artifact Tool; Quell-Metadaten nach Export gezielt wiederhergestellt.
+- Verifiziert: Cash-/XP-Bilanzen aller zehn Läufe, Materialbilanzen der sechs vollständig protokollierten Läufe, streng steigende Drillleistungen, eindeutige IDs, Formelprüfung, Eingabeänderung und Wiederherstellung, visuelle Prüfung aller 24 Tabellenblätter. Keine nativen Excel- oder Studio-Spieltests behauptet.
+- Exakte endgültige Laufzeiten und Grenzen: `TESTING/BALANCING_2026-11-09.md`; Modellbasis reproduzierbar unter `tools/balancing_20261109/`.
+- Modellgrenzen: feste Kaufstrategien, angenommene Wege, typische statt beliebige Bestückung, Offline-Cash ohne XP, Level 100 als Endkriterium statt vollständiger Inhaltskauf. Neue Sonderfunde und optionale Upgrades sind Vorschläge, in den regulären Fortschrittsläufen nicht bereits gekauft/eingerechnet.
+- Offene Designentscheidung vor späterer Offline-Spielumsetzung: Q-037 (Rückkehrbonus versus untätiger Onlinebetrieb).
+- Studio-Test jetzt: neue Werte sind noch nicht im Spiel. Testanleitung für die spätere Umsetzung und sofort mögliche Excel-Prüfung siehe den genannten Testbericht.
+- STOPP nach Hauptschritt Rechenentwurf. Weitere Zahlenänderungen oder Spielumsetzung erst nach ausdrücklicher Freigabe dieses Ergebnisses.
+
+## Balancing-Checkpoint – 2026-11-08: neues Zielbild
+
+- Status: TESTING_REQUIRED. Richtungsfragen Q-033 bis Q-036 beantwortet; D-084 dokumentiert. Keine offene Grundfrage für den nächsten Rechenschritt.
+- Neues Zielbild: `docs/BALANCING_ZIELBILD_2026-11-08.md`. L10 ca. 30 Minuten, L50 ca. sechs Stunden, L100 ca. 30 aktive Stunden; 30 Drill-Stufen L10 bis ca. L90; früh ca. 15 Minuten ohne Verkaufszwang.
+- Neue gewünschte Regeln: acht Stunden Offline-Ansammlung bei zunächst ca. 30 % Cash-Leistung; bei Prestige normale Spitzhacken/Rucksäcke sofort nutzbar behalten, Fahrzeuge/Luck künftig resetten.
+- Geprüft: 30 vorgeschlagene Drill-Level eindeutig/aufsteigend; Kapazitätsbeispiele, Offline-Zeitäquivalente und 15%-Dauerrechnung unabhängig nachgerechnet; bestehender Simulator deckt Offline/Prestige/Schmelzer bislang nicht ab. Keine erreichten Levelzeiten oder Bindungswirkung behauptet.
+- Quellen: offizielle Grow-a-Garden-Spielbeschreibung und Roblox-Retention-Dokumentation, Recherche 2026-11-08; keine fremden internen Balancewerte unterstellt.
+- Excel-Datei und Spielcode unverändert. Nur Zielbild, Antworten, Spezifikationshinweise und Testplanung aktualisiert. Vorschläge bleiben TODO_BALANCE; konkrete Balance ist nicht USER_APPROVED.
+- Studio-Test: jetzt keiner nötig; nach Umsetzung Testanleitung im Zielbild verwenden (frisches Profil, frühe Meilensteine, 15-Minuten-Kapazitäten, Offline-Anspruch ohne Doppelgutschrift, Prestige).
+- STOPP nach Hauptschritt Zielbild. Nächster Schritt nach ausdrücklicher Freigabe: Excel-Arbeitskopie und vollständiges Rechenmodell einschließlich Kaufpfad, Verarbeitung, Offline- und Prestige-Szenarien.
+
+## Balancing-Checkpoint – 2026-11-02
+
+- Status: TESTING_REQUIRED. Bestandsaufnahme der externen `Balancing.xlsx` (Stand 0.61.1): 12 Blätter; bestehende Werte und Vorschauformeln wurden ausgelesen, noch nicht neu berechnet oder verändert.
+- Neuere Entscheidungen D-033 bis D-046 gegenüber dem ursprünglichen Prompt berücksichtigt: Equipment/Fahrzeuge bleiben, keine Transport-Worker, offline keine Löhne, Förderband ab Level 12, Ziel erstes Prestige etwa 50 aktive Stunden.
+- Offene Richtungsentscheidungen: Q-033 in `QUESTIONS/OPEN_QUESTIONS.md`.
+- Excel-Datei und Spielcode unverändert. Noch keine simulierten Zielzeiten oder abgeschlossenen Formeltests behauptet.
+- Studio-Test jetzt: keiner erforderlich, da keine Spieländerung. Nach Zahlenfreigabe frühe Verkäufe/Upgrades zeitlich messen, Produktionsengpässe und Verkaufsfahrten prüfen sowie Prestige und Offline-Rückkehr testen.
+- Checkpoint: Antworten und ausdrückliche Freigabe abwarten, bevor neue Balancewerte eingetragen werden.
+
 Statuswerte: `IMPLEMENTED` · `TESTING_REQUIRED` · `USER_APPROVED` · `BUGGED` · `BLOCKED` · `NOT_STARTED`
 
 ## Phasen

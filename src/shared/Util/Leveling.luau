@@ -6,20 +6,16 @@ local BalanceConfig = require(script.Parent.Parent.Config.BalanceConfig)
 
 local Leveling = {}
 
--- XP, die nötig ist, um von `level` auf `level + 1` zu kommen. Abschnittsweise Potenzkurve
--- (D-042): in jedem Abschnitt wächst der Bedarf mit (L / Abschnittsanfang)^Exponent.
+-- XP, die nötig ist, um von `level` auf `level + 1` zu kommen. Seit D-087 einzeln je Level aus
+-- BalanceConfig.Leveling.Table; nach der Tabelle wächst der letzte Wert um AfterTableGrowth je Level.
 function Leveling.xpRequired(level: number): number
 	local curve = BalanceConfig.Leveling
-	local value, from = curve.BaseXP, 1
-	for _, segment in curve.Segments do
-		local upTo = math.min(level, segment.UpTo)
-		value *= (upTo / from) ^ segment.Exponent
-		from = upTo
-		if level <= segment.UpTo then
-			break
-		end
+	local list = curve.Table
+	local n = math.max(1, math.floor(level))
+	if n <= #list then
+		return list[n]
 	end
-	return math.max(1, math.floor(value))
+	return math.max(1, math.floor(list[#list] * curve.AfterTableGrowth ^ (n - #list) + 0.5))
 end
 
 -- Addiert XP und verarbeitet Level-Ups. Kein hartes Maximallevel (Level 1000+ möglich).

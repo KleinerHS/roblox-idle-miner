@@ -26,9 +26,9 @@ local list: { ConveyorDefinition } = {
 		Id = "conveyor_mk1",
 		DisplayName = "Conveyor MK1",
 		Tier = 1,
-		RequiredLevel = 12, -- Q-024 (Felix, D-031)
-		Price = 15000, -- Q-024
-		Throughput = 120, -- Q-024
+		RequiredLevel = 12, -- Q-024 (Felix, D-031), bestätigt Balancing 2026-11-11 (D-087)
+		Price = 1200, -- Balancing 2026-11-11 (D-087)
+		Throughput = 6000, -- Balancing 2026-11-11 (D-087)
 		FrameColor = Color3.fromRGB(236, 182, 40),
 		PersistenceClass = "Progression",
 	},

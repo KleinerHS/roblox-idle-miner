@@ -1,5 +1,7 @@
 # 11 – ECONOMY AND BALANCE
 
+> Aktualisierung 2026-11-08, D-084: Alle Zahlen werden neu abgestimmt. Neue Zeit-Richtwerte L10 ca. 30 Minuten, L50 ca. sechs Stunden, L100 ca. 30 aktive Stunden; ca. 15 Minuten Materialautonomie und spätere seltene manuelle Geldfunde gemeinsam berechnen. Verbindliche Richtungsantworten, eigene Vorschläge und noch ausstehende Simulation klar getrennt in `BALANCING_ZIELBILD_2026-11-08.md`. Keine neuen Zahlen bereits in Code/Excel übernommen.
+
 ## 1. Zweck dieses Dokuments
 
 Dieses Dokument definiert das wirtschaftliche Grundmodell des Spiels.

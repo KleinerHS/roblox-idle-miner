@@ -1,5 +1,65 @@
 # Answered Questions
 
+## Q-033 – Vollständiges Neubalancing der Excel-Datei
+
+**Status:** ANSWERED
+**Date:** 2026-11-08
+**Decision:** D-084
+
+Felix' Antworten auf die zehn Richtungsfragen:
+
+1. Grow a Garden als Orientierung für schnellen frühen Fortschritt und langes Endgame.
+2. Alle Zahlen dürfen neu abgestimmt werden.
+3. Alte Zielzeiten verwerfen: L10 ungefähr 30 Minuten, L50 ungefähr sechs aktive Stunden; ab etwa L50–60 langsamer.
+4. 30 Drills von ungefähr L10, L12, L16 an bis ungefähr L90 verteilen.
+5. Früh ungefähr 15 Minuten ohne Verkaufszwang ermöglichen; Fahrzeug- und Lagerkapazität darauf abstimmen.
+6. Manuelles Mining später freiwillig, mit wirklich seltenen sehr wertvollen besonderen Erzen.
+7. Jede Ausrüstungsstufe soll wichtig sein; Vorgängerkauf als gewünschte Richtung.
+8. Zweiter Prestige-Durchlauf grob 15 % kürzer; nachfolgende Präzisierung Q-036 beachten.
+9. Lastzüge mitrechnen; größte vorhandene Modelle bleiben das Ende der Reihe.
+10. Offline-Fortschritt wichtig, künftig geschätzter Umsatz als Cash, zunächst ungefähr 30 %, später ausbaubar.
+
+Zusatz: Felix will seine Zahlen ausdrücklich als kritisch zu prüfende Richtwerte verstanden wissen, nicht als starre Regeln. Frühe Freude und lohnende Rückkehr sind das Ziel. Konkrete neue Zahlen bleiben Vorschläge bis Berechnung und Test.
+
+## Q-034 – Zielzeit für erstes Prestige
+
+**Status:** ANSWERED
+**Date:** 2026-11-08
+**Decision:** D-084
+
+Frage: etwa 20, 30 oder 50 aktive Stunden bis L100, bei L10 nach ca. 30 Minuten und L50 nach ca. sechs Stunden?
+
+Antwort: „Etwa 30 Stunden: ab Level 60 spürbar langsamer (Empfehlung)“. Ausgangspunkt für den ersten Durchlauf ohne Offline-Cash und außergewöhnliche Glücksfunde.
+
+## Q-035 – Offline-Zeitlimit bei 30 %
+
+**Status:** ANSWERED
+**Date:** 2026-11-08
+**Decision:** D-084
+
+Frage: 1, 8 oder 12 Stunden Offline-Ansammlung bei zunächst 30 % Leistung?
+
+Antwort: „8 Stunden bei zunächst 30 % (Empfehlung)“. Ersetzt im Zielmodell das alte einstündige Zeitlimit. Effizienz- und Zeit-Upgrades bleiben rechnerisch auszuarbeiten.
+
+## Q-036 – Prestige-Besitz und sofortige Nutzung
+
+**Status:** ANSWERED
+**Date:** 2026-11-08
+**Decision:** D-084
+
+Erste Antwort: „pickaxe und rucksack behalten rest weg“. Als neue Resetregel für normale Spielausrüstung dokumentiert: Fahrzeuge und Luck-Upgrades werden künftig ebenfalls zurückgesetzt.
+
+Nachfrage zur Nutzung der behaltenen Gegenstände: „Sofort nutzbar; stärker beschleunigter Anfang ist erwünscht“. Keine erneute Mining-Level-Sperre für behaltene Spitzhacken/Rucksäcke. Ca. 15 % kürzere Gesamtdauer bleibt ein weicher Richtwert, keine Vorgabe für künstliche Wartezeiten.
+
+## Q-028 – Frühere einzelne Fahrzeugwerte abgelöst
+
+**Status:** ANSWERED
+**Date:** 2026-11-08
+**Decision:** D-084
+
+Die alte Frage zu L25/$1M/12.000 und L45/$78M/25.000 wird durch das vollständige Neubalancing aller sechs vorhandenen Fahrzeugtypen abgelöst, nicht als Bestätigung dieser Einzelwerte behandelt. Kapazitäten, Preise und Level neu berechnen; Lastzüge separat als noch nicht für den Kauf freigegebene Inhalte kennzeichnen.
+
+
 ## Q-001 – Hallenhülle beim Start
 
 **Status:** ANSWERED

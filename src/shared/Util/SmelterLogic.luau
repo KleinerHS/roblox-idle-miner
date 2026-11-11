@@ -66,6 +66,35 @@ function SmelterLogic.Status(state: Types.SmelterState): SmelterStatus
 	return if sum(state.Input) > 0 then "WaitingForInput" else "Idle"
 end
 
+-- Verarbeitet `seconds` Schmelzzeit gebündelt (D-087: 0,04 s je Barren = 1.500 Barren pro Minute).
+-- Begrenzt durch Erz im Trichter und freien Platz im Ausgangslager, Rezeptwahl wie PickRecipe.
+-- Ändert `state` und gibt die gefertigten Barren je ID sowie die übrige Zeit zurück (0, wenn der
+-- Ofen nichts mehr tun kann – wie bisher verfällt angefangene Zeit beim Stillstand).
+function SmelterLogic.Process(state: Types.SmelterState, seconds: number): ({ [string]: number }, number)
+	local made: { [string]: number } = {}
+	local per = BalanceConfig.Smelter.SecondsPerBar
+	-- kleine Toleranz: 1 / 0,04 ergibt im Gleitkomma 24,999…
+	local budget = math.floor(seconds / per + 1e-6)
+	local rest = math.max(0, seconds - budget * per)
+	while budget > 0 do
+		local recipe = SmelterLogic.PickRecipe(state)
+		if not recipe then
+			return made, 0
+		end
+		local free = CrateLogic.freeFor(state.Output, BalanceConfig.Smelter.OutputCrates, recipe.BarId)
+		local n = math.min(budget, math.floor((state.Input[recipe.OreId] or 0) / recipe.OrePerBar), free)
+		if n <= 0 then
+			return made, 0
+		end
+		local left = (state.Input[recipe.OreId] or 0) - n * recipe.OrePerBar
+		state.Input[recipe.OreId] = if left > 0 then left else nil
+		state.Output[recipe.BarId] = (state.Output[recipe.BarId] or 0) + n
+		made[recipe.BarId] = (made[recipe.BarId] or 0) + n
+		budget -= n
+	end
+	return made, rest
+end
+
 -- Kann dieses Erz überhaupt geschmolzen werden (aktives Rezept)?
 function SmelterLogic.IsSmeltable(oreId: string): boolean
 	local recipe = Recipes.ForOre(oreId)

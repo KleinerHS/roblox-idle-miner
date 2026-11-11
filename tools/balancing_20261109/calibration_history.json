@@ -1,0 +1,53 @@
+[
+  {
+    "iteration": 1,
+    "active_minutes": 1950.667,
+    "milestones": {
+      "first_sale": 2.0,
+      "first_upgrade": 2.0,
+      "first_worker": 9.667,
+      "first_drill": 29.167,
+      "level_10": 29.167,
+      "level_25": 123.167,
+      "level_50": 377.5,
+      "level_60": 541.167,
+      "level_75": 920.667,
+      "level_90": 1444.333,
+      "level_100": 1950.667
+    }
+  },
+  {
+    "iteration": 2,
+    "active_minutes": 1945.333,
+    "milestones": {
+      "first_sale": 2.0,
+      "first_upgrade": 2.0,
+      "first_worker": 9.667,
+      "first_drill": 33.5,
+      "level_10": 33.5,
+      "level_25": 118.0,
+      "level_50": 372.167,
+      "level_60": 552.333,
+      "level_75": 915.333,
+      "level_90": 1455.333,
+      "level_100": 1945.333
+    }
+  },
+  {
+    "iteration": 3,
+    "active_minutes": 1892.333,
+    "milestones": {
+      "first_sale": 2.0,
+      "first_upgrade": 2.0,
+      "first_worker": 9.667,
+      "first_drill": 29.167,
+      "level_10": 29.167,
+      "level_25": 123.167,
+      "level_50": 368.167,
+      "level_60": 515.167,
+      "level_75": 878.167,
+      "level_90": 1386.0,
+      "level_100": 1892.333
+    }
+  }
+]

@@ -50,8 +50,9 @@ function RareDropLogic.NextLuck(level: number): (number?, number?)
 	if level >= luck.MaxLevel then
 		return nil, nil
 	end
+	-- Preis und Mindest-Level je Stufe einzeln (D-087)
 	local n = level + 1
-	return math.floor(luck.BasePrice * luck.PriceGrowth ^ (n - 1) + 0.5), luck.RequiredLevelStep * n
+	return luck.Prices[n], luck.RequiredLevels[n]
 end
 
 return table.freeze(RareDropLogic)

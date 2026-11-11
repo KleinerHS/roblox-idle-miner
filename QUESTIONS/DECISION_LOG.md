@@ -1,5 +1,49 @@
 # Decision Log
 
+## D-087 – Neubalancing: Werte aus Felix' Balancing-Datei im Spiel
+
+**Source:** Felix, 2026-11-11 („hier sind die neuen Werte, ich habe ein paar Regeln geändert, die wir besprochen haben; falls dir Probleme auffallen, füg sie trotzdem ein und frag mich danach“). Datei `Balancing_Neuentwurf.xlsx` (identisch mit `outputs/balancing-20261111/`, Kopie unter `BALANCING/Balancing_Neuentwurf_2026-11-11.xlsx`), Einzelwerte aus `tools/balancing_20261109/definitions.json` und `model.json`.
+**Decision:** Hauptschritt 1 von mehreren. Alle Zahlen der bestehenden Systeme sind übernommen, dazu die Mechanik, die sie brauchen:
+- **Werte:** Startgeld 80, alle 50 Erze und 22 Barren mit festem Wert und XP (mit Nachkommastellen), 100 Minen mit Einzel-Level und -Preis, 25 Spitzhacken, 22 Rucksäcke, 30 Drills, 6 Fahrzeuge (Box Truck 110.000, Tipper 145.000, Grain 180.000 Fracht; Lastzüge weiter gesperrt bis zum Fahrtest), Bauschritte, Büro-Upgrade (jetzt Level 25 / $21.000 statt 15 / $35.000), Förderband ($1.200, 6.000/min), Worker, Elevator (Start 60, 10 neue Stufen bis 2.200), 192 Kistenpreise, Luck-Preise und -Level je Stufe, Drill-Level, Prestige-Geldbonus 5 % (Tempo-Bonus 0). Der Spätspiel-Preisaufschlag ist aus (alle Preise sind Endpreise).
+- **XP-Tabelle:** Bedarf je Level 1–120 einzeln. Ab 121 bleibt der letzte Wert gleich (TODO_BALANCE, Modell endet bei 120).
+- **Schmelzer:** 0,04 s je Barren = 1.500 Barren pro Minute. Server und Offline-Rechnung verarbeiten gebündelt (`SmelterLogic.Process`), begrenzt durch Erz im Trichter und Platz im Ausgangslager.
+- **Verkauf:** Werte mit Nachkommastellen; der Geld-Erlös je Verkauf wird abgerundet, XP bleiben genau.
+- **Spielstände (Datenschema v14):** Level bleibt, der Fortschritt im aktuellen Level wird anteilig auf den neuen Bedarf umgerechnet. Elevator-Kapazität = höchste neue Stufe, die nicht größer als die alte ist (z. B. 350 bleibt 350, 10.000 wird 2.200). Gekaufte Gegenstände, Geld und Minen bleiben.
+- **Testmodus:** In Studio mit Attribut `UseMockData = true` an ServerStorage lädt das Spiel ein frisches Profil nur im Speicher, echte Spielstände werden weder gelesen noch geschrieben.
+- **Noch nicht umgesetzt (eigene Hauptschritte):** Offline-Geld 30 % für bis zu 8 h (Q-037 offen; Offline bleibt vorerst 1 h Materialmodell), neue Prestige-Regel (nur Spitzhacken/Rucksäcke bleiben), Vorgängerkauf im Shop, Verladen von schmelzbarem Roherz bei Rückstau, 150 Sonderfunde, Offline-Upgrades.
+**Affected systems:** BalanceConfig, Pickaxes, Backpacks, Drills, Vehicles, BuildSteps, OfficeUpgrades, Conveyors, Mines, Leveling, RareDropLogic, SmelterLogic, SmelterService, OfflineSimulation, DataSchema (v14), DataService (Testmodus)
+
+## D-086 – Größere Fahrzeugfracht und kürzere späte Fortschrittsabschnitte
+
+Felix hat am 11.11.2026 größere Fahrzeugladungen beauftragt. Die Zeiten dürfen abweichen, und das Spiel soll sich zügig anfühlen. Er hat einen bestehenden Spielstand. Die Spielumsetzung übernimmt Claude.
+
+Die Revision rechnet die Standardprofile mit den vier kaufbaren Fahrzeugen und erhöht die Fracht des Box Trucks auf 110.000. Tipper und Grain erhalten 145.000 bzw. 180.000. Vorgeschlagen sind 1.500 Barren pro Minute und niedrigere späte XP-Schwellen sowie Minen- und Drill-Preise. Die konkreten Modellwerte sind in der Arbeitskopie vom 11.11. überprüfbar. Status `TESTING_REQUIRED` bis zu den Studio-Tests.
+
+
+## D-085 – Zielbild für Excel-Rechenentwurf freigegeben
+
+**Quelle:** Felix, 2026-11-09: „weiter“ nach dem Checkpoint des Balancing-Zielbilds.
+**Entscheidung:** Eine neue Excel-Arbeitskopie mit vollständigem Rechenentwurf, Kauf-/Bestandsmodell, Offline-/Prestige-Szenarien und Prüfbericht erstellen. Das ist keine Freigabe der noch zu berechnenden Zahlen oder einer Übernahme in den Spielcode. Zielbild D-084 bleibt die Richtung; numerische Ergebnisse und neue Fund-/Upgrade-Definitionen bleiben TODO_BALANCE/VORSCHLAG bzw. TESTING_REQUIRED.
+
+
+## D-084 – Neubalancing, Rückkehrbonus und neue Prestige-Richtung
+
+**Quelle:** Felix, Chat vom 2026-11-08; Q-033 bis Q-036.
+**Entscheidung:** Vollständiges Neubalancing aller Zahlen erlaubt. Zahlen aus dem Gespräch sind zu prüfende Richtwerte, keine starren Endwerte. Ausgangspunkte: L10 nach ca. 30 aktiven Minuten, L50 nach ca. sechs Stunden, L100/erstes Prestige nach ca. 30 Stunden; ab ungefähr L50–60 langsamer. Ersetzt alte Zielzeiten aus D-042/D-046.
+
+- 30 Drill-Typen ungefähr von L10/L12/L16 bis L90 verteilen; konkrete Zwischenlevel noch Vorschlag. Ersetzt die vorläufige L100-Häufung aus D-075.
+- Rund 15 Minuten ohne erzwungenen Verkauf sollen früh möglich sein; Rucksack, Lager, Fahrzeug, Produktion und Transporte gemeinsam neu abstimmen. Freiwilliger früher Verkauf bleibt möglich.
+- Jede Ausrüstungsstufe soll einen praktischen Nutzen haben; Vorgängerkauf als gewünschte Richtung, konkrete Freischaltkette noch Entwurf.
+- Manuelles Mining später freiwillige Ergänzung mit zusätzlichen seltenen, sehr wertvollen Funden. Konkrete Erze/Chancen/Preise noch TODO_BALANCE.
+- Alle sechs vorhandenen Fahrzeugtypen einschließlich Lastzügen berechnen. Keine weiteren größeren Modelle einplanen. Bestehende Kaufsperre bis Fahrtest bleibt davon unberührt. Q-028 wird durch Gesamtbalancing abgelöst.
+- Neues Offline-Zielmodell: Cash-Gutschrift aus belastbarer automatischer Firmenleistung, zunächst ca. 30 %, maximal acht Stunden Ansammlung, später ausbaubar. Ersetzt ausdrücklich das einstündige Materialmodell aus docs/00 §24/docs/14 im künftigen Balancing. Bestehende Implementierung ist noch nicht umgestellt. Cash-only ohne Offline-XP und genaue Behandlung von Kapazitäten sind Empfehlungen des Zielbilds, nicht bereits getestete Spielregeln.
+- Neue Prestige-Regel für normale Ausrüstung: nur Spitzhacken und Rucksäcke bleiben, sofort nutzbar. Fahrzeuge und Luck-Upgrades werden künftig ebenfalls zurückgesetzt; Maschinen/Firmenausbau bleiben wie bisher rücksetzbar. Ändert D-012/D-033/D-045. Firmenidentität, Einstellungen, Statistiken, Prestige-Zähler/-Boni und bezahlte Entitlements werden als Metadaten bzw. Rechte weiterhin getrennt von normaler Spielausrüstung behandelt.
+- Zweiter Durchlauf grob 15 % kürzer als erster; Felix akzeptiert nach Nachfrage einen stärker beschleunigten Anfang. Daraus keinen pauschalen +15%-Bonus oder künstliche Wartezeiten ableiten.
+
+**Betroffene Systeme:** Economy, XP-Kurve, sämtliche Kauf-/Kapazitätsdefinitionen, Rare Drops/Luck, Offline, Prestige, spätere Kaufvoraussetzungen.
+**Entwurfsstand:** `docs/BALANCING_ZIELBILD_2026-11-08.md`. Status des Rechen-/Implementierungsergebnisses: TESTING_REQUIRED. Richtungsantworten bestätigt; konkrete Zahlen, Excel-Modell und Code noch nicht freigegeben oder umgesetzt. Nach diesem Zielbild-Checkpoint ausdrückliche Freigabe abwarten.
+
+
 IDs fortlaufend (D-001 …). Jede Entscheidung verweist auf ihre Quellfrage und die betroffenen Systeme.
 
 ## D-001 – Projektstruktur mit Rojo

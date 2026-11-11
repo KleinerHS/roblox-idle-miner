@@ -1,5 +1,13 @@
 # Test Plan
 
+## Excel-Balancing-Rechenentwurf – 2026-11-09
+
+Status: TESTING_REQUIRED. Freigabe des Zielbilds durch „weiter“ erlaubt diese Arbeitskopie, keine Spielumstellung. Ergebnisse, Modellgrenzen, sofortige Excel-Prüfschritte und spätere Studio-Testanleitung: `TESTING/BALANCING_2026-11-09.md`. Originaldatei und Spielcode unverändert.
+
+## Neues Balancing-Zielbild – 2026-11-08
+
+Status: TESTING_REQUIRED. Design-Checkpoint, noch keine neuen Zahlen oder Regeln im Spiel. Studio-Tests jetzt nicht erforderlich. Die spätere Testanleitung und messbaren Zeit-/Kapazitätsziele stehen in `docs/BALANCING_ZIELBILD_2026-11-08.md`, Abschnitt „Studio-Testanleitung für die spätere Umsetzung“. Zusätzlich Offline-Cash gegen Online-Nettoertrag und untätigen Onlinebetrieb vergleichen; zweiter Prestige-Durchlauf mit sofort nutzbaren behaltenen Spitzhacken/Rucksäcken und zurückgesetzten Fahrzeugen/Luck. Erwartungswerte für seltene Funde nicht mit garantierten Wartezeiten verwechseln. Kein USER_APPROVED ohne Felix' Bestätigung.
+
 Testebenen und Pflichttests: `docs/18_TESTING_AND_QUALITY.md`.
 
 ## Setup

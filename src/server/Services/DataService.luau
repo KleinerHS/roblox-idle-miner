@@ -14,6 +14,8 @@
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local ServerStorage = game:GetService("ServerStorage")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local GameConfig = require(Shared.Config.GameConfig)
@@ -47,7 +49,11 @@ type Profile = {
 	OnSave: { Connect: (self: any, () -> ()) -> any },
 }
 
-local store = (ProfileStore :: any).New(GameConfig.Data.StoreName, DataSchema.getTemplate())
+local realStore = (ProfileStore :: any).New(GameConfig.Data.StoreName, DataSchema.getTemplate())
+-- Testmodus nur in Studio: Attribut "UseMockData" = true an ServerStorage → Profile nur im Speicher
+-- (frisches Profil, echte Spielstände werden weder gelesen noch geschrieben)
+local useMock = RunService:IsStudio() and ServerStorage:GetAttribute("UseMockData") == true
+local store = if useMock then realStore.Mock else realStore
 local profiles: { [Player]: Profile } = {}
 local snapshotQueued: { [Player]: boolean } = {}
 
@@ -209,7 +215,9 @@ function DataService.Start()
 		while api.DataStoreState == "NotReady" do
 			task.wait(0.5)
 		end
-		if api.DataStoreState == "Access" then
+		if useMock then
+			Log.warn(TAG, "Testmodus UseMockData: frisches Profil nur im Speicher, echte Spielstände bleiben unberührt")
+		elseif api.DataStoreState == "Access" then
 			Log.info(TAG, "DataStore verbunden – Spielstände werden gespeichert")
 		else
 			Log.warn(

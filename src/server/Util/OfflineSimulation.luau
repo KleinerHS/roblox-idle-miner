@@ -265,21 +265,12 @@ function OfflineSimulation.run(data: Types.PlayerData, seconds: number): Summary
 				accToSmelter = math.min(a - moved, 1)
 			end
 
-			-- Schmelzer: ein Barren je Rezeptdauer, Rezeptwahl je Barren
+			-- Schmelzer: gebündelt wie online (SmelterLogic.Process, D-087)
 			accSmelt += STEP_SECONDS
-			while true do
-				if SmelterLogic.Status(data.Smelter) ~= "Running" then
-					accSmelt = 0
-					break
-				end
-				local recipe = SmelterLogic.PickRecipe(data.Smelter)
-				if not recipe or accSmelt < recipe.Seconds then
-					break
-				end
-				accSmelt -= recipe.Seconds
-				take(data.Smelter.Input, recipe.OreId, recipe.OrePerBar)
-				data.Smelter.Output[recipe.BarId] = (data.Smelter.Output[recipe.BarId] or 0) + 1
-				add(summary.Smelted, recipe.BarId, 1)
+			local made
+			made, accSmelt = SmelterLogic.Process(data.Smelter, accSmelt)
+			for barId, n in made do
+				add(summary.Smelted, barId, n)
 			end
 
 			-- Förderband Schmelzer → Lager

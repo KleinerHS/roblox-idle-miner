@@ -1,5 +1,5 @@
 --!strict
--- Datenschema v13: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
+-- Datenschema v14: zentrales Default-Profil und Migrationen (docs/14 §3, §20).
 -- Regeln:
 --  * Defaults gibt es nur hier.
 --  * Jede Strukturänderung erhöht CURRENT_VERSION und bekommt eine Migration
@@ -14,12 +14,35 @@ local Pickaxes = require(Shared.Definitions.Pickaxes)
 local Backpacks = require(Shared.Definitions.Backpacks)
 local Mines = require(Shared.Definitions.Mines)
 local Types = require(Shared.Types)
+local Leveling = require(Shared.Util.Leveling)
 
-local CURRENT_VERSION = 13
+local CURRENT_VERSION = 14
 
 local DataSchema = {
 	CurrentVersion = CURRENT_VERSION,
 }
+
+-- XP-Kurve bis D-087 (abschnittsweise Potenzkurve, D-042). Nur für die Migration v13 → v14,
+-- um den Fortschritt im aktuellen Level anteilig zu übernehmen.
+local OLD_XP_SEGMENTS = {
+	{ UpTo = 10, Exponent = 1.5 },
+	{ UpTo = 25, Exponent = 4.6 },
+	{ UpTo = 50, Exponent = 6.9 },
+	{ UpTo = 100, Exponent = 0 },
+	{ UpTo = math.huge, Exponent = 2 },
+}
+local function oldXPRequired(level: number): number
+	local value, from = 100, 1
+	for _, segment in OLD_XP_SEGMENTS do
+		local upTo = math.min(level, segment.UpTo)
+		value *= (upTo / from) ^ segment.Exponent
+		from = upTo
+		if level <= segment.UpTo then
+			break
+		end
+	end
+	return math.max(1, math.floor(value))
+end
 
 -- Vorlage für neue Spieler. Wird auch genutzt, um fehlende Felder alter Profile zu
 -- ergänzen (Reconcile), deshalb keine zeitabhängigen Werte hier.
@@ -218,6 +241,29 @@ local MIGRATIONS: { [number]: (data: { [string]: any }) -> () } = {
 		eq.OwnedPickaxes = owned
 		if typeof(eq.EquippedPickaxe) == "string" then
 			eq.EquippedPickaxe = Pickaxes.LegacyIds[eq.EquippedPickaxe] or eq.EquippedPickaxe
+		end
+	end,
+	-- v13 → v14: Neubalancing (D-087). Das erreichte Level bleibt, der Fortschritt im Level wird
+	-- anteilig auf den neuen XP-Bedarf umgerechnet (sonst würde alte Rest-XP mehrere Level
+	-- auf einmal freischalten). Die Elevator-Kapazität wird auf die höchste neue Stufe gesetzt,
+	-- die nicht größer als die bisherige ist (gekaufte Stufen bleiben, nichts wird verschenkt).
+	[13] = function(data)
+		local level = if typeof(data.MiningLevel) == "number" then math.max(1, math.floor(data.MiningLevel)) else 1
+		local xp = if typeof(data.MiningXP) == "number" then math.max(0, data.MiningXP) else 0
+		local fraction = math.clamp(xp / oldXPRequired(level), 0, 1)
+		local newRequired = Leveling.xpRequired(level)
+		data.MiningXP = math.min(math.floor(fraction * newRequired), newRequired - 1)
+
+		local production = data.Production
+		if typeof(production) == "table" and typeof(production.ElevatorCapacity) == "number" then
+			local old = production.ElevatorCapacity
+			local best = BalanceConfig.Elevator.StartCapacity
+			for _, tier in BalanceConfig.Elevator.Upgrades do
+				if tier.Capacity <= old and tier.Capacity > best then
+					best = tier.Capacity
+				end
+			end
+			production.ElevatorCapacity = best
 		end
 	end,
 	-- v12 → v13: neue Rucksack-Stufen (D-074), alte IDs auf die Stufe mit denselben Werten

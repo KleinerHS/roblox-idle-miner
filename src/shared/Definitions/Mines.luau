@@ -17,6 +17,11 @@ export type MineDefinition = {
 }
 
 local function unlockCost(number: number, oreSell: number): number
+	-- Seit D-087 Einzelpreis je Mine; die Formeln sind nur noch Rückfall
+	local fixed = BalanceConfig.MineUnlocks[string.format("mine_%03d", number)]
+	if fixed and fixed.Price then
+		return fixed.Price
+	end
 	local price = BalanceConfig.MinePrice
 	if number < price.FirstPaidMine then
 		return 0

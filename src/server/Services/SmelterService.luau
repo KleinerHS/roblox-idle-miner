@@ -93,22 +93,12 @@ local function tickPlayer(player: Player)
 		updateVisual(player)
 		return
 	end
+	-- Sekundentakt, Barren gebündelt (D-087: bis zu 1.500 Barren pro Minute)
 	local t = (progress[player] or 0) + 1
-	if t >= recipe.Seconds then
-		t = 0
-		local oreId, barId, need = recipe.OreId, recipe.BarId, recipe.OrePerBar
-		DataService.MutateQuiet(player, function(d)
-			local input = d.Smelter.Input
-			if (input[oreId] or 0) < need then
-				return
-			end
-			input[oreId] -= need
-			if input[oreId] <= 0 then
-				input[oreId] = nil
-			end
-			d.Smelter.Output[barId] = (d.Smelter.Output[barId] or 0) + 1
-		end)
-	end
+	DataService.MutateQuiet(player, function(d)
+		local _, rest = SmelterLogic.Process(d.Smelter, t)
+		t = rest
+	end)
 	progress[player] = t
 	updateVisual(player)
 end
