@@ -73,6 +73,8 @@ local LayoutConfig = {
 		build_smelter = Vector2.new(-75, -60),
 		-- Büro-Upgrade (D-082): vor der Hütte rechts neben dem Eingang
 		office_premium = Vector2.new(129, 75),
+		-- Deko-Pakete (D-091): auf dem Vorplatz links neben der Zufahrt
+		decor = Vector2.new(2, -110),
 	} :: { [string]: Vector2 },
 
 	-- Büro-Ausbaustufen (D-082): Mitte der Grundfläche (X/Z, lokal zur Plotmitte), Eingang nach −Z

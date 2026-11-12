@@ -17,6 +17,7 @@ local Shared = ReplicatedStorage:WaitForChild("Shared")
 local LayoutConfig = require(Shared.Config.LayoutConfig)
 local BuildSteps = require(Shared.Definitions.BuildSteps)
 local OfficeUpgrades = require(Shared.Definitions.OfficeUpgrades)
+local Decor = require(Shared.Definitions.Decor)
 local CompanyIdentity = require(Shared.Definitions.CompanyIdentity)
 local Types = require(Shared.Types)
 local Result = require(Shared.Util.Result)
@@ -25,6 +26,7 @@ local NumberFormat = require(Shared.Util.NumberFormat)
 local Log = require(Shared.Util.Log)
 
 local PlotBuilder = require(script.Parent.Parent.World.PlotBuilder)
+local PlotDecor = require(script.Parent.Parent.World.PlotDecor)
 local BuildTemplates = require(script.Parent.Parent.World.BuildTemplates)
 local DataService = require(script.Parent.DataService)
 local PlotService = require(script.Parent.PlotService)
@@ -51,6 +53,9 @@ type PlotState = {
 	officeUpgrade: string?,
 	upgradeButton: BasePart?,
 	upgradeButtonId: string?,
+	-- Kaufknopf des nächsten Deko-Pakets (D-091)
+	decorButton: BasePart?,
+	decorButtonId: string?,
 }
 
 -- Was ein Kaufknopf anzeigt (BuildStep oder Büro-Stufe)
@@ -156,10 +161,11 @@ end
 
 local tryPurchase: (player: Player, stepId: string) -> ()
 local tryUpgrade: (player: Player, upgradeId: string) -> ()
+local tryDecor: (player: Player, decorId: string) -> ()
 
 -- Bodenknopf an LayoutConfig.BuildButtons[id]; Betreten durch den Besitzer ruft onBuy(id) auf
-local function createButton(state: PlotState, player: Player, id: string, onBuy: (Player, string) -> ()): BasePart
-	local position = LayoutConfig.BuildButtons[id]
+local function createButton(state: PlotState, player: Player, id: string, onBuy: (Player, string) -> (), positionKey: string?): BasePart
+	local position = LayoutConfig.BuildButtons[positionKey or id]
 	assert(position, `Keine Button-Position für {id} in LayoutConfig.BuildButtons`)
 	local size = LayoutConfig.ButtonSize
 	local button = Instance.new("Part")
@@ -232,6 +238,25 @@ local function updateUpgradeButton(player: Player, state: PlotState, data: Types
 			state.upgradeButtonId = wantedId
 		end
 		makeButtonLabel(state.upgradeButton :: BasePart, nextUpgrade, data, "UPGRADE")
+	end
+end
+
+-- Knopf für das nächste Deko-Paket (D-091): erst wenn die Hallenwände stehen
+local function updateDecorButton(player: Player, state: PlotState, data: Types.PlayerData)
+	local nextDecor = Decor.GetNext(data.Buildings)
+	local visible = nextDecor ~= nil and data.Buildings[Decor.Requires] == true
+	local wantedId = if visible and nextDecor then nextDecor.Id else nil
+	if state.decorButton and state.decorButtonId ~= wantedId then
+		state.decorButton:Destroy()
+		state.decorButton = nil
+		state.decorButtonId = nil
+	end
+	if wantedId and nextDecor then
+		if not state.decorButton then
+			state.decorButton = createButton(state, player, wantedId, tryDecor, "decor")
+			state.decorButtonId = wantedId
+		end
+		makeButtonLabel(state.decorButton :: BasePart, { DisplayName = nextDecor.DisplayName, Price = nextDecor.Price, RequiredLevel = 1 }, data, "DECOR:")
 	end
 end
 
@@ -344,6 +369,8 @@ local function render(player: Player)
 
 	updateButton(player, s, data)
 	updateUpgradeButton(player, s, data)
+	updateDecorButton(player, s, data)
+	PlotDecor.apply(plot, data.Buildings)
 	updateSign(s, player, data)
 	updateSpawn(s)
 end
@@ -364,6 +391,11 @@ local function clear(player: Player)
 	if state.upgradeButton then
 		state.upgradeButton:Destroy()
 	end
+	if state.decorButton then
+		state.decorButton:Destroy()
+	end
+	-- gekaufte Deko verschwindet mit dem Spieler
+	PlotDecor.apply(state.plot, {})
 end
 
 tryPurchase = function(player: Player, stepId: string)
@@ -434,9 +466,52 @@ tryUpgrade = function(player: Player, upgradeId: string)
 	notify(player, "Success", "BUILD_PURCHASED", { Name = def.DisplayName })
 end
 
+tryDecor = function(player: Player, decorId: string)
+	local data = DataService.Get(player)
+	local def = Decor.ById[decorId]
+	if not data or not def then
+		return
+	end
+	local nextDecor = Decor.GetNext(data.Buildings)
+	local code: string? = nil
+	if data.Buildings[def.Id] then
+		code = Result.Codes.ALREADY_DONE
+	elseif not nextDecor or nextDecor.Id ~= def.Id or not data.Buildings[Decor.Requires] then
+		code = Result.Codes.NOT_AVAILABLE
+	elseif data.Cash < def.Price then
+		code = Result.Codes.NOT_ENOUGH_MONEY
+	end
+	if code then
+		if code ~= Result.Codes.ALREADY_DONE then
+			notify(player, "Warning", code, { Price = def.Price })
+		end
+		return
+	end
+	local applied = DataService.Mutate(player, function(d)
+		d.Cash -= def.Price
+		d.Buildings[def.Id] = true
+	end)
+	if not applied then
+		return
+	end
+	Log.debug(TAG, `{player.Name} kauft {def.Id} für {def.Price}`)
+	render(player)
+	DataService.RequestSave(player)
+	notify(player, "Success", "BUILD_PURCHASED", { Name = def.DisplayName })
+end
+
 function BuildingService.Init() end
 
 function BuildingService.Start()
+	-- Deko gibt es nur durch Kauf (D-091): auf allen freien Plots zuerst versteckt
+	local plotsFolder = workspace:FindFirstChild("Plots")
+	if plotsFolder then
+		for _, plot in plotsFolder:GetChildren() do
+			if plot:IsA("Model") then
+				PlotDecor.apply(plot, {})
+			end
+		end
+	end
 	PlotService.PlotAssigned:Connect(function(player)
 		render(player)
 	end)
@@ -453,6 +528,7 @@ function BuildingService.Start()
 		if state and data then
 			updateButton(player, state, data)
 			updateUpgradeButton(player, state, data)
+			updateDecorButton(player, state, data)
 		end
 	end)
 	for _, player in Players:GetPlayers() do

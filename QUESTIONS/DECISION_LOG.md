@@ -1,5 +1,11 @@
 # Decision Log
 
+## D-091 – Deko rund um die Halle nur durch Kauf
+
+**Source:** Felix, 2026-11-12 („die Deko um die Halle herum soll nur durch Kaufen erhältlich sein, man kann sie kaufen ab dem Zeitpunkt, wo die Hallenwände stehen; pass die Preise steigend, aber moderat an“), Vorschlag mit 10 Paketen von Felix mit „passt“ bestätigt.
+**Decision:** Zäune, Vorplatz, Wege, Schotter und Seitenzufahrt gehören immer zum Grundstück. Die übrige Außen-Deko kommt in 10 Paketen, die der Reihe nach über einen Kaufknopf links auf dem Vorplatz gekauft werden („DECOR: …“), sobald die Hallenwände stehen: Blumenbeete $150, Laternen $250, Tannen vorne $400, Tannenreihe $600, Hof-Lager $900, Seiten-Lager $1.300, Felsen $1.900, Pförtnerhäuschen $2.700, Gabelstapler $3.800, Container und Klimageräte $5.400. Besitz wie ein Gebäude (`Buildings.decor_*`), Prestige setzt ihn zurück. Nicht gekaufte Deko liegt in `ServerStorage.DecorStash` und ist für Spieler unsichtbar.
+**Affected systems:** Decor (neu), PlotDecor (neu), BuildingService, LayoutConfig (BuildButtons.decor)
+
 ## D-090 – Plot-Claim an der Straße, kostenloses Starterauto, Start vor dem Autohaus
 
 **Source:** Felix, 2026-11-12 („der Spawn soll in der Mitte vor dem Autohaus sein, wo man automatisch vor dem Starterauto spawnt; die Garage hat man auch von Anfang an, wenn man den Hallenboden kauft“; Antworten: Starterauto kostenlos; vor dem Hallenboden direkt an der Straße ein Claim-Knopf, mit dem man das Grundstück auf sich zuweist; Spawn vor dem Autohaus nur beim ersten Mal, nach dem Claim in der Blechhütte vor dem Bett)

@@ -1,5 +1,13 @@
 # Implementation Status
 
+## Version 0.64.1 (2026-11-12) – Deko zum Kaufen (D-091)
+
+| System | Dateien | Status |
+|---|---|---|
+| 10 Deko-Pakete, Kaufknopf auf dem Vorplatz ab Hallenwänden, Preise $150–$5.400 | `Decor.luau` (neu), `PlotDecor.luau` (neu), `BuildingService.luau`, `LayoutConfig.luau` | TESTING_REQUIRED |
+
+Selbsttest (Play, Testprofil): Auf freien Plots ist die Deko versteckt (58 Teile), Zaun/Vorplatz bleiben. Nach Claim und Wänden steht der Knopf „DECOR: FLOWER BEDS · $150“; drei Käufe nacheinander → Beete, Laternen und Tannen vorne erscheinen, Geld wird abgezogen, nächster Knopf „PINE ROW · $600“. Keine Skriptfehler.
+
 ## Version 0.64.0 (2026-11-12) – Plot-Claim, Starterauto, Start vor dem Autohaus (D-090)
 
 | System | Dateien | Status |
