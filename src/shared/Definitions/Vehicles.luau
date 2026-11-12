@@ -143,6 +143,8 @@ local Vehicles = {
 	ById = table.freeze(byId),
 	-- Stellplätze in der Garage (D-016)
 	BayCount = 2,
+	-- Starterauto (D-090): jeder Spieler besitzt es kostenlos (auch nach Prestige wieder)
+	StarterId = "vehicle_pickup",
 }
 
 function Vehicles.Get(id: string): VehicleDefinition?

@@ -141,6 +141,9 @@ export type PlayerData = {
 	Stats: {
 		FirstJoinTime: number,
 		JoinCount: number,
+		-- Hat schon einmal ein Grundstück geclaimt (D-090): dann bekommt er beim Join automatisch
+		-- einen freien Plot und spawnt im Büro, sonst vor dem Autohaus beim Starterauto
+		PlotClaimed: boolean?,
 	},
 
 	-- Letzter gültiger Serverzeitpunkt (os.time) für Offline-Berechnung (docs/14 §7)

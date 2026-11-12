@@ -163,7 +163,8 @@ local function buildOffice(plotCFrame: CFrame): Model
 	light.Color = Color3.fromRGB(255, 226, 180)
 	light.Parent = lamp
 
-	local spawnAnchor = part(bedModel, "SpawnAnchor", Vector3.new(1, 1, 1), bed.CFrame * CFrame.new(0, 3, 0), WOOD, Enum.Material.SmoothPlastic)
+	-- Spawn vor dem Bett auf dem Boden, Blick zur Tür (D-090)
+	local spawnAnchor = part(bedModel, "SpawnAnchor", Vector3.new(1, 1, 1), o * CFrame.new(-5, 0.8, 5.5), WOOD, Enum.Material.SmoothPlastic)
 	spawnAnchor.Transparency = 1
 	spawnAnchor.CanCollide = false
 	spawnAnchor.CanQuery = false

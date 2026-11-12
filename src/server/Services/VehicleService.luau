@@ -248,14 +248,17 @@ local function spawnAtBay(player: Player, record: Types.VehicleRecord, override:
 	local def = Vehicles.Get(record.Type)
 	local garage = garageModel(player)
 	local data = DataService.Get(player)
-	if not (def and garage and record.Bay and data) then
+	-- Ohne Garage nur mit fester Stelle (Starterauto vor dem Autohaus, D-090)
+	if not (def and record.Bay and data and (garage or override)) then
 		return nil
 	end
 	-- Lastzüge passen auf keinen Stellplatz: sie stehen auf der Zufahrt zur Verladestraße neben
 	-- dem Grundstück, Front Richtung Zauntor (D-052, PLANS/ROAD_TRAINS.md T4)
 	local withTrailers = TrailerBuilder.HasTrailers(def.Id)
 	local floorCF: CFrame
-	if withTrailers then
+	if override then
+		floorCF = override
+	elseif withTrailers then
 		local plotId = PlotService.GetPlotId(player)
 		if not plotId then
 			return nil
@@ -263,14 +266,11 @@ local function spawnAtBay(player: Player, record: Types.VehicleRecord, override:
 		local side = LayoutConfig.SideRoad
 		floorCF = PlotBuilder.getPlotCFrame(plotId) * CFrame.new(side.OuterX, 1.05, LayoutConfig.Garage.Lane.Z - side.Radius - 20) * CFrame.Angles(0, math.pi, 0)
 	else
-		local bayPart = garage:FindFirstChild(`BaySpawn{record.Bay}`, true)
+		local bayPart = if garage then garage:FindFirstChild(`BaySpawn{record.Bay}`, true) else nil
 		if not (bayPart and bayPart:IsA("BasePart")) then
 			return nil
 		end
 		floorCF = bayPart.CFrame * CFrame.new(0, -bayPart.Size.Y / 2, 0)
-	end
-	if override then
-		floorCF = override
 	end
 	despawn(player, record.Id)
 	-- Fahrphysik von A-Chassis (D-026); ohne Kit im Place eigener Fallback
@@ -705,6 +705,7 @@ function VehicleService.Start()
 	end)
 
 	DataService.ProfileLoaded:Connect(function(player)
+		VehicleService.EnsureStarter(player)
 		task.defer(spawnParked, player)
 	end)
 	Players.PlayerRemoving:Connect(function(player)
@@ -738,6 +739,30 @@ function VehicleService.Start()
 			end
 		end
 	end)
+end
+
+-- Starterauto (D-090): Jeder Spieler besitzt den Pickup kostenlos. Fehlt er (neues Profil, nach
+-- Prestige), wird er mit einem freien Stellplatz angelegt. Gibt die Fahrzeug-ID zurück.
+function VehicleService.EnsureStarter(player: Player): string?
+	local data = DataService.Get(player)
+	if not data then
+		return nil
+	end
+	for id, record in data.Vehicles.Owned do
+		if record.Type == Vehicles.StarterId then
+			return id
+		end
+	end
+	local newId: string? = nil
+	DataService.Mutate(player, function(d)
+		d.Vehicles.Seq += 1
+		local id = `v{d.Vehicles.Seq}`
+		d.Vehicles.Owned[id] = { Id = id, Type = Vehicles.StarterId, Cargo = {}, Bay = freeBay(d, Vehicles.StarterId) }
+		newId = id
+	end)
+	DataService.RequestSave(player)
+	VehicleService.VehiclesChanged:Fire(player)
+	return newId
 end
 
 -- Alle Fahrzeuge des Spielers aus der Welt nehmen (Prestige: Garage wird zurückgesetzt)

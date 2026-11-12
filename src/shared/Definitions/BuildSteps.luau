@@ -13,6 +13,8 @@ export type BuildStepDefinition = {
 	Requires: string?,
 	-- Button erscheint erst nach der Firmeneinrichtung (docs/04 §6)
 	RequiresCompanySetup: boolean?,
+	-- Wird ohne Kauf gebaut, sobald der Spieler ein Grundstück hat (D-090: Garage kommt mit dem Claim)
+	AutoBuild: boolean?,
 }
 
 local list: { BuildStepDefinition } = {
@@ -61,6 +63,7 @@ local list: { BuildStepDefinition } = {
 	{
 		Id = "build_garage",
 		DisplayName = "Garage",
+		AutoBuild = true, -- Felix 2026-11-12 (D-090): kommt kostenlos mit dem Plot-Claim
 		Price = 900, -- Balancing 2026-11-11 (D-087)
 		RequiredLevel = 6, -- Balancing 2026-11-11 (D-087)
 		Requires = "build_storage",
@@ -100,7 +103,7 @@ end
 -- Liefert den nächsten noch nicht gekauften Schritt (oder nil, wenn alles gebaut ist).
 function BuildSteps.GetNext(purchased: { [string]: boolean }): BuildStepDefinition?
 	for _, def in list do
-		if not purchased[def.Id] then
+		if not purchased[def.Id] and not def.AutoBuild then
 			return def
 		end
 	end

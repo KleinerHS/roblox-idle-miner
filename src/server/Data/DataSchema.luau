@@ -133,6 +133,7 @@ local TEMPLATE: Types.PlayerData = {
 	Stats = {
 		FirstJoinTime = 0,
 		JoinCount = 0,
+		PlotClaimed = false,
 	},
 
 	LastValidTime = 0,

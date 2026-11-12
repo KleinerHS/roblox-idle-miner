@@ -4,6 +4,6 @@
 
 return {
 	Game = "Roblox Idle Miner",
-	Version = "0.63.3",
-	Phase = "Phase 20b – Neubalancing Regeln",
+	Version = "0.64.0",
+	Phase = "Phase 20e – Plot-Claim und Starterauto",
 }

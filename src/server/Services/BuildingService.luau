@@ -294,6 +294,23 @@ local function render(player: Player)
 	end
 	local s = state :: PlotState
 
+	-- Schritte, die mit dem Grundstück kostenlos kommen (D-090: Garage), auch nach Prestige wieder
+	local missing = {}
+	for _, step in BuildSteps.List do
+		if step.AutoBuild and not data.Buildings[step.Id] then
+			table.insert(missing, step.Id)
+		end
+	end
+	if #missing > 0 then
+		DataService.Mutate(player, function(d)
+			for _, id in missing do
+				d.Buildings[id] = true
+			end
+		end)
+		DataService.RequestSave(player)
+		data = DataService.Get(player) :: Types.PlayerData
+	end
+
 	-- Büro der falschen Stufe (nach dem Upgrade oder nach Prestige) abreißen
 	local upgrade = OfficeUpgrades.GetCurrent(data.Buildings)
 	local officeVariant = if upgrade then upgrade.Id else nil

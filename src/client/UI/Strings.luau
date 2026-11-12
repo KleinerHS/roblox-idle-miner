@@ -25,6 +25,10 @@ local MESSAGES: { [string]: string } = {
 
 	-- Tycoon
 	BUILD_PURCHASED = "{Name} built!",
+	PLOT_CLAIMED = "Plot {Plot} is yours! Your garage is ready.",
+	CLAIM_HINT = "Hop into your starter truck and claim a free plot at the road!",
+	ALREADY_HAS_PLOT = "You already own a plot.",
+	PLOT_TAKEN = "This plot is already taken.",
 	MINE_PURCHASED = "{Name} unlocked! Take the elevator down.",
 
 	-- Mining

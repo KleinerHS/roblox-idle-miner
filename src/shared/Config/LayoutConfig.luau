@@ -135,6 +135,11 @@ local LayoutConfig = {
 	-- Danach liegt der Spawn auf dem Bett in der Hütte (docs/04 §7). TODO_LAYOUT
 	SpawnOffset = Vector3.new(110, 4, 62),
 
+	-- Plot-Claim (Felix 2026-11-12, D-090): Bodenknopf auf dem Vorplatz, wo die Straße ankommt
+	-- (lokal X/Z; man kann auch mit dem Auto drüberfahren). TODO_LAYOUT
+	ClaimButton = Vector2.new(40, -138),
+	ClaimButtonSize = Vector3.new(10, 0.4, 10),
+
 	-- Mine Shaft (00 §13, MINE_SHAFT_REFERENCE.png): ein Raum pro Plot, unter dem Plot.
 	-- Der Raum wird beim Elevator-Wechsel auf die gewählte Mine umkonfiguriert (D-014).
 	MineShaft = {

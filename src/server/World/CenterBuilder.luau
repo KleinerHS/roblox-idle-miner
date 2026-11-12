@@ -537,6 +537,22 @@ local function shopLot(parent: Instance, name: string, spec: ShopLotSpec)
 		flat(m, `Line{i}`, Vector2.new(0.4, cc.StallDepth - 1), frame * CFrame.new(lx, 0, -(rowIn + cc.StallDepth / 2 - 0.3)), TOP + 0.08, LINE_WHITE, Enum.Material.SmoothPlastic)
 	end
 	flat(m, "RowLine", Vector2.new(width, 0.4), frame * CFrame.new(mid, 0, -(spec.rOut - 0.4)), TOP + 0.08, LINE_WHITE, Enum.Material.SmoothPlastic)
+	-- Unsichtbare Marken je Lücke (Mitte auf der Fahrbahn, Blick zum Shop): Startplätze der
+	-- Starterautos vor dem Autohaus (D-090)
+	for i = 1, stalls do
+		local lx = mid - width / 2 + (i - 0.5) * cc.StallWidth
+		local p = (frame * CFrame.new(lx, 0, -(rowIn + cc.StallDepth / 2))).Position
+		local spot = Instance.new("Part")
+		spot.Name = `StallSpot{i}`
+		spot.Anchored = true
+		spot.CanCollide = false
+		spot.CanQuery = false
+		spot.CanTouch = false
+		spot.Transparency = 1
+		spot.Size = Vector3.new(1, 0.2, 1)
+		spot.CFrame = CFrame.new(Vector3.new(p.X, TOP + 0.08, p.Z)) * frame.Rotation
+		spot.Parent = m
+	end
 	-- Pfeile in der Fahrgasse (nur Orientierung)
 	for j, ax in { mid - width / 4, mid + width / 4 } do
 		local arrow = flat(m, `Arrow{j}`, Vector2.new(5, 1.4), frame * CFrame.new(ax, 0, -shopLotAisle(spec)), TOP + 0.08, LINE_WHITE, Enum.Material.SmoothPlastic)

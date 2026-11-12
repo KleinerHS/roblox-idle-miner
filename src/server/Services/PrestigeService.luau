@@ -73,6 +73,8 @@ local function prestige(player: Player)
 
 	-- Welt auf Startzustand: Fahrzeuge weg, Gebäude neu, Worker-Figuren weg, Spieler an den Start
 	VehicleService.ClearAll(player)
+	-- Starterauto gibt es nach Prestige wieder kostenlos (D-090); steht nach dem Neubau in der Garage
+	VehicleService.EnsureStarter(player)
 	BuildingService.Rebuild(player)
 	WorkerService.WorkersChanged:Fire(player)
 	task.delay(1.5, function()

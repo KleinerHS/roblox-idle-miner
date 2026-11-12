@@ -1,5 +1,17 @@
 # Decision Log
 
+## D-090 – Plot-Claim an der Straße, kostenloses Starterauto, Start vor dem Autohaus
+
+**Source:** Felix, 2026-11-12 („der Spawn soll in der Mitte vor dem Autohaus sein, wo man automatisch vor dem Starterauto spawnt; die Garage hat man auch von Anfang an, wenn man den Hallenboden kauft“; Antworten: Starterauto kostenlos; vor dem Hallenboden direkt an der Straße ein Claim-Knopf, mit dem man das Grundstück auf sich zuweist; Spawn vor dem Autohaus nur beim ersten Mal, nach dem Claim in der Blechhütte vor dem Bett)
+**Decision:**
+- **Claim:** Jedes freie Grundstück hat vor dem Firmenschild an der Straße einen grünen Bodenknopf „CLAIM PLOT · Plot N · FREE“. Betreten weist das Grundstück zu (Server prüft: Profil geladen, noch kein Plot, Plot frei). Verlässt der Spieler den Server, wird der Plot frei und der Knopf erscheint wieder.
+- **Wiederkehrende Spieler:** Wer schon einmal geclaimt hat (`Stats.PlotClaimed`), bekommt beim Join wie bisher automatisch den freien Plot mit der kleinsten ID und spawnt im Büro.
+- **Starterauto:** Der rostige Pickup gehört jedem Spieler kostenlos (`Vehicles.StarterId`), auch neu nach Prestige.
+- **Start:** Neue Spieler ohne Plot spawnen auf dem Parkplatz vor dem Autohaus vor ihrem Pickup (je Spieler eine Parklücke) und bekommen den Hinweis, ein freies Grundstück zu claimen.
+- **Garage:** kommt kostenlos mit dem Grundstück (`AutoBuild`); der Kaufknopf für die Garage entfällt. Nach Prestige ist sie sofort wieder da.
+- **Spawn nach dem Claim:** in der Blechhütte vor dem Bett (Premium-Büro weiter vor dem Sofa).
+**Affected systems:** PlotService, StarterService (neu), VehicleService, BuildingService, BuildSteps, PrestigeService, CenterBuilder (Parklücken-Marken), LayoutConfig, Types, DataSchema-Vorlage, Strings, HallLayout (SpawnAnchor)
+
 ## D-089 – Antworten auf die Balancing-Probleme (Q-037, Q-038)
 
 **Source:** Felix, 2026-11-12 („1.ja 2.ja 3.ja 4.ja 5.lvl 25 aber 35000 6.5 7.nein aber er muss sehr sehr selten sein 8. nein runter schrauben 9.neu starten“)

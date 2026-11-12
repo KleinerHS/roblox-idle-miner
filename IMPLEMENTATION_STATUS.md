@@ -1,5 +1,17 @@
 # Implementation Status
 
+## Version 0.64.0 (2026-11-12) – Plot-Claim, Starterauto, Start vor dem Autohaus (D-090)
+
+| System | Dateien | Status |
+|---|---|---|
+| Claim-Knopf auf dem Vorplatz an der Straße (zu Fuß oder mit dem Auto), Knopf kommt nach Verlassen wieder | `PlotService.luau`, `LayoutConfig.luau` | TESTING_REQUIRED |
+| Wiederkehrende Spieler bekommen ihren Plot automatisch (`Stats.PlotClaimed`) | `PlotService.luau`, `Types.luau`, `DataSchema.luau` | TESTING_REQUIRED |
+| Kostenloser Pickup für jeden (auch nach Prestige), Start vor dem Autohaus vor dem eigenen Pickup | `StarterService.luau` (neu), `VehicleService.luau`, `Vehicles.luau`, `PrestigeService.luau`, `CenterBuilder.luau` | TESTING_REQUIRED |
+| Garage kommt kostenlos mit dem Grundstück | `BuildSteps.luau` (`AutoBuild`), `BuildingService.luau` | TESTING_REQUIRED |
+| Spawn in der Hütte vor dem Bett | Place: `HallLayout.Office.Bed.SpawnAnchor` – **Place speichern!** Sicherung `assets/HallLayout.rbxm` (Rücktest 6.355 Objekte, 0 Abweichungen); `BuildTemplates.luau` | TESTING_REQUIRED |
+
+Selbsttest (Play, Testprofil): Start auf dem Parkplatz vor dem Autohaus neben dem eigenen Pickup; mit dem Pickup über den Claim-Knopf von Plot 1 → Plot gehört dem Spieler, Garage steht, Knopf weg; Büro gebaut, Respawn steht in der Hütte vor dem Bett; keine Skriptfehler. Nicht getestet: Wiederkehrender Spieler mit automatischem Plot (Testprofil wird bei jedem Start neu angelegt).
+
 ## Version 0.63.3 (2026-11-12) – Laufgeschwindigkeit 22
 
 | System | Dateien | Status |
