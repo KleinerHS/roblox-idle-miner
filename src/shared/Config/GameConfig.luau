@@ -18,6 +18,11 @@ local GameConfig = {
 	},
 
 	-- Servervalidierung beim manuellen Mining (docs/03 §4)
+	-- Laufgeschwindigkeit der Spielfigur (Roblox-Standard 16). Felix 2026-11-12: „etwas hoch“.
+	Player = {
+		WalkSpeed = 20,
+	},
+
 	Mining = {
 		-- Maximaler Abstand des Spielers zur Abbauzone in Studs
 		ReachStuds = 7,

@@ -90,7 +90,7 @@ local function barWall(parent: Instance, name: string, width: number, y0: number
 end
 
 -- Ein Torflügel: Rahmen + Stäbe + gelbes Band
-local function gateLeaf(parent: Instance, name: string, width: number, height: number, cframe: CFrame)
+local function gateLeaf(parent: Instance, name: string, width: number, height: number, cframe: CFrame, floor: CFrame)
 	local leaf = Instance.new("Folder")
 	leaf.Name = name
 	leaf.Parent = parent
@@ -102,7 +102,9 @@ local function gateLeaf(parent: Instance, name: string, width: number, height: n
 	barWall(leaf, "Leaf", width, 0.3, height, cframe, 0.8)
 	for _, d in leaf:GetDescendants() do
 		if d:IsA("BasePart") then
-			d:SetAttribute("ClosedCFrame", d.CFrame)
+			-- Geschlossene Lage relativ zum Korbboden (BUG-019): bleibt richtig, wenn der Korb
+			-- verschoben/gedreht wird (HallLayout-Kopie auf den Plot, Felix verschiebt in Studio).
+			d:SetAttribute("ClosedOffset", floor:ToObjectSpace(d.CFrame))
 		end
 	end
 	return leaf
@@ -151,8 +153,9 @@ function ElevatorCageBuilder.build(parent: Instance, base: CFrame, kind: "Surfac
 	gate.Name = "Gate"
 	gate.Parent = cage
 	local leafW = half - 0.1
-	gateLeaf(gate, "LeafLeft", leafW, H - 1.2, base * CFrame.new(leafW / 2 + 0.05, 0, -half - 0.6))
-	gateLeaf(gate, "LeafRight", leafW, H - 1.2, base * CFrame.new(-leafW / 2 - 0.05, 0, -half - 0.6))
+	local floorCFrame = base * CFrame.new(0, -0.25, 0) -- = CarFloor
+	gateLeaf(gate, "LeafLeft", leafW, H - 1.2, base * CFrame.new(leafW / 2 + 0.05, 0, -half - 0.6), floorCFrame)
+	gateLeaf(gate, "LeafRight", leafW, H - 1.2, base * CFrame.new(-leafW / 2 - 0.05, 0, -half - 0.6), floorCFrame)
 	part(cage, "GateTrack", Vector3.new(S * 2, 0.3, 0.4), base * CFrame.new(0, H - 0.9, -half - 0.6), STEEL_DARK)
 	hazardStrip(cage, "Header", S, Vector2.new(0.7, 0.25), base * CFrame.new(0, H - 1.8, -half - 0.85))
 
@@ -242,28 +245,37 @@ function ElevatorCageBuilder.build(parent: Instance, base: CFrame, kind: "Surfac
 end
 
 -- Tor öffnen/schließen. Offen = Flügel seitlich vor die Seitenwände geschoben.
+-- Alle Lagen werden aus dem aktuellen Korbboden berechnet (BUG-019). Ältere Körbe aus dem
+-- HallLayout tragen nur eine absolute "ClosedCFrame" aus der Bauzeit, die nach dem Verschieben
+-- falsch ist (Flügel flogen weg/verdrehten sich). Für sie wird die geschlossene Lage einmalig aus
+-- der aktuellen, offenen Lage abgeleitet (gebaute Körbe stehen immer offen).
 function ElevatorCageBuilder.setGate(cage: Instance, open: boolean, animate: boolean)
 	local gate = cage:FindFirstChild("Gate")
-	if not gate then
+	local floor = cage:FindFirstChild("CarFloor")
+	if not gate or not (floor and floor:IsA("BasePart")) then
 		return
 	end
+	local floorCFrame = floor.CFrame
 	local slide = ElevatorCageBuilder.Size / 2 - 0.4
 	for _, leafName in { "LeafLeft", "LeafRight" } do
 		local leaf = gate:FindFirstChild(leafName)
 		if leaf then
 			local dir = if leafName == "LeafLeft" then 1 else -1
+			local shift = floorCFrame.RightVector * (dir * slide)
 			for _, p in leaf:GetChildren() do
 				if p:IsA("BasePart") then
-					local closed = p:GetAttribute("ClosedCFrame")
-					if typeof(closed) == "CFrame" then
-						-- Verschieben entlang der lokalen X-Achse des Korbs (Breite)
-						local offset = closed.Rotation:Inverse() * (cage:FindFirstChild("CarFloor") :: BasePart).CFrame.RightVector * (dir * slide)
-						local target = if open then closed * CFrame.new(offset) else closed
-						if animate then
-							TweenService:Create(p, TweenInfo.new(GATE_OPEN_SECONDS, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), { CFrame = target }):Play()
-						else
-							p.CFrame = target
-						end
+					local offset = p:GetAttribute("ClosedOffset")
+					if typeof(offset) ~= "CFrame" then
+						-- Altbestand: Korb steht offen, also geschlossene Lage = aktuelle Lage − Schub
+						offset = floorCFrame:ToObjectSpace(p.CFrame - shift)
+						p:SetAttribute("ClosedOffset", offset)
+					end
+					local closed = floorCFrame * (offset :: CFrame)
+					local target = if open then closed + shift else closed
+					if animate then
+						TweenService:Create(p, TweenInfo.new(GATE_OPEN_SECONDS, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), { CFrame = target }):Play()
+					else
+						p.CFrame = target
 					end
 				end
 			end

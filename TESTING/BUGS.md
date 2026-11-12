@@ -214,3 +214,14 @@ Nicht verschoben: eine Rohr-Aufhänger-Gruppe weit außerhalb der Halle (Workspa
 **Fix:** Glas reicht bis unter den Kopfriegel (alle Glaswände des Autohauses). Flügel genau halb so breit wie die Tür (treffen sich in der Mitte) und 0,4 höher, sodass sie hinter dem Sturz enden. Auslösebereich ist jetzt ein Rechteck direkt vor und hinter der Tür (11 Studs seitlich, 6 Studs tief) statt eines Kreises.
 **Regression geprüft:** Play: 4 Studs vor der Tür → ganz offen; an der Kasse → ganz zu; Spalt zwischen den Flügeln 0; Flügel oben 14,0 über Sturz-Unterkante 13,6; Glas oben 25,15 über Kopfriegel-Unterkante 25,10.
 **Likely system:** VehicleShopBuilder, AutoDoorController
+
+## BUG-019 – Elevator-Tore öffnen nicht, Flügel verdrehen sich
+
+**Severity:** High
+**Status:** Fixed (TESTING_REQUIRED)
+**Build:** 0.63.1
+**Gemeldet:** Felix, 2026-11-12 („die türen vom elevator sind verglitcht, sie öffnen sich nicht sondern verdrehen sich ganz komisch“)
+**Ursache:** Jeder Torflügel-Teil speicherte beim Bau seine geschlossene Lage als absolute Welt-CFrame (`ClosedCFrame`). Der Elevator kommt aus dem HallLayout und wird per `PivotTo` auf den Plot versetzt und gedreht (und Felix hat ihn in Studio verschoben); die gespeicherte Lage wandert nicht mit. Beim Schließen/Öffnen flogen die Teile zur alten Bauposition mit alter Drehung.
+**Fix:** Geschlossene Lage wird relativ zum Korbboden gespeichert (`ClosedOffset`), alle Lagen werden aus dem aktuellen Korbboden berechnet. Altbestand im HallLayout ohne `ClosedOffset`: einmalig aus der aktuellen, offenen Lage abgeleitet.
+**Regression geprüft:** Nur statisch (Code, Typprüfung). Play-Test in Studio offen: Surface → Mine → Surface fahren, beide Tore schließen und öffnen seitlich, kein Verdrehen.
+

@@ -233,35 +233,37 @@ local function playSwing(tool: Tool)
 	Debris:AddItem(anim, 1)
 end
 
-local function onActivated(tool: Tool)
+-- Ein Schlag. Rückgabe: true = Gedrückthalten darf weiterschlagen, false = abbrechen
+-- (nicht in der Mine, zu weit weg, Rucksack voll …), damit keine Meldung im Takt wiederholt wird.
+local function onActivated(tool: Tool): boolean
 	local now = os.clock()
 	if now < busyUntil then
-		return
+		return true
 	end
 	local snapshot = StateController.Get()
 	local pickaxe = snapshot and Pickaxes.Get(snapshot.EquippedPickaxe)
 	if not pickaxe then
-		return
+		return false
 	end
 	busyUntil = now + 1 / (pickaxe.MiningSpeed * PrestigeLogic.SpeedMultiplier((snapshot :: any).PrestigeCount or 0))
 
 	if not Mines.Get(ElevatorController.GetLocation()) then
 		NotificationController.Show("Info", "NOT_IN_MINE")
-		return
+		return false
 	end
 	local character = player.Character
 	local root = character and character:FindFirstChild("HumanoidRootPart")
 	if not (root and root:IsA("BasePart")) then
-		return
+		return false
 	end
 	local zone, distance = nearestSlot(root.Position)
 	if not zone or distance > GameConfig.Mining.ReachStuds then
 		NotificationController.Show("Info", "TOO_FAR")
-		return
+		return false
 	end
 	local slotIndex = zone:GetAttribute("SlotIndex")
 	if typeof(slotIndex) ~= "number" then
-		return
+		return false
 	end
 
 	-- Zur Erzwand drehen und zuschlagen
@@ -286,14 +288,46 @@ local function onActivated(tool: Tool)
 		shake()
 	elseif result.code ~= "COOLDOWN" then
 		NotificationController.Show(if result.code == "BACKPACK_FULL" then "Warning" else "Info", result.code)
+		return false
 	end
+	return true
+end
+
+-- Maustaste gedrückt halten = weiter abbauen im Takt der Spitzhacke (Felix 2026-11-12).
+-- Ein einzelner Klick ergibt wie bisher genau einen Schlag.
+local holding = false
+local holdLoopRunning = false
+
+local function startHold(tool: Tool)
+	holding = true
+	if holdLoopRunning then
+		return
+	end
+	holdLoopRunning = true
+	task.spawn(function()
+		while holding and tool.Parent ~= nil and tool.Parent == player.Character do
+			local remaining = busyUntil - os.clock()
+			if remaining > 0 then
+				task.wait(remaining)
+			elseif not onActivated(tool) then
+				break
+			end
+		end
+		holdLoopRunning = false
+	end)
 end
 
 local function watchTool(tool: Instance)
 	if tool:IsA("Tool") and tool.Name == PICKAXE_TOOL and not tool:GetAttribute("MiningHooked") then
 		tool:SetAttribute("MiningHooked", true)
 		tool.Activated:Connect(function()
-			onActivated(tool)
+			startHold(tool)
+		end)
+		tool.Deactivated:Connect(function()
+			holding = false
+		end)
+		tool.Unequipped:Connect(function()
+			holding = false
 		end)
 	end
 end

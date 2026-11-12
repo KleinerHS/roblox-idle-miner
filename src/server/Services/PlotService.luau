@@ -127,11 +127,23 @@ function PlotService.Init()
 	end)
 end
 
+-- Laufgeschwindigkeit aus GameConfig (Felix 2026-11-12)
+local function applyWalkSpeed(character: Model)
+	local humanoid = character:FindFirstChildOfClass("Humanoid") or character:WaitForChild("Humanoid", 5)
+	if humanoid and humanoid:IsA("Humanoid") then
+		humanoid.WalkSpeed = GameConfig.Player.WalkSpeed
+	end
+end
+
 function PlotService.Start()
 	local function onPlayerAdded(player: Player)
 		player.CharacterAdded:Connect(function(character)
+			task.spawn(applyWalkSpeed, character)
 			teleportToPlot(player, character)
 		end)
+		if player.Character then
+			task.spawn(applyWalkSpeed, player.Character)
+		end
 		assign(player)
 	end
 

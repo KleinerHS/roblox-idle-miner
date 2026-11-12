@@ -1,5 +1,15 @@
 # Implementation Status
 
+## Version 0.63.2 (2026-11-12) – Laufen, Abbauen, Elevator-Tore
+
+| System | Dateien | Status |
+|---|---|---|
+| Laufgeschwindigkeit 20 statt 16 (`GameConfig.Player.WalkSpeed`) | `GameConfig`, `PlotService` | TESTING_REQUIRED |
+| Abbauen per gedrückter Maustaste im Takt der Spitzhacke, Abbruch bei Fehlermeldung | `MiningController` | TESTING_REQUIRED |
+| BUG-019 Elevator-Tore verdrehen sich | `ElevatorCageBuilder` | TESTING_REQUIRED |
+
+Testanleitung Studio: Play, in der Halle laufen (spürbar schneller). In Mine 01 fahren: Maustaste an der Erzwand gedrückt halten → schlägt durchgehend, Loslassen stoppt; Rucksack voll → stoppt mit einer Meldung. Elevator Surface ↔ Mine: Tore schließen beim Abfahren und öffnen bei Ankunft seitlich, nichts verdreht.
+
 ## Phase 20c (Version 0.63.1, 2026-11-12) – Felix' Antworten zum Balancing (D-089)
 
 | System | Dateien | Status |
