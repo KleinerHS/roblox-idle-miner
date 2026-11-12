@@ -20,8 +20,8 @@ local list: { OfficeUpgradeDefinition } = {
 		Id = "office_premium",
 		DisplayName = "Premium Office",
 		Level = 2,
-		Price = 21000, -- Balancing 2026-11-11 (D-087), vorher 35.000 (D-082)
-		RequiredLevel = 25, -- Balancing 2026-11-11 (D-087), vorher 15 (D-082)
+		Price = 35000, -- Felix 2026-11-12 (D-089)
+		RequiredLevel = 25, -- Balancing 2026-11-11 (D-087), bestätigt D-089
 		Template = "PremiumOffice",
 	},
 }

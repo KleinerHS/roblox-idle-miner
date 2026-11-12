@@ -9,7 +9,7 @@ local BalanceConfig = {
 	StartCash = 80, -- D-087 (vorher 800, D-003)
 
 	-- XP-Bedarf je Level (D-087): Table[L] = XP von Level L auf L + 1, Level 1–120 einzeln aus dem
-	-- Rechenmodell. Ab Level 121 wächst der letzte Wert je Level um AfterTableGrowth (1 = gleich bleibend).
+	-- Rechenmodell, ab Level 101 je +3 % (D-089). Ab Level 121 wächst der letzte Wert je Level um AfterTableGrowth (1 = gleich bleibend).
 	-- Der Bedarf wird im Spiel ausschließlich hier gelesen (Util/Leveling).
 	Leveling = {
 		Table = {
@@ -23,10 +23,10 @@ local BalanceConfig = {
 			1189337, 1189337, 1202129, 1202129, 2071130, 2071130, 2086867, 2086867, 2347601, 2347601,
 			2357940, 2357940, 2637642, 2637642, 2640572, 2640572, 2935704, 2935704, 2935704, 6466939,
 			6724602, 6724602, 6936522, 6936522, 7205696, 7205696, 7425170, 7425170, 7647031, 7647031,
-			7647031, 7647031, 7647031, 7647031, 7647031, 7647031, 7647031, 7647031, 7647031, 7647031,
-			7647031, 7647031, 7647031, 7647031, 7647031, 7647031, 7647031, 7647031, 7647031, 7647031,
+			7876442, 8112735, 8356117, 8606801, 8865005, 9130955, 9404884, 9687031, 9977642, 10276971,
+			10585280, 10902838, 11229923, 11566821, 11913826, 12271241, 12639378, 13018559, 13409116, 13811389,
 		},
-		AfterTableGrowth = 1, -- TODO_BALANCE: Fortsetzung nach Level 120 (Modell endet bei 120)
+		AfterTableGrowth = 1.03, -- Felix 2026-11-12 (D-089): ab Level 101 +3 % je Level, TODO_BALANCE Feinwert
 	},
 
 	-- Verkaufswert und Mining-XP je Erz (D-087). Werte mit Nachkommastellen: Der Verkaufserlös wird
@@ -149,7 +149,7 @@ local BalanceConfig = {
 		mine_033 = { RequiredLevel = 33, Price = 87000 }, mine_034 = { RequiredLevel = 34, Price = 110000 },
 		mine_035 = { RequiredLevel = 35, Price = 110000 }, mine_036 = { RequiredLevel = 36, Price = 150000 },
 		mine_037 = { RequiredLevel = 37, Price = 160000 }, mine_038 = { RequiredLevel = 38, Price = 190000 },
-		mine_039 = { RequiredLevel = 39, Price = 200000 }, mine_040 = { RequiredLevel = 40, Price = 190000 },
+		mine_039 = { RequiredLevel = 39, Price = 190000 }, mine_040 = { RequiredLevel = 40, Price = 200000 },
 		mine_041 = { RequiredLevel = 41, Price = 210000 }, mine_042 = { RequiredLevel = 42, Price = 330000 },
 		mine_043 = { RequiredLevel = 43, Price = 330000 }, mine_044 = { RequiredLevel = 44, Price = 340000 },
 		mine_045 = { RequiredLevel = 45, Price = 340000 }, mine_046 = { RequiredLevel = 46, Price = 450000 },
@@ -161,16 +161,16 @@ local BalanceConfig = {
 		mine_057 = { RequiredLevel = 57, Price = 2300000 }, mine_058 = { RequiredLevel = 58, Price = 2800000 },
 		mine_059 = { RequiredLevel = 59, Price = 3100000 }, mine_060 = { RequiredLevel = 60, Price = 5400000 },
 		mine_061 = { RequiredLevel = 61, Price = 5900000 }, mine_062 = { RequiredLevel = 62, Price = 7000000 },
-		mine_063 = { RequiredLevel = 63, Price = 7000000 }, mine_064 = { RequiredLevel = 64, Price = 9200000 },
-		mine_065 = { RequiredLevel = 65, Price = 9100000 }, mine_066 = { RequiredLevel = 66, Price = 12000000 },
-		mine_067 = { RequiredLevel = 67, Price = 12000000 }, mine_068 = { RequiredLevel = 68, Price = 19000000 },
-		mine_069 = { RequiredLevel = 69, Price = 21000000 }, mine_070 = { RequiredLevel = 70, Price = 18000000 },
-		mine_071 = { RequiredLevel = 71, Price = 19000000 }, mine_072 = { RequiredLevel = 72, Price = 24000000 },
-		mine_073 = { RequiredLevel = 73, Price = 23000000 }, mine_074 = { RequiredLevel = 74, Price = 28000000 },
-		mine_075 = { RequiredLevel = 75, Price = 41000000 }, mine_076 = { RequiredLevel = 76, Price = 73000000 },
-		mine_077 = { RequiredLevel = 77, Price = 72000000 }, mine_078 = { RequiredLevel = 78, Price = 82000000 },
-		mine_079 = { RequiredLevel = 79, Price = 89000000 }, mine_080 = { RequiredLevel = 80, Price = 80000000 },
-		mine_081 = { RequiredLevel = 81, Price = 79000000 }, mine_082 = { RequiredLevel = 82, Price = 100000000 },
+		mine_063 = { RequiredLevel = 63, Price = 7000000 }, mine_064 = { RequiredLevel = 64, Price = 9100000 },
+		mine_065 = { RequiredLevel = 65, Price = 9200000 }, mine_066 = { RequiredLevel = 66, Price = 12000000 },
+		mine_067 = { RequiredLevel = 67, Price = 12000000 }, mine_068 = { RequiredLevel = 68, Price = 18000000 },
+		mine_069 = { RequiredLevel = 69, Price = 19000000 }, mine_070 = { RequiredLevel = 70, Price = 19000000 },
+		mine_071 = { RequiredLevel = 71, Price = 21000000 }, mine_072 = { RequiredLevel = 72, Price = 23000000 },
+		mine_073 = { RequiredLevel = 73, Price = 24000000 }, mine_074 = { RequiredLevel = 74, Price = 28000000 },
+		mine_075 = { RequiredLevel = 75, Price = 41000000 }, mine_076 = { RequiredLevel = 76, Price = 72000000 },
+		mine_077 = { RequiredLevel = 77, Price = 73000000 }, mine_078 = { RequiredLevel = 78, Price = 79000000 },
+		mine_079 = { RequiredLevel = 79, Price = 80000000 }, mine_080 = { RequiredLevel = 80, Price = 82000000 },
+		mine_081 = { RequiredLevel = 81, Price = 89000000 }, mine_082 = { RequiredLevel = 82, Price = 100000000 },
 		mine_083 = { RequiredLevel = 83, Price = 100000000 }, mine_084 = { RequiredLevel = 84, Price = 130000000 },
 		mine_085 = { RequiredLevel = 85, Price = 130000000 }, mine_086 = { RequiredLevel = 86, Price = 150000000 },
 		mine_087 = { RequiredLevel = 87, Price = 150000000 }, mine_088 = { RequiredLevel = 88, Price = 190000000 },
@@ -252,9 +252,9 @@ local BalanceConfig = {
 	-- ID = <Erz-ID>_<Seltenheit>. Chance je Hit × Luck-Faktor.
 	SpecialFinds = {
 		Rarities = { -- Reihenfolge = Wurfreihenfolge (seltenste zuerst)
-			{ Id = "ancient", DisplayName = "Ancient", Chance = 2e-06 }, -- TODO_BALANCE (D-088) (1 : 600.000)
-			{ Id = "radiant", DisplayName = "Radiant", Chance = 1.7e-05 }, -- TODO_BALANCE (D-088) (1 : 60.000)
-			{ Id = "pristine", DisplayName = "Pristine", Chance = 0.000167 }, -- TODO_BALANCE (D-088) (1 : 6.000)
+			{ Id = "ancient", DisplayName = "Ancient", Chance = 1 / 6000000 }, -- Felix 2026-11-12 (D-089): sehr sehr selten (1 : 6.000.000)
+			{ Id = "radiant", DisplayName = "Radiant", Chance = 1 / 60000 }, -- TODO_BALANCE (D-088) (1 : 60.000)
+			{ Id = "pristine", DisplayName = "Pristine", Chance = 1 / 6000 }, -- TODO_BALANCE (D-088) (1 : 6.000)
 		},
 		Values = { -- TODO_BALANCE (D-088)
 			ore_coal_pristine = { Value = 600, XP = 1 },
@@ -454,12 +454,12 @@ local BalanceConfig = {
 	-- Keine XP, kein Material, kein Lohn. Dauer-Limit ohne Upgrade: GameConfig.Offline.MaxSeconds (8 h).
 	-- Upgrades in der Laptop-App COMPANY, der Reihe nach, bei Prestige zurückgesetzt.
 	Offline = {
-		Efficiency = 0.3, -- TODO_BALANCE (D-088)
+		Efficiency = 0.15, -- Felix 2026-11-12 (D-089): runter, vorher 0,3
 		EfficiencyLevels = { -- TODO_BALANCE (D-088)
-			{ RequiredLevel = 15, Price = 83466, Efficiency = 0.35 },
-			{ RequiredLevel = 35, Price = 1227100, Efficiency = 0.4 },
-			{ RequiredLevel = 55, Price = 21386579, Efficiency = 0.45 },
-			{ RequiredLevel = 75, Price = 675376745, Efficiency = 0.5 },
+			{ RequiredLevel = 15, Price = 83466, Efficiency = 0.175 },
+			{ RequiredLevel = 35, Price = 1227100, Efficiency = 0.2 },
+			{ RequiredLevel = 55, Price = 21386579, Efficiency = 0.225 },
+			{ RequiredLevel = 75, Price = 675376745, Efficiency = 0.25 },
 		},
 		DurationLevels = { -- TODO_BALANCE (D-088)
 			{ RequiredLevel = 30, Price = 912505, Hours = 10 },
@@ -473,8 +473,8 @@ local BalanceConfig = {
 		-- Verkaufserlös (Geld, nicht XP) +n je Prestige: Faktor = 1 + n * Count
 		MoneyBonusPerPrestige = 0.05, -- D-087 (vorher 0,10)
 		-- Mining Speed (Hits pro Sekunde) +n je Prestige, gedeckelt
-		SpeedBonusPerPrestige = 0, -- D-087 (vorher 0,05)
-		SpeedBonusMax = 0, -- D-087 (vorher 0,50)
+		SpeedBonusPerPrestige = 0.05, -- Felix 2026-11-12 (D-089)
+		SpeedBonusMax = 0.5, -- Felix 2026-11-12 (D-089), wie Q-025
 	},
 
 	-- Kurven für Inhalte ohne festen Einzelwert (Phase 12, ContentCurve.luau). Seit D-087 haben alle

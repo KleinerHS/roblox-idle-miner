@@ -1,5 +1,20 @@
 # Decision Log
 
+## D-089 – Antworten auf die Balancing-Probleme (Q-037, Q-038)
+
+**Source:** Felix, 2026-11-12 („1.ja 2.ja 3.ja 4.ja 5.lvl 25 aber 35000 6.5 7.nein aber er muss sehr sehr selten sein 8. nein runter schrauben 9.neu starten“)
+**Decision:**
+1. **Drill-Preise** aufsteigend sortiert (gleiche Preise, nur andere Reihenfolge). Gleichstand MK24/MK25 aufgelöst: MK25 $53 Mio. (Mitte zwischen MK24 und MK26).
+2. **Minenpreise** aufsteigend sortiert: jede Mine kostet mindestens so viel wie die vorige (Minen 39/40, 64/65, 68–73, 76–81 betroffen).
+3. **XP ab Level 101** je Level +3 % (Level 120 = 13,8 Mio.), danach weiter +3 % je Level. Höhe = Claudes Standardwert, TODO_BALANCE.
+4. **Rucksäcke:** größter Rucksack 55.000 (halbe Box-Truck-Fracht). Bis Lava Crucible (29.000) unverändert, darüber gleichmäßig flacher. Grenze = Claudes Standardwert.
+5. **Büro-Upgrade:** Level 25, $35.000.
+6. **Prestige-Tempo:** +5 % je Prestige, max. +50 %.
+7. **Sonderfunde:** Werte bleiben, Ancient zehnmal seltener: 1 : 6.000.000 Hits (vorher 1 : 600.000). Radiant/Pristine unverändert.
+8. **Offline (Q-037):** Geld halbiert: Grundwert 15 %, Upgrades 17,5/20/22,5/25 %. Dauer (8/10/12 h) und Preise unverändert. Halbierung = Claudes Standardwert.
+9. **Neustart:** neuer DataStore `PlayerData_2`, alle starten frisch. Der alte Store `PlayerData` bleibt unangetastet (nicht gelöscht).
+**Affected systems:** Drills, BalanceConfig (MineUnlocks, Leveling, Prestige, SpecialFinds, Offline), Backpacks, OfficeUpgrades, GameConfig.Data.StoreName
+
 ## D-088 – Neubalancing: Regeln aus Felix' Balancing-Datei im Spiel
 
 **Source:** Felix, 2026-11-11 (Balancing_Neuentwurf.xlsx: „ich habe ein paar regeln geändert … falls dir probleme auffallen füg sie trotzdem ein und frag mich danach“). Werte selbst: D-087.

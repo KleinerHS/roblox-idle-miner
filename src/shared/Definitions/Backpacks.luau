@@ -135,7 +135,7 @@ local list: { BackpackDefinition } = {
 		DisplayName = "Frost Archive",
 		RequiredLevel = 56, -- Balancing 2026-11-11 (D-087)
 		Price = 1100000, -- Balancing 2026-11-11 (D-087)
-		Capacity = 33400, -- Balancing 2026-11-11 (D-087)
+		Capacity = 31100, -- Felix 2026-11-12 (D-089): max. halbe Box-Truck-Fracht
 		PersistenceClass = "Permanent", -- bleibt bei Prestige (D-012)
 		Glow = true, -- leuchtende Teile (Neon + Licht)
 	},
@@ -144,7 +144,7 @@ local list: { BackpackDefinition } = {
 		DisplayName = "Tidal Prism",
 		RequiredLevel = 61, -- Balancing 2026-11-11 (D-087)
 		Price = 2200000, -- Balancing 2026-11-11 (D-087)
-		Capacity = 38500, -- Balancing 2026-11-11 (D-087)
+		Capacity = 33500, -- Felix 2026-11-12 (D-089): max. halbe Box-Truck-Fracht
 		PersistenceClass = "Permanent", -- bleibt bei Prestige (D-012)
 		Glow = true, -- leuchtende Teile (Neon + Licht)
 	},
@@ -153,7 +153,7 @@ local list: { BackpackDefinition } = {
 		DisplayName = "Storm Reactor",
 		RequiredLevel = 66, -- Balancing 2026-11-11 (D-087)
 		Price = 6300000, -- Balancing 2026-11-11 (D-087)
-		Capacity = 44300, -- Balancing 2026-11-11 (D-087)
+		Capacity = 35900, -- Felix 2026-11-12 (D-089): max. halbe Box-Truck-Fracht
 		PersistenceClass = "Permanent", -- bleibt bei Prestige (D-012)
 		Glow = true, -- leuchtende Teile (Neon + Licht)
 	},
@@ -162,7 +162,7 @@ local list: { BackpackDefinition } = {
 		DisplayName = "Thunder Coil",
 		RequiredLevel = 71, -- Balancing 2026-11-11 (D-087)
 		Price = 10000000, -- Balancing 2026-11-11 (D-087)
-		Capacity = 51000, -- Balancing 2026-11-11 (D-087)
+		Capacity = 38600, -- Felix 2026-11-12 (D-089): max. halbe Box-Truck-Fracht
 		PersistenceClass = "Permanent", -- bleibt bei Prestige (D-012)
 		Glow = true, -- leuchtende Teile (Neon + Licht)
 	},
@@ -171,7 +171,7 @@ local list: { BackpackDefinition } = {
 		DisplayName = "Amethyst Sanctum",
 		RequiredLevel = 76, -- Balancing 2026-11-11 (D-087)
 		Price = 33000000, -- Balancing 2026-11-11 (D-087)
-		Capacity = 58700, -- Balancing 2026-11-11 (D-087)
+		Capacity = 41400, -- Felix 2026-11-12 (D-089): max. halbe Box-Truck-Fracht
 		PersistenceClass = "Permanent", -- bleibt bei Prestige (D-012)
 		Glow = true, -- leuchtende Teile (Neon + Licht)
 	},
@@ -180,7 +180,7 @@ local list: { BackpackDefinition } = {
 		DisplayName = "Lunar Oracle",
 		RequiredLevel = 80, -- Balancing 2026-11-11 (D-087)
 		Price = 42000000, -- Balancing 2026-11-11 (D-087)
-		Capacity = 67600, -- Balancing 2026-11-11 (D-087)
+		Capacity = 44500, -- Felix 2026-11-12 (D-089): max. halbe Box-Truck-Fracht
 		PersistenceClass = "Permanent", -- bleibt bei Prestige (D-012)
 		Glow = true, -- leuchtende Teile (Neon + Licht)
 	},
@@ -189,7 +189,7 @@ local list: { BackpackDefinition } = {
 		DisplayName = "Solar Sovereign",
 		RequiredLevel = 85, -- Balancing 2026-11-11 (D-087)
 		Price = 84000000, -- Balancing 2026-11-11 (D-087)
-		Capacity = 77800, -- Balancing 2026-11-11 (D-087)
+		Capacity = 47700, -- Felix 2026-11-12 (D-089): max. halbe Box-Truck-Fracht
 		PersistenceClass = "Permanent", -- bleibt bei Prestige (D-012)
 		Glow = true, -- leuchtende Teile (Neon + Licht)
 	},
@@ -198,7 +198,7 @@ local list: { BackpackDefinition } = {
 		DisplayName = "Royal Crystal",
 		RequiredLevel = 90, -- Balancing 2026-11-11 (D-087)
 		Price = 160000000, -- Balancing 2026-11-11 (D-087)
-		Capacity = 89500, -- Balancing 2026-11-11 (D-087)
+		Capacity = 51200, -- Felix 2026-11-12 (D-089): max. halbe Box-Truck-Fracht
 		PersistenceClass = "Permanent", -- bleibt bei Prestige (D-012)
 		Glow = true, -- leuchtende Teile (Neon + Licht)
 	},
@@ -207,7 +207,7 @@ local list: { BackpackDefinition } = {
 		DisplayName = "Void Emperor",
 		RequiredLevel = 95, -- Balancing 2026-11-11 (D-087)
 		Price = 390000000, -- Balancing 2026-11-11 (D-087)
-		Capacity = 103000, -- Balancing 2026-11-11 (D-087)
+		Capacity = 55000, -- Felix 2026-11-12 (D-089): max. halbe Box-Truck-Fracht
 		PersistenceClass = "Permanent", -- bleibt bei Prestige (D-012)
 		Glow = true, -- leuchtende Teile (Neon + Licht)
 	},

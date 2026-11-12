@@ -4,7 +4,7 @@ Q-033 bis Q-036 wurden am 2026-11-08 beantwortet: siehe `ANSWERED_QUESTIONS.md`,
 
 ## Q-038 – Probleme im Balancing-Entwurf vom 11.11.2026
 
-**Status:** OPEN
+**Status:** ANSWERED 2026-11-12 (D-089)
 **Priority:** IMPORTANT_NON_BLOCKING
 **System:** Economy
 **Date:** 2026-11-11
@@ -30,7 +30,7 @@ Regeln (D-088), ebenfalls trotzdem eingebaut:
 
 ## Q-037 – Offline-Cash gegenüber untätigem Onlinebetrieb
 
-**Status:** OPEN
+**Status:** ANSWERED 2026-11-12 (D-089: runterschrauben)
 **Priority:** IMPORTANT_NON_BLOCKING
 **System:** Offline / Economy
 **Date:** 2026-11-09

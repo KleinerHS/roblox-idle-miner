@@ -11,7 +11,8 @@ local GameConfig = {
 
 	Data = {
 		-- Name des DataStores. Nie ändern, sonst sind alle Spielstände "weg".
-		StoreName = "PlayerData",
+		-- Felix 2026-11-12 (D-089): Neustart, alter Store "PlayerData" bleibt unangetastet liegen.
+		StoreName = "PlayerData_2",
 		-- Schlüssel pro Spieler: KeyPrefix .. UserId
 		KeyPrefix = "Player_",
 	},

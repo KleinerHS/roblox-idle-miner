@@ -1,5 +1,14 @@
 # Implementation Status
 
+## Phase 20c (Version 0.63.1, 2026-11-12) – Felix' Antworten zum Balancing (D-089)
+
+| System | Dateien | Status |
+|---|---|---|
+| Drill- und Minenpreise aufsteigend, XP ab 101 +3 %, Rucksack max. 55.000, Büro Lv25/$35.000, Prestige-Tempo 5 %, Ancient 1 : 6 Mio., Offline 15–25 % | `Drills`, `BalanceConfig`, `Backpacks`, `OfficeUpgrades` | TESTING_REQUIRED |
+| Neustart: neuer DataStore `PlayerData_2` | `GameConfig` | TESTING_REQUIRED |
+
+Selbsttest (Luau-CLI): Drillpreise streng steigend (30 Stufen), Minenpreise nie fallend, XP L100 7.647.031 → L101 7.876.442 → L120 13.811.389, größter Rucksack 55.000, Offline 0,15/0,25, Büro 25/$35.000, Store `PlayerData_2`. Kein Play-Test in Studio.
+
 ## Phase 20b (Version 0.63.0, 2026-11-11) – Neubalancing: Regeln im Spiel (D-088)
 
 | System | Dateien | Status |
