@@ -17,12 +17,13 @@ local GameConfig = {
 		KeyPrefix = "Player_",
 	},
 
-	-- Servervalidierung beim manuellen Mining (docs/03 §4)
-	-- Laufgeschwindigkeit der Spielfigur (Roblox-Standard 16). Felix 2026-11-12: „etwas hoch“.
+	-- Laufgeschwindigkeit der Spielfigur (Roblox-Standard 16). Felix 2026-11-12: „etwas hoch“,
+	-- danach „noch ein kleines wenig hoch“.
 	Player = {
-		WalkSpeed = 20,
+		WalkSpeed = 22,
 	},
 
+	-- Servervalidierung beim manuellen Mining (docs/03 §4)
 	Mining = {
 		-- Maximaler Abstand des Spielers zur Abbauzone in Studs
 		ReachStuds = 7,

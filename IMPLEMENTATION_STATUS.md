@@ -1,5 +1,11 @@
 # Implementation Status
 
+## Version 0.63.3 (2026-11-12) – Laufgeschwindigkeit 22
+
+| System | Dateien | Status |
+|---|---|---|
+| Laufgeschwindigkeit 22 statt 20 (Felix: „noch ein kleines wenig hoch“) | `GameConfig.luau` (`Player.WalkSpeed`) | TESTING_REQUIRED |
+
 ## Version 0.63.2 (2026-11-12) – Laufen, Abbauen, Elevator-Tore
 
 | System | Dateien | Status |
