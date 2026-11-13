@@ -143,6 +143,14 @@ local function onProfileReady(player: Player, profile: Profile)
 	)
 	DataService.ProfileLoaded:Fire(player, data)
 	sendSnapshot(player)
+	-- Testmodus sichtbar machen, damit niemand versehentlich ohne Speichern spielt
+	if useMock then
+		task.delay(3, function()
+			if player.Parent == Players then
+				RemoteService.FireClient("Notify", player, { Kind = "Warning", Code = "TEST_MODE" })
+			end
+		end)
+	end
 end
 
 local function loadProfile(player: Player)

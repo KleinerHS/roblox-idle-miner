@@ -1,5 +1,11 @@
 # Implementation Status
 
+## Version 0.64.4 (2026-11-13) – BUG-020 Testmodus-Warnung
+
+| System | Dateien | Status |
+|---|---|---|
+| Spielstand wurde wegen mitgespeichertem Testmodus nicht geladen; Attribut entfernt, Warnung im Testmodus | `DataService.luau`, `Strings.luau` | TESTING_REQUIRED |
+
 ## Version 0.64.3 (2026-11-13) – Garagen-Deko zum Kaufen (D-093)
 
 | System | Dateien | Status |

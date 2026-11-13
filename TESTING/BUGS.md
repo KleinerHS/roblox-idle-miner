@@ -225,3 +225,13 @@ Nicht verschoben: eine Rohr-Aufhänger-Gruppe weit außerhalb der Halle (Workspa
 **Fix:** Geschlossene Lage wird relativ zum Korbboden gespeichert (`ClosedOffset`), alle Lagen werden aus dem aktuellen Korbboden berechnet. Altbestand im HallLayout ohne `ClosedOffset`: einmalig aus der aktuellen, offenen Lage abgeleitet.
 **Regression geprüft:** Nur statisch (Code, Typprüfung). Play-Test in Studio offen: Surface → Mine → Surface fahren, beide Tore schließen und öffnen seitlich, kein Verdrehen.
 
+## BUG-020 – Spielstand wird beim Joinen nicht geladen
+
+**Severity:** High
+**Status:** Fixed (TESTING_REQUIRED)
+**Build:** 0.64.1
+**Gemeldet:** Felix, 2026-11-13 („warum speichert der Spielstand nicht beim Joinen“)
+**Ursache:** Mein Studio-Testmodus (Attribut `UseMockData` an ServerStorage, D-087) war in Felix' Place-Datei mitgespeichert worden, als er die Place während meiner Tests am 12.11. speicherte. Danach liefen seine Play-Runden mit einem Testprofil nur im Speicher; die Konsole zeigte „Testmodus UseMockData“. Beim ersten Play am 13.11. (0.64.1) war der Testmodus noch an; im zweiten Play (0.64.2) war er aus, das Profil wurde aus dem echten DataStore (`PlayerData_2`) geladen und war noch leer („Joins 1“), weil vorher nie echt gespeichert wurde.
+**Fix:** Attribut entfernt (Felix muss die Place speichern). Zusätzlich zeigt das Spiel im Testmodus jetzt nach dem Laden eine Warnung „Studio test mode: progress is NOT saved!“, damit das nicht mehr unbemerkt passiert.
+**Regression geprüft:** Konsole der aktuellen Sitzung: „DataStore verbunden – Spielstände werden gespeichert“. Nach Stop und neuem Play muss „Joins 2“ und der Fortschritt da sein.
+**Likely system:** DataService

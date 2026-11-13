@@ -25,6 +25,7 @@ local MESSAGES: { [string]: string } = {
 
 	-- Tycoon
 	BUILD_PURCHASED = "{Name} built!",
+	TEST_MODE = "Studio test mode (UseMockData): progress is NOT saved!",
 	PLOT_CLAIMED = "Plot {Plot} is yours! Your garage is ready.",
 	CLAIM_HINT = "Hop into your starter truck and claim a free plot at the road!",
 	ALREADY_HAS_PLOT = "You already own a plot.",
