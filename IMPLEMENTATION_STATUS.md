@@ -1,5 +1,33 @@
 # Implementation Status
 
+## Version 0.64.2 (2026-11-13) – Blechhütte höher (D-092)
+
+| System | Dateien | Status |
+|---|---|---|
+| Hütte 25 % höher (ab Bodenoberkante gestreckt): Schrank stößt nicht mehr an die Deckenstreben; Kollision, Dach und Deckenlampe mit angepasst | Place: `HallLayout.Office.StarterHut`, `Office.CeilingLamp` – **Place speichern!** Sicherung `assets/HallLayout.rbxm` (Rücktest 6.355 Objekte, 0 Abweichungen) | TESTING_REQUIRED |
+
+Selbsttest (Play, Testprofil): Schrank-Oberkante 9,74, unterste Deckenstrebe jetzt 10,05 (vorher 8,2); Bild geprüft, Schrank steht frei unter den Streben; Wände sitzen auf dem Boden (Unterkante 0,78).
+
+## Thumbnail-Checkpoint – 2026-11-13
+
+| System | Dateien | Status |
+|---|---|---|
+| Zweite Serie mit fünf Thumbnails für Mining Company Tycoon | `outputs/thumbnails-20261113/` | TESTING_REQUIRED |
+
+Ancient-Fund, Grundstück, Minenaufzug, Verladung und Goldbarren wurden als eigene Motive exportiert. Alle fünf JPEGs sind 1920 × 1080 Pixel groß und unter 1 MB. Die Hauptmotive wurden in einer 240 × 135 Pixel großen Vorschau geprüft.
+
+Test in Roblox Studio: Im Play-Modus den Grundstücksknopf, den geöffneten Minenaufzug, den Verladeplatz und das Förderband mit den Motiven vergleichen. Erzfund, Figuren und Fracht sind stilisiert. Anschließend im Creator Dashboard unter „Thumbnails“ die gewünschte Bildreihenfolge in der Vorschau prüfen.
+
+## Thumbnail-Checkpoint – 2026-11-12
+
+| System | Dateien | Status |
+|---|---|---|
+| Fünf Roblox-Thumbnails für Mining Company Tycoon | `outputs/thumbnails-20261112/` | TESTING_REQUIRED |
+
+Alle fünf JPEGs haben 1920 × 1080 Pixel und liegen unter 3 MB. Spitzhacke, Drill, Schmelzhalle, Lkw im Verkaufskreis und Diamantfund bleiben in der 240 × 135 Pixel großen Vorschau erkennbar.
+
+Test in Roblox Studio: Im Play-Modus Schacht, Schmelzhalle und Verkaufskreis zum Vergleich öffnen. Die Bilder zeigen dieselben Spielmechaniken als stilisierte Illustrationen. Im Creator Dashboard die Motive unter „Thumbnails“ in der Vorschau der Experience prüfen.
+
 ## Version 0.64.1 (2026-11-12) – Deko zum Kaufen (D-091)
 
 | System | Dateien | Status |

@@ -1,5 +1,11 @@
 # Decision Log
 
+## D-092 – Blechhütte höher
+
+**Source:** Felix, 2026-11-13 („mach die Hütte etwas höher, damit der Schrank nicht in die Deckenstreben geht“, mit Bild)
+**Decision:** Die Starter-Blechhütte ist 25 % höher: Wände, Rahmen, Fenster, Tür, Dach und Kollision sind ab der Bodenoberkante nach oben gestreckt, Fundament und Stufen bleiben. Die unterste Deckenstrebe liegt jetzt über dem Schrank (10,05 statt 8,2 über dem Boden, Schrank 9,74). Die Deckenlampe hängt weiter direkt unter dem First. Hütte jetzt etwa 15,2 statt 12,3 hoch.
+**Affected systems:** Place-Datei (`Workspace.HallLayout.Office`), `assets/HallLayout.rbxm`
+
 ## D-091 – Deko rund um die Halle nur durch Kauf
 
 **Source:** Felix, 2026-11-12 („die Deko um die Halle herum soll nur durch Kaufen erhältlich sein, man kann sie kaufen ab dem Zeitpunkt, wo die Hallenwände stehen; pass die Preise steigend, aber moderat an“), Vorschlag mit 10 Paketen von Felix mit „passt“ bestätigt.
