@@ -1,5 +1,15 @@
 # Decision Log
 
+## D-093 – Garagen-Deko nur durch Kauf
+
+**Source:** Felix, 2026-11-13 („wenn man ein Plot claimt, stehen noch Gegenstände von Anfang an da, alles muss gekauft werden“, Bild: Paletten, Regale und Werkstatt in der Garage)
+**Decision:** Die Garage kommt weiter mit dem Grundstück, aber nur ihre Technik (Verladeturm, Stellplätze, Leuchtring, Tor, Kabine). Ihre Deko wird wie die Außen-Deko gekauft, eingereiht in die Deko-Pakete:
+- Garage Pallets (Paletten, Fässer, Feuerlöscher) $500, nach „Front Pines“
+- Garage Racks (Hochregale) $1.100, nach „Yard Storage“
+- Garage Workshop (Werkbank, Teileregal, Ölfässer, Pylonen, Hubwagen, Ware) $1.600, nach „Side Storage“
+Damit 13 Pakete von $150 bis $5.400, gleicher Kaufknopf, ab Hallenwänden.
+**Affected systems:** Decor, PlotDecor, BuildingService
+
 ## D-092 – Blechhütte höher
 
 **Source:** Felix, 2026-11-13 („mach die Hütte etwas höher, damit der Schrank nicht in die Deckenstreben geht“, mit Bild)

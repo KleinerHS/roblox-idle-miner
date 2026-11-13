@@ -1,5 +1,13 @@
 # Implementation Status
 
+## Version 0.64.3 (2026-11-13) – Garagen-Deko zum Kaufen (D-093)
+
+| System | Dateien | Status |
+|---|---|---|
+| Paletten, Regale und Werkstatt der Garage nur noch über die Deko-Pakete ($500, $1.100, $1.600) | `Decor.luau`, `PlotDecor.luau`, `BuildingService.luau` | TESTING_REQUIRED |
+
+Selbsttest: Namenszuordnung gegen die Garage im HallLayout geprüft (14 Paletten-Teile, 2 Regale, 7 Werkstatt-Teile, nichts übrig). Im Spiel noch nicht getestet (Felix war im Play-Modus).
+
 ## Version 0.64.2 (2026-11-13) – Blechhütte höher (D-092)
 
 | System | Dateien | Status |

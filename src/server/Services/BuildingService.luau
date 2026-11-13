@@ -360,6 +360,11 @@ local function render(player: Player)
 				end
 			end
 			if model then
+				-- Garagen-Deko gibt es nur durch Kauf (D-093): vor dem Einsetzen verstecken
+				if step.Id == "build_garage" then
+					PlotDecor.resetGarage(plot)
+					PlotDecor.apply(plot, data.Buildings, model)
+				end
 				model.Parent = getFolder(plot)
 				s.models[step.Id] = model
 				BuildingService.ModelBuilt:Fire(player, step.Id, model)
@@ -370,7 +375,7 @@ local function render(player: Player)
 	updateButton(player, s, data)
 	updateUpgradeButton(player, s, data)
 	updateDecorButton(player, s, data)
-	PlotDecor.apply(plot, data.Buildings)
+	PlotDecor.apply(plot, data.Buildings, s.models.build_garage)
 	updateSign(s, player, data)
 	updateSpawn(s)
 end
@@ -396,6 +401,7 @@ local function clear(player: Player)
 	end
 	-- gekaufte Deko verschwindet mit dem Spieler
 	PlotDecor.apply(state.plot, {})
+	PlotDecor.resetGarage(state.plot)
 end
 
 tryPurchase = function(player: Player, stepId: string)
