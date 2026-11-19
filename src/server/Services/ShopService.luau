@@ -20,6 +20,7 @@ local Drills = require(Shared.Definitions.Drills)
 local Conveyors = require(Shared.Definitions.Conveyors)
 local Vehicles = require(Shared.Definitions.Vehicles)
 local Types = require(Shared.Types)
+local BalanceConfig = require(Shared.Config.BalanceConfig)
 local Result = require(Shared.Util.Result)
 local Log = require(Shared.Util.Log)
 local RareDropLogic = require(Shared.Util.RareDropLogic)
@@ -212,7 +213,9 @@ local function buyMachine(player: Player, typeId: unknown)
 	if not isNearShop(player, "machine") then
 		return Result.err(Result.Codes.TOO_FAR)
 	end
-	if data.MiningLevel < def.RequiredLevel then
+	-- Drills alle ab einem gemeinsamen Level, Förderbänder je Stufe (D-097)
+	local requiredLevel = if drill then BalanceConfig.DrillShopLevel else def.RequiredLevel
+	if data.MiningLevel < requiredLevel then
 		return Result.err(Result.Codes.LEVEL_TOO_LOW)
 	end
 	-- Drills: Typ-Vorgänger muss einmal gekauft worden sein (D-088)
@@ -273,9 +276,7 @@ local function buyVehicle(player: Player, typeId: unknown)
 	if not data.Buildings.build_garage then
 		return Result.err(Result.Codes.GARAGE_REQUIRED)
 	end
-	if data.MiningLevel < def.RequiredLevel then
-		return Result.err(Result.Codes.LEVEL_TOO_LOW)
-	end
+	-- Fahrzeuge ohne Level-Sperre (Felix 2026-11-19, D-097)
 	if data.Cash < def.Price then
 		return Result.err(Result.Codes.NOT_ENOUGH_MONEY)
 	end

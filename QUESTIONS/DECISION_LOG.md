@@ -1,5 +1,16 @@
 # Decision Log
 
+## D-097 – Level-Sperren: Drills ab 10, Fahrzeuge ohne Level; Deko-Mitarbeiter weg
+
+**Source:** Felix, 2026-11-19 („Deko ja weg, Rucksäcke mit Level, Drills sollen auf Level 10 anfangen, danach aber ohne Level kaufbar sein, Fahrzeuge auch ohne Level“)
+**Decision:**
+- **Drills:** Alle Drills brauchen Mining-Level 10 (`BalanceConfig.DrillShopLevel`), danach zählen nur Geld und der Vorgänger (D-088).
+- **Fahrzeuge:** ohne Level-Sperre (Garage und Geld bleiben Voraussetzung).
+- **Rucksäcke:** behalten ihre Level je Stufe. Förderbänder unverändert.
+- `RequiredLevel` in den Definitionen bleibt bestehen, weil die späte Preiskurve (`ContentCurve.latePrice`) daraus rechnet; Preise ändern sich nicht.
+- **Deko-Mitarbeiter** in der Schmelze (StaffKiln, StaffOutput) und in der Garagenwerkstatt (StaffWorkshop) entfernt, auch aus den Vorlagen.
+**Affected systems:** ShopService, ShopController, BalanceConfig, HallLayout, SmelterTemplate, GarageTemplate, HallTemplates
+
 ## D-096 – Rucksack-Wert im HUD, frühe Minen teurer, Rucksack-Puppen statt Tisch
 
 **Source:** Felix, 2026-11-19 („unter dem Geld soll ein Backpack-Symbol sein, das anzeigt, welchen Wert man in seinem Backpack hat“, „die Minen sollen am Anfang etwas teurer sein als jetzt“, „der Tisch mit den Backpacks ist zu viel, stell da einfach noch mal 3 Schaufensterpuppen hin mit random Rucksäcken, der letzte soll aber den besten Rucksack aufhaben“)

@@ -1,5 +1,14 @@
 # Implementation Status
 
+## Version 0.65.3 (2026-11-19) – Level-Sperren Drills/Fahrzeuge, Deko-Mitarbeiter weg (D-097)
+
+| System | Dateien | Status |
+|---|---|---|
+| Drills: alle ab Level 10 (danach nur Geld und Vorgänger), Fahrzeuge ohne Level, Rucksäcke unverändert | `BalanceConfig.luau` (`DrillShopLevel`), `ShopService.luau`, `ShopController.luau` | TESTING_REQUIRED |
+| Deko-Mitarbeiter in Schmelze (2) und Garagenwerkstatt (1) entfernt | Place: `HallLayout.Smelter`, `HallLayout.Garage` – **Place speichern!** Sicherung `assets/HallLayout.rbxm` (Rücktest 6.343 Objekte, 0 Abweichungen); Vorlagen `SmelterTemplate`, `GarageTemplate`, `HallTemplates` | TESTING_REQUIRED |
+
+Selbsttest (Play, Testprofil): Level 1 → Lieferwagen kaufbar; Drill Mk1 bei Level 1 „Level zu niedrig“; bei Level 10 Mk1, Mk2 (vorher Level 12) und Mk3 (vorher 16) kaufbar. Keine Skriptfehler. Testmodus danach aus.
+
 ## Version 0.65.2 (2026-11-19) – Rucksack-Wert im HUD, frühe Minen teurer, Spitzhacken-Werte lesbar, Rucksack-Puppen (D-096, BUG-022)
 
 | System | Dateien | Status |

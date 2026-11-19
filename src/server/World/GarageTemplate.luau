@@ -754,7 +754,6 @@ local function props(model: Model, o: CFrame)
 	AmbientProps.cartonPallet(shop, "GarageOpen", o * CFrame.new(-29, 0, -22), 2, false)
 	AmbientProps.palletTruck(shop, "GaragePalletTruck", o * CFrame.new(-34, 0, -30) * CFrame.Angles(0, math.rad(60), 0))
 	AmbientProps.cones(shop, "LaneCones", o * CFrame.new(-12, 0, -60) * CFrame.Angles(0, math.rad(90), 0), 4, 6)
-	AmbientProps.staffPath(model, "StaffWorkshop", { (o * CFrame.new(-26, 0, -75)).Position, (o * CFrame.new(-36, 0, -56)).Position, (o * CFrame.new(-26, 0, -26)).Position })
 end
 
 -- Glas-Rolltor in der Hallen-Toröffnung (docs/07 §3, §19). Geschlossen füllt es die Öffnung;

@@ -288,8 +288,6 @@ function HallTemplates.buildStorage(plotCFrame: CFrame): Model
 	AmbientProps.vending(rest, "VendingMachine", o * CFrame.new(hw - 2.5, 0, -20) * CFrame.Angles(0, math.rad(90), 0))
 	AmbientProps.waterCooler(rest, "WaterCooler", o * CFrame.new(hw - 2.2, 0, -15.5))
 	-- Arbeiter: Packplatz ↔ Regale, Pausenecke ↔ Terminal
-	AmbientProps.staffPath(model, "StaffPacking", { (o * CFrame.new(-6, 0, -44)).Position, (o * CFrame.new(-30, 0, -30)).Position, (o * CFrame.new(-60, 0, -30)).Position })
-	AmbientProps.staffPath(model, "StaffBreak", { (o * CFrame.new(hw - 16, 0, -29)).Position, (o * CFrame.new(hw - 18, 0, -42)).Position, (o * CFrame.new(hw - 41, 0, -38)).Position })
 
 	-- Schwebende Info-Schrift vorne über dem Lager (Felix: keine Tafeln, freundliche Schrift)
 	FloatingText.create(model, "StorageDisplay", o * CFrame.new(RACK_SHIFT_X, 36, -hd + 30), 22, {

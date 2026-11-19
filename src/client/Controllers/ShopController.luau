@@ -17,6 +17,7 @@ local Drills = require(Shared.Definitions.Drills)
 local Conveyors = require(Shared.Definitions.Conveyors)
 local Vehicles = require(Shared.Definitions.Vehicles)
 local Types = require(Shared.Types)
+local BalanceConfig = require(Shared.Config.BalanceConfig)
 local NumberFormat = require(Shared.Util.NumberFormat)
 
 local Net = require(script.Parent.Parent.Net)
@@ -123,7 +124,7 @@ local function cardsFor(tab: string, snapshot: Types.StateSnapshot): { Card }
 			table.insert(cards, {
 				Id = def.Id,
 				Name = def.DisplayName,
-				Level = def.RequiredLevel,
+				Level = 1, -- Fahrzeuge ohne Level-Sperre (D-097)
 				Price = def.Price,
 				Available = def.Available ~= false,
 				Stats = {
@@ -164,7 +165,7 @@ local function cardsFor(tab: string, snapshot: Types.StateSnapshot): { Card }
 			table.insert(cards, {
 				Id = def.Id,
 				Name = def.DisplayName,
-				Level = def.RequiredLevel,
+				Level = BalanceConfig.DrillShopLevel, -- alle Drills ab demselben Level (D-097)
 				Price = def.Price,
 				Available = true,
 				Multi = true,
@@ -206,7 +207,8 @@ local function act(remote: string, itemId: string)
 	busy = false
 	if not result.success then
 		local def: any = if currentTab == "pickaxe" then Pickaxes.Get(itemId) elseif currentTab == "drill" then Drills.Get(itemId) elseif currentTab == "conveyor" then Conveyors.Get(itemId) elseif currentTab == "vehicle" or currentTab == "truck" then Vehicles.Get(itemId) else Backpacks.Get(itemId)
-		NotificationController.Show("Warning", result.code, { Level = def and def.RequiredLevel, Price = def and def.Price })
+		local level = if currentTab == "drill" then BalanceConfig.DrillShopLevel else def and def.RequiredLevel
+		NotificationController.Show("Warning", result.code, { Level = level, Price = def and def.Price })
 	end
 end
 

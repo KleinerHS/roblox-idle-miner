@@ -424,6 +424,11 @@ local BalanceConfig = {
 	-- Drill-Level am Laptop (D-043): jeder Drill hat eigene Upgrade-Level 1…MaxLevel.
 	--   Produktion × (1 + (Level − 1) × ProductionBonusPerLevel), Puffer wächst mit
 	--   Kosten Level n → n+1 = Drill-Preis × UpgradeCostShare × UpgradeCostGrowth^(n − 1)
+	-- Level-Sperren beim Kaufen (Felix 2026-11-19, D-097): Spitzhacken und Fahrzeuge ohne Level,
+	-- alle Drills ab einem gemeinsamen Mindest-Level (danach nur Geld und Vorgänger),
+	-- Rucksäcke behalten ihre Level je Stufe. RequiredLevel in den Definitionen bleibt für die Preiskurve.
+	DrillShopLevel = 10, -- Felix (D-097)
+
 	Drills = {
 		MaxLevel = 10, -- Felix (D-043)
 		ProductionBonusPerLevel = 0.04, -- D-087 (Lv 10 = +36 %)

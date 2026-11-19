@@ -1051,8 +1051,6 @@ function SmelterTemplate.build(plotCFrame: CFrame): Model
 
 	-- Leben: Rundumleuchten im Betrieb, Arbeiter auf dem Gehweg, blinkende Kontroll-LEDs
 	AmbientProps.beacon(model, "BeaconFeedBin", at(kilnX + 4, gh + 11.4, backZ - 3), true)
-	AmbientProps.staffPath(model, "StaffKiln", { pos(kilnX + 24, 0, frontZ - 16), pos(kilnX + 24, 0, frontZ + 20), pos(kilnX + 22, 0, frontZ + 40) })
-	AmbientProps.staffPath(model, "StaffOutput", { pos(outputX + 19, 0, outputZ - 11), pos(outputX - 13, 0, outputZ - 11) })
 	for _, d in model:GetDescendants() do
 		if d:IsA("BasePart") and d.Name:match("Led%d*$") then
 			AmbientProps.blink(d)
