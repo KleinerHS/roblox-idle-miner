@@ -1,5 +1,16 @@
 # Implementation Status
 
+## Version 0.65.2 (2026-11-19) – Rucksack-Wert im HUD, frühe Minen teurer, Spitzhacken-Werte lesbar, Rucksack-Puppen (D-096, BUG-022)
+
+| System | Dateien | Status |
+|---|---|---|
+| HUD: Rucksack-Symbol unter dem Geld zeigt den Verkaufswert des Rucksacks (mit Prestige-Bonus) | `HudController.luau` | TESTING_REQUIRED |
+| Minen 3–19 teurer (Faktor ~2,5 abnehmend) | `BalanceConfig.luau` | TESTING_REQUIRED |
+| Shop-Ansicht: Werte untereinander statt abgeschnitten | `ShopController.luau` | TESTING_REQUIRED |
+| Equipment-Shop: Rucksack-Tisch weg, 6 Schaufensterpuppen (5 zufällig, letzte bester Rucksack) | `EquipmentShopBuilder.luau` | TESTING_REQUIRED |
+
+Selbsttest (Play, Testprofil): 40 Kohle im Rucksack → HUD „$80“ unter dem Geld; Mine 3 kostet $150; Puppen 1–5 mit verschiedenen Rucksäcken, Puppe 6 `backpack_void_emperor`, kein Tisch mehr; Werte-Zeile passt zweizeilig (TextFits). Keine Skriptfehler. Testmodus danach wieder aus.
+
 ## Version 0.65.1 (2026-11-19) – Spitzhacken ohne Level, Minenliste aktualisiert sich (D-095, BUG-021)
 
 | System | Dateien | Status |

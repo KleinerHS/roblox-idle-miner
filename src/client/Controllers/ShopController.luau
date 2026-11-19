@@ -495,7 +495,8 @@ local function renderShowcase()
 	for _, stat in card.Stats do
 		table.insert(statLines, if stat.compare then `{stat.label}: {stat.compare} → {stat.value}` else `{stat.label}: {stat.value}`)
 	end
-	scStats.Text = table.concat(statLines, "   ·   ")
+	-- je Wert eine Zeile, damit nichts abgeschnitten wird (Felix 2026-11-19, BUG-022)
+	scStats.Text = table.concat(statLines, "\n")
 	scInfo.Text = if locked then lockText(card, snapshot) else ""
 	scCounter.Text = `{scIndex} / {#cards}`
 	scAction.Text = string.split(text, "\n")[1]
@@ -736,19 +737,19 @@ local function buildShowcase()
 		Parent = info,
 	})
 	scStats = Create("TextLabel", {
-		Position = UDim2.fromOffset(0, 40),
-		Size = UDim2.new(1, 0, 0, 22),
+		Position = UDim2.fromOffset(0, 36),
+		Size = UDim2.new(1, 0, 0, 40),
 		BackgroundTransparency = 1,
 		Font = UITheme.Font,
-		TextSize = 17,
+		TextSize = 16,
 		TextColor3 = UITheme.Colors.TextSecondary,
 		TextXAlignment = Enum.TextXAlignment.Left,
-		TextTruncate = Enum.TextTruncate.AtEnd,
+		TextYAlignment = Enum.TextYAlignment.Top,
 		Parent = info,
 	})
 	scInfo = Create("TextLabel", {
-		Position = UDim2.fromOffset(0, 66),
-		Size = UDim2.new(0.7, 0, 0, 20),
+		Position = UDim2.fromOffset(0, 76),
+		Size = UDim2.new(0.7, 0, 0, 18),
 		BackgroundTransparency = 1,
 		Font = UITheme.Font,
 		TextSize = 15,
@@ -758,8 +759,8 @@ local function buildShowcase()
 	})
 	scCounter = Create("TextLabel", {
 		AnchorPoint = Vector2.new(1, 0),
-		Position = UDim2.new(1, 0, 0, 66),
-		Size = UDim2.new(0.3, 0, 0, 20),
+		Position = UDim2.new(1, 0, 0, 76),
+		Size = UDim2.new(0.3, 0, 0, 18),
 		BackgroundTransparency = 1,
 		Font = UITheme.Font,
 		TextSize = 15,

@@ -1,5 +1,14 @@
 # Decision Log
 
+## D-096 – Rucksack-Wert im HUD, frühe Minen teurer, Rucksack-Puppen statt Tisch
+
+**Source:** Felix, 2026-11-19 („unter dem Geld soll ein Backpack-Symbol sein, das anzeigt, welchen Wert man in seinem Backpack hat“, „die Minen sollen am Anfang etwas teurer sein als jetzt“, „der Tisch mit den Backpacks ist zu viel, stell da einfach noch mal 3 Schaufensterpuppen hin mit random Rucksäcken, der letzte soll aber den besten Rucksack aufhaben“)
+**Decision:**
+- **HUD:** Unter dem Geld steht ein Rucksack-Symbol mit dem Verkaufswert des Rucksack-Inhalts (Menge × Verkaufswert × Prestige-Geldbonus, wie beim Verkaufen).
+- **Minenpreise:** Minen 3–19 teurer, Aufschlag von ~×2,5 (Mine 3) abnehmend bis ~×1,25 (Mine 19), streng steigend: 150, 160, 180, 190, 220, 230, 280, 300, 330, 360, 390, 420, 440, 480, 520, 560, 600. Ab Mine 20 unverändert.
+- **Equipment-Shop:** Rucksack-Tisch entfernt. 6 Schaufensterpuppen in einer Reihe; 1–5 tragen zufällige, verschiedene Rucksäcke (neu gewürfelt bei jedem Serverstart), die letzte immer den besten (`backpack_void_emperor`).
+**Affected systems:** HudController, BalanceConfig, EquipmentShopBuilder
+
 ## D-095 – Spitzhacken ohne Level-Sperre
 
 **Source:** Felix, 2026-11-19 („die Spitzhacken dürfen nicht Level-geschützt sein“)

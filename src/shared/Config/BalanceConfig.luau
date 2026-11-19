@@ -129,17 +129,18 @@ local BalanceConfig = {
 
 	-- Minen 001–100 (D-087): Mindest-Level und Kaufpreis je Mine einzeln. Minen ab Preis > 0
 	-- werden zusätzlich gekauft (der Reihe nach, D-017/D-019).
+	-- frühe Minen teurer (Felix 2026-11-19, D-096): Faktor ~2,5 bei Mine 3 abnehmend bis ~1,25 bei Mine 19
 	MineUnlocks = {
 		mine_001 = { RequiredLevel = 1, Price = 0 }, mine_002 = { RequiredLevel = 2, Price = 0 },
-		mine_003 = { RequiredLevel = 3, Price = 58 }, mine_004 = { RequiredLevel = 4, Price = 61 },
-		mine_005 = { RequiredLevel = 5, Price = 78 }, mine_006 = { RequiredLevel = 6, Price = 82 },
-		mine_007 = { RequiredLevel = 7, Price = 100 }, mine_008 = { RequiredLevel = 8, Price = 110 },
-		mine_009 = { RequiredLevel = 9, Price = 140 }, mine_010 = { RequiredLevel = 10, Price = 140 },
-		mine_011 = { RequiredLevel = 11, Price = 180 }, mine_012 = { RequiredLevel = 12, Price = 180 },
-		mine_013 = { RequiredLevel = 13, Price = 230 }, mine_014 = { RequiredLevel = 14, Price = 240 },
-		mine_015 = { RequiredLevel = 15, Price = 290 }, mine_016 = { RequiredLevel = 16, Price = 300 },
-		mine_017 = { RequiredLevel = 17, Price = 380 }, mine_018 = { RequiredLevel = 18, Price = 390 },
-		mine_019 = { RequiredLevel = 19, Price = 480 }, mine_020 = { RequiredLevel = 20, Price = 2500 },
+		mine_003 = { RequiredLevel = 3, Price = 150 }, mine_004 = { RequiredLevel = 4, Price = 160 },
+		mine_005 = { RequiredLevel = 5, Price = 180 }, mine_006 = { RequiredLevel = 6, Price = 190 },
+		mine_007 = { RequiredLevel = 7, Price = 220 }, mine_008 = { RequiredLevel = 8, Price = 230 },
+		mine_009 = { RequiredLevel = 9, Price = 280 }, mine_010 = { RequiredLevel = 10, Price = 300 },
+		mine_011 = { RequiredLevel = 11, Price = 330 }, mine_012 = { RequiredLevel = 12, Price = 360 },
+		mine_013 = { RequiredLevel = 13, Price = 390 }, mine_014 = { RequiredLevel = 14, Price = 420 },
+		mine_015 = { RequiredLevel = 15, Price = 440 }, mine_016 = { RequiredLevel = 16, Price = 480 },
+		mine_017 = { RequiredLevel = 17, Price = 520 }, mine_018 = { RequiredLevel = 18, Price = 560 },
+		mine_019 = { RequiredLevel = 19, Price = 600 }, mine_020 = { RequiredLevel = 20, Price = 2500 },
 		mine_021 = { RequiredLevel = 21, Price = 4100 }, mine_022 = { RequiredLevel = 22, Price = 6300 },
 		mine_023 = { RequiredLevel = 23, Price = 8000 }, mine_024 = { RequiredLevel = 24, Price = 12000 },
 		mine_025 = { RequiredLevel = 25, Price = 24000 }, mine_026 = { RequiredLevel = 26, Price = 24000 },

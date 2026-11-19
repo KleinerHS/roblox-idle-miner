@@ -288,11 +288,23 @@ function EquipmentShopBuilder.build(parent: Instance): Model
 	camPart.CanCollide = false
 	camPart.CanQuery = false
 
-	-- Rucksack-Abteilung an der linken Wand (lokal +X): Puppen vorne, Tisch mit allen Stufen dahinter
+	-- Rucksack-Abteilung an der linken Wand (lokal +X): eine Reihe Schaufensterpuppen statt Tisch
+	-- (Felix 2026-11-19, D-096): zufällige Rucksäcke (ohne Doppelte), die letzte Puppe trägt den besten
 	ShopInterior.hangingSign(inside, "BackpackSign", o * CFrame.new(W / 2 - 9, ceilingY - 4, 4) * CFrame.Angles(0, math.rad(90), 0), "BACKPACKS", Color3.fromRGB(70, 96, 70), WHITE, 12, ceilingY)
-	for k, z in { -12, -6, 0 } do
-		local back = ShopInterior.mannequin(inside, `Mannequin{k}`, o * CFrame.new(W / 2 - 11, 0.6, z) * CFrame.Angles(0, math.rad(-90), 0), CANVAS[k], Color3.fromRGB(240, 196, 40))
-		local tier = #Backpacks.List - 3 + k
+	local spots = { -12, -6, 0, 6, 12, 18 }
+	local pool = {}
+	for i = 1, #Backpacks.List - 1 do
+		table.insert(pool, i)
+	end
+	local pick = Random.new()
+	local tiers = {}
+	for k = 1, #spots - 1 do
+		tiers[k] = if #pool > 0 then table.remove(pool, pick:NextInteger(1, #pool)) else 1
+	end
+	tiers[#spots] = #Backpacks.List
+	for k, z in spots do
+		local back = ShopInterior.mannequin(inside, `Mannequin{k}`, o * CFrame.new(W / 2 - 11, 0.6, z) * CFrame.Angles(0, math.rad(-90), 0), CANVAS[((k - 1) % #CANVAS) + 1], Color3.fromRGB(240, 196, 40))
+		local tier = tiers[k]
 		local worn = BackpackModels.clone(Backpacks.List[tier])
 		if worn then
 			-- Vorlagen-Pivot = Befestigungspunkt am Rücken (D-074)
@@ -347,55 +359,6 @@ function EquipmentShopBuilder.build(parent: Instance): Model
 			light.Parent = spot
 		end
 	end
-	-- Rucksack-Tisch vor der linken hinteren Ecke, endet vor der Spitzhacken-Wand
-	local tables = Instance.new("Folder")
-	tables.Name = "BackpackDisplay"
-	tables.Parent = model
-	local tableCF = o * CFrame.new(W / 2 - 12, 0, 14)
-	part(tables, "Table", Vector3.new(4, 0.4, 20), tableCF * CFrame.new(0, 3.2, 0), WOOD, Enum.Material.Wood)
-	for _, z in { -9, 9 } do
-		part(tables, `TableLeg{z}`, Vector3.new(3.4, 3, 0.4), tableCF * CFrame.new(0, 1.5, z), WOOD_DARK, Enum.Material.Wood)
-	end
-	-- D-074: alle Stufen als echte Modelle in zwei Reihen (vordere Reihe die ersten Stufen, hintere
-	-- erhöht auf einer Stufe), Vorderseite zur Ladenmitte
-	local count = #Backpacks.List
-	local perRow = math.ceil(count / 2)
-	part(tables, "Riser", Vector3.new(1.6, 0.8, 19.4), tableCF * CFrame.new(1, 3.8, 0), WOOD_DARK, Enum.Material.Wood)
-	for row = 1, 2 do
-		local first = (row - 1) * perRow + 1
-		local last = math.min(count, row * perRow)
-		local defs = {}
-		for i = first, last do
-			table.insert(defs, Backpacks.List[i])
-		end
-		local models = {}
-		local widths, total = {}, 0
-		for i, def in defs do
-			local m = BackpackModels.standing(def, 0.9)
-			models[i] = m
-			local w = if m then select(2, m:GetBoundingBox()).X else 1.65 * backpackScale(first + i - 1)
-			widths[i] = w
-			total += w
-		end
-		local gap = math.max(0.1, (19 - total) / math.max(1, #defs - 1))
-		local x, y = if row == 1 then -0.9 else 1, if row == 1 then 3.4 else 4.2
-		local z = -9.5
-		for i, def in defs do
-			local holder = Instance.new("Folder")
-			holder.Name = def.Id
-			holder.Parent = tables
-			local cf = tableCF * CFrame.new(x, y, z + widths[i] / 2)
-			local m = models[i]
-			if m then
-				m:PivotTo(cf * CFrame.Angles(0, math.rad(90), 0))
-				m.Parent = holder
-			else
-				displayBackpack(holder, cf * CFrame.Angles(0, math.rad(-90), 0), first + i - 1)
-			end
-			z += widths[i] + gap
-		end
-	end
-
 	-- Hinten rechts: Probierecke mit Fels, Personaltür, Poster, Uhr
 	local rock = part(inside, "TryRock", Vector3.new(6, 4, 5), o * CFrame.new(-W / 2 + 10, 2.6, 16) * CFrame.Angles(0.2, 0.6, 0.1), Color3.fromRGB(110, 106, 100), Enum.Material.Rock)
 	rock.CanCollide = true

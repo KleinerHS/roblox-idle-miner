@@ -12,6 +12,8 @@ local UITheme = require(Shared.Config.UITheme)
 local CompanyIdentity = require(Shared.Definitions.CompanyIdentity)
 local Mines = require(Shared.Definitions.Mines)
 local Ores = require(Shared.Definitions.Ores)
+local Materials = require(Shared.Definitions.Materials)
+local PrestigeLogic = require(Shared.Util.PrestigeLogic)
 local Types = require(Shared.Types)
 local NumberFormat = require(Shared.Util.NumberFormat)
 
@@ -26,6 +28,7 @@ local TEXT = Strings.Hud
 local HudController = {}
 
 local cashLabel: TextLabel
+local backpackLabel: TextLabel
 local levelLabel: TextLabel
 local xpLabel: TextLabel
 local xpFill: Frame
@@ -83,8 +86,21 @@ local function showPopup(title: string, line1: string, line2: string, color: Col
 	end)
 end
 
+-- Verkaufswert des Rucksacks (wie beim Verkauf: Menge × Wert, Prestige-Bonus, abgerundet)
+local function backpackValue(snapshot: Types.StateSnapshot): number
+	local total = 0
+	for id, amount in snapshot.Backpack do
+		local m = Materials.Get(id)
+		if m and m.SellValue and amount > 0 then
+			total += amount * m.SellValue
+		end
+	end
+	return math.floor(total * PrestigeLogic.MoneyMultiplier((snapshot :: any).PrestigeCount or 0))
+end
+
 local function refresh(snapshot: Types.StateSnapshot)
 	animateCash(snapshot.Cash)
+	backpackLabel.Text = NumberFormat.cash(backpackValue(snapshot))
 	levelLabel.Text = string.format(TEXT.MiningLevel, snapshot.MiningLevel)
 	xpLabel.Text = string.format(TEXT.XP, NumberFormat.withSeparators(snapshot.MiningXP), NumberFormat.withSeparators(snapshot.MiningXPRequired))
 	local ratio = math.clamp(snapshot.MiningXP / math.max(snapshot.MiningXPRequired, 1), 0, 1)
@@ -147,6 +163,35 @@ function HudController.Init()
 		TextColor3 = UITheme.Colors.Positive,
 		Text = "$0",
 		Parent = cashCard,
+	})
+
+	-- Rucksack-Wert unter dem Geld (Felix 2026-11-19, D-096)
+	local backpackCard = Create("Frame", {
+		AnchorPoint = Vector2.new(1, 0),
+		Position = UDim2.new(1, -20, 0, 64),
+		Size = UDim2.fromOffset(0, 36),
+		AutomaticSize = Enum.AutomaticSize.X,
+		BackgroundColor3 = UITheme.Colors.Background,
+		BackgroundTransparency = 0.15,
+		Parent = gui,
+	}, {
+		Create("UICorner", { CornerRadius = UITheme.CornerRadius }),
+		Create("UIPadding", { PaddingLeft = UDim.new(0, 8), PaddingRight = UDim.new(0, 14) }),
+		Create("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, VerticalAlignment = Enum.VerticalAlignment.Center, Padding = UDim.new(0, 4), SortOrder = Enum.SortOrder.LayoutOrder }),
+	})
+	local backpackIcon = CategoryIcon.create("Backpack", 30)
+	backpackIcon.LayoutOrder = 0
+	backpackIcon.Parent = backpackCard
+	backpackLabel = Create("TextLabel", {
+		LayoutOrder = 1,
+		Size = UDim2.fromScale(0, 1),
+		AutomaticSize = Enum.AutomaticSize.X,
+		BackgroundTransparency = 1,
+		Font = UITheme.FontBold,
+		TextSize = 20,
+		TextColor3 = UITheme.Colors.TextPrimary,
+		Text = "$0",
+		Parent = backpackCard,
 	})
 
 	-- Mining Level unten mittig über der Hotbar (docs/09 §8, verbindlich)

@@ -246,3 +246,14 @@ Nicht verschoben: eine Rohr-Aufhänger-Gruppe weit außerhalb der Halle (Workspa
 **Fix:** `ElevatorController` zeichnet die Liste bei jeder Spielstand-Änderung neu, solange das Fenster offen ist.
 **Regression geprüft:** Play ohne Skriptfehler; Liste reagiert auf Geld-/Level-Änderung bei offenem Fenster. Der Minenkauf selbst ist im echten Ablauf (am Elevator) noch zu testen.
 **Likely system:** ElevatorController
+
+## BUG-022 – Spitzhacken-Ansicht: Mining-Speed abgeschnitten
+
+**Severity:** Low
+**Status:** Fixed (TESTING_REQUIRED)
+**Build:** 0.65.1
+**Gemeldet:** Felix, 2026-11-19 („wenn man Pickaxes kauft, ist der Mining-Speed abgeschnitten, man sieht gar nicht, wie viel es gibt“)
+**Ursache:** In der Shop-Ansicht standen alle Werte in einer Zeile („Power: 1 → 2 · Speed: …“) mit Abschneiden am Ende; bei Vergleichswerten passte der Speed nicht mehr hinein.
+**Fix:** `ShopController` zeigt jeden Wert in einer eigenen Zeile (Feld zweizeilig), Info-/Zähler-Zeile darunter verschoben.
+**Regression geprüft:** Play: zweizeiliger Text passt (TextFits), keine Skriptfehler.
+**Likely system:** ShopController
