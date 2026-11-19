@@ -531,7 +531,24 @@ end
 -- Alle Fahrzeuge mit Stellplatz in die Halle stellen (nach Join / Garagenbau)
 local function spawnParked(player: Player)
 	local data = DataService.Get(player)
-	if not data or not data.Buildings[GARAGE_STEP] then
+	if not data then
+		return
+	end
+	if not data.Buildings[GARAGE_STEP] then
+		-- Noch keine Garage (D-094: muss gekauft werden): Fahrzeuge auf dem Vorplatz des Grundstücks
+		local plotId = PlotService.GetPlotId(player)
+		if not plotId then
+			return
+		end
+		local spot = LayoutConfig.ForecourtParking
+		local i = 0
+		for _, record in data.Vehicles.Owned do
+			if record.Bay and not TrailerBuilder.HasTrailers(record.Type) and not (spawned[player] and spawned[player][record.Id]) then
+				local cf = PlotBuilder.getPlotCFrame(plotId) * CFrame.new(spot.X + i * 14, 1.05, spot.Y) * CFrame.Angles(0, math.pi, 0)
+				spawnAtBay(player, record, cf)
+				i += 1
+			end
+		end
 		return
 	end
 	for _, record in data.Vehicles.Owned do
@@ -706,6 +723,9 @@ function VehicleService.Start()
 
 	DataService.ProfileLoaded:Connect(function(player)
 		VehicleService.EnsureStarter(player)
+		task.defer(spawnParked, player)
+	end)
+	PlotService.PlotAssigned:Connect(function(player)
 		task.defer(spawnParked, player)
 	end)
 	Players.PlayerRemoving:Connect(function(player)

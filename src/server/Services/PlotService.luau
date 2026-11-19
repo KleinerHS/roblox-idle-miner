@@ -61,11 +61,27 @@ local claimButtons: { [number]: BasePart } = {}
 local lastClaimTouch: { [Player]: number } = {}
 local claimPlot: (player: Player, plotId: number) -> ()
 
+-- Freie Grundstücke für alle Clients (Wegweiser und große CLAIM-Schilder, D-094), unabhängig vom
+-- Streaming: ReplicatedStorage.FreePlots.Plot_N = Position des Claim-Knopfs
+local function freePlotsFolder(): Folder
+	local f = ReplicatedStorage:FindFirstChild("FreePlots")
+	if not f then
+		f = Instance.new("Folder")
+		f.Name = "FreePlots"
+		f.Parent = ReplicatedStorage
+	end
+	return f :: Folder
+end
+
 local function removeClaimButton(plotId: number)
 	local button = claimButtons[plotId]
 	if button then
 		button:Destroy()
 		claimButtons[plotId] = nil
+	end
+	local marker = freePlotsFolder():FindFirstChild(`Plot_{plotId}`)
+	if marker then
+		marker:Destroy()
 	end
 end
 
@@ -146,6 +162,11 @@ local function makeClaimButton(plotId: number)
 	end)
 	button.Parent = plots[plotId]
 	claimButtons[plotId] = button
+	local marker = Instance.new("Vector3Value")
+	marker.Name = `Plot_{plotId}`
+	marker.Value = button.Position
+	marker:SetAttribute("PlotId", plotId)
+	marker.Parent = freePlotsFolder()
 end
 
 local function notify(player: Player, kind: string, code: string, args: { [string]: any }?)

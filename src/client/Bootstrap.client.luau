@@ -39,6 +39,7 @@ local CONTROLLER_ORDER = {
 	"ConveyorController",
 	"HallAmbienceController",
 	"AutoDoorController",
+	"ClaimGuideController",
 	"TradeController",
 	"OfflineController",
 }

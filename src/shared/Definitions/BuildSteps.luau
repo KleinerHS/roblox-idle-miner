@@ -63,7 +63,6 @@ local list: { BuildStepDefinition } = {
 	{
 		Id = "build_garage",
 		DisplayName = "Garage",
-		AutoBuild = true, -- Felix 2026-11-12 (D-090): kommt kostenlos mit dem Plot-Claim
 		Price = 900, -- Balancing 2026-11-11 (D-087)
 		RequiredLevel = 6, -- Balancing 2026-11-11 (D-087)
 		Requires = "build_storage",

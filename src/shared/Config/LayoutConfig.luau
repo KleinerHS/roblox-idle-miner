@@ -141,6 +141,8 @@ local LayoutConfig = {
 	-- (lokal X/Z; man kann auch mit dem Auto drüberfahren). TODO_LAYOUT
 	ClaimButton = Vector2.new(40, -138),
 	ClaimButtonSize = Vector3.new(10, 0.4, 10),
+	-- Abstellplatz für Fahrzeuge, solange keine Garage gekauft ist (D-094): Vorplatz, Front zur Halle
+	ForecourtParking = Vector2.new(65, -118),
 
 	-- Mine Shaft (00 §13, MINE_SHAFT_REFERENCE.png): ein Raum pro Plot, unter dem Plot.
 	-- Der Raum wird beim Elevator-Wechsel auf die gewählte Mine umkonfiguriert (D-014).

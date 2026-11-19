@@ -98,9 +98,14 @@ local function check(player: Player)
 		local seat = model:FindFirstChild("DriveSeat", true)
 		local pos = if seat and seat:IsA("BasePart") then seat.Position else model:GetPivot().Position
 		if inCircle(pos) then
-			local result = sellAll(player, vehicleId)
-			if result then
-				RemoteService.FireClient("Sold", player, result)
+			-- im Fahrzeug Ladung UND Rucksack verkaufen, ohne Aussteigen (Felix 2026-11-19, D-094)
+			local cargo = sellAll(player, vehicleId)
+			local pack = sellAll(player, nil)
+			if cargo or pack then
+				RemoteService.FireClient("Sold", player, {
+					Cash = (if cargo then cargo.Cash else 0) + (if pack then pack.Cash else 0),
+					XP = (if cargo then cargo.XP else 0) + (if pack then pack.XP else 0),
+				})
 			end
 		end
 		return

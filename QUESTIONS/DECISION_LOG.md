@@ -1,5 +1,18 @@
 # Decision Log
 
+## D-094 – Felix' Liste vom 19.11.: Claim-Wegweiser, Garage kaufen, Verkaufen im Auto
+
+**Source:** Felix, 2026-11-19 („wenn man reinkommt und kein Plot hat, muss über allen freien Plots ganz groß CLAIM stehen“, „eine dezente gepunktete Linie mit einer Wellen-Animation, die einen zum Auto und dann zu einem der freien Plots führt“, „das Garagentor und der Verladeturm dürfen nicht direkt da sein, muss alles gekauft werden, außerdem erscheint die Fahrspur beim Verladeturm erst, wenn man den Verladeturm kauft“, „die Spitzhacke glitcht aus dem Auto“, „man muss in der Mitte aussteigen, um sein Inventar zu verkaufen, es soll einfach direkt beides, Auto und Inventar, verkaufen“, „wenn man das Lager kauft, laufen da direkt Arbeiter rum“, „der Gabelstapler neben dem Lager ist halb im Boden“)
+**Decision:**
+- **CLAIM-Anzeige:** Spieler ohne Grundstück sehen über jedem freien Grundstück groß „CLAIM · FREE PLOT N“, auf jede Entfernung (Bildschirm-Anzeige, weil Roblox Billboards in der Ferne nicht zeigt). Die Positionen kommen vom Server (`ReplicatedStorage.FreePlots`).
+- **Wegweiser:** dezente gepunktete Linie mit laufender Welle, erst zum eigenen Pickup, im Auto zum nächsten freien Claim-Knopf. Verschwindet nach dem Claim.
+- **Garage wieder kaufen:** Verladeturm, Tor, Stellplätze und Fahrspur kommen erst mit dem Bauschritt Garage ($900, Level 6), nicht mehr mit dem Claim (ersetzt den Garagen-Teil von D-090). Ohne Garage parkt der Pickup auf dem Vorplatz des Grundstücks.
+- **Spitzhacke im Auto:** wird beim Einsteigen weggelegt und lässt sich im Auto nicht ausrüsten.
+- **Verkaufen im Auto:** Im Verkaufskreis werden Ladung und Rucksack zusammen verkauft, ohne Aussteigen.
+- **Lager:** die zwei herumlaufenden Lager-Arbeiter (Deko-Figuren) sind entfernt. Echte, eingestellte Worker sind davon nicht betroffen.
+- **Gabelstapler** im Lager steht jetzt auf dem Hallenboden (2,4 Studs angehoben).
+**Affected systems:** ClaimGuideController (neu), PlotService, BuildSteps, VehicleService, MiningController, SellingService, LayoutConfig, HallLayout (Storage)
+
 ## D-093 – Garagen-Deko nur durch Kauf
 
 **Source:** Felix, 2026-11-13 („wenn man ein Plot claimt, stehen noch Gegenstände von Anfang an da, alles muss gekauft werden“, Bild: Paletten, Regale und Werkstatt in der Garage)

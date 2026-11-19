@@ -1,5 +1,29 @@
 # Implementation Status
 
+## Version 0.65.0 (2026-11-19) – Felix' Liste: Claim-Wegweiser, Garage kaufen, Verkaufen im Auto (D-094)
+
+| System | Dateien | Status |
+|---|---|---|
+| Große CLAIM-Anzeige über freien Grundstücken, gepunktete Wellen-Linie zum Auto und zum Grundstück | `ClaimGuideController.luau` (neu), `PlotService.luau` | TESTING_REQUIRED |
+| Garage (Verladeturm, Tor, Fahrspur) wieder als Kaufschritt; Pickup parkt ohne Garage auf dem Vorplatz | `BuildSteps.luau`, `VehicleService.luau`, `LayoutConfig.luau` | TESTING_REQUIRED |
+| Spitzhacke im Auto weggelegt | `MiningController.luau` | TESTING_REQUIRED |
+| Im Verkaufskreis Ladung und Rucksack zusammen verkaufen | `SellingService.luau` | TESTING_REQUIRED |
+| Lager-Arbeiter (Deko) entfernt, Gabelstapler auf den Boden | Place: `HallLayout.Storage` – **Place speichern!** Sicherung `assets/HallLayout.rbxm` (Rücktest 6.347 Objekte, 0 Abweichungen) | TESTING_REQUIRED |
+
+Selbsttest (Play, Testprofil): 6 CLAIM-Anzeigen sichtbar (auch über 600 Studs), Punkte führen zum Pickup, im Auto zum nächsten Grundstück; Einsteigen mit Spitzhacke in der Hand → Hacke weg; Claim per Auto → nur Büro-Knopf, keine Garage; im Auto im Verkaufskreis: Ladung $400/200 XP und Rucksack $100/50 XP in einem Durchgang; Gabelstapler-Räder auf Bodenhöhe. Keine Skriptfehler.
+
+## Separates 3D-Modell – Förderkorb mit Dachwinde
+
+| System | Datei | Status |
+|---|---|---|
+| Förderkorb mit kompakter Seilwinde als eigene Baugruppe | `outputs/foerderkorb/Foerderkorb.rbxm` | TESTING_REQUIRED |
+
+Korb optisch überarbeitet. Einstieg mit Rampe, Torrahmen mit Griffen und Kennschild, verstärkte Seitenbleche, Handläufe und neues Bedienpult. Export und Vorschau geprüft. Studio-Checkpoint: Aktualisierte Datei in einer Test-Place über das Workspace-Kontextmenü einfügen, mit **F** fokussieren und im Play-Modus über die Rampe in den Korb laufen. Einstieg, Torbeschläge und Bedienpult aus der Nähe prüfen.
+
+Korrektur an der Seiltrommel: Flanschschrauben auf die Außenseiten gesetzt, das ablaufende Seil tangential an die Wicklungen geführt und die Bodendurchführung mitversetzt. Abstände und korrigierte Vorschau geprüft. In Studio die aktualisierte Datei neu einfügen und die Trommel von beiden Seiten aus der Nähe prüfen.
+
+Modell mit Rojo exportiert und als 3D-Vorschau geprüft. Studio-Checkpoint: In einer Test-Place die Datei über das Workspace-Kontextmenü einfügen, das Modell auswählen und mit **F** heranzoomen. Die Dachwinde von vorne und seitlich prüfen. Für eine Anprobe am bestehenden Korb nur die Baugruppe `Dachwinde` kopieren und ihren Drehpunkt auf der Dachmitte ausrichten.
+
 ## Version 0.64.4 (2026-11-13) – BUG-020 Testmodus-Warnung
 
 | System | Dateien | Status |

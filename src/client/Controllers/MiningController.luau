@@ -332,11 +332,33 @@ local function watchTool(tool: Instance)
 	end
 end
 
+-- Im Fahrzeug keine Spitzhacke in der Hand (sie ragte aus dem Auto, Felix 2026-11-19, D-094)
+local function inVehicle(humanoid: Humanoid): boolean
+	local seat = humanoid.SeatPart
+	return seat ~= nil and seat:IsA("VehicleSeat")
+end
+
 local function onCharacter(character: Model)
 	for _, child in character:GetChildren() do
 		watchTool(child)
 	end
-	character.ChildAdded:Connect(watchTool)
+	local humanoid = character:WaitForChild("Humanoid", 10)
+	character.ChildAdded:Connect(function(child)
+		watchTool(child)
+		if child:IsA("Tool") and humanoid and humanoid:IsA("Humanoid") and inVehicle(humanoid) then
+			task.defer(function()
+				humanoid:UnequipTools()
+			end)
+		end
+	end)
+	if humanoid and humanoid:IsA("Humanoid") then
+		humanoid.Seated:Connect(function(active)
+			if active and inVehicle(humanoid) then
+				holding = false
+				humanoid:UnequipTools()
+			end
+		end)
+	end
 end
 
 function MiningController.Init()
