@@ -484,7 +484,15 @@ function ElevatorController.Init()
 	Net.on("LocationChanged", onLocation)
 end
 
-function ElevatorController.Start() end
+function ElevatorController.Start()
+	-- Nach einem Minenkauf (oder Geld/Level-Änderung) die offene Liste sofort aktualisieren:
+	-- „Kaufen“ wird direkt zu „GO“ (Felix 2026-11-19, BUG-021)
+	StateController.Changed:Connect(function()
+		if menuGui and menuGui.Enabled then
+			refreshRows()
+		end
+	end)
+end
 
 -- Aktueller Ort ("surface" oder Mine-ID), z. B. für Mining-Controller in Schritt 2c.
 function ElevatorController.GetLocation(): string

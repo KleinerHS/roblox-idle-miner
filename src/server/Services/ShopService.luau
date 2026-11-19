@@ -149,7 +149,8 @@ local function buy(player: Player, categoryName: unknown, itemId: unknown)
 	if item.Available == false then
 		return Result.err(Result.Codes.NOT_AVAILABLE)
 	end
-	if data.MiningLevel < item.RequiredLevel then
+	-- Spitzhacken ohne Level-Sperre (Felix 2026-11-19, D-095): nur Vorgänger und Geld zählen
+	if categoryName ~= "pickaxe" and data.MiningLevel < item.RequiredLevel then
 		return Result.err(Result.Codes.LEVEL_TOO_LOW)
 	end
 	-- Spitzhacken und Rucksäcke: Vorgänger muss besessen werden (D-088)

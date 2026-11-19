@@ -1,5 +1,12 @@
 # Implementation Status
 
+## Version 0.65.1 (2026-11-19) – Spitzhacken ohne Level, Minenliste aktualisiert sich (D-095, BUG-021)
+
+| System | Dateien | Status |
+|---|---|---|
+| Spitzhacken ohne Level-Sperre (nur Geld und Vorgänger) | `ShopService.luau`, `ShopController.luau` | TESTING_REQUIRED |
+| Elevator-Minenliste: nach dem Kauf sofort „GO“ | `ElevatorController.luau` | TESTING_REQUIRED |
+
 ## Version 0.65.0 (2026-11-19) – Felix' Liste: Claim-Wegweiser, Garage kaufen, Verkaufen im Auto (D-094)
 
 | System | Dateien | Status |

@@ -1,5 +1,11 @@
 # Decision Log
 
+## D-095 – Spitzhacken ohne Level-Sperre
+
+**Source:** Felix, 2026-11-19 („die Spitzhacken dürfen nicht Level-geschützt sein“)
+**Decision:** Spitzhacken kann man unabhängig vom Mining-Level kaufen. Es zählen nur noch Geld und der Vorgänger (D-088: die vorige Stufe muss man besitzen). Im Shop steht bei Spitzhacken keine Level-Anforderung mehr. Rucksäcke, Drills und Fahrzeuge behalten ihre Level.
+**Affected systems:** ShopService, ShopController
+
 ## D-094 – Felix' Liste vom 19.11.: Claim-Wegweiser, Garage kaufen, Verkaufen im Auto
 
 **Source:** Felix, 2026-11-19 („wenn man reinkommt und kein Plot hat, muss über allen freien Plots ganz groß CLAIM stehen“, „eine dezente gepunktete Linie mit einer Wellen-Animation, die einen zum Auto und dann zu einem der freien Plots führt“, „das Garagentor und der Verladeturm dürfen nicht direkt da sein, muss alles gekauft werden, außerdem erscheint die Fahrspur beim Verladeturm erst, wenn man den Verladeturm kauft“, „die Spitzhacke glitcht aus dem Auto“, „man muss in der Mitte aussteigen, um sein Inventar zu verkaufen, es soll einfach direkt beides, Auto und Inventar, verkaufen“, „wenn man das Lager kauft, laufen da direkt Arbeiter rum“, „der Gabelstapler neben dem Lager ist halb im Boden“)

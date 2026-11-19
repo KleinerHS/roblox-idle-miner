@@ -235,3 +235,14 @@ Nicht verschoben: eine Rohr-Aufhänger-Gruppe weit außerhalb der Halle (Workspa
 **Fix:** Attribut entfernt (Felix muss die Place speichern). Zusätzlich zeigt das Spiel im Testmodus jetzt nach dem Laden eine Warnung „Studio test mode: progress is NOT saved!“, damit das nicht mehr unbemerkt passiert.
 **Regression geprüft:** Konsole der aktuellen Sitzung: „DataStore verbunden – Spielstände werden gespeichert“. Nach Stop und neuem Play muss „Joins 2“ und der Fortschritt da sein.
 **Likely system:** DataService
+
+## BUG-021 – Nach Minenkauf wird „Kaufen“ erst nach erneutem Öffnen zu „GO“
+
+**Severity:** Medium
+**Status:** Fixed (TESTING_REQUIRED)
+**Build:** 0.65.0
+**Gemeldet:** Felix, 2026-11-19 („wenn man neue Minen kauft, wird der Kaufen-Button nicht zum GO-Button aktualisiert, erst wenn man das Fenster schließt und wieder öffnet“)
+**Ursache:** Die Minenliste im Elevator-Fenster wurde nur beim Öffnen gezeichnet; der neue Spielstand nach dem Kauf kam an, ohne dass die Liste neu gezeichnet wurde.
+**Fix:** `ElevatorController` zeichnet die Liste bei jeder Spielstand-Änderung neu, solange das Fenster offen ist.
+**Regression geprüft:** Play ohne Skriptfehler; Liste reagiert auf Geld-/Level-Änderung bei offenem Fenster. Der Minenkauf selbst ist im echten Ablauf (am Elevator) noch zu testen.
+**Likely system:** ElevatorController

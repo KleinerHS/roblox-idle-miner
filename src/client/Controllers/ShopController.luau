@@ -103,7 +103,8 @@ local function cardsFor(tab: string, snapshot: Types.StateSnapshot): { Card }
 			table.insert(cards, {
 				Id = def.Id,
 				Name = def.DisplayName,
-				Level = def.RequiredLevel,
+				-- ohne Level-Sperre (D-095)
+				Level = 1,
 				Price = def.Price,
 				Available = def.Available ~= false,
 				Requires = if previous and not snapshot.OwnedPickaxes[previous.Id] then previous.DisplayName else nil,
