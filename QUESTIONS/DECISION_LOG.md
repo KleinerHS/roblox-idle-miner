@@ -1,5 +1,14 @@
 # Decision Log
 
+## D-104 – Supercar
+
+**Source:** Felix, 2026-11-20 (Link Creator Store 5389371630)
+**Decision:**
+- Übernommen als `vehicle_supercar` / „Supercar“. Entfernt: alle Skripte und das mitgebrachte Fahrwerk, die Logo-Teile „Badges“ und „InteriorBadges“, die Felgen-Wappen samt Radmuttern („BadgeAndNuts“) und das Logo in der Lenkradmitte. Scheiben (Front, Heck, Türen, kleine Heckscheiben) dunkel; Licht-Abdeckungen und Lüftungsgitter bleiben.
+- Fahrwerk vom Pickup abgeleitet (Gewicht 1.350, Drehmoment 410, Drehzahl bis 8.200).
+- Nur im Kauf-Fenster. Werte als Vorschlag, TODO_BALANCE: Preis 240.000, Ladung 8.000, Tempo 75, Beschleunigung 1,55. Sortierung: Sport Sedan → Sports Coupe → Track Car → Classic Sports Car → Supercar → Hypercar.
+**Affected systems:** Vehicles, AChassis-Tunes, VehicleBodies
+
 ## D-103 – Classic Sports Car
 
 **Source:** Felix, 2026-11-20 (Link Creator Store 5421203592)

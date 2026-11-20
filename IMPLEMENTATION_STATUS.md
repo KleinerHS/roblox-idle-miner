@@ -1,5 +1,14 @@
 # Implementation Status
 
+## Version 0.67.5 (2026-11-20) – Supercar (D-104)
+
+| System | Dateien | Status |
+|---|---|---|
+| Neues Fahrzeug „Supercar“ (Creator-Store-Modell ohne Logos/Wappen, Lenkrad-Logo entfernt, Scheiben dunkel), nur im Kauf-Fenster | `Vehicles.luau`; Place: `Vendor.VehicleBodies.vehicle_supercar`, `Vendor.AChassis.Tunes.vehicle_supercar` – **Place speichern!** Sicherungen `assets/VehicleBodies.rbxm`, `assets/AChassis.rbxm` | TESTING_REQUIRED |
+| Werte (Preis 240.000, Ladung 8.000, Tempo 75, Beschleunigung 1,55) | `Vehicles.luau` | TODO_BALANCE |
+
+Selbsttest (Play, Testprofil): per DevTool gegeben und ausgeparkt, Einsteigen und Fahren (300 Studs in 4 s) ohne Fehler. Fotos nicht möglich (Studio-Bild schwarz) – Sichtprüfung offen. Rücktest Sicherungen 0 Abweichungen. Testmodus danach aus.
+
 ## Version 0.67.4 (2026-11-20) – Classic Sports Car (D-103)
 
 | System | Dateien | Status |
