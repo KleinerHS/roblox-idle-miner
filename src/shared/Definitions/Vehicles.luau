@@ -82,12 +82,27 @@ local list: { VehicleDefinition } = {
 		PaintColor = Color3.fromRGB(196, 60, 46),
 		PersistenceClass = "Permanent",
 	},
+	-- Felix 2026-11-20 (D-100): Sportlimousine fürs Autohaus, Creator-Store-Modell ohne Markenlogos und
+	-- Nummernschild (D-026). Alle Drehteller sind belegt, deshalb nur im Kauf-Fenster. Werte: TODO_BALANCE.
+	{
+		Id = "vehicle_sedan",
+		DisplayName = "Sport Sedan",
+		Tier = 7, -- Sortierung hinter allen Nutzfahrzeugen
+		Style = "Pickup",
+		RequiredLevel = 25, -- nur Bezug für die Preiskurve (Fahrzeuge ohne Level-Sperre, D-097)
+		Price = 120000, -- TODO_BALANCE
+		Capacity = 10000, -- TODO_BALANCE
+		MaxSpeed = 68, -- TODO_BALANCE
+		Acceleration = 1.3, -- TODO_BALANCE
+		PaintColor = Color3.fromRGB(232, 232, 228),
+		PersistenceClass = "Permanent",
+	},
 	-- Felix 2026-11-20 (D-099): Sportwagen fürs Autohaus, Modell aus dem Creator Store ohne Markenlogos
 	-- (D-026). Schnell und spritzig, aber wenig Ladung. Werte sind ein Vorschlag: TODO_BALANCE.
 	{
 		Id = "vehicle_hypercar",
 		DisplayName = "Hypercar",
-		Tier = 7, -- Sortierung hinter allen Nutzfahrzeugen
+		Tier = 8, -- Sortierung hinter allen Nutzfahrzeugen
 		Style = "Pickup",
 		RequiredLevel = 30, -- nur Bezug für die Preiskurve (Fahrzeuge ohne Level-Sperre, D-097)
 		Price = 250000, -- TODO_BALANCE

@@ -1,5 +1,14 @@
 # Implementation Status
 
+## Version 0.67.1 (2026-11-20) – Sport Sedan (D-100)
+
+| System | Dateien | Status |
+|---|---|---|
+| Neues Fahrzeug „Sport Sedan“ (Creator-Store-Modell ohne Logos/Nummernschild, dunkle Scheiben), nur im Kauf-Fenster (alle Drehteller belegt) | `Vehicles.luau`; Place: `Vendor.VehicleBodies.vehicle_sedan`, `Vendor.AChassis.Tunes.vehicle_sedan` – **Place speichern!** Sicherungen `assets/VehicleBodies.rbxm`, `assets/AChassis.rbxm` | TESTING_REQUIRED |
+| Werte (Preis 120.000, Ladung 10.000, Tempo 68, Beschleunigung 1,3) | `Vehicles.luau` | TODO_BALANCE |
+
+Selbsttest (Play, Testprofil): per DevTool gegeben und ausgeparkt, Einsteigen und Fahren ohne Fehler; Fotos von vorne/hinten ohne Markenlogos. Rücktest Sicherungen 0 Abweichungen (außer den bekannten zwei namenlosen Pickup-Teilen). Testmodus danach aus.
+
 ## Version 0.67.0 (2026-11-20) – Hypercar im Autohaus (D-099)
 
 | System | Dateien | Status |

@@ -1,5 +1,15 @@
 # Decision Log
 
+## D-100 – Sport Sedan
+
+**Source:** Felix, 2026-11-20 (Link Creator Store 138845731794216, „füg alle ins Autohaus ein“)
+**Decision:**
+- Übernommen als `vehicle_sedan` / „Sport Sedan“. Entfernt: alle Skripte und das mitgebrachte Fahrwerk (wir nutzen unser A-Chassis), Nummernschild, 30 Logo-Teile (Haube, Grill, Heck, Lenkrad, Motor, Nabenkappen). Scheiben dunkel, ohne Spiegelung.
+- Fahrwerk vom Pickup abgeleitet (Gewicht 1.600, Drehmoment 360, Drehzahl bis 7.200).
+- Alle 4 Drehteller im Autohaus sind belegt: vorerst nur im Kauf-Fenster, bis Felix entscheidet (Q offen: mehr Ausstellungsplätze?).
+- Werte als Vorschlag, TODO_BALANCE: Preis 120.000, Ladung 10.000, Tempo 68, Beschleunigung 1,3. Das Hypercar rückt in der Sortierung dahinter (Tier 8).
+**Affected systems:** Vehicles, AChassis-Tunes, VehicleBodies
+
 ## D-099 – Hypercar im Autohaus
 
 **Source:** Felix, 2026-11-20 („füg bitte auch noch ein paar mehr Autos hinzu … füg alle ins Autohaus ein“, Link Creator Store 11921126659)
