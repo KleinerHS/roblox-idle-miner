@@ -1,5 +1,16 @@
 # Decision Log
 
+## D-099 – Hypercar im Autohaus
+
+**Source:** Felix, 2026-11-20 („füg bitte auch noch ein paar mehr Autos hinzu … füg alle ins Autohaus ein“, Link Creator Store 11921126659)
+**Decision:**
+- Das Modell (Sportwagen, Creator Store) wird als `vehicle_hypercar` / „Hypercar“ übernommen. Alle Markenlogos sind entfernt (6 Teile mit Badge-Textur), keine echten Namen (D-026). Scheiben dunkel und undurchsichtig wie bei allen Fahrzeugen.
+- Ausgestellt auf dem bisher leeren großen Drehteller hinten mittig im Autohaus.
+- Fahrwerk: A-Chassis-Abstimmung vom Pickup abgeleitet, leichter (1.400) und stärker (420 Drehmoment, Drehzahl bis 8.000).
+- Werte als Vorschlag, TODO_BALANCE: Preis 250.000, Ladung 8.000, Tempo 75, Beschleunigung 1,6.
+- Hinweis: Das Modell ist sehr detailreich (laut Ersteller etwa 250.000 Dreiecke). Auf schwachen Geräten kann es ruckeln, wenn mehrere davon unterwegs sind.
+**Affected systems:** Vehicles, VehicleModelBuilder (Vorlage), VehicleShopBuilder (Ausstellung), AChassis-Tunes
+
 ## D-098 – Felix' Mine V5 und neuer Förderkorb
 
 **Source:** Felix, 2026-11-20 („hier ist die neue Mine und auch ein neuer Fahrstuhl, füg das bitte alles so ein, und der Fahrstuhl oben soll auch so aussehen“, Datei MineShaft_V5.zip)

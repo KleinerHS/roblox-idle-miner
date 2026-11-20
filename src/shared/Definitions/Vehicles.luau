@@ -82,6 +82,22 @@ local list: { VehicleDefinition } = {
 		PaintColor = Color3.fromRGB(196, 60, 46),
 		PersistenceClass = "Permanent",
 	},
+	-- Felix 2026-11-20 (D-099): Sportwagen fürs Autohaus, Modell aus dem Creator Store ohne Markenlogos
+	-- (D-026). Schnell und spritzig, aber wenig Ladung. Werte sind ein Vorschlag: TODO_BALANCE.
+	{
+		Id = "vehicle_hypercar",
+		DisplayName = "Hypercar",
+		Tier = 7, -- Sortierung hinter allen Nutzfahrzeugen
+		Style = "Pickup",
+		RequiredLevel = 30, -- nur Bezug für die Preiskurve (Fahrzeuge ohne Level-Sperre, D-097)
+		Price = 250000, -- TODO_BALANCE
+		Capacity = 8000, -- TODO_BALANCE
+		Showroom = true,
+		MaxSpeed = 75, -- TODO_BALANCE
+		Acceleration = 1.6, -- TODO_BALANCE
+		PaintColor = Color3.fromRGB(232, 232, 228),
+		PersistenceClass = "Permanent",
+	},
 	-- Phase 12c (docs/07 §6: mittlerer LKW, großer Mining-Truck). Vorschlag Q-028:
 	-- Preis ≈ 20.000 × Erzwert auf diesem Level, Modelle vorläufig (Feinschliff am Ende)
 	{

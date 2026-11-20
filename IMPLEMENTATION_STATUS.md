@@ -1,5 +1,15 @@
 # Implementation Status
 
+## Version 0.67.0 (2026-11-20) – Hypercar im Autohaus (D-099)
+
+| System | Dateien | Status |
+|---|---|---|
+| Neues Fahrzeug „Hypercar“ (Creator-Store-Modell ohne Markenlogos, dunkle Scheiben) auf dem großen Drehteller hinten im Autohaus, kaufbar und fahrbar | `Vehicles.luau`; Place: `Vendor.VehicleBodies.vehicle_hypercar`, `Vendor.AChassis.Tunes.vehicle_hypercar` – **Place speichern!** Sicherungen `assets/VehicleBodies.rbxm`, `assets/AChassis.rbxm` | TESTING_REQUIRED |
+| Werte (Preis 250.000, Ladung 8.000, Tempo 75, Beschleunigung 1,6) | `Vehicles.luau` | TODO_BALANCE |
+| Export-Werkzeug: Mesh-Verweise (MeshId/TextureID) wieder in den Sicherungen | `tools/ExportRbxmx.luau`; neu gesichert `assets/HallLayout.rbxm`, `assets/VehicleBodies.rbxm` | IMPLEMENTED |
+
+Selbsttest (Play, Testprofil): Hypercar steht im Autohaus (Teller 4), per DevTool gegeben und ausgeparkt, Einsteigen und Fahren (≈ 70 Studs/s) ohne Fehler. Rücktest Sicherungen: HallLayout 6.557 Objekte 0 Abweichungen (inkl. MeshId), VehicleBodies 0 Abweichungen außer den bekannten zwei namenlosen Pickup-Teilen, AChassis 879 Objekte 0 Abweichungen. Testmodus danach aus.
+
 ## Version 0.66.0 (2026-11-20) – Felix' Mine V5 und neuer Förderkorb (D-098)
 
 | System | Dateien | Status |

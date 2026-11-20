@@ -71,7 +71,10 @@ local function enc(name: string, etype: string, v: any): string?
 		-- neuer Werttyp (z. B. SurfaceAppearance.ColorMapContent): als klassische Content-URL unter
 		-- dem älteren Namen ohne „Content“ schreiben (ColorMap), das versteht rojo/rbx-dom
 		local uri = (v :: any).Uri
-		local name = if string.sub(n, -7) == "Content" then string.sub(n, 1, -8) else n
+		-- MeshPart.MeshContent/TextureContent heißen in der Datei MeshId/TextureID (sonst gehen die
+		-- Mesh-Verweise verloren, gefunden 2026-11-20 beim Rücktest der VehicleBodies)
+		local CONTENT_NAMES = { MeshContent = "MeshId", TextureContent = "TextureID" }
+		local name = CONTENT_NAMES[n] or (if string.sub(n, -7) == "Content" then string.sub(n, 1, -8) else n)
 		if typeof(uri) ~= "string" or uri == "" then
 			return `<Content name="{name}"><null></null></Content>`
 		end
