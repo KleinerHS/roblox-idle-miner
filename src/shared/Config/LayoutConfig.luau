@@ -151,8 +151,9 @@ local LayoutConfig = {
 		DepthBelowPlot = 260,
 		-- Innenmaß X (Breite), Z (Tiefe), Höhe. TODO_LAYOUT
 		Size = Vector3.new(96, 22, 72),
-		-- Elevator-Podest mittig, nach hinten versetzt wie im Referenzbild (lokal X/Z)
-		ElevatorCenter = Vector2.new(0, 14),
+		-- Elevator-Podest mittig hinten (lokal X/Z), seit Felix' Mine V5 weiter hinten (D-098).
+		-- Die Geometrie kommt aus MineShaftLayout; der Wert dient nur noch als Bezug.
+		ElevatorCenter = Vector2.new(0, 24.65),
 		-- Mining-Slots wie im Referenzbild: Platz 1 hinten links (+X = links im Bild),
 		-- Platz 2 rechts an der Wand. Center = Mitte des Erzhaufens.
 		Slots = {

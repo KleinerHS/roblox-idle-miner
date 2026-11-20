@@ -1,5 +1,15 @@
 # Decision Log
 
+## D-098 – Felix' Mine V5 und neuer Förderkorb
+
+**Source:** Felix, 2026-11-20 („hier ist die neue Mine und auch ein neuer Fahrstuhl, füg das bitte alles so ein, und der Fahrstuhl oben soll auch so aussehen“, Datei MineShaft_V5.zip)
+**Decision:**
+- Die sichtbare Geometrie des Mine-Shaft-Raums und des Förderkorbs kommt aus Felix' OBJ (nur Quader, Zylinder, Kugeln). `tools/obj_to_luau.py` wandelt sie verlustfrei in Roblox-Teile um (`MineShaftLayout.luau`, `CageLayout.luau`); bei einer neuen Version von Felix einfach neu erzeugen.
+- Funktionsteile bleiben im Code: Abbauzonen, Slot-Prompts, Beschriftungen, Lichter, Staub, Ankunftspunkt, Elevator-Prompt. Die Abbauplätze liegen unverändert.
+- Felix' Programm zeigt OBJ-Dateien seitenverkehrt zu Roblox. Der Korb wird deshalb gespiegelt übernommen, damit er wie auf seinem Bild aussieht (Pult links, „01“ lesbar, Motor links). Der Raum bleibt ungespiegelt, damit die Abbauplätze nicht die Seite tauschen.
+- Oben in der Halle steht derselbe Korb (HallLayout.Elevator.Cage ersetzt; Korbboden 0,55 über dem Sockel wie unten auf dem Podest).
+**Affected systems:** MineShaftBuilder, ElevatorCageBuilder, BuildTemplates, LayoutConfig, HallLayout
+
 ## D-097 – Level-Sperren: Drills ab 10, Fahrzeuge ohne Level; Deko-Mitarbeiter weg
 
 **Source:** Felix, 2026-11-19 („Deko ja weg, Rucksäcke mit Level, Drills sollen auf Level 10 anfangen, danach aber ohne Level kaufbar sein, Fahrzeuge auch ohne Level“)

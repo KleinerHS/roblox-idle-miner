@@ -194,7 +194,8 @@ local function buildElevator(plotCFrame: CFrame): Model
 	-- Rampe vorne, damit man bequem hineinläuft
 	part(model, "Ramp", Vector3.new(10, 0.5, 4), o * CFrame.new(0, 0.55, -13.5) * CFrame.Angles(math.rad(-12), 0, 0), METAL_DARK, Enum.Material.DiamondPlate)
 
-	ElevatorCageBuilder.build(model, o * CFrame.new(0, 1.25, 0), "Surface", nil)
+	-- Korbboden 0,55 über dem Sockel wie auf dem Podest in der Mine (Unterwanne/Rampe stehen auf)
+	ElevatorCageBuilder.build(model, o * CFrame.new(0, 1.55, 0), "Surface", nil)
 
 	CollectionService:AddTag(model, "Elevator")
 	return model

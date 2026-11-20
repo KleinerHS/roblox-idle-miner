@@ -1,5 +1,15 @@
 # Implementation Status
 
+## Version 0.66.0 (2026-11-20) – Felix' Mine V5 und neuer Förderkorb (D-098)
+
+| System | Dateien | Status |
+|---|---|---|
+| Mine-Shaft-Raum aus Felix' Modell V5 (406 Teile, Podest weiter hinten, Deckennische für die Winde) | `MineShaftLayout.luau` (neu, erzeugt), `MineShaftBuilder.luau`, `LayoutConfig.luau` | TESTING_REQUIRED |
+| Förderkorb V5 mit Schiebetoren, Pult, „01“, Warnleuchte, Seilwinde – unten und oben gleich | `CageLayout.luau` (neu, erzeugt), `ElevatorCageBuilder.luau`, `BuildTemplates.luau`; Place: `HallLayout.Elevator.Cage` ersetzt – **Place speichern!** Sicherung `assets/HallLayout.rbxm` (Rücktest 6.557 Objekte, 0 Abweichungen) | TESTING_REQUIRED |
+| Umwandler OBJ → Luau-Daten | `tools/obj_to_luau.py` | IMPLEMENTED |
+
+Selbsttest (Play, Testprofil): Mine wird ohne Fehler gebaut (800 Teile inkl. Korb), Tore schließen/öffnen, Warnleuchte an/aus; Fahrt Oberfläche → Mine 1 → Oberfläche funktioniert; Korb oben sieht aus wie Felix' Bild (Pult links, „01“ lesbar, Motor links). Testmodus danach aus.
+
 ## Version 0.65.3 (2026-11-19) – Level-Sperren Drills/Fahrzeuge, Deko-Mitarbeiter weg (D-097)
 
 | System | Dateien | Status |
