@@ -1,5 +1,14 @@
 # Implementation Status
 
+## Version 0.67.3 (2026-11-20) – Track Car (D-102)
+
+| System | Dateien | Status |
+|---|---|---|
+| Neues Fahrzeug „Track Car“ (Creator-Store-Modell ohne Logos, Schriftzüge, Nummernschild; dunkle Scheiben, fehlende Seitenscheiben ergänzt), nur im Kauf-Fenster | `Vehicles.luau`; Place: `Vendor.VehicleBodies.vehicle_trackcar`, `Vendor.AChassis.Tunes.vehicle_trackcar` – **Place speichern!** Sicherungen `assets/VehicleBodies.rbxm`, `assets/AChassis.rbxm` | TESTING_REQUIRED |
+| Werte (Preis 210.000, Ladung 8.500, Tempo 74, Beschleunigung 1,55) | `Vehicles.luau` | TODO_BALANCE |
+
+Selbsttest (Play, Testprofil): per DevTool gegeben und ausgeparkt, Einsteigen und Fahren ohne Fehler; Fotos von vorne und von der Seite ohne Logos, Scheiben dunkel. Rücktest Sicherungen 0 Abweichungen. Testmodus danach aus.
+
 ## Version 0.67.2 (2026-11-20) – Sports Coupe (D-101)
 
 | System | Dateien | Status |

@@ -1,5 +1,15 @@
 # Decision Log
 
+## D-102 – Track Car
+
+**Source:** Felix, 2026-11-20 (Link Creator Store 10852828237)
+**Decision:**
+- Übernommen als `vehicle_trackcar` / „Track Car“. Entfernt: alle Skripte, Sounds und das mitgebrachte Fahrwerk, Nummernschild und Halter, alle Teile mit Hersteller-Wappen und Schriftzügen (Chrom-Schriftzüge, Wappen auf Haube, Felgen und Lenkrad). Zwei Rücklicht-Teile hießen wie Räder (RR) und wurden für die Rad-Erkennung umbenannt.
+- Die Seitenscheiben waren im Original unsichtbar (offen); sie sind als dunkle Scheiben ergänzt (alle Fahrzeuge mit dunklen, undurchsichtigen Scheiben).
+- Fahrwerk vom Pickup abgeleitet (Gewicht 1.450, Drehmoment 400, Drehzahl bis 9.000).
+- Nur im Kauf-Fenster. Werte als Vorschlag, TODO_BALANCE: Preis 210.000, Ladung 8.500, Tempo 74, Beschleunigung 1,55. Sortierung: Sport Sedan → Sports Coupe → Track Car → Hypercar.
+**Affected systems:** Vehicles, AChassis-Tunes, VehicleBodies
+
 ## D-101 – Sports Coupe
 
 **Source:** Felix, 2026-11-20 (Link Creator Store 9693496707)
