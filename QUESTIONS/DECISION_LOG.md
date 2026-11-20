@@ -1,5 +1,15 @@
 # Decision Log
 
+## D-107 – Hybrid Hypercar
+
+**Source:** Felix, 2026-11-20 (Link Creator Store 12168843278)
+**Decision:**
+- Übernommen als `vehicle_hybridhyper` / „Hybrid Hypercar“. Entfernt: alle Skripte, Sounds und das mitgebrachte Fahrwerk. Das Modell hat keine eigenen Logo-Teile; Schriftzüge können nur in den Texturen stecken (Sichtprüfung offen). Vier Licht-Teile hießen wie Räder (FL/RL) und wurden umbenannt.
+- Scheiben dunkel.
+- Fahrwerk vom Pickup abgeleitet (Gewicht 1.400, Drehmoment 440, Drehzahl bis 8.300).
+- Nur im Kauf-Fenster. Werte als Vorschlag, TODO_BALANCE: Preis 248.000, Ladung 8.000, Tempo 75, Beschleunigung 1,6. Sortierung: … Luxury SUV → Hybrid Hypercar → Hypercar.
+**Affected systems:** Vehicles, AChassis-Tunes, VehicleBodies
+
 ## D-106 – Luxury SUV
 
 **Source:** Felix, 2026-11-20 (Link Creator Store 4997399697)

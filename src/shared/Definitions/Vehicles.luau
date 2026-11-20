@@ -187,12 +187,27 @@ local list: { VehicleDefinition } = {
 		PaintColor = Color3.fromRGB(232, 232, 228),
 		PersistenceClass = "Permanent",
 	},
+	-- Felix 2026-11-20 (D-107): Hybrid-Hypercar fürs Autohaus, Creator-Store-Modell (keine Logo-Teile;
+	-- D-026). Nur im Kauf-Fenster. Werte: TODO_BALANCE.
+	{
+		Id = "vehicle_hybridhyper",
+		DisplayName = "Hybrid Hypercar",
+		Tier = 14, -- Sortierung hinter allen Nutzfahrzeugen
+		Style = "Pickup",
+		RequiredLevel = 30, -- nur Bezug für die Preiskurve (Fahrzeuge ohne Level-Sperre, D-097)
+		Price = 248000, -- TODO_BALANCE
+		Capacity = 8000, -- TODO_BALANCE
+		MaxSpeed = 75, -- TODO_BALANCE
+		Acceleration = 1.6, -- TODO_BALANCE
+		PaintColor = Color3.fromRGB(232, 232, 228),
+		PersistenceClass = "Permanent",
+	},
 	-- Felix 2026-11-20 (D-099): Sportwagen fürs Autohaus, Modell aus dem Creator Store ohne Markenlogos
 	-- (D-026). Schnell und spritzig, aber wenig Ladung. Werte sind ein Vorschlag: TODO_BALANCE.
 	{
 		Id = "vehicle_hypercar",
 		DisplayName = "Hypercar",
-		Tier = 14, -- Sortierung hinter allen Nutzfahrzeugen
+		Tier = 15, -- Sortierung hinter allen Nutzfahrzeugen
 		Style = "Pickup",
 		RequiredLevel = 30, -- nur Bezug für die Preiskurve (Fahrzeuge ohne Level-Sperre, D-097)
 		Price = 250000, -- TODO_BALANCE

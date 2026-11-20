@@ -1,5 +1,15 @@
 # Implementation Status
 
+## Version 0.67.8 (2026-11-20) – Hybrid Hypercar (D-107)
+
+| System | Dateien | Status |
+|---|---|---|
+| Neues Fahrzeug „Hybrid Hypercar“ (Creator-Store-Modell, keine Logo-Teile; Scheiben dunkel), nur im Kauf-Fenster | `Vehicles.luau`; Place: `Vendor.VehicleBodies.vehicle_hybridhyper`, `Vendor.AChassis.Tunes.vehicle_hybridhyper` – **Place speichern!** Sicherungen `assets/VehicleBodies.rbxm`, `assets/AChassis.rbxm` | TESTING_REQUIRED |
+| Sichtprüfung (Logos evtl. in Texturen) | – | TESTING_REQUIRED (Studio-Bild schwarz) |
+| Werte (Preis 248.000, Ladung 8.000, Tempo 75, Beschleunigung 1,6) | `Vehicles.luau` | TODO_BALANCE |
+
+Selbsttest (Play, Testprofil): per DevTool gegeben und ausgeparkt, Einsteigen und Fahren (336 Studs in 4 s) ohne Fehler. Rücktest Sicherungen 0 Abweichungen. Testmodus danach aus.
+
 ## Version 0.67.7 (2026-11-20) – Luxury SUV (D-106)
 
 | System | Dateien | Status |
