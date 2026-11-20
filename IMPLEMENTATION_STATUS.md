@@ -1,5 +1,14 @@
 # Implementation Status
 
+## Version 0.67.2 (2026-11-20) – Sports Coupe (D-101)
+
+| System | Dateien | Status |
+|---|---|---|
+| Neues Fahrzeug „Sports Coupe“ (Creator-Store-Modell ohne Logos, Aufkleber, Nummernschild; Fahrwerks-Hilfsteile entfernt; dunkle Scheiben), nur im Kauf-Fenster | `Vehicles.luau`; Place: `Vendor.VehicleBodies.vehicle_sportscoupe`, `Vendor.AChassis.Tunes.vehicle_sportscoupe` – **Place speichern!** Sicherungen `assets/VehicleBodies.rbxm` (ohne die 25 Unions des Coupés), `assets/AChassis.rbxm` | TESTING_REQUIRED |
+| Werte (Preis 180.000, Ladung 9.000, Tempo 72, Beschleunigung 1,45) | `Vehicles.luau` | TODO_BALANCE |
+
+Selbsttest (Play, Testprofil): per DevTool gegeben und ausgeparkt, Einsteigen und Fahren ohne Fehler; Foto von vorne ohne Logos. Rücktest Sicherungen 0 Abweichungen (Unions sind per Skript nicht exportierbar). Testmodus danach aus.
+
 ## Version 0.67.1 (2026-11-20) – Sport Sedan (D-100)
 
 | System | Dateien | Status |

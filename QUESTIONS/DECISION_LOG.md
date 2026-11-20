@@ -1,5 +1,14 @@
 # Decision Log
 
+## D-101 – Sports Coupe
+
+**Source:** Felix, 2026-11-20 (Link Creator Store 9693496707)
+**Decision:**
+- Übernommen als `vehicle_sportscoupe` / „Sports Coupe“. Entfernt: alle Skripte, Sounds und das mitgebrachte Fahrwerk, Nummernschilder, Logo-Teile („Badges“, Schriftzüge), Aufkleber auf den Radmuttern, Felgen-Schild mit Herstellername, 47 Fahrwerks-Hilfsteile (bunt, halbdurchsichtig). Scheiben dunkel, Scheinwerfer-Abdeckung bleibt wie im Original.
+- Fahrwerk vom Pickup abgeleitet (Gewicht 1.500, Drehmoment 380, Drehzahl bis 7.800).
+- Nur im Kauf-Fenster (alle Drehteller belegt). Werte als Vorschlag, TODO_BALANCE: Preis 180.000, Ladung 9.000, Tempo 72, Beschleunigung 1,45. Sortierung: Sport Sedan → Sports Coupe → Hypercar.
+**Affected systems:** Vehicles, AChassis-Tunes, VehicleBodies
+
 ## D-100 – Sport Sedan
 
 **Source:** Felix, 2026-11-20 (Link Creator Store 138845731794216, „füg alle ins Autohaus ein“)
