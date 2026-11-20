@@ -1,5 +1,15 @@
 # Decision Log
 
+## D-105 – Wedge GT
+
+**Source:** Felix, 2026-11-20 (Link Creator Store 9567389725)
+**Decision:**
+- Übernommen als `vehicle_wedge` / „Wedge GT“. Entfernt: alle Skripte, Sounds und das mitgebrachte Fahrwerk, beide Kennzeichen, das Wappen auf der Haube, das Logo im Tacho. Ein Rücklicht-Teil hieß wie ein Rad (RR) und wurde umbenannt.
+- Scheiben dunkel und undurchsichtig. Die große Glasfläche des Modells reicht über die ganze Länge; falls sie auch die Scheinwerfer abdeckt, sind diese jetzt dunkel (Sichtprüfung offen).
+- Fahrwerk vom Pickup abgeleitet (Gewicht 1.500, Drehmoment 430, Drehzahl bis 8.200).
+- Nur im Kauf-Fenster. Werte als Vorschlag, TODO_BALANCE: Preis 245.000, Ladung 8.000, Tempo 75, Beschleunigung 1,55. Sortierung: … Supercar → Wedge GT → Hypercar.
+**Affected systems:** Vehicles, AChassis-Tunes, VehicleBodies
+
 ## D-104 – Supercar
 
 **Source:** Felix, 2026-11-20 (Link Creator Store 5389371630)

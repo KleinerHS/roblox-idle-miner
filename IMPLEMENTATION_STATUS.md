@@ -1,5 +1,15 @@
 # Implementation Status
 
+## Version 0.67.6 (2026-11-20) – Wedge GT (D-105)
+
+| System | Dateien | Status |
+|---|---|---|
+| Neues Fahrzeug „Wedge GT“ (Creator-Store-Modell ohne Logos/Kennzeichen, Scheiben dunkel), nur im Kauf-Fenster | `Vehicles.luau`; Place: `Vendor.VehicleBodies.vehicle_wedge`, `Vendor.AChassis.Tunes.vehicle_wedge` – **Place speichern!** Sicherungen `assets/VehicleBodies.rbxm`, `assets/AChassis.rbxm` | TESTING_REQUIRED |
+| Sichtprüfung (Logos, große Glasfläche inkl. evtl. Scheinwerfer-Abdeckung jetzt dunkel) | – | TESTING_REQUIRED (Studio-Bild schwarz) |
+| Werte (Preis 245.000, Ladung 8.000, Tempo 75, Beschleunigung 1,55) | `Vehicles.luau` | TODO_BALANCE |
+
+Selbsttest (Play, Testprofil): per DevTool gegeben und ausgeparkt, Einsteigen und Fahren (313 Studs in 4 s) ohne Fehler. Rücktest Sicherungen 0 Abweichungen. Testmodus danach aus.
+
 ## Version 0.67.5 (2026-11-20) – Supercar (D-104)
 
 | System | Dateien | Status |
