@@ -1,5 +1,15 @@
 # Decision Log
 
+## D-106 – Luxury SUV
+
+**Source:** Felix, 2026-11-20 (Link Creator Store 4997399697)
+**Decision:**
+- Übernommen als `vehicle_luxurysuv` / „Luxury SUV“. Entfernt: alle Skripte, Sounds und das mitgebrachte Fahrwerk, die Felgen-Logos, der Schriftzug am Heck, das Lenkrad-Logo. Ein Licht-Teil hieß wie ein Rad (RR) und wurde umbenannt. Front-Logo nicht als eigenes Teil gefunden (Sichtprüfung offen).
+- Scheiben dunkel (Front/Heck, Seiten); die große Licht-Glasfläche bleibt.
+- Fahrwerk vom Pickup abgeleitet, schwerer (2.100), Drehmoment 420, Drehzahl bis 7.000.
+- Nur im Kauf-Fenster. Werte als Vorschlag, TODO_BALANCE: Preis 220.000, Ladung 14.000 (mehr Platz als die Sportwagen), Tempo 68, Beschleunigung 1,25.
+**Affected systems:** Vehicles, AChassis-Tunes, VehicleBodies
+
 ## D-105 – Wedge GT
 
 **Source:** Felix, 2026-11-20 (Link Creator Store 9567389725)

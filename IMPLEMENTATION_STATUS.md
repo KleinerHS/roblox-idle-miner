@@ -1,5 +1,15 @@
 # Implementation Status
 
+## Version 0.67.7 (2026-11-20) – Luxury SUV (D-106)
+
+| System | Dateien | Status |
+|---|---|---|
+| Neues Fahrzeug „Luxury SUV“ (Creator-Store-Modell ohne Felgen-Logos, Heck-Schriftzug, Lenkrad-Logo; Scheiben dunkel), nur im Kauf-Fenster | `Vehicles.luau`; Place: `Vendor.VehicleBodies.vehicle_luxurysuv`, `Vendor.AChassis.Tunes.vehicle_luxurysuv` – **Place speichern!** Sicherungen `assets/VehicleBodies.rbxm`, `assets/AChassis.rbxm` | TESTING_REQUIRED |
+| Sichtprüfung (Logo vorne evtl. in Textur) | – | TESTING_REQUIRED (Studio-Bild schwarz) |
+| Werte (Preis 220.000, Ladung 14.000, Tempo 68, Beschleunigung 1,25) | `Vehicles.luau` | TODO_BALANCE |
+
+Selbsttest (Play, Testprofil): per DevTool gegeben und ausgeparkt, Einsteigen und Fahren (310 Studs in 4 s) ohne Fehler. Rücktest Sicherungen 0 Abweichungen. Testmodus danach aus.
+
 ## Version 0.67.6 (2026-11-20) – Wedge GT (D-105)
 
 | System | Dateien | Status |
