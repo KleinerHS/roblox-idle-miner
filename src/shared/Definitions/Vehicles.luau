@@ -127,12 +127,27 @@ local list: { VehicleDefinition } = {
 		PaintColor = Color3.fromRGB(232, 232, 228),
 		PersistenceClass = "Permanent",
 	},
+	-- Felix 2026-11-20 (D-103): klassischer Sportwagen fürs Autohaus, Creator-Store-Modell ohne Logos und
+	-- Kennzeichen (D-026). Nur im Kauf-Fenster. Werte: TODO_BALANCE.
+	{
+		Id = "vehicle_classicsport",
+		DisplayName = "Classic Sports Car",
+		Tier = 10, -- Sortierung hinter allen Nutzfahrzeugen
+		Style = "Pickup",
+		RequiredLevel = 29, -- nur Bezug für die Preiskurve (Fahrzeuge ohne Level-Sperre, D-097)
+		Price = 230000, -- TODO_BALANCE
+		Capacity = 8000, -- TODO_BALANCE
+		MaxSpeed = 74, -- TODO_BALANCE
+		Acceleration = 1.5, -- TODO_BALANCE
+		PaintColor = Color3.fromRGB(232, 232, 228),
+		PersistenceClass = "Permanent",
+	},
 	-- Felix 2026-11-20 (D-099): Sportwagen fürs Autohaus, Modell aus dem Creator Store ohne Markenlogos
 	-- (D-026). Schnell und spritzig, aber wenig Ladung. Werte sind ein Vorschlag: TODO_BALANCE.
 	{
 		Id = "vehicle_hypercar",
 		DisplayName = "Hypercar",
-		Tier = 10, -- Sortierung hinter allen Nutzfahrzeugen
+		Tier = 11, -- Sortierung hinter allen Nutzfahrzeugen
 		Style = "Pickup",
 		RequiredLevel = 30, -- nur Bezug für die Preiskurve (Fahrzeuge ohne Level-Sperre, D-097)
 		Price = 250000, -- TODO_BALANCE

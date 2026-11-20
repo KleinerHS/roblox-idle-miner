@@ -1,5 +1,15 @@
 # Decision Log
 
+## D-103 – Classic Sports Car
+
+**Source:** Felix, 2026-11-20 (Link Creator Store 5421203592)
+**Decision:**
+- Übernommen als `vehicle_classicsport` / „Classic Sports Car“. Entfernt: alle Skripte und das mitgebrachte Fahrwerk, das Wappen-Teil vorne und das Kennzeichen-Bild. Die Karosserie besteht aus wenigen großen Meshes mit aufgemalten Texturen; falls darin noch Logos sichtbar sind, müssen die betroffenen Texturen ersetzt werden (Sichtprüfung offen).
+- Scheiben dunkel und undurchsichtig (Glas-Textur entfernt).
+- Fahrwerk vom Pickup abgeleitet (Gewicht 1.300, Drehmoment 390, Drehzahl bis 7.800).
+- Nur im Kauf-Fenster. Werte als Vorschlag, TODO_BALANCE: Preis 230.000, Ladung 8.000, Tempo 74, Beschleunigung 1,5. Sortierung: Sport Sedan → Sports Coupe → Track Car → Classic Sports Car → Hypercar.
+**Affected systems:** Vehicles, AChassis-Tunes, VehicleBodies
+
 ## D-102 – Track Car
 
 **Source:** Felix, 2026-11-20 (Link Creator Store 10852828237)

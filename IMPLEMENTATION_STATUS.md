@@ -1,5 +1,15 @@
 # Implementation Status
 
+## Version 0.67.4 (2026-11-20) – Classic Sports Car (D-103)
+
+| System | Dateien | Status |
+|---|---|---|
+| Neues Fahrzeug „Classic Sports Car“ (Creator-Store-Modell, Wappen-Teil und Kennzeichen-Bild entfernt, Scheiben dunkel), nur im Kauf-Fenster | `Vehicles.luau`; Place: `Vendor.VehicleBodies.vehicle_classicsport`, `Vendor.AChassis.Tunes.vehicle_classicsport` – **Place speichern!** Sicherungen `assets/VehicleBodies.rbxm`, `assets/AChassis.rbxm` | TESTING_REQUIRED |
+| Sichtprüfung auf Logos in den Texturen | – | TESTING_REQUIRED (Studio-Bild war beim Test schwarz, Fotos nicht möglich) |
+| Werte (Preis 230.000, Ladung 8.000, Tempo 74, Beschleunigung 1,5) | `Vehicles.luau` | TODO_BALANCE |
+
+Selbsttest (Play, Testprofil): per DevTool gegeben und ausgeparkt, Einsteigen und Fahren ohne Fehler. Rücktest Sicherungen 0 Abweichungen. Testmodus danach aus.
+
 ## Version 0.67.3 (2026-11-20) – Track Car (D-102)
 
 | System | Dateien | Status |
