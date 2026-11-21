@@ -1,5 +1,15 @@
 # Implementation Status
 
+## Version 0.68.0 (2026-11-21) – Fünf weitere Autos (D-108)
+
+| System | Dateien | Status |
+|---|---|---|
+| Neue Fahrzeuge „Hot Hatch“, „Compact Coupe“, „Sport Estate“, „Grand SUV“, „Supercar Spyder“ (Creator-Store-Modelle ohne Logos, Kennzeichen und Zubehör; Scheiben dunkel), nur im Kauf-Fenster | `Vehicles.luau`; Place: `Vendor.VehicleBodies.*`, `Vendor.AChassis.Tunes.*` – **Place speichern!** Sicherungen `assets/VehicleBodies.rbxm`, `assets/AChassis.rbxm` | TESTING_REQUIRED |
+| Sichtprüfung auf Logos (in Texturen) | – | TESTING_REQUIRED (Studio-Bild schwarz) |
+| Werte (siehe D-108) | `Vehicles.luau` | TODO_BALANCE |
+
+Selbsttest (Play, Testprofil): alle fünf per DevTool gegeben, ausgeparkt, eingestiegen und je 4 s gefahren (150–285 Studs) ohne Fehler. Rücktest Sicherungen 0 Abweichungen (Unions und namenlose Teile wie bekannt ausgenommen). Testmodus danach aus.
+
 ## Version 0.67.8 (2026-11-20) – Hybrid Hypercar (D-107)
 
 | System | Dateien | Status |

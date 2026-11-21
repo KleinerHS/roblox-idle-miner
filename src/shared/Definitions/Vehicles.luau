@@ -202,12 +202,79 @@ local list: { VehicleDefinition } = {
 		PaintColor = Color3.fromRGB(232, 232, 228),
 		PersistenceClass = "Permanent",
 	},
+	-- Felix 2026-11-21 (D-108): fünf weitere Autos fürs Autohaus, Creator-Store-Modelle ohne Logos,
+	-- Kennzeichen und Zubehör-Krempel (D-026). Nur im Kauf-Fenster. Werte: TODO_BALANCE.
+	{
+		Id = "vehicle_hatch",
+		DisplayName = "Hot Hatch", -- kleiner Kompaktwagen
+		Tier = 15, -- Sortierung hinter allen Nutzfahrzeugen
+		Style = "Pickup",
+		RequiredLevel = 20, -- nur Bezug für die Preiskurve (Fahrzeuge ohne Level-Sperre, D-097)
+		Price = 45000, -- TODO_BALANCE
+		Capacity = 7000, -- TODO_BALANCE
+		MaxSpeed = 62, -- TODO_BALANCE
+		Acceleration = 1.2, -- TODO_BALANCE
+		PaintColor = Color3.fromRGB(232, 232, 228),
+		PersistenceClass = "Permanent",
+	},
+	{
+		Id = "vehicle_compact",
+		DisplayName = "Compact Coupe", -- Kompakt-Coupé
+		Tier = 16, -- Sortierung hinter allen Nutzfahrzeugen
+		Style = "Pickup",
+		RequiredLevel = 20, -- nur Bezug für die Preiskurve (Fahrzeuge ohne Level-Sperre, D-097)
+		Price = 60000, -- TODO_BALANCE
+		Capacity = 7500, -- TODO_BALANCE
+		MaxSpeed = 63, -- TODO_BALANCE
+		Acceleration = 1.2, -- TODO_BALANCE
+		PaintColor = Color3.fromRGB(232, 232, 228),
+		PersistenceClass = "Permanent",
+	},
+	{
+		Id = "vehicle_estate",
+		DisplayName = "Sport Estate", -- Sport-Kombi mit viel Laderaum
+		Tier = 17, -- Sortierung hinter allen Nutzfahrzeugen
+		Style = "Pickup",
+		RequiredLevel = 25, -- nur Bezug für die Preiskurve (Fahrzeuge ohne Level-Sperre, D-097)
+		Price = 140000, -- TODO_BALANCE
+		Capacity = 16000, -- TODO_BALANCE
+		MaxSpeed = 70, -- TODO_BALANCE
+		Acceleration = 1.35, -- TODO_BALANCE
+		PaintColor = Color3.fromRGB(232, 232, 228),
+		PersistenceClass = "Permanent",
+	},
+	{
+		Id = "vehicle_grandsuv",
+		DisplayName = "Grand SUV", -- großer SUV mit viel Laderaum
+		Tier = 18, -- Sortierung hinter allen Nutzfahrzeugen
+		Style = "Pickup",
+		RequiredLevel = 25, -- nur Bezug für die Preiskurve (Fahrzeuge ohne Level-Sperre, D-097)
+		Price = 160000, -- TODO_BALANCE
+		Capacity = 18000, -- TODO_BALANCE
+		MaxSpeed = 64, -- TODO_BALANCE
+		Acceleration = 1.1, -- TODO_BALANCE
+		PaintColor = Color3.fromRGB(232, 232, 228),
+		PersistenceClass = "Permanent",
+	},
+	{
+		Id = "vehicle_slotsuper",
+		DisplayName = "Supercar Spyder", -- offener Supersportwagen
+		Tier = 19, -- Sortierung hinter allen Nutzfahrzeugen
+		Style = "Pickup",
+		RequiredLevel = 30, -- nur Bezug für die Preiskurve (Fahrzeuge ohne Level-Sperre, D-097)
+		Price = 235000, -- TODO_BALANCE
+		Capacity = 8000, -- TODO_BALANCE
+		MaxSpeed = 75, -- TODO_BALANCE
+		Acceleration = 1.55, -- TODO_BALANCE
+		PaintColor = Color3.fromRGB(232, 232, 228),
+		PersistenceClass = "Permanent",
+	},
 	-- Felix 2026-11-20 (D-099): Sportwagen fürs Autohaus, Modell aus dem Creator Store ohne Markenlogos
 	-- (D-026). Schnell und spritzig, aber wenig Ladung. Werte sind ein Vorschlag: TODO_BALANCE.
 	{
 		Id = "vehicle_hypercar",
 		DisplayName = "Hypercar",
-		Tier = 15, -- Sortierung hinter allen Nutzfahrzeugen
+		Tier = 20, -- Sortierung hinter allen Nutzfahrzeugen
 		Style = "Pickup",
 		RequiredLevel = 30, -- nur Bezug für die Preiskurve (Fahrzeuge ohne Level-Sperre, D-097)
 		Price = 250000, -- TODO_BALANCE

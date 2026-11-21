@@ -1,5 +1,18 @@
 # Decision Log
 
+## D-108 – Fünf weitere Autos
+
+**Source:** Felix, 2026-11-20/21 (Links Creator Store 18517158235, 12491949935, 11801816336, 18480786589, 18511078771)
+**Decision:**
+- `vehicle_hatch` „Hot Hatch“ (Kompaktwagen): Kennzeichen und Schild entfernt.
+- `vehicle_compact` „Compact Coupe“: Kennzeichen entfernt (keine Logo-Teile gefunden).
+- `vehicle_estate` „Sport Estate“ (Kombi): Front-, Heck-, Felgen- und Tacho-Logos, Kennzeichen entfernt. Sehr detailreich (Motorraum, ~1.450 Teile) – auf schwachen Geräten beobachten.
+- `vehicle_grandsuv` „Grand SUV“: nur das Auto übernommen (ohne mitgelieferten Schlüssel); Front-Teil mit Logo-Bild und Heck-Emblem entfernt; viele Teile hießen wie Räder und wurden umbenannt.
+- `vehicle_slotsuper` „Supercar Spyder“: Zubehör entfernt (Kissen mit Anime-Motiv, Dachbox, Turbolader, Kamera mit Halterung, Schattenteil).
+- Alle: Skripte, Sounds und mitgebrachte Fahrwerke entfernt, Scheiben dunkel, Fahrwerk vom Pickup abgeleitet.
+- Nur im Kauf-Fenster. Werte als Vorschlag, TODO_BALANCE: Hot Hatch 45.000 / 7.000 / 62 / 1,2; Compact Coupe 60.000 / 7.500 / 63 / 1,2; Sport Estate 140.000 / 16.000 / 70 / 1,35; Grand SUV 160.000 / 18.000 / 64 / 1,1; Supercar Spyder 235.000 / 8.000 / 75 / 1,55 (Preis / Ladung / Tempo / Beschleunigung). Hypercar rückt auf Tier 20.
+**Affected systems:** Vehicles, AChassis-Tunes, VehicleBodies
+
 ## D-107 – Hybrid Hypercar
 
 **Source:** Felix, 2026-11-20 (Link Creator Store 12168843278)
